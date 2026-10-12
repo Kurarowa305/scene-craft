@@ -1,0 +1,42 @@
+{
+  "formula": "clamp(1 - L(normal Diffuse Direct) / L(no_shadow Diffuse Direct), 0, 1)",
+  "luminance_weights": [
+    0.2126,
+    0.7152,
+    0.0722
+  ],
+  "epsilon": 1e-06,
+  "zero_denominator_policy": "mask=0",
+  "view_transform_applied": false,
+  "normal_sha256": "9e0a06975f420fd8333ba25b70d2646627b34edb40d6957d5c6370449b32d930",
+  "no_shadow_sha256": "5722df1f6ef89a577500aef7e7c6017f309ec3f31fa65add027ec7a8c60a5b78",
+  "mask_png": "/mnt/c/Users/oy_ta/AppData/Local/Temp/scene-craft-issue4-probe/shadow-ratio-mask.png",
+  "size": [
+    96,
+    96
+  ],
+  "normal_y_range": [
+    0.016547278947010635,
+    0.6639871763944626
+  ],
+  "no_shadow_y_range": [
+    0.020151915828138592,
+    0.6639871763944626
+  ],
+  "mask_range": [
+    0.0,
+    0.936549775439104
+  ],
+  "valid_denominator_pixels": 9216,
+  "mask_pixels_above_0_05": 338,
+  "mask_pixels_above_0_5": 282,
+  "negative_unclamped_pixels": 0,
+  "max_mask_pixel": {
+    "x": 43,
+    "y": 64,
+    "normal_y": 0.020181351087242366,
+    "no_shadow_y": 0.3180658733189106,
+    "mask": 0.936549775439104
+  },
+  "scope": "Synthetic opaque cube/ground; program-derived adjustment mask, not adopted"
+}

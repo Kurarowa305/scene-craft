@@ -1,0 +1,34 @@
+{
+  "blender": "5.2.2 LTS",
+  "engine": "CYCLES",
+  "device": "CPU",
+  "samples": 64,
+  "seed": 173,
+  "adaptive_sampling": false,
+  "denoising": false,
+  "size": [
+    96,
+    96
+  ],
+  "input": "C:\\Users\\oy_ta\\AppData\\Local\\Temp\\scene-craft-issue4-probe\\render-input.blend",
+  "mesh_settings": [
+    {
+      "name": "Cube",
+      "property_exists": true,
+      "original_visible_shadow": true,
+      "original_shadow_catcher": false
+    },
+    {
+      "name": "Probe_Ground",
+      "property_exists": true,
+      "original_visible_shadow": true,
+      "original_shadow_catcher": false
+    }
+  ],
+  "timings_seconds": {
+    "normal": 0.045573400013381615,
+    "no_shadow": 0.04018390001147054
+  },
+  "input_saved_over": false,
+  "changed_between_renders": "visible_shadow on all mesh objects"
+}

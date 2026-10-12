@@ -1,0 +1,19 @@
+{
+  "blender": "5.2.2 LTS",
+  "engine": "CYCLES",
+  "device": "CPU",
+  "samples": 16,
+  "size": [
+    96,
+    96
+  ],
+  "pid": 692,
+  "seconds": 0.08809060000930913,
+  "input": "C:\\Users\\oy_ta\\AppData\\Local\\Temp\\scene-craft-issue4-probe\\render-input.blend",
+  "output": "C:\\Users\\oy_ta\\AppData\\Local\\Temp\\scene-craft-issue4-probe\\shadow-catcher-passes.exr",
+  "receiver_objects": [
+    "Probe_Ground"
+  ],
+  "use_pass_shadow_catcher": true,
+  "input_saved_over": false
+}
