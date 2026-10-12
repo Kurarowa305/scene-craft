@@ -11,7 +11,7 @@ Issue の状態・依存関係・担当者は GitHub を正とする。この一
 | 領域 | 設計 Issue | 設計資料の作成先 |
 | --- | --- | --- |
 | LLM 接続・費用制約 | [LLM 接続と費用制約を満たす方式を決める](https://github.com/Kurarowa305/scene-craft/issues/2) | [llm-connection.md](llm-connection.md)（設計合意済み） |
-| 全体構成・OS の責務 | [アプリ全体と Windows・WSL の責務を決める](https://github.com/Kurarowa305/scene-craft/issues/3) | `application-architecture.md` |
+| 全体構成・OS の責務 | [アプリ全体と Windows・WSL の責務を決める](https://github.com/Kurarowa305/scene-craft/issues/3) | [application-architecture.md](application-architecture.md)（配置・技術構成・終了方針・Codex 領域分離は合意済み、接続・生存管理は検討中） |
 | Blender 連携・出力 | [Blender の操作経路とレンダー出力契約を決める](https://github.com/Kurarowa305/scene-craft/issues/4) | `blender-integration.md` |
 | ドメイン・データモデル | [作品と制作履歴のデータモデルを決める](https://github.com/Kurarowa305/scene-craft/issues/5) | `domain-data-model.md` |
 | 保存・復元・バックアップ | [制作データの保存・復元・バックアップ方式を決める](https://github.com/Kurarowa305/scene-craft/issues/6) | `artifact-storage.md` |
