@@ -1,0 +1,52 @@
+{
+  "experiment_date": "2026-10-12",
+  "render": {
+    "blender": "5.2.2 LTS",
+    "pid": 19896,
+    "engine": "CYCLES",
+    "size": [
+      96,
+      96
+    ],
+    "seconds": 0.3337900000042282,
+    "exr_bytes": 427533,
+    "png_bytes": 46979,
+    "scene_saved": true,
+    "view_transform": "AgX",
+    "display_device": "sRGB"
+  },
+  "render_exit_code": 0,
+  "initial_invalid_media_type_python_error_exit_code": 17,
+  "stop_immediate": {
+    "scope": "forced termination after render_init; saved checkpoint retained",
+    "creation_time": "2026-10-12T15:45:25.7072730+09:00",
+    "still_running": true,
+    "pid": 3712,
+    "complete_present": false,
+    "checkpoint_present": true
+  },
+  "stop_after_wsl_exit": {
+    "partial_image_present": false,
+    "checkpoint_present": true,
+    "pid": 3712,
+    "complete_present": false,
+    "process_absent": true
+  },
+  "stopped_wsl_exit_code": 255,
+  "checkpoint_reopen": {
+    "success": true,
+    "objects": [
+      "Camera",
+      "Cube",
+      "Light"
+    ],
+    "engine": "CYCLES",
+    "samples": 100000
+  },
+  "limits": [
+    "CPU tiny synthetic scene only",
+    "Forced termination after render_init, not cooperative cancellation",
+    "No mid-save interruption or GPU test",
+    "No real artwork or Photoshop automation"
+  ]
+}

@@ -1,0 +1,210 @@
+{
+  "experiment_date": "2026-10-12",
+  "platform": "Linux-6.18.40.1-microsoft-standard-WSL2-x86_64-with-glibc2.43",
+  "python": "3.14.4",
+  "packages": {
+    "PhotoshopAPI": "0.9.1",
+    "psd-tools": "1.24.0",
+    "numpy": "2.5.4"
+  },
+  "output_psd": "/mnt/c/Users/oy_ta/AppData/Local/Temp/scene-craft-issue4-probe/13-passes-16bit-validated.psd",
+  "raw_psd": "/mnt/c/Users/oy_ta/AppData/Local/Temp/scene-craft-issue4-probe/13-passes-16bit-validated.raw.psd",
+  "raw_layer_names": [
+    "Ambient Occlusion\u0000",
+    "Indirect Lighting\u0000",
+    "Reflections\u0000",
+    "Refractions\u0000",
+    "Shadows\u0000",
+    "Global Alpha Mask\u0000",
+    "Z Depth\u0000",
+    "Diffuse Lighting\u0000",
+    "Specular Lighting\u0000",
+    "Material color\u0000",
+    "Object ID\u0000",
+    "Material ID\u0000",
+    "Combined\u0000"
+  ],
+  "name_normalization": "psd-tools rstrip terminal NUL and re-save",
+  "sha256": "520934d4abe1b8efe4a59e4d7fbe8a5f474b29e6303b4b3b43063a22a69cb17e",
+  "bytes": 7716,
+  "header": {
+    "version": 1,
+    "channels": 3,
+    "width": 32,
+    "height": 24,
+    "depth": 16,
+    "color_mode": "RGB"
+  },
+  "layer_count": 13,
+  "layers_parser_order_bottom_to_top": [
+    {
+      "name": "Ambient Occlusion",
+      "visible": false,
+      "kind": "pixel",
+      "bbox": [
+        0,
+        0,
+        32,
+        24
+      ],
+      "rgb_16bit_samples_exact": true
+    },
+    {
+      "name": "Indirect Lighting",
+      "visible": false,
+      "kind": "pixel",
+      "bbox": [
+        0,
+        0,
+        32,
+        24
+      ],
+      "rgb_16bit_samples_exact": true
+    },
+    {
+      "name": "Reflections",
+      "visible": false,
+      "kind": "pixel",
+      "bbox": [
+        0,
+        0,
+        32,
+        24
+      ],
+      "rgb_16bit_samples_exact": true
+    },
+    {
+      "name": "Refractions",
+      "visible": false,
+      "kind": "pixel",
+      "bbox": [
+        0,
+        0,
+        32,
+        24
+      ],
+      "rgb_16bit_samples_exact": true
+    },
+    {
+      "name": "Shadows",
+      "visible": false,
+      "kind": "pixel",
+      "bbox": [
+        0,
+        0,
+        32,
+        24
+      ],
+      "rgb_16bit_samples_exact": true
+    },
+    {
+      "name": "Global Alpha Mask",
+      "visible": false,
+      "kind": "pixel",
+      "bbox": [
+        0,
+        0,
+        32,
+        24
+      ],
+      "rgb_16bit_samples_exact": true
+    },
+    {
+      "name": "Z Depth",
+      "visible": false,
+      "kind": "pixel",
+      "bbox": [
+        0,
+        0,
+        32,
+        24
+      ],
+      "rgb_16bit_samples_exact": true
+    },
+    {
+      "name": "Diffuse Lighting",
+      "visible": false,
+      "kind": "pixel",
+      "bbox": [
+        0,
+        0,
+        32,
+        24
+      ],
+      "rgb_16bit_samples_exact": true
+    },
+    {
+      "name": "Specular Lighting",
+      "visible": false,
+      "kind": "pixel",
+      "bbox": [
+        0,
+        0,
+        32,
+        24
+      ],
+      "rgb_16bit_samples_exact": true
+    },
+    {
+      "name": "Material color",
+      "visible": false,
+      "kind": "pixel",
+      "bbox": [
+        0,
+        0,
+        32,
+        24
+      ],
+      "rgb_16bit_samples_exact": true
+    },
+    {
+      "name": "Object ID",
+      "visible": false,
+      "kind": "pixel",
+      "bbox": [
+        0,
+        0,
+        32,
+        24
+      ],
+      "rgb_16bit_samples_exact": true
+    },
+    {
+      "name": "Material ID",
+      "visible": false,
+      "kind": "pixel",
+      "bbox": [
+        0,
+        0,
+        32,
+        24
+      ],
+      "rgb_16bit_samples_exact": true
+    },
+    {
+      "name": "Combined",
+      "visible": true,
+      "kind": "pixel",
+      "bbox": [
+        0,
+        0,
+        32,
+        24
+      ],
+      "rgb_16bit_samples_exact": true
+    }
+  ],
+  "checks": {
+    "header_16bit_rgb_psd": true,
+    "exact_names": true,
+    "only_combined_visible": true,
+    "all_rgb_samples_exact": true
+  },
+  "limitations": [
+    "Synthetic 32x24 RGB arrays only; no real render passes",
+    "Photoshop application has not opened or validated the file",
+    "No ICC profile or alpha-channel preservation experiment",
+    "PhotoshopAPI documents no valid merged preview; not repaired here",
+    "No large-file/performance or PSD size-limit validation"
+  ]
+}

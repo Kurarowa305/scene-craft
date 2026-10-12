@@ -1,0 +1,33 @@
+{
+  "date": "2026-10-12",
+  "profile": "sRGB",
+  "icc_sha256": "5e979eff8a3c97c4ffb797f1c5d343b7f3e3ee65b8254cdf76d4249ea825ff62",
+  "results": [
+    {
+      "path": "/mnt/c/Users/oy_ta/AppData/Local/Temp/scene-craft-issue4-probe/13-passes-srgb-probe.psd",
+      "version": 1,
+      "depth": 16,
+      "layers": 13,
+      "profile_exact": true,
+      "rgb_samples_exact": true,
+      "only_combined_visible": true,
+      "bytes": 8328
+    },
+    {
+      "path": "/mnt/c/Users/oy_ta/AppData/Local/Temp/scene-craft-issue4-probe/13-passes-srgb-probe.psb",
+      "version": 2,
+      "depth": 16,
+      "layers": 13,
+      "profile_exact": true,
+      "rgb_samples_exact": true,
+      "only_combined_visible": true,
+      "bytes": 8640
+    }
+  ],
+  "limits": [
+    "Small synthetic files; not a >2GB fallback test",
+    "ICC embedding only, not linear-to-sRGB or AgX conversion",
+    "No Photoshop display or merged preview test",
+    "Names compared after trimming observed terminal NUL"
+  ]
+}

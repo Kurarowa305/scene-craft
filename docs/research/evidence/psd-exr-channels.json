@@ -1,0 +1,535 @@
+{
+  "source": "/mnt/c/Users/oy_ta/AppData/Local/Temp/scene-craft-issue4-probe/render-passes.exr",
+  "sha256": "65b6a020b9a13040bcd3113016b313bce1ef1ef28dbcac81d500e52e13be3247",
+  "OpenEXR": "3.5.2",
+  "part_count": 15,
+  "parts": [
+    {
+      "name": "ViewLayer.Combined",
+      "channels": {
+        "ViewLayer.Combined.A": {
+          "shape": [
+            96,
+            96
+          ],
+          "dtype": "float32",
+          "min": 1.0,
+          "max": 1.0,
+          "nonzero_samples": 9216,
+          "all_finite": true
+        },
+        "ViewLayer.Combined.B": {
+          "shape": [
+            96,
+            96
+          ],
+          "dtype": "float32",
+          "min": 0.0032786016818135977,
+          "max": 0.45219823718070984,
+          "nonzero_samples": 9216,
+          "all_finite": true
+        },
+        "ViewLayer.Combined.G": {
+          "shape": [
+            96,
+            96
+          ],
+          "dtype": "float32",
+          "min": 0.005691876169294119,
+          "max": 0.4541063606739044,
+          "nonzero_samples": 9216,
+          "all_finite": true
+        },
+        "ViewLayer.Combined.R": {
+          "shape": [
+            96,
+            96
+          ],
+          "dtype": "float32",
+          "min": 0.027891499921679497,
+          "max": 0.46584680676460266,
+          "nonzero_samples": 9216,
+          "all_finite": true
+        }
+      }
+    },
+    {
+      "name": "ViewLayer.Depth",
+      "channels": {
+        "ViewLayer.Depth.Z": {
+          "shape": [
+            96,
+            96
+          ],
+          "dtype": "float32",
+          "min": 7.796252727508545,
+          "max": 47.18216323852539,
+          "nonzero_samples": 9216,
+          "all_finite": true
+        }
+      }
+    },
+    {
+      "name": "ViewLayer.Object Index",
+      "channels": {
+        "ViewLayer.Object Index.X": {
+          "shape": [
+            96,
+            96
+          ],
+          "dtype": "float32",
+          "min": 1.0,
+          "max": 2.0,
+          "nonzero_samples": 9216,
+          "all_finite": true
+        }
+      }
+    },
+    {
+      "name": "ViewLayer.Material Index",
+      "channels": {
+        "ViewLayer.Material Index.X": {
+          "shape": [
+            96,
+            96
+          ],
+          "dtype": "float32",
+          "min": 1.0,
+          "max": 2.0,
+          "nonzero_samples": 9216,
+          "all_finite": true
+        }
+      }
+    },
+    {
+      "name": "ViewLayer.Diffuse Direct",
+      "channels": {
+        "ViewLayer.Diffuse Direct.B": {
+          "shape": [
+            96,
+            96
+          ],
+          "dtype": "float32",
+          "min": 0.0,
+          "max": 0.6723132729530334,
+          "nonzero_samples": 9192,
+          "all_finite": true
+        },
+        "ViewLayer.Diffuse Direct.G": {
+          "shape": [
+            96,
+            96
+          ],
+          "dtype": "float32",
+          "min": 0.0,
+          "max": 0.6723132133483887,
+          "nonzero_samples": 9192,
+          "all_finite": true
+        },
+        "ViewLayer.Diffuse Direct.R": {
+          "shape": [
+            96,
+            96
+          ],
+          "dtype": "float32",
+          "min": 0.0,
+          "max": 0.6723132729530334,
+          "nonzero_samples": 9192,
+          "all_finite": true
+        }
+      }
+    },
+    {
+      "name": "ViewLayer.Diffuse Indirect",
+      "channels": {
+        "ViewLayer.Diffuse Indirect.B": {
+          "shape": [
+            96,
+            96
+          ],
+          "dtype": "float32",
+          "min": 0.0,
+          "max": 0.3399668335914612,
+          "nonzero_samples": 1871,
+          "all_finite": true
+        },
+        "ViewLayer.Diffuse Indirect.G": {
+          "shape": [
+            96,
+            96
+          ],
+          "dtype": "float32",
+          "min": 0.0,
+          "max": 0.34526190161705017,
+          "nonzero_samples": 1871,
+          "all_finite": true
+        },
+        "ViewLayer.Diffuse Indirect.R": {
+          "shape": [
+            96,
+            96
+          ],
+          "dtype": "float32",
+          "min": 0.0,
+          "max": 0.45190319418907166,
+          "nonzero_samples": 1871,
+          "all_finite": true
+        }
+      }
+    },
+    {
+      "name": "ViewLayer.Diffuse Color",
+      "channels": {
+        "ViewLayer.Diffuse Color.B": {
+          "shape": [
+            96,
+            96
+          ],
+          "dtype": "float32",
+          "min": 0.02691436931490898,
+          "max": 0.7630609273910522,
+          "nonzero_samples": 9216,
+          "all_finite": true
+        },
+        "ViewLayer.Diffuse Color.G": {
+          "shape": [
+            96,
+            96
+          ],
+          "dtype": "float32",
+          "min": 0.07177165150642395,
+          "max": 0.7630609273910522,
+          "nonzero_samples": 9216,
+          "all_finite": true
+        },
+        "ViewLayer.Diffuse Color.R": {
+          "shape": [
+            96,
+            96
+          ],
+          "dtype": "float32",
+          "min": 0.5382874011993408,
+          "max": 0.7630609273910522,
+          "nonzero_samples": 9216,
+          "all_finite": true
+        }
+      }
+    },
+    {
+      "name": "ViewLayer.Glossy Direct",
+      "channels": {
+        "ViewLayer.Glossy Direct.B": {
+          "shape": [
+            96,
+            96
+          ],
+          "dtype": "float32",
+          "min": 0.0,
+          "max": 0.7736709117889404,
+          "nonzero_samples": 9192,
+          "all_finite": true
+        },
+        "ViewLayer.Glossy Direct.G": {
+          "shape": [
+            96,
+            96
+          ],
+          "dtype": "float32",
+          "min": 0.0,
+          "max": 0.7736709117889404,
+          "nonzero_samples": 9192,
+          "all_finite": true
+        },
+        "ViewLayer.Glossy Direct.R": {
+          "shape": [
+            96,
+            96
+          ],
+          "dtype": "float32",
+          "min": 0.0,
+          "max": 0.7736709117889404,
+          "nonzero_samples": 9192,
+          "all_finite": true
+        }
+      }
+    },
+    {
+      "name": "ViewLayer.Glossy Indirect",
+      "channels": {
+        "ViewLayer.Glossy Indirect.B": {
+          "shape": [
+            96,
+            96
+          ],
+          "dtype": "float32",
+          "min": 0.0,
+          "max": 1.0333698987960815,
+          "nonzero_samples": 1871,
+          "all_finite": true
+        },
+        "ViewLayer.Glossy Indirect.G": {
+          "shape": [
+            96,
+            96
+          ],
+          "dtype": "float32",
+          "min": 0.0,
+          "max": 1.051650047302246,
+          "nonzero_samples": 1871,
+          "all_finite": true
+        },
+        "ViewLayer.Glossy Indirect.R": {
+          "shape": [
+            96,
+            96
+          ],
+          "dtype": "float32",
+          "min": 0.0,
+          "max": 1.9386467933654785,
+          "nonzero_samples": 1871,
+          "all_finite": true
+        }
+      }
+    },
+    {
+      "name": "ViewLayer.Glossy Color",
+      "channels": {
+        "ViewLayer.Glossy Color.B": {
+          "shape": [
+            96,
+            96
+          ],
+          "dtype": "float32",
+          "min": 0.046173855662345886,
+          "max": 0.1780969649553299,
+          "nonzero_samples": 9216,
+          "all_finite": true
+        },
+        "ViewLayer.Glossy Color.G": {
+          "shape": [
+            96,
+            96
+          ],
+          "dtype": "float32",
+          "min": 0.046173855662345886,
+          "max": 0.1780969649553299,
+          "nonzero_samples": 9216,
+          "all_finite": true
+        },
+        "ViewLayer.Glossy Color.R": {
+          "shape": [
+            96,
+            96
+          ],
+          "dtype": "float32",
+          "min": 0.046173855662345886,
+          "max": 0.1780969649553299,
+          "nonzero_samples": 9216,
+          "all_finite": true
+        }
+      }
+    },
+    {
+      "name": "ViewLayer.Transmission Direct",
+      "channels": {
+        "ViewLayer.Transmission Direct.B": {
+          "shape": [
+            96,
+            96
+          ],
+          "dtype": "float32",
+          "min": 0.0,
+          "max": 0.0,
+          "nonzero_samples": 0,
+          "all_finite": true
+        },
+        "ViewLayer.Transmission Direct.G": {
+          "shape": [
+            96,
+            96
+          ],
+          "dtype": "float32",
+          "min": 0.0,
+          "max": 0.0,
+          "nonzero_samples": 0,
+          "all_finite": true
+        },
+        "ViewLayer.Transmission Direct.R": {
+          "shape": [
+            96,
+            96
+          ],
+          "dtype": "float32",
+          "min": 0.0,
+          "max": 0.0,
+          "nonzero_samples": 0,
+          "all_finite": true
+        }
+      }
+    },
+    {
+      "name": "ViewLayer.Transmission Indirect",
+      "channels": {
+        "ViewLayer.Transmission Indirect.B": {
+          "shape": [
+            96,
+            96
+          ],
+          "dtype": "float32",
+          "min": 0.0,
+          "max": 0.0,
+          "nonzero_samples": 0,
+          "all_finite": true
+        },
+        "ViewLayer.Transmission Indirect.G": {
+          "shape": [
+            96,
+            96
+          ],
+          "dtype": "float32",
+          "min": 0.0,
+          "max": 0.0,
+          "nonzero_samples": 0,
+          "all_finite": true
+        },
+        "ViewLayer.Transmission Indirect.R": {
+          "shape": [
+            96,
+            96
+          ],
+          "dtype": "float32",
+          "min": 0.0,
+          "max": 0.0,
+          "nonzero_samples": 0,
+          "all_finite": true
+        }
+      }
+    },
+    {
+      "name": "ViewLayer.Transmission Color",
+      "channels": {
+        "ViewLayer.Transmission Color.B": {
+          "shape": [
+            96,
+            96
+          ],
+          "dtype": "float32",
+          "min": 0.0,
+          "max": 0.0,
+          "nonzero_samples": 0,
+          "all_finite": true
+        },
+        "ViewLayer.Transmission Color.G": {
+          "shape": [
+            96,
+            96
+          ],
+          "dtype": "float32",
+          "min": 0.0,
+          "max": 0.0,
+          "nonzero_samples": 0,
+          "all_finite": true
+        },
+        "ViewLayer.Transmission Color.R": {
+          "shape": [
+            96,
+            96
+          ],
+          "dtype": "float32",
+          "min": 0.0,
+          "max": 0.0,
+          "nonzero_samples": 0,
+          "all_finite": true
+        }
+      }
+    },
+    {
+      "name": "ViewLayer.Ambient Occlusion",
+      "channels": {
+        "ViewLayer.Ambient Occlusion.B": {
+          "shape": [
+            96,
+            96
+          ],
+          "dtype": "float32",
+          "min": 0.0,
+          "max": 1.0,
+          "nonzero_samples": 9215,
+          "all_finite": true
+        },
+        "ViewLayer.Ambient Occlusion.G": {
+          "shape": [
+            96,
+            96
+          ],
+          "dtype": "float32",
+          "min": 0.0,
+          "max": 1.0,
+          "nonzero_samples": 9215,
+          "all_finite": true
+        },
+        "ViewLayer.Ambient Occlusion.R": {
+          "shape": [
+            96,
+            96
+          ],
+          "dtype": "float32",
+          "min": 0.0,
+          "max": 1.0,
+          "nonzero_samples": 9215,
+          "all_finite": true
+        }
+      }
+    },
+    {
+      "name": "ViewLayer.Noisy Image",
+      "channels": {
+        "ViewLayer.Noisy Image.A": {
+          "shape": [
+            96,
+            96
+          ],
+          "dtype": "float32",
+          "min": 1.0,
+          "max": 1.0,
+          "nonzero_samples": 9216,
+          "all_finite": true
+        },
+        "ViewLayer.Noisy Image.B": {
+          "shape": [
+            96,
+            96
+          ],
+          "dtype": "float32",
+          "min": 0.0011668279767036438,
+          "max": 0.45251449942588806,
+          "nonzero_samples": 9216,
+          "all_finite": true
+        },
+        "ViewLayer.Noisy Image.G": {
+          "shape": [
+            96,
+            96
+          ],
+          "dtype": "float32",
+          "min": 0.0027437694370746613,
+          "max": 0.458499014377594,
+          "nonzero_samples": 9216,
+          "all_finite": true
+        },
+        "ViewLayer.Noisy Image.R": {
+          "shape": [
+            96,
+            96
+          ],
+          "dtype": "float32",
+          "min": 0.017239145934581757,
+          "max": 0.5866495370864868,
+          "nonzero_samples": 9216,
+          "all_finite": true
+        }
+      }
+    }
+  ],
+  "scope": "Header/channel inspection only; no Vue-equivalence or PSD mapping claim"
+}
