@@ -1,0 +1,91 @@
+{
+  "recordedAt": "2026-10-06T14:59:56.504907+00:00",
+  "cli": "0.160.0",
+  "model": "gpt-6.1-sol",
+  "transport": "stdio",
+  "auth": "Codex-managed ChatGPT",
+  "reasoningEffort": "low",
+  "serviceTier": "default",
+  "lastGate": {
+    "auth": "chatgpt",
+    "planType": "prolite",
+    "ordinaryUsageAllowed": true,
+    "credits": {
+      "hasCredits": false,
+      "unlimited": false,
+      "balance": "0"
+    }
+  },
+  "results": {
+    "response_image_tool": {
+      "status": "completed",
+      "error": null,
+      "text": "{\"marker\":\"SCENE_CHECK_Q7M2\",\"objects\":[{\"color\":\"red\",\"shape\":\"square\"},{\"color\":\"green\",\"shape\":\"triangle\"},{\"color\":\"blue\",\"shape\":\"circle\"}],\"tool_result\":\"SC_TOOL_39375fb7c15c\"}",
+      "deltaCount": 53,
+      "itemTypes": {
+        "userMessage": 1,
+        "dynamicToolCall": 1,
+        "agentMessage": 1
+      }
+    },
+    "restart_resume": {
+      "status": "completed",
+      "error": null,
+      "text": "{\"marker\":\"SCENE_CHECK_Q7M2\",\"previous_tool_result\":\"SC_TOOL_39375fb7c15c\",\"new_tool_result\":\"SC_TOOL_5ddd492aa426\"}",
+      "deltaCount": 39,
+      "itemTypes": {
+        "userMessage": 1,
+        "dynamicToolCall": 1,
+        "agentMessage": 1
+      }
+    },
+    "compaction": {
+      "status": "completed",
+      "error": null,
+      "text": "",
+      "deltaCount": 0,
+      "itemTypes": {
+        "contextCompaction": 1
+      }
+    },
+    "after_compaction": {
+      "status": "completed",
+      "error": null,
+      "text": "{\"marker\":\"SCENE_CHECK_Q7M2\",\"objects\":[{\"color\":\"red\",\"shape\":\"square\"},{\"color\":\"green\",\"shape\":\"triangle\"},{\"color\":\"blue\",\"shape\":\"circle\"}]}",
+      "deltaCount": 39,
+      "itemTypes": {
+        "userMessage": 1,
+        "agentMessage": 1
+      }
+    },
+    "managed_refresh_request": {
+      "accountType": "chatgpt",
+      "planType": "prolite",
+      "rpcSucceeded": true
+    },
+    "interrupt": {
+      "status": "interrupted",
+      "error": null,
+      "text": "{\"status\":\"Calling scene_check_probe once.\"}",
+      "deltaCount": 10,
+      "itemTypes": {
+        "userMessage": 1,
+        "agentMessage": 1
+      }
+    },
+    "after_interrupt": {
+      "status": "completed",
+      "error": null,
+      "text": "{\"marker\":\"SCENE_CHECK_Q7M2\"}",
+      "deltaCount": 11,
+      "itemTypes": {
+        "userMessage": 1,
+        "agentMessage": 1
+      }
+    },
+    "original_history_after_compaction": {
+      "originalAgentMessageRetained": true,
+      "turnCount": 6
+    }
+  }
+}

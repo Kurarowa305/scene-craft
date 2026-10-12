@@ -1,6 +1,6 @@
 # 設計項目と資料
 
-[scene-craft 初期構築の設計マップ](https://github.com/Kurarowa305/scene-craft/issues/1) を設計作業の入口とする。[初期要件](../requirements/initial-scope.md) は合意済みで、以下は実装前に決める13領域である。2026-10-06 に設計 Issue を登録した。各設計の結論はまだ確定していない。
+[scene-craft 初期構築の設計マップ](https://github.com/Kurarowa305/scene-craft/issues/1) を設計作業の入口とする。[初期要件](../requirements/initial-scope.md) は合意済みで、以下は実装前に決める13領域である。2026-10-06 に設計 Issue を登録した。2026-10-12 に LLM 接続・費用制約の設計を合意した。Codex app-server と Codex 管理の認証を採用し、費用条件の確認は利用者が担う。モデル選択、停止・再開、再実行の契約と後続への引き継ぎは [接続設計](llm-connection.md) にまとめる。設計完了と本実装・異常系の検証完了は区別する。
 
 Issue の状態・依存関係・担当者は GitHub を正とする。この一覧は領域と資料化先の対応を示す。開始時は親 Issue の子 Issue と依存関係を取得する。登録時点で着手可能なのは「LLM 接続と費用制約を満たす方式を決める」と「Blender の操作経路とレンダー出力契約を決める」。それ以後の進捗は GitHub で確認する。
 
@@ -10,7 +10,7 @@ Issue の状態・依存関係・担当者は GitHub を正とする。この一
 
 | 領域 | 設計 Issue | 設計資料の作成先 |
 | --- | --- | --- |
-| LLM 接続・費用制約 | [LLM 接続と費用制約を満たす方式を決める](https://github.com/Kurarowa305/scene-craft/issues/2) | `llm-connection.md` |
+| LLM 接続・費用制約 | [LLM 接続と費用制約を満たす方式を決める](https://github.com/Kurarowa305/scene-craft/issues/2) | [llm-connection.md](llm-connection.md)（設計合意済み） |
 | 全体構成・OS の責務 | [アプリ全体と Windows・WSL の責務を決める](https://github.com/Kurarowa305/scene-craft/issues/3) | `application-architecture.md` |
 | Blender 連携・出力 | [Blender の操作経路とレンダー出力契約を決める](https://github.com/Kurarowa305/scene-craft/issues/4) | `blender-integration.md` |
 | ドメイン・データモデル | [作品と制作履歴のデータモデルを決める](https://github.com/Kurarowa305/scene-craft/issues/5) | `domain-data-model.md` |
