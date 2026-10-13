@@ -1,0 +1,100 @@
+%%{init: {"layout": "dagre", "theme": "base", "themeVariables": {"fontFamily": "Meiryo, sans-serif", "fontSize": "16px", "lineColor": "#64748b", "textColor": "#172b4d", "edgeLabelBackground": "#ffffff"}, "flowchart": {"curve": "linear", "nodeSpacing": 50, "rankSpacing": 65, "htmlLabels": true}}}%%
+flowchart TB
+  subgraph context["1 作品・会話"]
+    direction LR
+    W[作品]
+    C[会話]
+    M[原文メッセージ]
+  end
+  subgraph execution["2 依頼・実行"]
+    direction LR
+    Q[依頼]
+    E[実行]
+    R[再実行の記録]
+  end
+  subgraph production["3 候補・変更"]
+    direction LR
+    P[編集案]
+    S[保存状態]
+    X[変更記録]
+  end
+  subgraph decision["4 採否・継続"]
+    direction LR
+    D[採否記録]
+    H[現在状態の更新記録]
+  end
+  subgraph evidence["5 成果・根拠"]
+    direction LR
+    O[生成物]
+    F[ファイル参照]
+    T[文章記録]
+    V[振り返りの参照記録]
+  end
+  W -->|現在の更新| H
+  W -->|制作意図| T
+  C -->|所属・振り返り対象| W
+  M -->|所属| C
+  M -->|添付| F
+  Q -->|依頼元| C
+  Q -->|指示原文| M
+  Q -->|対象| W
+  Q -->|明示した起点| S
+  Q -->|修正元| P
+  E -->|依頼元| Q
+  E -->|入力| S
+  E -->|親実行| E
+  E -->|やり直し| R
+  R -->|予算の単位| Q
+  R -->|対象実行| E
+  F -->|所属| W
+  O -->|作成実行| E
+  O -->|ファイル内容| F
+  O -->|文章内容| T
+  S -->|所属| W
+  S -->|構成・素材・プレビュー| F
+  S -->|作成元| X
+  X -->|変更前後・復元元・派生元・寄与元| S
+  X -->|AI編集等の由来| E
+  X -->|対象・寄与元の案| P
+  X -->|要約・理由| T
+  P -->|依頼元| Q
+  P -->|作成実行| E
+  P -->|基準・AI結果| S
+  P -->|修正元・依存する案| P
+  D -->|判断対象の案| P
+  D -->|判断対象の状態| S
+  D -->|理由| T
+  D -->|以前の判断| D
+  H -->|所属| W
+  H -->|更新前後| S
+  H -->|採用の根拠| D
+  H -->|変更の根拠| X
+  T -->|原文の根拠・要約対象| M
+  T -->|訂正元| T
+  V -->|分析依頼| Q
+  V -->|分析実行| E
+  V -->|対象作品| W
+  V -->|対象状態| S
+  V -->|判断の根拠| D
+  V -->|変更の根拠・手修正を含む| X
+  V -->|当時の文章| T
+  V -->|分析結果| O
+  classDef contextNode fill:#e8f1fc,stroke:#3168a4,stroke-width:2px,color:#172b4d
+  class W,C,M contextNode
+  style context fill:#e8f1fc,stroke:#3168a4,stroke-width:1px
+  classDef executionNode fill:#e3f4f0,stroke:#247c6b,stroke-width:2px,color:#172b4d
+  class Q,E,R executionNode
+  style execution fill:#e3f4f0,stroke:#247c6b,stroke-width:1px
+  classDef productionNode fill:#fff2d8,stroke:#a66a18,stroke-width:2px,color:#172b4d
+  class P,S,X productionNode
+  style production fill:#fff2d8,stroke:#a66a18,stroke-width:1px
+  classDef decisionNode fill:#fde9e9,stroke:#ac4b53,stroke-width:2px,color:#172b4d
+  class D,H decisionNode
+  style decision fill:#fde9e9,stroke:#ac4b53,stroke-width:1px
+  classDef evidenceNode fill:#eee9fa,stroke:#7154a2,stroke-width:2px,color:#172b4d
+  class O,F,T,V evidenceNode
+  style evidence fill:#eee9fa,stroke:#7154a2,stroke-width:1px
+  linkStyle 0,2,3,5,6,7,9,10,14,16,17,20,22,24,25,27,28,31,35,37,38,39 stroke:#64748b,stroke-width:1.3px
+  linkStyle 4,8,11,18,21,23,29,32,36 stroke:#2864b4,stroke-width:1.8px
+  linkStyle 1,19,26,33,41,42,43,44,45,46,47,48 stroke:#7952a8,stroke-width:1.4px,stroke-dasharray:6 4
+  linkStyle 12,13,15,30,34,40 stroke:#b86b12,stroke-width:1.7px,stroke-dasharray:2 3
