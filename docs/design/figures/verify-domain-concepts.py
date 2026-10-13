@@ -18,7 +18,8 @@ assert collections.Counter(''.join(n.itertext()) for n in nodes)==collections.Co
 assert collections.Counter(''.join(n.itertext()) for n in labels)==collections.Counter(l for _,l,_ in ae)
 assert collections.Counter(tuple(p.attrib['data-id'].split('_')[1:3]) for p in paths)==collections.Counter((src,dst) for src,_,dst in ae)
 assert all(p.get('marker-end') for p in paths)
-assert collections.Counter((p.attrib['data-id'].split('_')[1], ''.join(label.itertext()), p.attrib['data-id'].split('_')[2]) for p,label in zip(paths,labels))==ae
+label_by_id={child.attrib['data-id']: ''.join(label.itertext()) for label in labels for child in label if child.get('data-id')}
+assert collections.Counter((p.attrib['data-id'].split('_')[1], label_by_id[p.attrib['data-id']], p.attrib['data-id'].split('_')[2]) for p in paths)==ae
 print('PASS: before/after 15 nodes and 49 directed labeled relations identical; SVG contains all 15 names, 49 labels, 49 directed paths with arrowheads.')
 print('PASS: additions 0; deletions 0; duplicate nodes/relations 0; direction/label changes 0.')
 for path in [Path('docs/design/domain-data-model.md'),Path('docs/design/figures/README.md')]:
