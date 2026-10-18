@@ -6,6 +6,8 @@ Issue の状態・依存関係・担当者は GitHub を正とする。この一
 
 2026-10-18、[編集案・保護指定の設計](edit-candidates.md)を合意した。独立した変更の部分採用、古い案の組合せ確認、手修正とAI修正の継続、直接・間接変更への保護と依頼限定許可、違反・検証不能な案の採用禁止、採用失敗時の照合を確定した。本実装・実機検証は後続へ引き継ぐ。
 
+2026-10-19、[文脈・作風・制作方針の設計](context-and-style.md)を合意した。Codexの会話継続・圧縮とscene-craftの根拠付き要約を分け、作品共有情報、制作意図の明示更新、振り返りの対象と根拠固定、方針の項目別採用、Gitコミット後の作品への明示適用を確定した。本実装・実機検証は後続へ引き継ぐ。
+
 ## 項目一覧
 
 設計がまとまった項目から資料を作成する。下表のファイル名は作成予定先であり、未作成の資料を設計済みとして扱わない。作成したらファイル名をリンクに更新する。大きい問いは追加 Issue に分割して、この領域の資料へ統合する。
@@ -20,7 +22,7 @@ Issue の状態・依存関係・担当者は GitHub を正とする。この一
 | 実行状態・再実行 | [実行状態・順序制御・再実行・復旧を決める](https://github.com/Kurarowa305/scene-craft/issues/7) | [execution-lifecycle.md](execution-lifecycle.md)（設計合意済み） |
 | 編集案・保護指定 | [編集案の採用と保護指定の適用方法を決める](https://github.com/Kurarowa305/scene-craft/issues/8) | [edit-candidates.md](edit-candidates.md)（設計合意済み） |
 | エージェント契約 | [工程別エージェントの入出力とツール契約を決める](https://github.com/Kurarowa305/scene-craft/issues/9) | `agent-contracts.md` |
-| 文脈・作風・制作方針 | [会話の文脈と作風・制作方針の利用方法を決める](https://github.com/Kurarowa305/scene-craft/issues/10) | `context-and-style.md` |
+| 文脈・作風・制作方針 | [会話の文脈と作風・制作方針の利用方法を決める](https://github.com/Kurarowa305/scene-craft/issues/10) | [context-and-style.md](context-and-style.md)（設計合意済み） |
 | Git の版参照・保持 | [Git の版固定・保持・更新互換性を決める](https://github.com/Kurarowa305/scene-craft/issues/11) | [git-versioning.md](git-versioning.md)（設計合意済み） |
 | 画面・制作導線 | [専用アプリの画面と制作・記録の導線を決める](https://github.com/Kurarowa305/scene-craft/issues/12) | `user-interface.md` |
 | 参考調査・素材サービス | [参考調査と素材サービスの選定・取り込み契約を決める](https://github.com/Kurarowa305/scene-craft/issues/13) | `reference-and-assets.md` |
