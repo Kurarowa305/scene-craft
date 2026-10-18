@@ -4,6 +4,8 @@
 
 Issue の状態・依存関係・担当者は GitHub を正とする。この一覧は領域と資料化先の対応を示す。開始時は親 Issue の子 Issue と依存関係を取得する。登録時点で着手可能なのは「LLM 接続と費用制約を満たす方式を決める」と「Blender の操作経路とレンダー出力契約を決める」。それ以後の進捗は GitHub で確認する。
 
+2026-10-18、[編集案・保護指定の設計](edit-candidates.md)を合意した。独立した変更の部分採用、古い案の組合せ確認、手修正とAI修正の継続、直接・間接変更への保護と依頼限定許可、違反・検証不能な案の採用禁止、採用失敗時の照合を確定した。本実装・実機検証は後続へ引き継ぐ。
+
 ## 項目一覧
 
 設計がまとまった項目から資料を作成する。下表のファイル名は作成予定先であり、未作成の資料を設計済みとして扱わない。作成したらファイル名をリンクに更新する。大きい問いは追加 Issue に分割して、この領域の資料へ統合する。
@@ -16,7 +18,7 @@ Issue の状態・依存関係・担当者は GitHub を正とする。この一
 | ドメイン・データモデル | [作品と制作履歴のデータモデルを決める](https://github.com/Kurarowa305/scene-craft/issues/5) | [domain-data-model.md](domain-data-model.md)（設計合意済み） |
 | 保存・復元・バックアップ | [制作データの保存・復元・バックアップ方式を決める](https://github.com/Kurarowa305/scene-craft/issues/6) | [artifact-storage.md](artifact-storage.md)（設計合意済み） |
 | 実行状態・再実行 | [実行状態・順序制御・再実行・復旧を決める](https://github.com/Kurarowa305/scene-craft/issues/7) | [execution-lifecycle.md](execution-lifecycle.md)（設計合意済み） |
-| 編集案・保護指定 | [編集案の採用と保護指定の適用方法を決める](https://github.com/Kurarowa305/scene-craft/issues/8) | `edit-candidates.md` |
+| 編集案・保護指定 | [編集案の採用と保護指定の適用方法を決める](https://github.com/Kurarowa305/scene-craft/issues/8) | [edit-candidates.md](edit-candidates.md)（設計合意済み） |
 | エージェント契約 | [工程別エージェントの入出力とツール契約を決める](https://github.com/Kurarowa305/scene-craft/issues/9) | `agent-contracts.md` |
 | 文脈・作風・制作方針 | [会話の文脈と作風・制作方針の利用方法を決める](https://github.com/Kurarowa305/scene-craft/issues/10) | `context-and-style.md` |
 | Git の版参照・保持 | [Git の版固定・保持・更新互換性を決める](https://github.com/Kurarowa305/scene-craft/issues/11) | [git-versioning.md](git-versioning.md)（設計合意済み） |
