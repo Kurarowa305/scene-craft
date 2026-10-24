@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 850">
+  <defs>
+    <linearGradient id="sky" x2="0" y2="1"><stop stop-color="#829fa9"/><stop offset=".55" stop-color="#d8c9ae"/><stop offset="1" stop-color="#ecd2a4"/></linearGradient>
+    <linearGradient id="sea" x2="0" y2="1"><stop stop-color="#9eb9b5"/><stop offset="1" stop-color="#4b858c"/></linearGradient>
+    <linearGradient id="land" x2="1" y2="1"><stop stop-color="#8c9270"/><stop offset="1" stop-color="#4d695c"/></linearGradient>
+    <linearGradient id="wall" x2="1" y2="1"><stop stop-color="#e9ce9c"/><stop offset="1" stop-color="#b1a187"/></linearGradient>
+    <linearGradient id="front" x2="0" y2="1"><stop stop-color="#d1c7a9"/><stop offset="1" stop-color="#aaa487"/></linearGradient>
+    <radialGradient id="sun"><stop stop-color="#fff2cf" stop-opacity=".65"/><stop offset="1" stop-color="#fff2cf" stop-opacity="0"/></radialGradient>
+    <filter id="grain"><feTurbulence baseFrequency=".55" numOctaves="3" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/><feComponentTransfer><feFuncA type="linear" slope=".045"/></feComponentTransfer><feBlend in="SourceGraphic" mode="soft-light"/></filter>
+    <g id="pine"><path d="M0 80V-130" stroke="#5b6350" stroke-width="8"/><path d="M-67 0 0-143 68 0ZM-83 40 0-100 85 40Z" fill="#536e5f"/><path d="M-56-12 0-135 5-12Z" fill="#6d8370"/></g>
+    <g id="grass"><path d="m0 0-10-39 16 29 4-48 8 46 19-29-13 41Z" fill="#65785c"/><path d="m5 0-4-25 13 25Z" fill="#9d9e73"/></g>
+    <g id="window"><rect width="48" height="76" fill="#516764" stroke="#8f806b" stroke-width="7"/><path d="M24 0v76M0 35h48" stroke="#c6b89a" stroke-width="3"/><path d="m4 4 16 0-16 30Z" fill="#e6d1a5" opacity=".5"/></g>
+  </defs>
+  <rect width="1200" height="850" fill="url(#sky)"/>
+  <ellipse cx="980" cy="270" rx="390" ry="300" fill="url(#sun)"/>
+  <path d="M0 380 125 340 250 372 406 321 570 375 760 346 985 384 1200 350V520H0Z" fill="#8ea7a5" opacity=".45"/>
+  <path d="M0 420Q280 390 530 415T1200 405V850H0Z" fill="url(#sea)"/>
+  <g fill="none" stroke="#d3d8c0" opacity=".5"><path d="M620 461h290m-250 18h365m-390 24h410m-345 30h160m-40 28h285m-460 35h295m-250 32h330m-100 27h270"/><path d="M820 454h95m-32 40h90m-290 49h84m155 29h80m-180 53h133" stroke-width="4"/></g>
+  <path d="M0 430 155 419 305 453 375 498 522 517 635 567 773 610 680 667 560 701 429 788 478 850H0Z" fill="#abaf91"/>
+  <path d="m0 463 140-19 154 47 112 59 171 16 143 54-153 48-109 100-85 82H0Z" fill="url(#land)"/>
+  <path d="m0 581 158-30 125 24 190 67 138-3-51 38-162 6-174-54-224 33Z" fill="#b5aa89"/>
+  <path d="m0 600 161-24 115 22 188 68 112-6" fill="none" stroke="#c3b99b" stroke-width="14"/>
+  <path d="m192 552 105-104 269 25 43 124-248 35Z" fill="#415c58" opacity=".25"/>
+  <path d="m234 416 229-35 117 65-223 43Z" fill="#685e50"/>
+  <path d="m234 416 123 73v138l-123-65Z" fill="url(#wall)"/>
+  <path d="m357 489 223-43v137l-223 44Z" fill="url(#front)"/>
+  <path d="m210 422 140-117 131 72-128 120Z" fill="#71716a"/>
+  <path d="m350 305 255 115-124-43Z" fill="#5b6662"/>
+  <path d="m350 305 135 69 120 46-252 77 128-120Z" fill="#666b62"/>
+  <path d="m210 422 143 75 252-77" stroke="#4c5b55" stroke-width="9" fill="none"/>
+  <path d="m250 400 114 59m-90-85 116 60m-87-86 116 60m-90-85 118 60" stroke="#97917a" opacity=".4" stroke-width="3"/>
+  <path d="m398 465 5 150m61-167 6 152m62-169 6 151" stroke="#a09275" stroke-width="3"/>
+  <g transform="matrix(.76,-.15,0,.85,395,508)"><use href="#window"/></g>
+  <g transform="matrix(.76,-.15,0,.85,492,489)"><use href="#window"/></g>
+  <path d="m270 468 45 26v95l-45-24Z" fill="#5a655a" stroke="#9a8769" stroke-width="5"/>
+  <path d="m278 481 27 15v41l-27-15Z" fill="#9dafa1"/>
+  <circle cx="308" cy="553" r="3" fill="#dfc38b"/>
+  <path d="m361 478 217-43v21l-217 44Z" fill="#c8b48a"/>
+  <path d="m421 470 100-20v20l-100 20Z" fill="#44605b"/>
+  <text x="440" y="478" fill="#e8d8b0" font-size="12" font-family="sans-serif" transform="rotate(-11 440 478)">汐見駅</text>
+  <g stroke="#615f4c" stroke-width="5"><path d="m647 566-1-165m-13 7h27m-15-8 9-13"/><path d="m160 518-1-142m-13 7h26"/></g>
+  <path d="M159 380q216-118 487 20" fill="none" stroke="#6a7261" stroke-width="2"/>
+  <g transform="translate(93 501) scale(.9)"><use href="#pine"/></g>
+  <g transform="translate(28 485) scale(1.3)"><use href="#pine"/></g>
+  <g transform="translate(189 473) scale(.65)"><use href="#pine"/></g>
+  <g transform="translate(704 631) scale(.62)"><use href="#pine"/></g>
+  <g transform="translate(629 598) scale(.43)"><use href="#pine"/></g>
+  <g transform="translate(90 749) scale(2.1)"><use href="#grass"/></g>
+  <g transform="translate(192 699) scale(1.2)"><use href="#grass"/></g>
+  <g transform="translate(376 699) scale(1.1)"><use href="#grass"/></g>
+  <g transform="translate(611 640) scale(.85)"><use href="#grass"/></g>
+  <g transform="translate(657 646) scale(.8)"><use href="#grass"/></g>
+  <g transform="translate(479 701) scale(1.2)"><use href="#grass"/></g>
+  <path d="m322 672 68 24m-65-35 68 24m-64-34 68 24" stroke="#6b6550" stroke-width="7"/><path d="m326 671-4 27m67-6-3 23" stroke="#4d5b50" stroke-width="5"/>
+  <g fill="#c6b985"><circle cx="149" cy="734" r="4"/><circle cx="160" cy="720" r="3"/><circle cx="426" cy="713" r="3"/><circle cx="449" cy="719" r="4"/></g>
+  <rect width="1200" height="850" fill="transparent" filter="url(#grain)"/>
+</svg>

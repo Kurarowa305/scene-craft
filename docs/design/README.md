@@ -24,7 +24,7 @@ Issue の状態・依存関係・担当者は GitHub を正とする。この一
 | エージェント契約 | [工程別エージェントの入出力とツール契約を決める](https://github.com/Kurarowa305/scene-craft/issues/9) | `agent-contracts.md` |
 | 文脈・作風・制作方針 | [会話の文脈と作風・制作方針の利用方法を決める](https://github.com/Kurarowa305/scene-craft/issues/10) | [context-and-style.md](context-and-style.md)（設計合意済み） |
 | Git の版参照・保持 | [Git の版固定・保持・更新互換性を決める](https://github.com/Kurarowa305/scene-craft/issues/11) | [git-versioning.md](git-versioning.md)（設計合意済み） |
-| 画面・制作導線 | [専用アプリの画面と制作・記録の導線を決める](https://github.com/Kurarowa305/scene-craft/issues/12) | `user-interface.md` |
+| 画面・制作導線 | [専用アプリの画面と制作・記録の導線を決める](https://github.com/Kurarowa305/scene-craft/issues/12) | [user-interface.md](user-interface.md)（草案・設計全体の最終確認待ち） |
 | 参考調査・素材サービス | [参考調査と素材サービスの選定・取り込み契約を決める](https://github.com/Kurarowa305/scene-craft/issues/13) | `reference-and-assets.md` |
 | テスト・診断・受け入れ | [テスト境界・診断情報・初期版の受け入れ手順を決める](https://github.com/Kurarowa305/scene-craft/issues/14) | `testing-and-diagnostics.md` |
 
