@@ -18,21 +18,23 @@ let seq = 10;
 const id = () => `demo-${++seq}`;
 const user = (text) => ({role:'user',text});
 const agent = (text,refs=[]) => ({role:'assistant',text,refs});
-const makeChat = (title,messages=[],stage='植物・小物配置') => ({id:id(),title,messages,stage,model:'既定モデル',status:'normal',detail:'作業なし',draft:'',source:'base',reference:null,attachments:[],side:null,recordMode:false,request:null,protectedPermission:false});
+const makeChat = (title,messages=[],stage='なし') => ({id:id(),title,messages,stage,model:'既定モデル',status:'normal',detail:'作業なし',draft:'',source:'base',reference:null,attachments:[],side:null,recordMode:false,request:null,protectedPermission:false,needsTitle:title==='新しいチャット',lastStage:null});
 const firstChat = makeChat('駅前の植栽と小物',[
   user('駅舎のまわりに植物を置いて。使い込まれたベンチも少し。\n静けさを残したいので、密度は低めに。カメラは変えないで。'),
   agent('駅舎への視線を残しながら、道沿いに低い草と松を配置しました。ベンチは入口の手前に置いています。\n\n案Aは植物と小物の変更です。照明を調整した案Bも別に用意しました。それぞれ独立して採用できます。\n\nカメラの位置・レンズは変更していません。保護検査は通過しています。まずはプレビューを開いて確認してください。',['plants','light']),
 ]);
 firstChat.source='plants';
+firstChat.stage='植物・小物配置';
 const makeProject = (name,intent,chats,artifacts=Object.values(artifactData).map(a=>({...a}))) => ({id:id(),name,intent,chats,artifacts,accepted:'base',style:'静かな風景 · 5f91881',guards:[{id:id(),title:'Camera_Main',detail:'位置・回転・レンズ・被写界深度'},{id:id(),title:'駅舎の外壁',detail:'材質・UV・画像テクスチャ'}],history:[{id:'base',label:'基準シーン',reason:'取り込み時点。理由は未入力。'},{id:'plants',label:'案A · 植物と小物',reason:'駅舎への視線を残し、道沿いの密度を抑える。'},{id:'light',label:'案B · 照明',reason:'空気感を比較するため、照明だけを調整。'}].filter(n=>artifacts.some(a=>a.id===n.id))});
 const project = makeProject('海辺の小さな駅','静かな午後。海からの風と、人の気配が残る小さな駅。',[firstChat,makeChat('構図とシーン計画',[agent('駅舎と海を主役にした構図を採用しています。制作意図は作品全体で共有されています。')],'シーン計画'),makeChat('光と空の検討',[agent('このチャットでは光と空を検討します。採用状態は作品と共有します。')],'空・海・照明')]);
 const other = makeProject('雨上がりの路地','濡れた路面の反射と、夕方の暖かな窓明かり。',[makeChat('参考資料の整理',[agent('こちらは別作品の制作会話です。駅の会話や成果物を混ぜずに進めます。')],'参考調査')],[{...artifactData.base,title:'路地 · 基準シーン',file:'alley_base.blend'}]);
-const state = {projects:[project,other],projectId:project.id,chatId:firstChat.id,tabs:[{id:'artifact:plants',type:'artifact',key:'plants',label:'案A · 植物と小物',projectId:project.id}],activeTab:'artifact:plants',variant:['A','B','C'].includes(new URLSearchParams(location.search).get('variant'))?new URLSearchParams(location.search).get('variant'):'A',mobile:'chat',drawer:false,offline:false,previewFailure:false,historyNode:'plants',operation:'',settingsPage:'backup',zoom:1,panX:0,panY:0,mainWidth:47};
+const reviewProject=makeProject('作品横断の振り返り','指定した作品を横断して振り返る。',[],[]);
+reviewProject.isReview=true;
+const state = {projects:[project,other,reviewProject],projectId:project.id,chatId:firstChat.id,tabs:[{id:'artifact:plants',type:'artifact',key:'plants',label:'案A · 植物と小物',projectId:project.id}],activeTab:'artifact:plants',mobile:'chat',drawer:false,attachmentMenu:false,offline:false,previewFailure:false,historyNode:'plants',operation:'',settingsPage:'backup',zoom:1,panX:0,panY:0,mainWidth:47};
 const currentProject = () => state.projects.find(p=>p.id===state.projectId);
 const currentChat = () => currentProject().chats.find(c=>c.id===state.chatId);
 const art = (key,p=currentProject()) => p.artifacts.find(a=>a.id===key);
 const activeTab = () => state.tabs.find(t=>t.id===state.activeTab && t.projectId===state.projectId);
-const labels = {A:'横タブ · 標準',B:'縦タブ · リスト',C:'グループ · ワークスペース'};
 const now = () => new Date().toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'});
 function statusIcon(c){return `<span class="state-icon ${c.status==='stopping'?'running':c.status}" title="${esc(c.detail)}" aria-label="${esc(c.detail)}">${{normal:'',running:'',stopping:'',attention:'!',stopped:'Ⅱ'}[c.status]||''}</span>`;}
 function artifactLink(key,p=currentProject()){
@@ -46,31 +48,37 @@ function render(){
   const p=currentProject(),c=currentChat();
   document.body.dataset.mobile=state.mobile;
   document.documentElement.style.setProperty('--main',`${state.mainWidth}%`);
-  $('#app').innerHTML=`<div class="shell variant-${state.variant.toLowerCase()}">
+  $('#app').innerHTML=`<div class="shell">
     <aside class="sidebar"><div class="brand"><span class="brand-mark">∿</span><span class="brand-name">scene-craft</span><small>STUDIO</small></div>
-    <div class="sidebar-tools"><button class="nav-button" data-action="new-project">${icon('plus')}<span>作品を作成</span></button><button class="nav-button" data-action="new-chat">${icon('chat')}<span>新しいチャット</span></button></div>
-    <div class="nav-label">WORKS / 作品</div><div class="projects">${state.projects.map(pr=>`<section class="project">${pr.isReview?'<div class="nav-label">REFLECTIONS / 作品横断</div>':''}<button class="project-title" data-action="project" data-key="${pr.id}"><span class="folder">▱</span>${esc(pr.name)}</button>${pr.chats.map(ch=>`<button class="chat-link ${ch.id===c.id?'active':''}" data-action="chat" data-key="${ch.id}" data-project="${pr.id}" title="${esc(ch.title)}"><span class="chat-title">${esc(ch.title)}</span>${statusIcon(ch)}<span class="mobile-toggle">◦</span></button>`).join('')}</section>`).join('')}</div>
+    <div class="sidebar-tools"><button class="nav-button" data-action="new-project">${icon('plus')}<span>作品を作成</span></button></div>
+    <div class="nav-label">WORKS / 作品</div><div class="projects">${state.projects.map(pr=>`<section class="project">${pr.isReview?'<div class="nav-label">REFLECTIONS / 作品横断</div>':''}<div class="project-heading"><button class="project-title" data-action="project" data-key="${pr.id}"><span class="folder">▱</span><span>${esc(pr.name)}</span></button><button class="icon project-new-chat" data-action="new-chat" data-project="${pr.id}" aria-label="${esc(pr.name)}に新しいチャット" title="新しいチャット">${icon('plus')}</button></div>${pr.chats.map(ch=>`<button class="chat-link ${ch.id===c.id?'active':''}" data-action="chat" data-key="${ch.id}" data-project="${pr.id}" title="${esc(ch.title)}"><span class="chat-title">${esc(ch.title)}</span>${statusIcon(ch)}<span class="mobile-toggle">◦</span></button>`).join('')}</section>`).join('')}</div>
     <div class="sidebar-footer"><button class="nav-button" data-action="reflection">${icon('leaf')}<span>作品を振り返る</span></button><button class="nav-button" data-action="settings">${icon('settings')}<span>設定・保存データ</span></button><div class="profile"><span class="avatar">K</span><span>ローカルワークスペース<br><span class="tiny">${state.offline?'LLM 利用不可（デモ）':'UI PROTOTYPE · 接続なし'}</span></span></div></div></aside>
-    <main class="workspace"><header class="topbar"><div><div class="crumb">作品 <span>/</span> ワークスペース</div><span class="work-title">${esc(p.name)}</span></div><div class="row"><span class="accepted"><i></i>${p.isReview?'対象：'+(c.scope?.length||0)+'作品':'現在採用：'+esc(art(p.accepted)?.title||'制作データなし')}</span><button class="icon mobile-toggle" data-action="mobile" aria-label="チャットとタブを切り替え">⇄</button></div></header>
-    <div class="workspace-body"><section class="main-chat" aria-label="メインチャット"><div class="chat-heading"><div><h1>${esc(c.title)}</h1><small>${esc(c.detail)}${state.offline?' · LLM利用不可':''}</small></div><button class="icon" title="サイドチャットを開く" aria-label="サイドチャットを開く" data-action="side">${icon('chat')}</button></div>
-    <div class="messages" id="main-messages"><div class="date-divider">今日 / ${esc(p.name)}</div>${c.messages.map(m=>messageHTML(m)).join('')}${c.status==='running'?'<div class="row muted tiny"><span class="state-icon running"></span>現在の作業を進めています…（デモ）</div>':''}</div>
-    <div class="composer-area"><div class="quick-prompts"><button data-action="prompt" data-text="この案を採用して">この案を採用</button><button data-action="prompt" data-text="ベンチを手修正したので、ここまでを記録して。">手作業を記録</button><button data-action="side">操作方法を相談</button></div>
-    <div class="composer">${c.reference?`<div class="composer-context"><span>↳</span><span>参照：${esc(art(c.reference)?.title||c.reference)}</span><button data-action="clear-ref" aria-label="参照を外す">×</button></div>`:''}
-    <select id="source" class="source-select" aria-label="成果物を選択"><option value="">成果物を選択・添付</option>${p.artifacts.filter(a=>!a.deleted).map(a=>`<option value="${a.id}" ${c.source===a.id?'selected':''}>${esc(a.file)} · ${esc(a.time)} · ${esc(a.title)}</option>`).join('')}</select>
+    <main class="workspace"><div class="workspace-body"><section class="main-chat" aria-label="メインチャット"><header class="chat-header"><h1>${esc(c.title)}</h1><button class="icon mobile-toggle" data-action="mobile" aria-label="チャットとタブを切り替え">⇄</button></header>
+    <div class="messages" id="main-messages">${c.messages.length?`<div class="date-divider">今日 / ${esc(p.name)}</div>${c.messages.map(m=>messageHTML(m)).join('')}`:'<div class="new-chat-intro"><div class="assistant-dot">∿</div><h2>どこから始めましょうか。</h2><p>メッセージを入力して始める。<br>工程のエージェントは、送信するときに選べます。</p></div>'}${c.status==='running'?'<div class="row muted tiny"><span class="state-icon running"></span>現在の作業を進めています…（デモ）</div>':''}</div>
+    <div class="composer-area"><div class="composer">${c.reference?`<div class="composer-context"><span>↳</span><span>参照：${esc(art(c.reference)?.title||c.reference)}</span><button data-action="clear-ref" aria-label="参照を外す">×</button></div>`:''}
     <textarea id="main-input" aria-label="メッセージ" placeholder="${state.offline?'対象と作業内容を入力して、記録として送信':'制作の依頼や、作業の記録を…'}">${esc(c.draft)}</textarea>
+    ${c.source&&art(c.source)?`<div class="attachments source-chip"><span>↳ ${esc(art(c.source).file)}</span><button data-action="clear-source" aria-label="選択した成果物を外す">×</button></div>`:''}
     ${c.attachments.length?`<div class="attachments">添付：${c.attachments.map(esc).join(' / ')} <button data-action="clear-files" aria-label="添付を外す">×</button></div>`:''}
-    <div class="composer-tools"><div class="composer-selects"><button class="icon" data-action="attach" title="ファイル・画像を添付" aria-label="ファイル・画像を添付">${icon('attach')}</button><select id="stage" aria-label="工程">${['参考調査','シーン計画','仮形状・モデリング','アセット検索','植物・小物配置','UV・テクスチャ','空・海・照明','レンダー出力','振り返り'].map(s=>`<option ${s===c.stage?'selected':''}>${s}</option>`).join('')}</select><select id="model" aria-label="モデル"><option>既定モデル</option><option ${c.model==='別モデル（デモ）'?'selected':''}>別モデル（デモ）</option></select><select id="send-mode" aria-label="送信方法"><option value="chat" ${!c.recordMode&&!state.offline?'selected':''}>会話で送信</option><option value="record" ${c.recordMode||state.offline?'selected':''}>記録として送信</option></select></div>
+    <div class="composer-tools"><div class="composer-selects"><div class="attachment-anchor"><button class="icon" data-action="attachment-menu" title="成果物・ファイルを添付" aria-label="成果物・ファイルを添付" aria-expanded="${state.attachmentMenu}" aria-controls="attachment-menu">${icon('plus')}</button>${state.attachmentMenu?attachmentMenuHTML():''}</div><select id="stage" aria-label="エージェント">${['なし','参考調査','シーン計画','仮形状・モデリング','アセット検索','植物・小物配置','UV・テクスチャ','空・海・照明','レンダー出力','振り返り'].map(s=>`<option ${s===c.stage?'selected':''}>${s}</option>`).join('')}</select><select id="model" aria-label="モデル"><option>既定モデル</option><option ${c.model==='別モデル（デモ）'?'selected':''}>別モデル（デモ）</option></select><select id="send-mode" aria-label="送信方法"><option value="chat" ${!c.recordMode&&!state.offline?'selected':''}>会話で送信</option><option value="record" ${c.recordMode||state.offline?'selected':''}>記録として送信</option></select></div>
     <button class="send ${c.status==='running'||c.status==='stopping'?'stop':''}" data-action="${c.status==='running'?'stop':'send'}" ${c.status==='stopping'?'disabled':''} aria-label="${c.status==='running'?'現在の作業を停止':'送信'}">${c.status==='running'?'■':c.status==='stopping'?'…':'↑'}</button></div></div><div class="composer-footnote">保存済みデータが対象 · 添付は名前のみ使用 · データは再読み込みでリセット</div></div></section>
     <div class="resize-handle" role="separator" aria-label="チャットとタブの表示幅" aria-orientation="vertical" tabindex="0"></div>
-    <aside class="inspector" aria-label="成果物と相談タブ"><nav class="tabs" aria-label="タブ">${state.tabs.filter(t=>t.projectId===p.id).map(t=>`<div class="tab ${t.id===state.activeTab?'active':''}"><button class="tab-open" role="tab" aria-selected="${t.id===state.activeTab}" data-action="tab" data-key="${t.id}">${esc(t.label)}</button><button class="tab-close" data-action="close-tab" data-key="${t.id}" aria-label="${esc(t.label)}を閉じる">×</button></div>`).join('')}<button class="icon tab-add" data-action="tab-menu" title="タブを開く" aria-label="タブを開く">＋</button></nav>
-    <section class="panel-content">${panelHTML()}</section><nav class="tab-shortcuts"><button data-action="side">◌ 相談</button><button data-action="history">⑂ 制作履歴</button><button data-action="guards">◇ 保護一覧</button><button data-action="style">✳ 作風・制作方針</button></nav></aside></div></main></div>
-    <footer class="prototype-bar"><div class="row"><span class="tag">PROTOTYPE / #12</span><span class="prototype-description">合意した導線を試す · 外部接続なし</span></div><div class="variant-switch"><button data-action="prev-variant" aria-label="前のレイアウト">←</button><span>${state.variant} · ${labels[state.variant]}</span><button data-action="next-variant" aria-label="次のレイアウト">→</button></div><button data-action="demo">${state.drawer?'閉じる':'シナリオ・内部状態'}</button></footer>${state.drawer?demoHTML():''}`;
+    <aside class="inspector" aria-label="成果物とサイドチャットのタブ"><nav class="tabs" aria-label="タブ"><button class="icon mobile-toggle" data-action="mobile" aria-label="チャットに戻る">⇄</button>${state.tabs.filter(t=>t.projectId===p.id).map(t=>`<div class="tab ${t.id===state.activeTab?'active':''}"><button class="tab-open" role="tab" aria-selected="${t.id===state.activeTab}" data-action="tab" data-key="${t.id}">${esc(t.label)}</button><button class="tab-close" data-action="close-tab" data-key="${t.id}" aria-label="${esc(t.label)}を閉じる">×</button></div>`).join('')}<button class="icon tab-add" data-action="tab-menu" title="新しいタブ" aria-label="新しいタブ">＋</button></nav>
+    <section class="panel-content">${panelHTML()}</section></aside></div></main></div>
+    <footer class="prototype-bar"><div class="row"><span class="tag">PROTOTYPE / #12</span><span class="prototype-description">外部接続なし · 命名は最初の送信から模擬生成</span></div><button data-action="demo">${state.drawer?'閉じる':'シナリオ・内部状態'}</button></footer>${state.drawer?demoHTML():''}`;
   bindPointer();
   const m=$('#main-messages');m.scrollTop=m.scrollHeight;
   const sm=$('.side-messages');if(sm)sm.scrollTop=sm.scrollHeight;
 }
+function attachmentMenuHTML(){
+  const c=currentChat();
+  return `<div class="attachment-menu" id="attachment-menu" role="menu" aria-label="成果物とファイル"><div class="menu-heading">この作品の成果物</div><div class="attachment-options">${currentProject().artifacts.filter(a=>!a.deleted).map(a=>`<button role="menuitem" data-action="select-source" data-key="${a.id}" class="${c.source===a.id?'selected':''}"><span>▧</span><span><strong>${esc(a.file)}</strong><small>${esc(a.time)} · ${esc(a.title)}</small></span><span>${c.source===a.id?'✓':''}</span></button>`).join('')||'<p class="muted tiny">成果物はまだありません。</p>'}</div><button class="attach-computer" role="menuitem" data-action="attach">${icon('attach')}<span>コンピューターからファイルを添付</span></button></div>`;
+}
+function tabChooserHTML(){
+  return `<div class="tab-chooser"><div class="eyebrow">NEW TAB</div><h2>タブを開く</h2><p class="muted">このタブで開く内容を選んでください。</p><div class="tab-type-list">${[['catalog','image','成果物','この作品のファイル・編集案を開く'],['side','chat','サイドチャット','制作と並行して、気になることを相談'],['history','history','制作履歴','分岐と手修正のつながりを見る'],['guards','shield','保護一覧','変更させない対象と項目を管理'],['style','leaf','作風・制作方針','作品で使う方針と版を確認']].map(([kind,ic,title,desc])=>`<button data-action="choose-tab" data-kind="${kind}">${icon(ic)}<span><strong>${title}</strong><small>${desc}</small></span><span class="type-arrow">↗</span></button>`).join('')}</div></div>`;
+}
 function panelHTML(){
-  const tab=activeTab();if(!tab)return '<div class="empty"><div style="font-size:32px">↗</div><p>チャット内の成果物リンクから<br>ここにタブを開きます。</p><button class="secondary" data-action="side">サイドチャットを開く</button></div>';
+  const tab=activeTab();if(!tab||tab.type==='new')return tabChooserHTML();
+  if(tab.type==='catalog')return `<div class="panel-page"><h2>成果物</h2><p class="intro">この作品の保存済みファイルと編集案</p>${currentProject().artifacts.map(a=>artifactLink(a.id)).join('')||'<p class="muted">成果物はまだありません。</p>'}</div>`;
   if(tab.type==='artifact')return previewHTML(tab.key);
   if(tab.type==='side')return sideHTML(tab);
   if(tab.type==='history')return historyHTML();
@@ -93,35 +101,37 @@ function historyHTML(){
 function guardsHTML(){return `<div class="panel-page"><div class="eyebrow">PROTECTION</div><h2>保護一覧</h2><p class="intro">AIに変更させない対象と項目。今回だけの許可はメインチャットで伝えます。</p>${currentProject().guards.map(g=>`<div class="list-row"><div><strong>◇ ${esc(g.title)}</strong><p>${esc(g.detail)}</p></div><button class="icon danger" data-action="delete-guard" data-key="${g.id}" aria-label="${esc(g.title)}の保護を削除">×</button></div>`).join('')||'<p class="muted">保護指定はありません。</p>'}<p class="note">保護の削除は継続的な解除です。成果物は削除されません。</p></div>`;}
 function styleHTML(){return `<div class="panel-page"><div class="eyebrow">STYLE & DIRECTION</div><h2>作風・制作方針</h2><p class="intro">作品の制作意図は、一般的な制作方針より優先します。</p><div class="list-row"><div><strong>この作品の制作意図</strong><p>${esc(currentProject().intent)}</p></div></div><div class="field"><label for="style-version">この作品に適用する版</label><select id="style-version"><option ${currentProject().style==='静かな風景 · 5f91881'?'selected':''}>静かな風景 · 5f91881</option><option ${currentProject().style==='余白と光 · a1f75a5'?'selected':''}>余白と光 · a1f75a5</option><option ${currentProject().style==='作風なし'?'selected':''}>作風なし</option></select></div><p class="tiny muted">現在：${esc(currentProject().style)}</p><div class="style-item">主役への視線を遮らず、余白と空気感を残す。</div><div class="style-item">人の気配は少数の小物で表現する。</div><span class="badge">採用済みの制作方針 · デモ内容</span><div class="rule"></div><p class="tiny muted">仮説：暖色を控えめに使う傾向があります。<br>この仮説は制作方針に未採用です。</p><button class="secondary" data-action="apply-style" style="margin-top:18px">選んだ版を作品に適用</button><p class="note">Git参照は表示用サンプル。実際のGit操作は行いません。</p></div>`;}
 function demoHTML(){
-  return `<aside class="demo-drawer"><div class="eyebrow">PROTOTYPE CONTROLS</div><h3>シナリオを試す</h3><p class="tiny muted">任意の文章に対するAI応答はありません。対応するキーワードと下のシナリオで導線を確認できます。</p><div class="demo-options">${[['start','制作を開始'],['record','手作業の記録'],['conflict','保護の競合'],['unknown','状態確認が必要'],['reconcile','停止を照合'],['offline','LLM利用不可'],['preview-failure','プレビュー失敗'],['reflection','複数作品の振り返り']].map(([k,l])=>`<button data-action="scenario" data-key="${k}" class="${k==='offline'&&state.offline||k==='preview-failure'&&state.previewFailure?'selected':''}">${l}${k==='offline'?`：${state.offline?'ON':'OFF'}`:k==='preview-failure'?`：${state.previewFailure?'ON':'OFF'}`:''}</button>`).join('')}</div><div class="row between"><span class="tiny muted">関連する内部状態（全てメモリ上）</span><button class="tiny" data-action="reset">初期化</button></div><pre class="sample-state">${esc(JSON.stringify({project:currentProject().name,chat:currentChat().title,accepted:currentProject().accepted,status:currentChat().status,detail:currentChat().detail,request:currentChat().request,reference:currentChat().reference,tabs:state.tabs.filter(t=>t.projectId===state.projectId).map(t=>t.label),sideChat:currentChat().side?'相談専用':'未作成',llmUnavailable:state.offline,previewFailure:state.previewFailure},null,2))}</pre></aside>`;
+  return `<aside class="demo-drawer"><div class="eyebrow">PROTOTYPE CONTROLS</div><h3>シナリオを試す</h3><p class="tiny muted">任意の文章に対するAI応答はありません。対応するキーワードと下のシナリオで導線を確認できます。</p><div class="demo-options">${[['start','制作を開始'],['record','手作業の記録'],['conflict','保護の競合'],['unknown','状態確認が必要'],['reconcile','停止を照合'],['offline','LLM利用不可'],['preview-failure','プレビュー失敗'],['reflection','複数作品の振り返り']].map(([k,l])=>`<button data-action="scenario" data-key="${k}" class="${k==='offline'&&state.offline||k==='preview-failure'&&state.previewFailure?'selected':''}">${l}${k==='offline'?`：${state.offline?'ON':'OFF'}`:k==='preview-failure'?`：${state.previewFailure?'ON':'OFF'}`:''}</button>`).join('')}</div><div class="row between"><span class="tiny muted">関連する内部状態（全てメモリ上）</span><button class="tiny" data-action="reset">初期化</button></div><pre class="sample-state">${esc(JSON.stringify({project:currentProject().name,chat:currentChat().title,accepted:currentProject().accepted,status:currentChat().status,detail:currentChat().detail,request:currentChat().request,reference:currentChat().reference,selectedAgent:currentChat().stage,lastSentStage:currentChat().lastStage,tabs:state.tabs.filter(t=>t.projectId===state.projectId).map(t=>t.label),sideChat:currentChat().side?'相談専用':'未作成',llmUnavailable:state.offline,previewFailure:state.previewFailure},null,2))}</pre></aside>`;
 }
 function toast(text){const el=$('#toast');el.textContent=text;el.classList.add('visible');clearTimeout(toast.timer);toast.timer=setTimeout(()=>el.classList.remove('visible'),3200);}
 function saveDrafts(){const c=currentChat();if($('#main-input'))c.draft=$('#main-input').value;const si=$('#side-input');if(si){const ch=currentProject().chats.find(ch=>ch.id===si.dataset.chat);ch.side.draft=si.value;}}
 function openTab(type,key,label,extra={}){saveDrafts();const tid=`${type}:${key}`;if(!state.tabs.some(t=>t.id===tid&&t.projectId===state.projectId))state.tabs.push({id:tid,type,key,label,projectId:state.projectId,...extra});state.activeTab=tid;state.mobile='panel';state.zoom=1;state.panX=state.panY=0;render();}
 function openArtifact(key){const a=art(key);if(a){currentChat().source=key;openTab('artifact',key,a.title);}}
-function openSide(){const c=currentChat(),p=currentProject();if(!c.side)c.side={topic:c.title,refs:[p.intent,art(c.source)?.file||'成果物未選択'],draft:'',busy:false,messages:[agent('制作の横で、気になることを相談できます。\nたとえば「ベンチの位置をBlenderで手調整するには？」と聞いてみてください。')]};openTab('side',c.id,'相談 · '+c.title,{chatId:c.id});}
+function openSide(){const c=currentChat(),p=currentProject();if(!c.side)c.side={topic:c.title,refs:[p.intent,art(c.source)?.file||'成果物未選択'],draft:'',busy:false,messages:[agent('制作の横で、気になることを相談できます。\nたとえば「ベンチの位置をBlenderで手調整するには？」と聞いてみてください。')]};openTab('side',c.id,'サイドチャット · '+c.title,{chatId:c.id});}
 function append(ch,text,refs=[]){ch.messages.push({...agent(text,refs),time:now()});}
 function record(ch,text){
-  const p=currentProject(),source=art(ch.reference||ch.source);if(!source&&!ch.attachments.length){append(ch,'記録する制作ファイルをプルダウンで選ぶか、保存したファイルを添付してください。');return;}
+  const p=currentProject(),source=art(ch.reference||ch.source);if(!source&&!ch.attachments.length){append(ch,'入力欄左下の＋から記録する制作ファイルを選ぶか、保存したファイルを添付してください。');return;}
   const a={id:id(),title:'手修正 · '+now(),file:ch.attachments.find(f=>/\.(blend|psd|psb)$/i.test(f))||'shiomi_hand_edit.blend（デモ）',state:'S'+seq,time:now(),kind:source?.kind||''};a.previewMissing=state.previewFailure||!(/\.blend(?:$|（)/i.test(a.file));p.artifacts.push(a);p.history.push({id:a.id,label:a.title,reason:text});ch.source=a.id;
   append(ch,`手修正を記録しました（デモ）。\n変更元：${source?.file||'添付ファイル'}\n作業内容：${text}\n理由：未入力。後から補記できます。\n${a.previewMissing?'プレビューは未取得です。制作ファイルと本文は記録済みです。後から画像を補えます。'+(state.previewFailure?'プレビュー生成に失敗しました。':'PSD/PSB等は人間が保存したプレビューを添付してください。'):'Camera_Main・F1・1200 × 850でプレビューを生成しました（デモ画像）。'}\n${state.offline||ch.recordMode?'LLMによる要約は行っていません。':''}`,[a.id]);ch.attachments=[];
 }
-function startWork(ch){if(state.offline){append(ch,'LLMを利用できません。閲覧・記録として送信・バックアップは使えます。');return;}
-  ch.status='running';ch.detail='植物の配置を調整中';ch.request=ch.request||{id:id(),retries:0};append(ch,'保存済みのデータを使って制作を始めました（デモ）。入力欄右下で停止できます。\nこのデモでは自動完了しないため、停止・明示再開を自由に確認できます。');}
+function startWork(ch,resume=false){if(state.offline){append(ch,'LLMを利用できません。閲覧・記録として送信・バックアップは使えます。');return;}
+  ch.status='running';ch.detail='植物の配置を調整中';ch.request=resume&&ch.request?ch.request:{id:id(),retries:0,stage:ch.lastStage||ch.stage};append(ch,'保存済みのデータを使って制作を始めました（デモ）。入力欄右下で停止できます。\nこのデモでは自動完了しないため、停止・明示再開を自由に確認できます。');}
 function sendMain(){saveDrafts();const c=currentChat(),p=currentProject(),text=c.draft.trim();if(!text)return;
   if(['running','stopping'].includes(c.status)){toast('現在の作業を止めてから、次のメッセージを送信してください。');return;}
-  c.messages.push({...user(text),time:now()});c.draft='';
+  c.lastStage=c.stage;
+  c.messages.push({...user(text),stage:c.stage,time:now()});c.draft='';
+  if(c.needsTitle&&!state.offline&&!c.recordMode){c.needsTitle=false;setTimeout(()=>{c.title=text.replace(/\s+/g,' ').slice(0,18)+(text.length>18?'…':'');render();},450);}
   if(c.recordMode||/記録|登録/.test(text))record(c,text);
   else if(state.offline)append(c,'LLMを利用できません。手作業は「記録として送信」から登録できます。');
   else if(/続け|再開/.test(text)){
     if(c.status==='attention'&&c.detail==='状態確認が必要')append(c,'結果がまだ不明です。照合が終わるまで再開できません。デモ操作の「停止を照合」で確認後の状態を試せます。');
-    else if(c.status==='stopped'){startWork(c);append(c,`元の作業を再開しました。依頼ID：${c.request?.id}。累積再実行回数は維持しています（このデモは未着手部分の続行です）。`);}
+    else if(c.status==='stopped'){startWork(c,true);append(c,`元の作業を再開しました。依頼ID：${c.request?.id}。累積再実行回数は維持しています（このデモは未着手部分の続行です）。`);}
     else append(c,'再開対象の停止した作業がありません。新しい制作内容を指定してください。');
   }else if(/今回だけ|今回.*許可/.test(text)){c.protectedPermission=true;c.status='normal';c.detail='依頼限定の許可を記録（デモ）';append(c,'今回の依頼に限って、指定されたカメラ項目の変更を許可しました。継続的な保護は維持します。新しい依頼には引き継ぎません。');}
   else if(/方針.*採用|コミット/.test(text)){append(c,'制作方針の採用とコミットを模擬しました。作品への適用は別操作です。作風・制作方針タブで版を選んでください。');}
   else if(/不採用/.test(text)){const a=art(c.reference||c.source);append(c,`${a?.title||'指定の案'}を不採用として記録しました。成果物・理由・分岐は残し、現在採用状態は変えません。`);}
   else if(/採用/.test(text)){
-    const a=art(c.reference||c.source);if(!a||a.id==='base')append(c,'どの編集案を採用しますか？成果物のプルダウンで対象を選び、採用する範囲を伝えてください。');
+    const a=art(c.reference||c.source);if(!a||a.id==='base')append(c,'どの編集案を採用しますか？入力欄左下の＋から成果物を選び、採用する範囲を伝えてください。');
     else if(a.deleted)append(c,'この案の実体は削除済みのため、採用できません。');
     else if(c.status==='attention'&&c.detail==='状態確認が必要')append(c,'状態の照合が必要です。現在状態を変更しません。');
     else{p.accepted=a.id;c.status='normal';c.detail='採用・適用済み（デモ）';append(c,`${a.title}・${a.state}を採用し、現在状態に適用しました（デモ）。\n他の案は未選択のまま残します。採用理由は未入力です。`,[a.id]);}
@@ -133,7 +143,7 @@ function sendMain(){saveDrafts();const c=currentChat(),p=currentProject(),text=c
   }else if(/別作品|派生/.test(text)){
     const a=art(c.reference||c.source);if(!a||a.deleted)append(c,'利用可能な保存状態を指定してください。');else{const np=makeProject(p.name+' · 派生',p.intent,[makeChat('派生作品の制作',[agent(`元作品「${p.name}」の${a.title}から始めました。独立した作品です（デモ）。作風は別途選択してください。`)])],[{...a}]);np.accepted=a.id;np.style='作風なし';state.projects.push(np);append(c,`「${np.name}」を作成しました（デモ）。左側の一覧から開けます。元作品は変更しません。`);}
   }else if(/補記|訂正|理由/.test(text)){append(c,'指定した記録への補記として保存しました（デモ）。以前の文章と記入時刻は保持し、通常表示は最新の内容を使います。');}
-  else if(/作って|配置|調整|明るく|開始/.test(text))startWork(c);
+  else if(/作って|配置|調整|明るく|開始/.test(text)){if(c.stage==='なし')append(c,'工程のエージェントは選択されていません。ここでは通常の会話として受け付けました（デモ）。制作を依頼する場合は、入力欄のエージェントを選んで送信してください。');else startWork(c);}
   else append(c,'これは入力を試すためのデモ応答です。\n「この案を採用して」「ここまでを記録して」「続けて」などを試せます。その他のシナリオは右下の「シナリオ・内部状態」から選べます。');
   render();$('#main-input').focus();
 }
@@ -150,7 +160,7 @@ function renderSettings(){
   const d=$('#dialog');d.innerHTML=`<div class="row between"><h2>設定・保存データ</h2><button class="icon" data-action="close-dialog" aria-label="閉じる">×</button></div><div class="settings-nav">${[['backup','バックアップ'],['data','保存データ'],['runtime','モデル・版']].map(([k,l])=>`<button class="${page===k?'active':''}" data-action="settings-page" data-key="${k}">${l}</button>`).join('')}</div>${content}${state.operation?`<div class="operation-result" role="status">${esc(state.operation)}</div>`:''}<p class="tiny muted" style="margin-top:20px">全てデモです。ファイルの読み書き・削除・Git通信は行いません。</p>`;if(!d.open)d.showModal();
 }
 function scenario(key){saveDrafts();const c=currentChat();
-  if(key==='start')startWork(c);
+  if(key==='start'){if(c.stage==='なし')c.stage='植物・小物配置';c.lastStage=c.stage;startWork(c);}
   if(key==='offline'){state.offline=!state.offline;if(state.offline){for(const p of state.projects)for(const ch of p.chats){if(ch.status==='running'||ch.status==='stopping'){ch.status='stopped';ch.detail='中断 · 利用上限（デモ）';append(ch,'利用上限のため作業を中断しました。回復後も明示的な再開が必要です。');}if(ch.side){ch.side.busy=false;ch.side.token=id();}}c.recordMode=true;}else c.recordMode=false;}
   if(key==='preview-failure')state.previewFailure=!state.previewFailure;
   if(key==='record'){c.draft='ベンチの位置を手修正しました。ここまでを記録して。';c.source='plants';state.mobile='chat';}
@@ -162,30 +172,34 @@ function scenario(key){saveDrafts();const c=currentChat();
 }
 function reflection(){modal('作品を振り返る',`<p class="muted tiny">対象作品と履歴の範囲を選び、専用チャットを始めます。</p><div class="field">${state.projects.filter(p=>!p.isReview).map(p=>`<label><input type="checkbox" name="reflection-work" value="${p.id}" checked> ${esc(p.name)}</label>`).join('')}</div><div class="field"><label for="reflection-scope">履歴の範囲</label><select id="reflection-scope"><option>現在採用状態までの分岐・採否・手修正</option><option>選択中の保存状態と、そこまでの履歴</option></select></div>`,'create-reflection','振り返りを開始');}
 document.addEventListener('input',e=>{if(e.target.id==='main-input')currentChat().draft=e.target.value;if(e.target.id==='side-input'){const ch=currentProject().chats.find(c=>c.id===e.target.dataset.chat);ch.side.draft=e.target.value;}});
-document.addEventListener('change',e=>{const c=currentChat();if(e.target.id==='source')c.source=e.target.value;if(e.target.id==='stage')c.stage=e.target.value;if(e.target.id==='model')c.model=e.target.value;if(e.target.id==='send-mode')c.recordMode=e.target.value==='record';});
+document.addEventListener('change',e=>{const c=currentChat();if(e.target.id==='stage')c.stage=e.target.value;if(e.target.id==='model')c.model=e.target.value;if(e.target.id==='send-mode')c.recordMode=e.target.value==='record';});
 document.addEventListener('click',e=>{
-  const el=e.target.closest('[data-action]');if(!el)return;const action=el.dataset.action,k=el.dataset.key;saveDrafts();
+  const el=e.target.closest('[data-action]');
+  if(state.attachmentMenu&&!e.target.closest('.attachment-anchor')){state.attachmentMenu=false;$('#attachment-menu')?.remove();document.querySelector('[data-action=attachment-menu]')?.setAttribute('aria-expanded','false');}
+  if(!el)return;const action=el.dataset.action,k=el.dataset.key;saveDrafts();
   if(action==='artifact')openArtifact(k);
   else if(action==='tab'){state.activeTab=k;render();}
   else if(action==='close-tab'){state.tabs=state.tabs.filter(t=>!(t.id===k&&t.projectId===state.projectId));if(state.activeTab===k)state.activeTab=state.tabs.filter(t=>t.projectId===state.projectId).at(-1)?.id;render();}
   else if(action==='side')openSide();
   else if(['history','guards','style'].includes(action))openTab(action,action,{history:'制作履歴',guards:'保護一覧',style:'作風・制作方針'}[action]);
-  else if(action==='tab-menu')modal('タブを開く',`<div class="demo-options"><button class="secondary" data-action="side">相談</button><button class="secondary" data-action="history">制作履歴</button><button class="secondary" data-action="guards">保護一覧</button><button class="secondary" data-action="style">作風・制作方針</button></div>`);
+  else if(action==='tab-menu')openTab('new',id(),'新しいタブ');
+  else if(action==='choose-tab'){const tab=activeTab();if(tab?.type==='new')state.tabs=state.tabs.filter(t=>t!==tab);const kind=el.dataset.kind;if(kind==='side')openSide();else openTab(kind,kind,{catalog:'成果物',history:'制作履歴',guards:'保護一覧',style:'作風・制作方針'}[kind]);}
   else if(action==='send')sendMain();
   else if(action==='stop')stopMain();
   else if(action==='side-send')sendSide(el.dataset.chat);
   else if(action==='side-stop'){const side=currentProject().chats.find(c=>c.id===el.dataset.chat).side;side.busy=false;side.token=id();side.messages.push(agent('相談の回答を停止しました。メインの制作作業は止まりません。'));render();}
   else if(action==='side-context'){const side=currentProject().chats.find(c=>c.id===el.dataset.chat).side;side.refs.push(`追加参照：${art(currentChat().source)?.file||'現在の話題'} / ${now()}`);render();toast('選択中の成果物を相談の参照に追加しました。');}
-  else if(action==='prompt'){currentChat().draft=el.dataset.text;state.mobile='chat';render();$('#main-input').focus();}
+  else if(action==='attachment-menu'){state.attachmentMenu=!state.attachmentMenu;render();if(state.attachmentMenu)$('#attachment-menu button')?.focus();}
+  else if(action==='select-source'){currentChat().source=k;currentChat().reference=null;state.attachmentMenu=false;render();$('#main-input').focus();}
+  else if(action==='clear-source'){currentChat().source='';render();}
   else if(action==='clear-ref'){currentChat().reference=null;render();}
   else if(action==='reference'){currentChat().reference=k;currentChat().source=art(k)?k:currentChat().source;state.mobile='chat';render();toast('メインチャットに参照を添えました。');}
   else if(action==='history-node'){state.historyNode=k;render();}
-  else if(action==='chat'||action==='project'){state.projectId=el.dataset.project||k;state.chatId=action==='chat'?k:currentProject().chats[0].id;state.activeTab=state.tabs.filter(t=>t.projectId===state.projectId).at(-1)?.id;state.mobile='chat';render();}
+  else if(action==='chat'||action==='project'){state.projectId=el.dataset.project||k;if(!currentProject().chats.length){createChat(state.projectId);return;}state.chatId=action==='chat'?k:currentProject().chats[0].id;state.activeTab=state.tabs.filter(t=>t.projectId===state.projectId).at(-1)?.id;state.mobile='chat';render();}
   else if(action==='new-project')modal('作品を作成',`<div class="field"><label for="project-name">作品名</label><input id="project-name" placeholder="作品の名前"></div><div class="field"><label for="project-intent">制作意図（後から補えます）</label><textarea id="project-intent" placeholder="描きたい景色、空気感など"></textarea></div><div class="field"><label for="project-style">作風の版</label><select id="project-style"><option>作風なし</option><option>静かな風景 · 5f91881</option></select></div><div class="field"><label for="project-file">既存ファイルから始める（任意・名前のみ使用）</label><input id="project-file" type="file" accept=".blend,.psd,.psb"></div>`,'create-project');
-  else if(action==='create-project'){const name=$('#project-name').value.trim();if(!name){$('#project-name').focus();return;}const file=$('#project-file').files[0];const np=makeProject(name,$('#project-intent').value,[makeChat('最初の制作チャット',[agent(file?`${file.name}の取り込みを模擬しました。実ファイルは読み込みません。`:'制作意図と最初の工程を伝えてください。')])],file?[{...artifactData.base,file:file.name}]:[]);np.style=$('#project-style').value;state.projects.push(np);state.projectId=np.id;state.chatId=np.chats[0].id;state.activeTab=null;$('#dialog').close();render();}
-  else if(action==='new-chat')modal('新しいチャット',`<div class="field"><label for="chat-name">チャット名</label><input id="chat-name" placeholder="検討したいテーマ"></div><div class="field"><label for="chat-stage">工程</label><select id="chat-stage"><option>参考調査</option><option>シーン計画</option><option>植物・小物配置</option><option>レンダー出力</option></select></div>`,'create-chat');
-  else if(action==='create-chat'){const c=makeChat($('#chat-name').value.trim()||'新しいチャット',[],$('#chat-stage').value);currentProject().chats.push(c);state.chatId=c.id;$('#dialog').close();render();}
-  else if(action==='attach'){const input=document.createElement('input');input.type='file';input.multiple=true;const ch=currentChat();input.onchange=()=>{ch.attachments=Array.from(input.files).map(f=>f.name);render();};input.click();}
+  else if(action==='create-project'){const name=$('#project-name').value.trim();if(!name){$('#project-name').focus();return;}const file=$('#project-file').files[0];const np=makeProject(name,$('#project-intent').value,[makeChat('新しいチャット',[agent(file?`${file.name}の取り込みを模擬しました。実ファイルは読み込みません。`:'制作意図と最初の工程を伝えてください。')])],file?[{...artifactData.base,file:file.name}]:[]);np.style=$('#project-style').value;state.projects.push(np);state.projectId=np.id;state.chatId=np.chats[0].id;state.activeTab=null;$('#dialog').close();render();}
+  else if(action==='new-chat')createChat(el.dataset.project||state.projectId);
+  else if(action==='attach'){state.attachmentMenu=false;$('#attachment-menu')?.remove();document.querySelector('[data-action=attachment-menu]')?.setAttribute('aria-expanded','false');const input=document.createElement('input');input.type='file';input.multiple=true;const ch=currentChat();input.onchange=()=>{ch.attachments=Array.from(input.files).map(f=>f.name);render();};input.click();}
   else if(action==='clear-files'){currentChat().attachments=[];render();}
   else if(action==='delete-guard')modal('保護を削除',`<p>「${esc(currentProject().guards.find(g=>g.id===k)?.title)}」の保護を継続的に解除します。<br>今回だけ許可したい場合は、メインチャットで伝えてください。</p><input id="guard-to-delete" type="hidden" value="${k}">`,'confirm-delete-guard','保護を削除');
   else if(action==='confirm-delete-guard'){const key=$('#guard-to-delete').value;currentProject().guards=currentProject().guards.filter(g=>g.id!==key);$('#dialog').close();render();toast('保護を解除しました（デモ）。');}
@@ -204,14 +218,27 @@ document.addEventListener('click',e=>{
   else if(action==='close-dialog')$('#dialog').close();
   else if(action==='demo'){state.drawer=!state.drawer;render();}
   else if(action==='scenario')scenario(k);
-  else if(action==='prev-variant'||action==='next-variant')setVariant(action==='next-variant'?1:-1);
   else if(action==='mobile'){state.mobile=state.mobile==='chat'?'panel':'chat';render();}
   else if(action==='reset'){location.reload();}
   else if(['zoom-in','zoom-out','zoom-fit'].includes(action)){if(action==='zoom-fit'){state.zoom=1;state.panX=state.panY=0;}else state.zoom=Math.max(.4,Math.min(4,state.zoom+(action==='zoom-in'?.2:-.2)));updateZoom();}
   if(['side','history','guards','style'].includes(action)&&$('#dialog').open)$('#dialog').close();
 });
-function setVariant(delta){saveDrafts();state.variant=['A','B','C'][(['A','B','C'].indexOf(state.variant)+delta+3)%3];const url=new URL(location.href);url.searchParams.set('variant',state.variant);history.replaceState(null,'',url);render();}
-document.addEventListener('keydown',e=>{const editing=e.target.matches('input,textarea,select,[contenteditable]');if(editing&&e.key==='Enter'&&!e.shiftKey&&e.target.id==='main-input'&&!e.isComposing){e.preventDefault();sendMain();}if(editing&&e.key==='Enter'&&!e.shiftKey&&e.target.id==='side-input'&&!e.isComposing){e.preventDefault();sendSide(e.target.dataset.chat);}if(!editing&&!$('#dialog').open&&['ArrowLeft','ArrowRight'].includes(e.key)){e.preventDefault();setVariant(e.key==='ArrowRight'?1:-1);}if(e.target.matches('[data-action][role=button]')&&['Enter',' '].includes(e.key)){e.preventDefault();e.target.click();}});
+function createChat(projectId){
+  state.attachmentMenu=false;
+  state.projectId=projectId;
+  const p=currentProject(),c=makeChat('新しいチャット');
+  c.source='';
+  if(p.isReview)c.scope=state.projects.filter(pr=>!pr.isReview).map(pr=>pr.id);
+  p.chats.push(c);state.chatId=c.id;state.mobile='chat';
+  state.activeTab=state.tabs.filter(t=>t.projectId===projectId).at(-1)?.id;
+  render();$('#main-input').focus();
+}
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'&&state.attachmentMenu){state.attachmentMenu=false;render();document.querySelector('[data-action=attachment-menu]')?.focus();return;}
+  const editing=e.target.matches('input,textarea,select,[contenteditable]');
+  if(editing&&e.key==='Enter'&&!e.shiftKey&&!e.isComposing){if(e.target.id==='main-input'){e.preventDefault();sendMain();}if(e.target.id==='side-input'){e.preventDefault();sendSide(e.target.dataset.chat);}}
+  if(e.target.matches('[data-action][role=button]')&&['Enter',' '].includes(e.key)){e.preventDefault();e.target.click();}
+});
 function updateZoom(){const im=$('#preview-image');if(im)im.style.transform=`translate(${state.panX}px,${state.panY}px) scale(${state.zoom})`;if($('#zoom-label'))$('#zoom-label').textContent=Math.round(state.zoom*100)+'%';}
 function bindPointer(){
   const canvas=$('.preview-canvas');if(canvas){let start;canvas.addEventListener('wheel',e=>{e.preventDefault();state.zoom=Math.max(.4,Math.min(4,state.zoom-e.deltaY*.002));updateZoom();},{passive:false});canvas.addEventListener('pointerdown',e=>{start={x:e.clientX,y:e.clientY,px:state.panX,py:state.panY};canvas.setPointerCapture(e.pointerId);});canvas.addEventListener('pointermove',e=>{if(start){state.panX=start.px+e.clientX-start.x;state.panY=start.py+e.clientY-start.y;updateZoom();}});canvas.addEventListener('pointerup',()=>start=null);canvas.addEventListener('pointercancel',()=>start=null);}
