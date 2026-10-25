@@ -28,6 +28,12 @@ Issue の状態・依存関係・担当者は GitHub を正とする。この一
 | 参考調査・素材サービス | [参考調査と素材サービスの選定・取り込み契約を決める](https://github.com/Kurarowa305/scene-craft/issues/13) | `reference-and-assets.md` |
 | テスト・診断・受け入れ | [テスト境界・診断情報・初期版の受け入れ手順を決める](https://github.com/Kurarowa305/scene-craft/issues/14) | `testing-and-diagnostics.md` |
 
+## 追加の設計調査
+
+| 調査Issue | 成果物と状態 |
+| --- | --- |
+| [Codex app-serverの仕様を調査し、画面機能の実現範囲と独自実装の分担表を作成する](https://github.com/Kurarowa305/scene-craft/issues/26) | app-server提供部分・scene-craft独自実装・外部ツール・根拠・制約の機能別対応表。2026-10-26はIssue登録のみ。調査と表の作成は未着手 |
+
 ## 資料にまとめる内容
 
 - 対象範囲、責務・構成
