@@ -14,6 +14,8 @@ Issue の状態・依存関係・担当者は GitHub を正とする。この一
 
 2026-10-31、[工程別エージェントと外部ツール契約](agent-contracts.md)を合意した。10役割の入出力・完了条件、専用stdio MCPとWSL内ローカルRPC、同じthreadの工程切替、固定手順と生成Python、Git定義、提案数と補助モデルを確定した。操作相談は独立した結果記録を作らない。全体構成図へMCPプロセスを追加し、命名・要約のモデルは設定可能、初期値をGPT-6 Lunaとした。本実装と権限・停止・異常系の実機検証は後続へ引き継ぐ。
 
+2026-10-31、[13レイヤーPSD出力の変換調査](../research/psd16-conversion-validation.md)で、小さなCycles実EXRからPSD/PSBへの一貫変換を確認した。PhotoshopAPIとpsd-toolsの組合せ、名称・merged imageの補修、Blender付属の表示変換、データ画像の符号化、容量・メモリの検査方針を確定し、確認用ファイルを保存した。Photoshop実機・2GB超の実生成・透明/ボリューム品質は受け入れ設計へ引き継ぐ。
+
 ## 項目一覧
 
 設計がまとまった項目から資料を作成する。下表のファイル名は作成予定先であり、未作成の資料を設計済みとして扱わない。作成したらファイル名をリンクに更新する。大きい問いは追加 Issue に分割して、この領域の資料へ統合する。
@@ -22,7 +24,7 @@ Issue の状態・依存関係・担当者は GitHub を正とする。この一
 | --- | --- | --- |
 | LLM 接続・費用制約 | [LLM 接続と費用制約を満たす方式を決める](https://github.com/Kurarowa305/scene-craft/issues/2) | [llm-connection.md](llm-connection.md)（設計合意済み） |
 | 全体構成・OS の責務 | [アプリ全体と Windows・WSL の責務を決める](https://github.com/Kurarowa305/scene-craft/issues/3) | [application-architecture.md](application-architecture.md)（設計合意済み） |
-| Blender 連携・出力 | [Blender の操作経路とレンダー出力契約を決める](https://github.com/Kurarowa305/scene-craft/issues/4) | [blender-integration.md](blender-integration.md)（設計合意済み。出力方式の実装検証は[後続調査](https://github.com/Kurarowa305/scene-craft/issues/16)） |
+| Blender 連携・出力 | [Blender の操作経路とレンダー出力契約を決める](https://github.com/Kurarowa305/scene-craft/issues/4) | [blender-integration.md](blender-integration.md)（設計合意済み。[13種類の変換検証](../research/psd16-conversion-validation.md)済み。Photoshop実機と大容量検証は後続） |
 | ドメイン・データモデル | [作品と制作履歴のデータモデルを決める](https://github.com/Kurarowa305/scene-craft/issues/5) | [domain-data-model.md](domain-data-model.md)（設計合意済み） |
 | 保存・復元・バックアップ | [制作データの保存・復元・バックアップ方式を決める](https://github.com/Kurarowa305/scene-craft/issues/6) | [artifact-storage.md](artifact-storage.md)（設計合意済み） |
 | 実行状態・再実行 | [実行状態・順序制御・再実行・復旧を決める](https://github.com/Kurarowa305/scene-craft/issues/7) | [execution-lifecycle.md](execution-lifecycle.md)（設計合意済み） |

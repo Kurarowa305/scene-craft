@@ -65,7 +65,7 @@ Windows Blender をバックグラウンドで起動し、保存済み入力か�
 
 パスの根拠は [Blender の Passes](https://docs.blender.org/manual/en/latest/render/layers/passes.html)。Vue の元の各レイヤーの厳密な定義は未確認であり、単なる名称変更で互換を約束しない。出力はシーン全体に対する13種類に限定すると合意済み。以前検討した「物体の隠れた部分も個別出力する」方針は、初期範囲を絞る今回の判断により初期対象から外した。
 
-標準パスの取得、ID の可視化、決まった式での合成・深度変換・書き出しは通常のプログラムで行う方針とする。LLM による画像調整は挟まない。各パスの意味は合意済みで、表の式と以下の変換規約に従う。実際の13レイヤーへの一貫した変換とPhotoshopでの使用結果は未検証。PSD方式は以下のとおり合意済み。
+標準パスの取得、ID の可視化、決まった式での合成・深度変換・書き出しは通常のプログラムで行う方針とする。LLM による画像調整は挟まない。各パスの意味は合意済みで、表の式と以下の変換規約に従う。小さな合成シーンの実EXRから13レイヤーへの一貫変換は[確認済み](../research/psd16-conversion-validation.md)。Photoshopでの使用結果は未検証。PSD方式は以下のとおり合意済み。
 
 ## PSD への引き渡し
 
@@ -75,7 +75,7 @@ Blender でパスを出力した後、通常のプログラムで PSD を新規�
 
 - 13種類の名前付き画像レイヤーを格納する。初期表示は統合レイヤーだけを表示し、残りは補助素材として非表示にする。自動で13枚を重ねて統合画像を再現することは要求しない。
 - 16 bit RGB、sRGBを採用する。sRGBのICCプロファイルを埋め込む。色の画像にはシーンリニアからの変換を行い、ID色・マスク・Z Depthには用途に合う値を符号化する。具体的な変換規約は後述の出力契約に従い、全種類へ同じ表示変換を掛けない。プロファイルの埋め込みだけでは色変換したことにならない。
-- 書き込みライブラリは PhotoshopAPI が候補。[合成データの検証](../research/psd-export-validation.md)で、13枚の16bit画像レイヤーと表示状態、独立パーサーによる全RGB画素値の一致を確認した。名前末尾のNUL表現と合成プレビューの制約があり、採用は[後続調査](https://github.com/Kurarowa305/scene-craft/issues/16)で確定する。実レンダーパスからの変換・色管理・Photoshopでの読み込みは未検証。
+- 2026-10-31の[実EXR変換検証](../research/psd16-conversion-validation.md)に基づき、PhotoshopAPI 0.9.1でレイヤーを書き、psd-tools 1.24.0で期待する名称を設定し直し、変換済みCombinedをmerged imageへ直接格納する方式を採用する。psd-toolsの内部APIを使うため版を固定し、更新時は再検証する。通常の再合成は行わず、一時ファイルを再読込して全レイヤー・merged image・ICCを検証してから完成として公開する。小さなCycles実出力からの13種類の変換とPSD/PSBでの16bit値保持は確認済み。Photoshop実機の表示・編集、大容量の実動作は未確認。
 - PSDの容量・寸法上限を超える場合は同じ13レイヤー・16 bit・sRGBを維持してPSBへ自動切り替えし、出力形式を画面に表示する。自動縮小やbit depthの変更は行わない。PSB自体の上限や保存容量不足は失敗として示す。
 - 実機確認ではレイヤー数・名称・表示状態、16 bit、色とアルファ、ID 色と深度の保持、Photoshop での開き直しを確認する。ライブラリの合成プレビューの制約も確認する。
 
@@ -150,8 +150,8 @@ Blender操作Moduleの呼び出し側には、BlenderのPython、Windowsプロ�
 | --- | --- | --- |
 | Windows Blenderのbackground起動・合成シーンの保存・CPUレンダー・EXR/PNG・Python例外終了コード | [実行確認](../research/blender-execution-validation.md) | 実作品・外部素材・GPU・保存中断・Windows補助プロセスの製品実装 |
 | 所有する検証プロセスの強制終了と保存済み `.blend` の開き直し | 同上 | 協調停止・保存中の障害・バックエンド再起動後の照合 |
-| 指定地面のShadow Catcher | [影の確認](../research/blender-shadow-validation.md) | 複数受け面・壁・透過・ボリューム、レタッチ用変換 |
-| 16bit・13画像レイヤー・表示状態・RGB値・ICCの保持、PSDと小さいPSB | [PSD確認](../research/psd-export-validation.md) | 実レンダーパスの一貫変換、alpha・色の見た目・大容量での切り替え、Photoshop実機、合成プレビュー |
+| 指定地面のShadow CatcherとRGBの0〜1クランプ、中間EXRの原値保持 | [影の確認](../research/blender-shadow-validation.md)、[変換確認](../research/psd16-conversion-validation.md) | 複数受け面・壁・透過・ボリュームの品質 |
+| Cycles実EXRから13種類へ一貫変換、AgX/sRGB、空を除くAlpha、16bit・名称・表示・ICC・merged RGB、PSDと小さいPSB | [先行PSD確認](../research/psd-export-validation.md)、[実EXR変換確認](../research/psd16-conversion-validation.md) | 透明・ボリュームのAlpha品質、大容量での実切り替えとメモリ、Photoshop実機 |
 
 - [全体構成](https://github.com/Kurarowa305/scene-craft/issues/3): Windows補助プロセスとWSLの生存管理、終了・再接続。
 - [データモデル](https://github.com/Kurarowa305/scene-craft/issues/5)・[保存](https://github.com/Kurarowa305/scene-craft/issues/6): 入力の固定、外部依存、生成物の完成状態、IDと色の対応、保持・削除。
@@ -159,4 +159,4 @@ Blender操作Moduleの呼び出し側には、BlenderのPython、Windowsプロ�
 - [編集案と保護指定](https://github.com/Kurarowa305/scene-craft/issues/8)・[エージェント契約](https://github.com/Kurarowa305/scene-craft/issues/9): 操作要求と変更範囲の検査、固定ツールと生成スクリプトの権限。
 - [テストと受け入れ](https://github.com/Kurarowa305/scene-craft/issues/14): 上表の未検証点、13種類の実出力からPSDまで、Photoshopでの読み込み・色・alpha・再保存。利用者によるPhotoshop確認を受け入れへ含める。
 
-[13レイヤーPSD出力の変換方式とライブラリを検証する](https://github.com/Kurarowa305/scene-craft/issues/16)で、実装仕様の前に13種類の出力と変換規約を小さな見本で確認する。PhotoshopAPIは候補のままとし、レイヤー名末尾NUL・合成プレビューの扱いを含めて採用可否を決める。設計完了と本実装・全受け入れの完了は区別する。
+[13レイヤーPSD出力の変換方式とライブラリを検証する](https://github.com/Kurarowa305/scene-craft/issues/16)で、2026-10-31に小さな実EXRからの変換と名称・merged imageの補修方式を確認した。[変換方式・容量/メモリ設計・再現手順・確認用PSD/PSB](../research/psd16-conversion-validation.md)を仕様統合と受け入れ設計へ引き継ぐ。PSD/PSBの選択はscene-craftが寸法・圧縮後サイズ上界・各長さフィールドから事前判定し、実サイズも検証する。境界値の分岐確認と2GB超の実生成は区別する。大容量メモリ不足で解像度等を落とさず、失敗を記録して中間出力を残す。Photoshopの人間による確認は受け入れ設計へ渡す。設計完了と本実装・全受け入れの完了は区別する。

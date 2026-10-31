@@ -1,0 +1,42 @@
+{
+  "blender": "5.2.2 LTS",
+  "build_hash": "d13f752e3b9c",
+  "engine": "CYCLES",
+  "device": "CPU",
+  "samples": 32,
+  "size": [
+    192,
+    128
+  ],
+  "view_transform": "AgX",
+  "look": "None",
+  "exposure": 0,
+  "gamma": 1,
+  "display": "sRGB",
+  "background_objects": [
+    "BackgroundBoard"
+  ],
+  "receivers": [
+    "Receiver"
+  ],
+  "depth_range": [
+    5.0,
+    25.0
+  ],
+  "ao_distance": 10.0,
+  "object_indices": {
+    "Receiver": 1,
+    "Diffuse": 2,
+    "Metal": 3,
+    "Glass": 4,
+    "BackgroundBoard": 5
+  },
+  "material_indices": {
+    "Glass": 4,
+    "Ground": 1,
+    "Material": 0,
+    "Metal": 3,
+    "Red": 2,
+    "SkyBoard": 5
+  }
+}

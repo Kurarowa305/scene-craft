@@ -1,0 +1,51 @@
+{
+  "blender": "5.2.2 LTS",
+  "ocio_config_sha256": "c39c242ccfbb6b667b804afa281652727148874bcd7ffbc01c777341bc597487",
+  "images": [
+    {
+      "name": "Combined",
+      "view": "AgX",
+      "exposure": 0,
+      "input_space": "Linear Rec.709"
+    },
+    {
+      "name": "Material color",
+      "view": "Standard",
+      "exposure": 0,
+      "input_space": "Linear Rec.709"
+    },
+    {
+      "name": "Specular Lighting",
+      "view": "AgX",
+      "exposure": 0,
+      "input_space": "Linear Rec.709"
+    },
+    {
+      "name": "Diffuse Lighting",
+      "view": "AgX",
+      "exposure": 0,
+      "input_space": "Linear Rec.709"
+    },
+    {
+      "name": "Refractions",
+      "view": "AgX",
+      "exposure": 0,
+      "input_space": "Linear Rec.709"
+    },
+    {
+      "name": "Reflections",
+      "view": "AgX",
+      "exposure": 0,
+      "input_space": "Linear Rec.709"
+    },
+    {
+      "name": "Indirect Lighting",
+      "view": "AgX",
+      "exposure": 0,
+      "input_space": "Linear Rec.709"
+    }
+  ],
+  "look": "None",
+  "gamma": 1,
+  "display": "sRGB"
+}

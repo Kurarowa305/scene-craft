@@ -1,0 +1,115 @@
+{
+  "normal_parts": [
+    "Combined",
+    "Depth",
+    "Object Index",
+    "Material Index",
+    "Diffuse Direct",
+    "Diffuse Indirect",
+    "Diffuse Color",
+    "Glossy Direct",
+    "Glossy Indirect",
+    "Glossy Color",
+    "Transmission Direct",
+    "Transmission Indirect",
+    "Transmission Color",
+    "Ambient Occlusion",
+    "Noisy Image"
+  ],
+  "formulas": {
+    "Specular Lighting": "Glossy Direct * Glossy Color",
+    "Refractions": "(Transmission Direct + Transmission Indirect) * Transmission Color",
+    "Reflections": "Glossy Indirect * Glossy Color"
+  },
+  "depth_range": [
+    5,
+    25
+  ],
+  "id_palette": {
+    "0": [
+      0,
+      0,
+      0
+    ],
+    "1": [
+      65535,
+      16384,
+      16384
+    ],
+    "2": [
+      16384,
+      65535,
+      16384
+    ],
+    "3": [
+      16384,
+      16384,
+      65535
+    ],
+    "4": [
+      65535,
+      65535,
+      16384
+    ],
+    "5": [
+      65535,
+      16384,
+      65535
+    ]
+  },
+  "alpha": {
+    "min": 0.0,
+    "max": 1.0,
+    "fractional_samples": 366
+  },
+  "shadow": {
+    "min": 0.008543170057237148,
+    "max": 1.678664207458496,
+    "above_one": 19140
+  },
+  "linear_inputs": {
+    "Combined": {
+      "min": 0.003524229396134615,
+      "max": 22.37580108642578,
+      "nonzero": 73728
+    },
+    "Material color": {
+      "min": 0.0,
+      "max": 0.6736317873001099,
+      "nonzero": 69912
+    },
+    "Specular Lighting": {
+      "min": 0.0,
+      "max": 26.024044036865234,
+      "nonzero": 73209
+    },
+    "Diffuse Lighting": {
+      "min": 0.0,
+      "max": 2.9990415573120117,
+      "nonzero": 69741
+    },
+    "Refractions": {
+      "min": -4.7981707496091985e-09,
+      "max": 0.8974173665046692,
+      "nonzero": 2556
+    },
+    "Reflections": {
+      "min": 0.0,
+      "max": 1.1487600803375244,
+      "nonzero": 58761
+    },
+    "Indirect Lighting": {
+      "min": 0.0,
+      "max": 5.369413375854492,
+      "nonzero": 55890
+    }
+  },
+  "source_sha256": {
+    "normal.exr": "68f2412c701140de334e9ea5f58c88a2497550f36649b344650822920895ecb4",
+    "alpha.exr": "ee6e91bd142540e7c074c4e286b23c528aa1d9e2e477a1c8e9f9a10e6c147ef3",
+    "shadow.exr": "96e376cabfb55fe4422ab87021c89e4d74e682d5fe962ccfa4d2db14b6133007",
+    "fixture.blend": "6b917e39b5bd7a6d34611c895de54a27bcefd829be2c8eea5ff33ac5e5609de9"
+  },
+  "missing_required_pass_rejected": true,
+  "finite_zero_contribution_accepted": true
+}
