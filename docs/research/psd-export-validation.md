@@ -2,6 +2,8 @@
 
 2026-10-12、[Issue #4](https://github.com/Kurarowa305/scene-craft/issues/4) の調査。**合成データによる RGB 16bit PSD の生成と独立パーサーでの検証は成立した。Photoshop での表示・編集は未確認**。製品実装やライブラリ採用の決定ではない。
 
+2026-10-31の後続調査で、[実EXRからの13種類の変換、名前・merged imageの補修、PSD/PSBの確認用ファイル](psd16-conversion-validation.md)を追加した。以下は2026-10-12当時の合成データ検証である。
+
 ## 方法と確認結果
 
 WSL Linux x86_64 / Python 3.14.4 の `/tmp/scene-craft-psd-probe` にだけ依存を導入した。PhotoshopAPI 0.9.1、psd-tools 1.24.0、NumPy 2.5.4。Blender や Photoshop を操作せず、32×24 の合成 RGB uint16 配列を13枚生成した。8bit に縮退すると一致しなくなる値を使った。

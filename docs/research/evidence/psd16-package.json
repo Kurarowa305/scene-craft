@@ -1,0 +1,63 @@
+{
+  "date": "2026-10-31",
+  "python": "3.14.4",
+  "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.43",
+  "packages": {
+    "PhotoshopAPI": "0.9.1",
+    "psd-tools": "1.24.0",
+    "numpy": "2.5.4",
+    "OpenEXR": "3.5.2",
+    "pypng": "0.20220715.0",
+    "pillow": "13.0.0"
+  },
+  "combined_reference_max_u16_error": 0,
+  "material_srgb_formula_max_u16_error": 1,
+  "exposure_change_observed": true,
+  "format_threshold_unit_checks": true,
+  "icc_sha256": "51167dd131cd567c2a0fe5ddf5bf0fd968c89c35b6cd25450b60d05ef8350136",
+  "results": [
+    {
+      "path": "/mnt/c/Users/oy_ta/AppData/Local/Temp/scene-craft-issue16-replay/13-passes.psd",
+      "bytes": 838851,
+      "sha256": "c13c517fc16f20a933ed00ec0ab1865e0c677f12d837d8ee0934e11d756d5904",
+      "version": 1,
+      "depth": 16,
+      "layers": 13,
+      "rgb_samples_exact": 958464,
+      "exact_names": true,
+      "only_combined_visible": true,
+      "icc_exact": true,
+      "merged_rgb16_exact": true,
+      "stdlib_merged_rgb16_exact": true,
+      "raw_merged_was_zero": true,
+      "truncated_rejected": true
+    },
+    {
+      "path": "/mnt/c/Users/oy_ta/AppData/Local/Temp/scene-craft-issue16-replay/13-passes.psb",
+      "bytes": 839019,
+      "sha256": "19c85f73f7caa8d0fe973fd1557b625bf41ecb0b68192eb21850ae85dd722e79",
+      "version": 2,
+      "depth": 16,
+      "layers": 13,
+      "rgb_samples_exact": 958464,
+      "exact_names": true,
+      "only_combined_visible": true,
+      "icc_exact": true,
+      "merged_rgb16_exact": true,
+      "stdlib_merged_rgb16_exact": true,
+      "raw_merged_was_zero": true,
+      "truncated_rejected": true
+    }
+  ],
+  "seconds_package_and_verify": 0.5646820639994985,
+  "peak_process_rss_kib": 118144,
+  "limits": [
+    "Small 192x128 synthetic scene, not artwork",
+    "No Photoshop application used",
+    "No >2GB actual file or production memory validation",
+    "No volume/transparent-cutout alpha quality validation",
+    "All layers full-canvas opaque RGB; Global Alpha Mask is a separate gray RGB image",
+    "No general compositor effects; Combined uses raw render and recorded view transform",
+    "Scene-specific fixed ID palette, not production persistent-ID allocation"
+  ]
+}
