@@ -50,6 +50,77 @@ app-server は会話・推論・ツール呼び出しの基盤として利用で
 | 一般Web検索・参考画像を調べる | Web検索ツールの呼び出しと、検索・ページ参照などのitemを会話で扱う。取得した画像をモデル入力として渡す経路も提供する。 | 検索目的と制作意図を結び付け、出典・確認日・参考にする要素・人間の選択を保存する。画像を保持できる条件を確認し、保存できる実体は管理下へコピーする。参照URLだけを残した場合は画像未保持として扱い、選択した資料を次工程へ渡す。 | Web取得プログラム、SQLite、ファイル保存 |
 | Poly Haven／ambientCG・指定フォルダー検索と素材取得 | MCPや動的ツールを介して、サービス別APIやローカル検索を行う外部処理を呼び出す。候補情報や取得結果を会話へ返し、人間の選択を扱うために利用する。 | サービス別の検索・ページ取得・キャッシュと、指定フォルダー内の検索を実装する。候補の出典・利用条件・品質を示し、人間が選んだ素材と依存ファイルを管理下へ取得する。Blenderへ取り込んだ結果を編集案として提示し、選択・取得・採用を別々に記録する。 | Poly Haven/ambientCG API、HTTPクライアント、ファイル検索、Windows Blender |
 
+## app-serverの管理情報とデータモデルの対応
+
+[データモデル設計](../design/domain-data-model.md)の15エンティティを、app-serverとの接続に対応する記録と、制作データ・判断を保持する記録に分けて示す。scene-craftのエンティティはそれぞれ独自の永続IDを持ち、Codexのthread／turn／item IDは接続対応記録で結び付ける。
+
+実線はapp-server内の履歴構造と、図中に示すscene-craftの所属関係を表す。点線は両者を照合するための対応を表し、同じデータを共有することや一対一の関係を意味しない。エンティティ間の参照は、対応を説明するために必要なものだけを描いている。
+
+```mermaid
+---
+config:
+  layout: elk
+  theme: neutral
+---
+flowchart LR
+  subgraph AS["Codex app-server：会話の継続と実行を管理"]
+    direction TB
+    AThread["thread<br/>会話の履歴・継続設定"]
+    ATurn["turn<br/>一回のモデル処理とその状態"]
+    AItem["item<br/>発言・ツール要求／結果・圧縮項目"]
+    AContext["モデル用の文脈<br/>圧縮後の継続情報"]
+    AThread --> ATurn
+    ATurn --> AItem
+    AThread --> AContext
+  end
+
+  subgraph SC["scene-craft：独自IDで制作記録を保持（WSLのSQLite）"]
+    subgraph SR["会話・依頼・処理の記録"]
+      direction TB
+      SConversation["会話"]
+      SMessage["原文メッセージ"]
+      SRequest["依頼"]
+      SExecution["実行"]
+      SRetry["再実行の記録"]
+      SMessage --> SConversation
+      SRequest --> SConversation
+      SExecution --> SRequest
+      SRetry --> SRequest
+    end
+    subgraph ST["理由・要約・分析の記録"]
+      direction TB
+      SText["文章記録"]
+      SReview["振り返りの参照記録"]
+    end
+    subgraph SP["制作データと判断の記録"]
+      direction TB
+      SWork["作品"]
+      SFile["ファイル参照"]
+      SArtifact["生成物"]
+      SState["保存状態"]
+      SChange["変更記録"]
+      SCandidate["編集案"]
+      SDecision["採否記録"]
+      SCurrent["現在状態の更新記録"]
+    end
+  end
+
+  SConversation -. "thread IDを対応付け" .-> AThread
+  SExecution -. "AI処理をturn IDへ対応付け" .-> ATurn
+  SMessage -. "発言itemを保存・照合" .-> AItem
+  SExecution -. "ツール要求／結果を操作へ対応付け" .-> AItem
+```
+
+**会話・原文メッセージとthread・item。** scene-craftの会話には、所属作品や振り返り対象、モデル選択を保持する。app-serverのthreadは、その会話でモデルとのやり取りを継続するために使う。利用者とAIの発言itemは原文メッセージへ保存し、会話ID・メッセージIDとCodex側の識別子を照合できるようにする。一つのturnには発言以外のitemも含まれ、内部推論やツール項目をすべて原文メッセージへ変換する前提は置かない。LLMなしの記録送信や外部取り込みの原文は、Codex側のitemがなくても保持する。バックアップ移行でCodex内部データを引き継がない場合も、scene-craftの会話IDと原文を保持する。
+
+**依頼・実行・再実行の記録とturn・ツールitem。** 依頼は制作目的と停止・再実行予算の単位であり、その下にAI処理やWindows制作操作の実行を記録する。AI処理の実行にはturn ID、外部操作の実行にはツール要求・結果の対応とWindows側の実行記録を結び付ける。一つの依頼が複数turnへまたがる場合も、同じturn内で制作操作をやり直す場合もあるため、依頼・実行・turnを一対一に固定しない。再実行の記録は依頼IDと対象実行を参照し、turnの変更やCodex内部の通信再送だけで制作の再実行回数を決めない。LLMを呼ばないプレビュー生成等の実行もscene-craft側で記録する。
+
+**文章記録・振り返りの参照記録と圧縮後の文脈。** app-serverはモデルが会話を継続するための文脈と圧縮処理を管理する。scene-craftは、理由・要約・制作意図を文章記録として保存し、訂正前の文章と対象原文への参照を残す。振り返りの参照記録には、分析で実際に使った保存状態・採否・変更・文章などのIDを固定する。これらの根拠付き記録はscene-craftが管理するため、図では圧縮後の文脈からの直接対応線を引いていない。
+
+**制作データと判断の8エンティティ。** 作品、ファイル参照、生成物、保存状態、変更記録、編集案、採否記録、現在状態の更新記録は、scene-craftが制作ツールの結果と人間の判断を基に確定する。ファイル参照が指す`.blend`・PSD/PSB・素材・プレビューの実体はWindows側に置く。app-serverのツール結果や返答は実行の照合資料として使い、検証済みの実体・完成判定・採否の確定結果を各エンティティへ記録する。会話の分岐、turn完了、操作承認だけで作品の保存状態や採用状態を更新しない。
+
+図はデータモデル設計のエンティティと会話実行基盤の対応に絞っている。app-serverのproject、認証、モデル一覧、設定などの補助情報は省略しており、projectを利用する場合も、作品の永続IDと制作記録はscene-craftで保持する。接続対応記録は既存設計で定めた参照の役割を説明するもので、16番目のドメインエンティティやSQLテーブルを追加する判断ではない。
+
 ## 根拠資料と確認範囲
 
 - **D**：[公式 app-server 文書](https://learn.chatgpt.com/docs/app-server)。確認時点の更新される文書。API 名の記載だけでは実機確認済みを意味しない。取得URLは `https://learn.chatgpt.com/docs/app-server.md`、本文SHA-256は `f879715bb0d440db60b71e7a5bfe1258d045520feabe3fc6b11847100c8d064b`。公開文書には版固定がないため、追跡可能な公式ソースの固定コミットとPも併用する。
