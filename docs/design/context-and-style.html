@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta
+      name="description"
+      content="scene-craftの確定設計を全体図と要点から確認する人間向け資料。詳細な契約は設計Issueへ。"
+    />
+    <title>文脈・作風・制作方針 | scene-craft 設計</title>
+    <link rel="stylesheet" href="portal.css" />
+  </head>
+  <body>
+    <a class="skip" href="#main">本文へ移動</a>
+    <header class="top">
+      <a class="brand" href="index.html"
+        ><span class="mark" aria-hidden="true">sc</span> scene-craft
+        <span class="brand-sub">/ DESIGN NOTES</span></a
+      ><a href="https://github.com/Kurarowa305/scene-craft/issues/1"
+        >設計マップ ↗</a
+      >
+    </header>
+    <div class="layout">
+      <aside>
+        <nav aria-label="設計領域">
+          <a href="index.html">全体像</a>
+          <p class="nav-label">全体を知る</p>
+          <a href="application-architecture.html">全体構成とOSの責務</a
+          ><a href="user-interface.html">画面と制作の導線</a
+          ><a href="domain-data-model.html">作品と制作履歴</a>
+          <p class="nav-label">制作を進める</p>
+          <a href="llm-connection.html">LLM接続と費用</a
+          ><a href="agent-contracts.html">工程別エージェントとツール</a
+          ><a href="execution-lifecycle.html">実行・停止・復旧</a
+          ><a href="edit-candidates.html">編集案の採用と保護</a
+          ><a href="blender-integration.html">Blender連携とレンダー出力</a>
+          <p class="nav-label">残して活かす</p>
+          <a href="artifact-storage.html">保存・復元・バックアップ</a
+          ><a href="reference-and-assets.html">参考資料と素材</a
+          ><a href="context-and-style.html" aria-current="page"
+            >文脈・作風・制作方針</a
+          ><a href="git-versioning.html">Gitの版固定と更新</a>
+          <p class="nav-label">次の設計</p>
+          <a href="testing-and-diagnostics.html">テスト・診断・受け入れ</a>
+        </nav>
+        <div class="aside-note">
+          設計の要点はここで。<br />詳細はMarkdown、合意はIssueで。
+        </div>
+      </aside>
+      <main id="main" tabindex="-1">
+        <p class="eyebrow">DESIGN / 11</p>
+        <h1>文脈・作風・制作方針</h1>
+        <p class="lead">作品の意図を、次の制作へつなぐ</p>
+        <p class="intro">
+          作品の制作意図を最優先に、採用状態・保護・作風を共有する。Codexの文脈圧縮と、scene-craftが残す根拠付き要約を分ける。
+        </p>
+        <p>
+          <span class="badge">設計合意済み</span>
+          <span class="muted">本実装・実機受け入れは後続</span>
+        </p>
+        <figure>
+          <ol class="flow">
+            <li>対象作品の全履歴</li>
+            <li>実際の参照と不足を固定</li>
+            <li>作風の傾向を仮説として提示</li>
+            <li>方針を項目別に採用・コミット・適用</li>
+          </ol>
+          <figcaption>主要な流れの要約。人間が工程と採否を選ぶ。</figcaption>
+        </figure>
+        <section aria-labelledby="contracts">
+          <h2 id="contracts">主要な契約</h2>
+          <div
+            class="table-scroll"
+            tabindex="0"
+            role="region"
+            aria-label="主要な契約"
+          >
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">項目</th>
+                  <th scope="col">決めたこと・受け渡すもの</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">会話の継続</th>
+                  <td>
+                    同じthreadをCodexで継続し、圧縮もCodexに任せる。scene-craftは原文と根拠付き要約を独立保存。
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">作品の共有情報</th>
+                  <td>
+                    制作意図・採用状態・保護・固定作風を作品単位で管理。人間の明示更新を原文へ結び付け、古い要約で巻き戻さない。
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">実行へ渡す文脈</th>
+                  <td>
+                    依頼・起点・意図・範囲・保護・許可・作風を固定。他会話の関連要約と必要な原文・画像を追加取得し、実参照を残す。
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">要約の区切り</th>
+                  <td>
+                    完了・停止・確認待ちを区切りに追加発言を対象化。ただし停止後等は新たなLLM処理を起動せず未要約で保持。
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">振り返り</th>
+                  <td>
+                    人間が一作品または作品集合を選ぶ。対象は各作品の全履歴。未取得・削除・欠落と、実際に観察した範囲を説明する。
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">制作方針への採用</th>
+                  <td>
+                    作風の傾向は仮説。人間が項目別に採用・編集・保留し、採用変更をGitへコミット。作品へ使う版の適用は別途選ぶ。
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+        <section>
+          <h2>制約と失敗時の扱い</h2>
+          <ul class="rules">
+            <li>
+              理由未入力を推測で埋めず、事実・人間の理由・AIの解釈を区別する。
+            </li>
+            <li>
+              後日の理由訂正で過去の分析根拠を変更しない。「根拠に更新あり」を示し、再分析は人間が起動する。
+            </li>
+            <li>
+              新規作品の作風は版を選択するか「なし」。前作や最新の版を自動適用しない。
+            </li>
+            <li>
+              対象が全履歴であることと、全画像・実体を観察済みであることを区別する。
+            </li>
+          </ul>
+        </section>
+        <section class="sources">
+          <h2>詳細と根拠へ</h2>
+          <p>
+            <a href="https://github.com/Kurarowa305/scene-craft/issues/10"
+              >設計Issue：文脈・作風・制作方針</a
+            >
+          </p>
+          <p><a href="context-and-style.md">現在の詳細設計（Markdown） →</a></p>
+          <details>
+            <summary>詳細設計の内容を確認する</summary>
+            <p>以下の契約・説明は既存Markdownに保持しています。</p>
+            <ul>
+              <li><a href="context-and-style.md">責務</a></li>
+              <li><a href="context-and-style.md">共有情報と制作意図</a></li>
+              <li><a href="context-and-style.md">実行に渡す文脈</a></li>
+              <li><a href="context-and-style.md">要約の更新と原文</a></li>
+              <li><a href="context-and-style.md">振り返りと根拠</a></li>
+              <li>
+                <a href="context-and-style.md">作風の傾向から制作方針へ</a>
+              </li>
+              <li>
+                <a href="context-and-style.md">後続への引き継ぎと確認範囲</a>
+              </li>
+              <li><a href="context-and-style.md">根拠</a></li>
+            </ul>
+            <p>
+              <a
+                href="https://github.com/Kurarowa305/scene-craft/issues/10#issuecomment-6542677625"
+                >2026-10-31時点の本文スナップショット（履歴）</a
+              >
+            </p>
+          </details>
+        </section>
+        <section>
+          <h2>つながる設計</h2>
+          <div class="related">
+            <a href="domain-data-model.html">作品と制作履歴</a
+            ><a href="git-versioning.html">Gitの版固定と更新</a
+            ><a href="llm-connection.html">LLM接続と費用</a
+            ><a href="user-interface.html">画面と制作の導線</a>
+          </div>
+        </section>
+        <footer>
+          <p>scene-craft · 設計ポータル · 2026-10-31 時点の整理</p>
+          <p>
+            <a href="../requirements/initial-scope.md">合意済み要件</a> ·
+            <a href="../../GLOSSARY.md">用語集</a> ·
+            <a href="../agents/development-workflow.md">開発フロー</a> ·
+            <a href="https://github.com/Kurarowa305/scene-craft/issues/33"
+              >このポータルの整備記録</a
+            >
+          </p>
+          <p>
+            設計の合意と、本実装・実機検証の完了は別です。最新の進捗は設計マップを参照してください。
+          </p>
+        </footer>
+      </main>
+    </div>
+  </body>
+</html>

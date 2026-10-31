@@ -6,6 +6,8 @@
 [開発フロー](docs/agents/development-workflow.md) を読む。
 現在の合意事項は [初期要件](docs/requirements/initial-scope.md)、
 設計 Issue と確定した設計資料の入口は [設計一覧](docs/design/README.md) とする。
+人間向けの要点・図は [HTML設計ポータル](docs/design/index.html) に併設する。
+HTMLを作成・更新するときは [readable-html](.agents/skills/readable-html/SKILL.md) を読む。既存Markdownはすべて維持する。
 
 ### Issue tracker
 

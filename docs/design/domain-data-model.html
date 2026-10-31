@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta
+      name="description"
+      content="scene-craftの確定設計を全体図と要点から確認する人間向け資料。詳細な契約は設計Issueへ。"
+    />
+    <title>作品と制作履歴 | scene-craft 設計</title>
+    <link rel="stylesheet" href="portal.css" />
+  </head>
+  <body>
+    <a class="skip" href="#main">本文へ移動</a>
+    <header class="top">
+      <a class="brand" href="index.html"
+        ><span class="mark" aria-hidden="true">sc</span> scene-craft
+        <span class="brand-sub">/ DESIGN NOTES</span></a
+      ><a href="https://github.com/Kurarowa305/scene-craft/issues/1"
+        >設計マップ ↗</a
+      >
+    </header>
+    <div class="layout">
+      <aside>
+        <nav aria-label="設計領域">
+          <a href="index.html">全体像</a>
+          <p class="nav-label">全体を知る</p>
+          <a href="application-architecture.html">全体構成とOSの責務</a
+          ><a href="user-interface.html">画面と制作の導線</a
+          ><a href="domain-data-model.html" aria-current="page"
+            >作品と制作履歴</a
+          >
+          <p class="nav-label">制作を進める</p>
+          <a href="llm-connection.html">LLM接続と費用</a
+          ><a href="agent-contracts.html">工程別エージェントとツール</a
+          ><a href="execution-lifecycle.html">実行・停止・復旧</a
+          ><a href="edit-candidates.html">編集案の採用と保護</a
+          ><a href="blender-integration.html">Blender連携とレンダー出力</a>
+          <p class="nav-label">残して活かす</p>
+          <a href="artifact-storage.html">保存・復元・バックアップ</a
+          ><a href="reference-and-assets.html">参考資料と素材</a
+          ><a href="context-and-style.html">文脈・作風・制作方針</a
+          ><a href="git-versioning.html">Gitの版固定と更新</a>
+          <p class="nav-label">次の設計</p>
+          <a href="testing-and-diagnostics.html">テスト・診断・受け入れ</a>
+        </nav>
+        <div class="aside-note">
+          設計の要点はここで。<br />詳細はMarkdown、合意はIssueで。
+        </div>
+      </aside>
+      <main id="main" tabindex="-1">
+        <p class="eyebrow">DESIGN / 03</p>
+        <h1>作品と制作履歴</h1>
+        <p class="lead">保存状態をつなぎ、判断の理由を残す</p>
+        <p class="intro">
+          作品は完成した一枚を目指す単位。AI案・手修正・採否の分岐をつなぎ、何を見て判断し、どこから次の制作を始めたかを追跡する。
+        </p>
+        <p>
+          <span class="badge">設計合意済み</span>
+          <span class="muted">本実装・実機受け入れは後続</span>
+        </p>
+        <figure>
+          <div
+            class="diagram-scroll"
+            tabindex="0"
+            role="region"
+            aria-label="制作履歴の分岐例"
+          >
+            <svg
+              viewBox="0 0 820 245"
+              role="img"
+              aria-labelledby="hist-title hist-desc"
+            >
+              <title id="hist-title">未採用の案を修正して採用する例</title>
+              <desc id="hist-desc">
+                保存状態Sから案Aと案Bに分岐。案Aから人間の手修正H、追加AI修正A2へ進み、A2を修正して採用して次の制作へ進む。採用前の現在状態はSのまま。案Bの記録も残る。
+              </desc>
+              <defs>
+                <marker
+                  id="h-arrow"
+                  markerWidth="8"
+                  markerHeight="8"
+                  refX="7"
+                  refY="4"
+                  orient="auto"
+                >
+                  <path d="M0 0L8 4L0 8Z" fill="#48716b" />
+                </marker>
+              </defs>
+              <g class="history-lines">
+                <path
+                  d="M112 88H180M112 88V187H180M282 88H330M432 88H480M582 88H650"
+                />
+              </g>
+              <g class="node">
+                <rect x="10" y="60" width="102" height="56" rx="8" />
+                <text x="61" y="93">基準 S</text>
+                <rect x="180" y="60" width="102" height="56" rx="8" />
+                <text x="231" y="93">AI案 A</text>
+                <rect x="180" y="158" width="102" height="56" rx="8" />
+                <text x="231" y="191">別案 B</text>
+                <rect x="330" y="60" width="102" height="56" rx="8" />
+                <text x="381" y="93">手修正 H</text>
+                <rect x="480" y="60" width="102" height="56" rx="8" />
+                <text x="531" y="93">AI修正 A2</text>
+              </g>
+              <g class="node primary">
+                <rect x="650" y="60" width="155" height="56" rx="8" />
+                <text x="727" y="93">次の制作へ</text>
+              </g>
+              <text class="edge-label" x="614" y="43">修正して採用</text>
+              <text class="sub note" x="420" y="192">
+                採用前の現在状態は S のまま
+              </text>
+              <text class="sub note" x="420" y="217">
+                別案・理由・指示原文も残す
+              </text>
+            </svg>
+          </div>
+          <figcaption>
+            矢印は変更の順序。所属関係図や自動マージの図ではない。採否は確認したA2の保存状態を参照する。
+          </figcaption>
+        </figure>
+        <section aria-labelledby="contracts">
+          <h2 id="contracts">主要な契約</h2>
+          <div
+            class="table-scroll"
+            tabindex="0"
+            role="region"
+            aria-label="主要な契約"
+          >
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">項目</th>
+                  <th scope="col">決めたこと・受け渡すもの</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">作品・会話・原文</th>
+                  <td>
+                    作品の共有情報と複数会話を管理。原文メッセージは順序・発言者・添付・途中や欠落を保持する。
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">依頼・実行・再実行の記録</th>
+                  <td>
+                    目的と予算の単位、AIとWindowsの親子実行、そのやり直しを分ける。Codex
+                    thread/turnの対応は接続記録。
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">ファイル参照・生成物</th>
+                  <td>
+                    固定実体とAI等の成果物を区別。人間が取り込んだファイルをAIの生成物と呼ばない。
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">保存状態・変更記録</th>
+                  <td>
+                    固定した構成と依存素材、変更前後と由来。手修正・復元・派生も変更記録でつなぐ。
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">編集案・採否記録</th>
+                  <td>
+                    基準と候補、代替・依存・修正元を保持。判断は実際に確認した状態と範囲を参照する。
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">現在状態の更新記録</th>
+                  <td>
+                    次の制作の出発点をいつ、どの採否・変更で切り替えたかを記録する。
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">文章記録・振り返りの参照記録</th>
+                  <td>
+                    理由・要約・制作意図は訂正履歴付き。分析が当時使った文章・採否・実体を固定する。
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+        <section>
+          <h2>制約と失敗時の扱い</h2>
+          <ul class="rules">
+            <li>
+              15概念を上の7群に整理している。物理的なテーブル分割を表すものではない。
+            </li>
+            <li>
+              案の完成・候補上の修正だけで現在状態を更新しない。未選択と不採用は別。
+            </li>
+            <li>
+              復元は直前と復元元を残す新記録。派生は別作品。理由の訂正や実体削除で過去の判断を消さない。
+            </li>
+          </ul>
+        </section>
+        <section class="sources">
+          <h2>詳細と根拠へ</h2>
+          <p>
+            <a href="https://github.com/Kurarowa305/scene-craft/issues/5"
+              >設計Issue：作品と制作履歴</a
+            >
+          </p>
+          <p><a href="domain-data-model.md">現在の詳細設計（Markdown） →</a></p>
+          <details>
+            <summary>詳細設計の内容を確認する</summary>
+            <p>以下の契約・説明は既存Markdownに保持しています。</p>
+            <ul>
+              <li><a href="domain-data-model.md">対象と責務</a></li>
+              <li><a href="domain-data-model.md">識別と共通契約</a></li>
+              <li><a href="domain-data-model.md">主要データの契約</a></li>
+              <li>
+                <a href="domain-data-model.md">記録が成立する単位と不変条件</a>
+              </li>
+              <li>
+                <a href="domain-data-model.md"
+                  >ブランチグラフによる制作履歴の表示</a
+                >
+              </li>
+              <li><a href="domain-data-model.md">具体例による確認</a></li>
+              <li><a href="domain-data-model.md">後続設計との境界</a></li>
+              <li><a href="domain-data-model.md">根拠</a></li>
+            </ul>
+            <p>
+              <a
+                href="https://github.com/Kurarowa305/scene-craft/issues/5#issuecomment-6542676111"
+                >2026-10-31時点の本文スナップショット（履歴）</a
+              >
+            </p>
+          </details>
+        </section>
+        <section>
+          <h2>つながる設計</h2>
+          <div class="related">
+            <a href="artifact-storage.html">保存・復元・バックアップ</a
+            ><a href="edit-candidates.html">編集案の採用と保護</a
+            ><a href="context-and-style.html">文脈・作風・制作方針</a
+            ><a href="execution-lifecycle.html">実行・停止・復旧</a>
+          </div>
+        </section>
+        <footer>
+          <p>scene-craft · 設計ポータル · 2026-10-31 時点の整理</p>
+          <p>
+            <a href="../requirements/initial-scope.md">合意済み要件</a> ·
+            <a href="../../GLOSSARY.md">用語集</a> ·
+            <a href="../agents/development-workflow.md">開発フロー</a> ·
+            <a href="https://github.com/Kurarowa305/scene-craft/issues/33"
+              >このポータルの整備記録</a
+            >
+          </p>
+          <p>
+            設計の合意と、本実装・実機検証の完了は別です。最新の進捗は設計マップを参照してください。
+          </p>
+        </footer>
+      </main>
+    </div>
+  </body>
+</html>
