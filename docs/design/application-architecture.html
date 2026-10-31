@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta
       name="description"
-      content="scene-craftの確定設計を全体図と要点から確認する人間向け資料。詳細な契約は設計Issueへ。"
+      content="scene-craftで作る機能・構成・制作の流れをまとめた設計資料。"
     />
     <title>全体構成とOSの責務 | scene-craft 設計</title>
     <link rel="stylesheet" href="portal.css" />
@@ -16,8 +16,6 @@
       <a class="brand" href="index.html"
         ><span class="mark" aria-hidden="true">sc</span> scene-craft
         <span class="brand-sub">/ DESIGN NOTES</span></a
-      ><a href="https://github.com/Kurarowa305/scene-craft/issues/1"
-        >設計マップ ↗</a
       >
     </header>
     <div class="layout">
@@ -40,12 +38,7 @@
           ><a href="reference-and-assets.html">参考資料と素材</a
           ><a href="context-and-style.html">文脈・作風・制作方針</a
           ><a href="git-versioning.html">Gitの版固定と更新</a>
-          <p class="nav-label">次の設計</p>
-          <a href="testing-and-diagnostics.html">テスト・診断・受け入れ</a>
         </nav>
-        <div class="aside-note">
-          設計の要点はここで。<br />詳細はMarkdown、合意はIssueで。
-        </div>
       </aside>
       <main id="main" tabindex="-1">
         <p class="eyebrow">DESIGN / 01</p>
@@ -54,10 +47,7 @@
         <p class="intro">
           Windowsの制作アプリと、WSLの会話・制作管理をつなぐ。ブラウザを閉じても処理は続き、アプリを終了するときに安全に停止する。
         </p>
-        <p>
-          <span class="badge">設計合意済み</span>
-          <span class="muted">本実装・実機受け入れは後続</span>
-        </p>
+
         <figure class="architecture">
           <div
             class="diagram-scroll"
@@ -86,7 +76,7 @@
                   refY="4"
                   orient="auto-start-reverse"
                 >
-                  <path d="M0 0L8 4L0 8Z" fill="#48716b" />
+                  <path d="M0 0L8 4L0 8Z" fill="#48716b"></path>
                 </marker>
               </defs>
               <rect
@@ -96,7 +86,7 @@
                 width="400"
                 height="620"
                 rx="16"
-              />
+              ></rect>
               <rect
                 class="zone wsl"
                 x="448"
@@ -104,79 +94,79 @@
                 width="496"
                 height="620"
                 rx="16"
-              />
+              ></rect>
               <text class="zone-title" x="40" y="51">WINDOWS · 制作と表示</text>
               <text class="zone-title" x="472" y="51">WSL · 会話と管理</text>
               <g class="node">
-                <rect x="40" y="76" width="350" height="64" rx="9" />
+                <rect x="40" y="76" width="350" height="64" rx="9"></rect>
                 <text x="215" y="102">ブラウザ</text>
                 <text class="sub" x="215" y="125">React / TypeScript</text>
               </g>
               <g class="node primary">
-                <rect x="490" y="76" width="415" height="64" rx="9" />
+                <rect x="490" y="76" width="415" height="64" rx="9"></rect>
                 <text x="697" y="102">制作管理・実行管理</text>
                 <text class="sub" x="697" y="125">Node.js / Fastify</text>
               </g>
-              <path class="edge" d="M390 105H490" />
+              <path class="edge" d="M390 105H490"></path>
               <text class="edge-label" x="439" y="90">HTTP / SSE</text>
               <g class="node">
-                <rect x="490" y="193" width="178" height="60" rx="9" />
+                <rect x="490" y="193" width="178" height="60" rx="9"></rect>
                 <text x="579" y="219">SQLite</text>
                 <text class="sub" x="579" y="242">履歴・依頼記録</text>
               </g>
-              <path class="edge" d="M579 140V193" />
+              <path class="edge" d="M579 140V193"></path>
               <text class="edge-label" x="611" y="172">保存</text>
               <g class="node">
-                <rect x="727" y="193" width="178" height="60" rx="9" />
+                <rect x="727" y="193" width="178" height="60" rx="9"></rect>
                 <text x="816" y="218">Codex app-server</text>
                 <text class="sub" x="816" y="242">会話・モデルの実行</text>
               </g>
-              <path class="edge" d="M816 140V193" />
+              <path class="edge" d="M816 140V193"></path>
               <text class="edge-label" x="847" y="172">stdio</text>
               <g class="node">
-                <rect x="727" y="317" width="178" height="65" rx="9" />
+                <rect x="727" y="317" width="178" height="65" rx="9"></rect>
                 <text x="816" y="343">専用MCP</text>
                 <text class="sub" x="816" y="367">制作ツールの入口</text>
               </g>
-              <path class="edge" d="M816 253V317" />
+              <path class="edge" d="M816 253V317"></path>
               <text class="edge-label" x="843" y="289">stdio</text>
-              <path class="edge" d="M727 350H695V140" />
+              <path class="edge" d="M727 350H695V140"></path>
               <text class="edge-label" x="595" y="340">認可付き</text>
               <text class="edge-label" x="595" y="362">Unix socket RPC</text>
               <g class="node">
-                <rect x="40" y="193" width="350" height="60" rx="9" />
+                <rect x="40" y="193" width="350" height="60" rx="9"></rect>
                 <text x="215" y="218">Windows 実行補助プロセス</text>
                 <text class="sub" x="215" y="242">
                   実行ごとの記録・プロセス所有権
                 </text>
               </g>
-              <path class="edge" d="M490 126H465V222H390" />
+              <path class="edge" d="M490 126H465V222H390"></path>
               <text class="edge-label" x="430" y="277">開始・照合・停止</text>
               <g class="node">
-                <rect x="40" y="310" width="350" height="60" rx="9" />
+                <rect x="40" y="310" width="350" height="60" rx="9"></rect>
                 <text x="215" y="335">background Blender / Cycles</text>
                 <text class="sub" x="215" y="357">
                   入力コピーへ編集・レンダー
                 </text>
               </g>
-              <path class="edge" d="M215 253V310" />
+              <path class="edge" d="M215 253V310"></path>
               <g class="node">
-                <rect x="40" y="428" width="350" height="60" rx="9" />
+                <rect x="40" y="428" width="350" height="60" rx="9"></rect>
                 <text x="215" y="452">制作ファイル・依存素材</text>
                 <text class="sub" x="215" y="477">
                   .blend / PSD・PSB / EXR / 画像
                 </text>
               </g>
-              <path class="edge" d="M215 370V428" />
+              <path class="edge" d="M215 370V428"></path>
               <text class="edge-label" x="274" y="403">検証して保存</text>
               <g class="node">
-                <rect x="40" y="548" width="350" height="60" rx="9" />
+                <rect x="40" y="548" width="350" height="60" rx="9"></rect>
                 <text x="215" y="573">Photoshop · 人間が操作</text>
                 <text class="sub" x="215" y="597">
                   保存した結果をチャットから記録
                 </text>
               </g>
-              <path class="edge" d="M215 548V488" />
+              <path class="edge" d="M215 548V488"></path>
               <text class="sub note" x="697" y="490">
                 WSLの管理処理からも制作ファイルへアクセス
               </text>
@@ -253,102 +243,56 @@
             <li>
               ブラウザ切断は実行を維持。WSLとの連絡喪失は新規操作を止め、安全に停止・照合する。
             </li>
-            <li>
-              バックエンド再起動やMCP再接続だけで制作を再開しない。生存管理・OS間の停止は実機検証へ。
-            </li>
+            <li>バックエンド再起動やMCP再接続だけで制作を再開しない。</li>
           </ul>
         </section>
         <section class="sources">
-          <h2>詳細と根拠へ</h2>
+          <h2>詳細資料</h2>
           <p>
-            <a href="https://github.com/Kurarowa305/scene-craft/issues/3"
+            <a
+              href="https://github.com/Kurarowa305/scene-craft/issues/3"
+              target="_blank"
+              rel="noopener noreferrer"
               >設計Issue：全体構成とOSの責務</a
             >
           </p>
           <p>
             <a
               href="https://github.com/Kurarowa305/scene-craft/blob/main/docs/design/application-architecture.md"
+              target="_blank"
+              rel="noopener noreferrer"
               >現在の詳細設計（Markdown） →</a
             >
           </p>
-          <details>
-            <summary>詳細設計の内容を確認する</summary>
-            <p>以下の契約・説明は既存Markdownに保持しています。</p>
-            <ul>
-              <li>
-                <a
-                  href="https://github.com/Kurarowa305/scene-craft/blob/main/docs/design/application-architecture.md"
-                  >合意済みの配置と利用方法</a
-                >
-              </li>
-              <li>
-                <a
-                  href="https://github.com/Kurarowa305/scene-craft/blob/main/docs/design/application-architecture.md"
-                  >合意した構成</a
-                >
-              </li>
-              <li>
-                <a
-                  href="https://github.com/Kurarowa305/scene-craft/blob/main/docs/design/application-architecture.md"
-                  >根拠・確認範囲</a
-                >
-              </li>
-              <li>
-                <a
-                  href="https://github.com/Kurarowa305/scene-craft/blob/main/docs/design/application-architecture.md"
-                  >後続への引き継ぎと完了の範囲</a
-                >
-              </li>
-            </ul>
-            <p>
-              <a
-                href="https://github.com/Kurarowa305/scene-craft/issues/3#issuecomment-6542675585"
-                >2026-10-31時点の本文スナップショット（履歴）</a
-              >
-            </p>
-          </details>
+
           <ul>
             <li>
               <a
                 href="https://github.com/Kurarowa305/scene-craft/blob/main/docs/adr/0005-wsl-runtime-and-windows-production-files.md"
+                target="_blank"
+                rel="noopener noreferrer"
                 >ADR：WindowsとWSLの配置</a
               >
             </li>
           </ul>
         </section>
-        <section>
-          <h2>つながる設計</h2>
-          <div class="related">
-            <a href="llm-connection.html">LLM接続と費用</a
-            ><a href="agent-contracts.html">工程別エージェントとツール</a
-            ><a href="artifact-storage.html">保存・復元・バックアップ</a
-            ><a href="execution-lifecycle.html">実行・停止・復旧</a>
-          </div>
-        </section>
+
         <footer>
-          <p>scene-craft · 設計ポータル · 2026-10-31 時点の整理</p>
+          <p>scene-craft · 設計ポータル</p>
           <p>
             <a
               href="https://github.com/Kurarowa305/scene-craft/blob/main/docs/requirements/initial-scope.md"
-              >合意済み要件</a
+              target="_blank"
+              rel="noopener noreferrer"
+              >要件</a
             >
             ·
             <a
               href="https://github.com/Kurarowa305/scene-craft/blob/main/GLOSSARY.md"
+              target="_blank"
+              rel="noopener noreferrer"
               >用語集</a
             >
-            ·
-            <a
-              href="https://github.com/Kurarowa305/scene-craft/blob/main/docs/agents/development-workflow.md"
-              >開発フロー</a
-            >
-            ·
-            <a href="https://github.com/Kurarowa305/scene-craft/issues/33"
-              >このポータルの整備記録</a
-            >
-          </p>
-          <p>
-            設計の合意と、本実装・実機検証の完了は別です。最新の進捗は設計マップを参照してください。
           </p>
         </footer>
       </main>

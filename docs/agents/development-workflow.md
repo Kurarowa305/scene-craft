@@ -29,7 +29,7 @@
 
 ## 記録の役割
 
-人間向けの全体図・領域別の要点は [HTML設計ポータル](../design/index.html) に併設する。現在の詳細設計は既存Markdown、合意・検討経緯は設計Issueを引き続き参照する。既存Markdownはすべて維持し、設計の変更時には詳細資料とHTMLの要点・状態・関連リンクを揃えて更新する。HTML作成・更新には [readable-html](../../.agents/skills/readable-html/SKILL.md) を使う。
+人間向けの全体図・領域別の要点は [HTML設計ポータル](../design/index.html) に併設する。現在の詳細設計は既存Markdown、合意・検討経緯は設計Issueを引き続き参照する。既存Markdownはすべて維持し、設計の変更時には詳細資料とHTMLの機能・仕様の要点を揃えて更新する。HTML作成・更新には [readable-html](../../.agents/skills/readable-html/SKILL.md) を使う。
 
 | 記録先 | 正として管理する内容 |
 | --- | --- |

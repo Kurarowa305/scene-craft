@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta
       name="description"
-      content="scene-craftの確定設計を全体図と要点から確認する人間向け資料。詳細な契約は設計Issueへ。"
+      content="scene-craftで作る機能・構成・制作の流れをまとめた設計資料。"
     />
     <title>全体像 | scene-craft 設計</title>
     <link rel="stylesheet" href="portal.css" />
@@ -16,8 +16,6 @@
       <a class="brand" href="index.html"
         ><span class="mark" aria-hidden="true">sc</span> scene-craft
         <span class="brand-sub">/ DESIGN NOTES</span></a
-      ><a href="https://github.com/Kurarowa305/scene-craft/issues/1"
-        >設計マップ ↗</a
       >
     </header>
     <div class="layout">
@@ -39,31 +37,16 @@
           ><a href="reference-and-assets.html">参考資料と素材</a
           ><a href="context-and-style.html">文脈・作風・制作方針</a
           ><a href="git-versioning.html">Gitの版固定と更新</a>
-          <p class="nav-label">次の設計</p>
-          <a href="testing-and-diagnostics.html">テスト・診断・受け入れ</a>
         </nav>
-        <div class="aside-note">
-          設計の要点はここで。<br />詳細はMarkdown、合意はIssueで。
-        </div>
       </aside>
       <main id="main" tabindex="-1">
         <p class="eyebrow">SCENE-CRAFT / DESIGN PORTAL</p>
-        <h1>制作を支え、<br />判断の過程を残す。</h1>
-        <p class="lead">BlenderからPhotoshopへ。作品の経験を、次の一枚へ。</p>
+        <h1>全体像</h1>
+
         <p class="intro">
           人間が工程を選び、AIの編集案を確かめ、採用する。scene-craftは制作データと会話、手修正と理由をつないで残す。
         </p>
-        <div class="metrics">
-          <div><strong>10</strong><span>制作を支える役割</span></div>
-          <div><strong>12 / 13</strong><span>設計領域を合意</span></div>
-          <div><strong>13</strong><span>PSD / PSBのレイヤー</span></div>
-        </div>
-        <div class="notice">
-          <strong>これは設計を確認するための資料です。</strong>
-          <p>
-            本実装・製品全体の受け入れは後続。テスト・診断・受け入れの設計は未確定です。現在の詳細設計は既存Markdown、判断の経緯と合意は設計Issueを参照してください。
-          </p>
-        </div>
+
         <section id="overview">
           <p class="eyebrow">01 / SYSTEM</p>
           <h2>どこで、何を動かすか</h2>
@@ -99,7 +82,7 @@
                     refY="4"
                     orient="auto-start-reverse"
                   >
-                    <path d="M0 0L8 4L0 8Z" fill="#48716b" />
+                    <path d="M0 0L8 4L0 8Z" fill="#48716b"></path>
                   </marker>
                 </defs>
                 <rect
@@ -109,7 +92,7 @@
                   width="400"
                   height="620"
                   rx="16"
-                />
+                ></rect>
                 <rect
                   class="zone wsl"
                   x="448"
@@ -117,81 +100,81 @@
                   width="496"
                   height="620"
                   rx="16"
-                />
+                ></rect>
                 <text class="zone-title" x="40" y="51">
                   WINDOWS · 制作と表示
                 </text>
                 <text class="zone-title" x="472" y="51">WSL · 会話と管理</text>
                 <g class="node">
-                  <rect x="40" y="76" width="350" height="64" rx="9" />
+                  <rect x="40" y="76" width="350" height="64" rx="9"></rect>
                   <text x="215" y="102">ブラウザ</text>
                   <text class="sub" x="215" y="125">React / TypeScript</text>
                 </g>
                 <g class="node primary">
-                  <rect x="490" y="76" width="415" height="64" rx="9" />
+                  <rect x="490" y="76" width="415" height="64" rx="9"></rect>
                   <text x="697" y="102">制作管理・実行管理</text>
                   <text class="sub" x="697" y="125">Node.js / Fastify</text>
                 </g>
-                <path class="edge" d="M390 105H490" />
+                <path class="edge" d="M390 105H490"></path>
                 <text class="edge-label" x="439" y="90">HTTP / SSE</text>
                 <g class="node">
-                  <rect x="490" y="193" width="178" height="60" rx="9" />
+                  <rect x="490" y="193" width="178" height="60" rx="9"></rect>
                   <text x="579" y="219">SQLite</text>
                   <text class="sub" x="579" y="242">履歴・依頼記録</text>
                 </g>
-                <path class="edge" d="M579 140V193" />
+                <path class="edge" d="M579 140V193"></path>
                 <text class="edge-label" x="611" y="172">保存</text>
                 <g class="node">
-                  <rect x="727" y="193" width="178" height="60" rx="9" />
+                  <rect x="727" y="193" width="178" height="60" rx="9"></rect>
                   <text x="816" y="218">Codex app-server</text>
                   <text class="sub" x="816" y="242">会話・モデルの実行</text>
                 </g>
-                <path class="edge" d="M816 140V193" />
+                <path class="edge" d="M816 140V193"></path>
                 <text class="edge-label" x="847" y="172">stdio</text>
                 <g class="node">
-                  <rect x="727" y="317" width="178" height="65" rx="9" />
+                  <rect x="727" y="317" width="178" height="65" rx="9"></rect>
                   <text x="816" y="343">専用MCP</text>
                   <text class="sub" x="816" y="367">制作ツールの入口</text>
                 </g>
-                <path class="edge" d="M816 253V317" />
+                <path class="edge" d="M816 253V317"></path>
                 <text class="edge-label" x="843" y="289">stdio</text>
-                <path class="edge" d="M727 350H695V140" />
+                <path class="edge" d="M727 350H695V140"></path>
                 <text class="edge-label" x="595" y="340">認可付き</text>
                 <text class="edge-label" x="595" y="362">Unix socket RPC</text>
                 <g class="node">
-                  <rect x="40" y="193" width="350" height="60" rx="9" />
+                  <rect x="40" y="193" width="350" height="60" rx="9"></rect>
                   <text x="215" y="218">Windows 実行補助プロセス</text>
                   <text class="sub" x="215" y="242">
                     実行ごとの記録・プロセス所有権
                   </text>
                 </g>
-                <path class="edge" d="M490 126H465V222H390" />
+                <path class="edge" d="M490 126H465V222H390"></path>
                 <text class="edge-label" x="430" y="277">開始・照合・停止</text>
                 <g class="node">
-                  <rect x="40" y="310" width="350" height="60" rx="9" />
+                  <rect x="40" y="310" width="350" height="60" rx="9"></rect>
                   <text x="215" y="335">background Blender / Cycles</text>
                   <text class="sub" x="215" y="357">
                     入力コピーへ編集・レンダー
                   </text>
                 </g>
-                <path class="edge" d="M215 253V310" />
+                <path class="edge" d="M215 253V310"></path>
                 <g class="node">
-                  <rect x="40" y="428" width="350" height="60" rx="9" />
+                  <rect x="40" y="428" width="350" height="60" rx="9"></rect>
                   <text x="215" y="452">制作ファイル・依存素材</text>
                   <text class="sub" x="215" y="477">
                     .blend / PSD・PSB / EXR / 画像
                   </text>
                 </g>
-                <path class="edge" d="M215 370V428" />
+                <path class="edge" d="M215 370V428"></path>
                 <text class="edge-label" x="274" y="403">検証して保存</text>
                 <g class="node">
-                  <rect x="40" y="548" width="350" height="60" rx="9" />
+                  <rect x="40" y="548" width="350" height="60" rx="9"></rect>
                   <text x="215" y="573">Photoshop · 人間が操作</text>
                   <text class="sub" x="215" y="597">
                     保存した結果をチャットから記録
                   </text>
                 </g>
-                <path class="edge" d="M215 548V488" />
+                <path class="edge" d="M215 548V488"></path>
                 <text class="sub note" x="697" y="490">
                   WSLの管理処理からも制作ファイルへアクセス
                 </text>
@@ -244,309 +227,104 @@
         </section>
         <section id="areas">
           <p class="eyebrow">03 / DESIGN AREAS</p>
-          <h2>13領域から設計をたどる</h2>
-          <p>
-            要点と関係は各ページで、詳細な契約は既存Markdown、合意・根拠は設計Issueで確認できます。
-          </p>
-          <div id="search-controls" hidden>
-            <label for="area-search">領域を探す</label
-            ><input
-              id="area-search"
-              type="search"
-              placeholder="例：停止、素材、作風"
-              aria-describedby="search-count"
-            />
-            <p id="search-count" role="status" aria-live="polite"></p>
-          </div>
+          <h2>設計一覧</h2>
+          <p>各設計で作る機能と仕様を確認できます。</p>
+
           <div class="cards">
-            <article
-              class="area-card"
-              data-search="全体構成とOSの責務Windowsの制作アプリと、WSLの会話・制作管理をつなぐ。ブラウザを閉じても処理は続き、アプリを終了するときに安全に停止する。[[&#x27;画面&#x27;, &#x27;React・TypeScript・Vite。HTTPで指示し、SSEで進捗を受け取る。&#x27;], [&#x27;制作・実行管理&#x27;, &#x27;Node.js・Fastify。同じ作品の更新順序、保護、停止と再実行を判断する。&#x27;], [&#x27;Codex接続&#x27;, &#x27;WSLのapp-serverをstdioで管理。専用MCPから認可付きUnix socket RPCで制作管理へつなぐ。&#x27;], [&#x27;Windows補助プロセス&#x27;, &#x27;所有するbackground Blenderだけを起動・照合・停止。実行ごとの永続記録を残す。&#x27;], [&#x27;保存&#x27;, &#x27;履歴DBはWSL上のSQLite、制作ファイルはWindows。ルートID＋相対パスを実パスへ変換する。&#x27;], [&#x27;起動と終了&#x27;, &#x27;Windows起動管理プロセスがwsl.exeを保持。二重起動を防ぎ、終了時は安全な停止を待つ。&#x27;]][&#x27;localhostのHost・Originと変更要求を検査する。任意パスや任意シェル文字列を実行しない。&#x27;, &#x27;ブラウザ切断は実行を維持。WSLとの連絡喪失は新規操作を止め、安全に停止・照合する。&#x27;, &#x27;バックエンド再起動やMCP再接続だけで制作を再開しない。生存管理・OS間の停止は実機検証へ。&#x27;]"
-            >
-              <div class="card-top">
-                <span class="card-number">01</span
-                ><span class="badge">設計合意済み</span>
-              </div>
-              <h3>
-                <a href="application-architecture.html">全体構成とOSの責務</a>
-              </h3>
+            <a class="area-card" href="application-architecture.html"
+              ><h3>全体構成とOSの責務</h3>
               <p>
                 Windowsの制作アプリと、WSLの会話・制作管理をつなぐ。ブラウザを閉じても処理は続き、アプリを終了するときに安全に停止する。
-              </p>
-            </article>
-            <article
-              class="area-card"
-              data-search="画面と制作の導線左に作品と会話、中央にメインチャット、右に横タブ。採否や手作業の記録は会話から行い、成果物・履歴・相談を隣で開く。[[&#x27;作品と会話&#x27;, &#x27;新規・既存ファイル取り込み・保存状態からの派生。作品別に複数チャットを持つ。&#x27;], [&#x27;右側タブ&#x27;, &#x27;成果物・サイドチャット・制作履歴・保護・作風。＋で開いたタブ内で種類を選ぶ。同じ成果物は既存タブを選択。&#x27;], [&#x27;編集案の確認&#x27;, &#x27;成果物リンクは特定の案・状態・ファイルを固定参照。画像を拡大・移動し、採否・追加修正は会話で伝える。&#x27;], [&#x27;手作業の記録&#x27;, &#x27;本文・添付・セッションの成果物を選択。保存済みblendから通常スクリプトでプレビューを生成し、失敗しても記録を残せる。&#x27;], [&#x27;サイド相談&#x27;, &#x27;保存して開き直せる相談専用チャット。初期文脈を引き継ぎ、制作操作・採否・記録・メインへの依頼の受け渡しはしない。&#x27;], [&#x27;実行表示&#x27;, &#x27;チャットで今行っている作業を停止。停止待ち・状態確認が必要・保留と、明示再開を区別する。&#x27;], [&#x27;履歴と全体管理&#x27;, &#x27;履歴は左から右へ。理由はホバーで確認。作品選択から全履歴の振り返り、設定からバックアップ・実体削除へ。&#x27;]][&#x27;「記録として送信」はLLMを使わない。相談の通常送信と区別する。&#x27;, &#x27;タブを閉じても成果物・会話・履歴は削除しない。実体の欠落は欠落と表示する。&#x27;, &#x27;画面試作は操作契約の根拠。本実装・性能・ファイル選択のOS連携は未検証。&#x27;]"
+              </p></a
             >
-              <div class="card-top">
-                <span class="card-number">02</span
-                ><span class="badge">設計合意済み</span>
-              </div>
-              <h3><a href="user-interface.html">画面と制作の導線</a></h3>
+            <a class="area-card" href="user-interface.html"
+              ><h3>画面と制作の導線</h3>
               <p>
                 左に作品と会話、中央にメインチャット、右に横タブ。採否や手作業の記録は会話から行い、成果物・履歴・相談を隣で開く。
-              </p>
-            </article>
-            <article
-              class="area-card"
-              data-search="作品と制作履歴作品は完成した一枚を目指す単位。AI案・手修正・採否の分岐をつなぎ、何を見て判断し、どこから次の制作を始めたかを追跡する。[[&#x27;作品・会話・原文&#x27;, &#x27;作品の共有情報と複数会話を管理。原文メッセージは順序・発言者・添付・途中や欠落を保持する。&#x27;], [&#x27;依頼・実行・再実行の記録&#x27;, &#x27;目的と予算の単位、AIとWindowsの親子実行、そのやり直しを分ける。Codex thread/turnの対応は接続記録。&#x27;], [&#x27;ファイル参照・生成物&#x27;, &#x27;固定実体とAI等の成果物を区別。人間が取り込んだファイルをAIの生成物と呼ばない。&#x27;], [&#x27;保存状態・変更記録&#x27;, &#x27;固定した構成と依存素材、変更前後と由来。手修正・復元・派生も変更記録でつなぐ。&#x27;], [&#x27;編集案・採否記録&#x27;, &#x27;基準と候補、代替・依存・修正元を保持。判断は実際に確認した状態と範囲を参照する。&#x27;], [&#x27;現在状態の更新記録&#x27;, &#x27;次の制作の出発点をいつ、どの採否・変更で切り替えたかを記録する。&#x27;], [&#x27;文章記録・振り返りの参照記録&#x27;, &#x27;理由・要約・制作意図は訂正履歴付き。分析が当時使った文章・採否・実体を固定する。&#x27;]][&#x27;15概念を上の7群に整理している。物理的なテーブル分割を表すものではない。&#x27;, &#x27;案の完成・候補上の修正だけで現在状態を更新しない。未選択と不採用は別。&#x27;, &#x27;復元は直前と復元元を残す新記録。派生は別作品。理由の訂正や実体削除で過去の判断を消さない。&#x27;]"
+              </p></a
             >
-              <div class="card-top">
-                <span class="card-number">03</span
-                ><span class="badge">設計合意済み</span>
-              </div>
-              <h3><a href="domain-data-model.html">作品と制作履歴</a></h3>
+            <a class="area-card" href="domain-data-model.html"
+              ><h3>作品と制作履歴</h3>
               <p>
                 作品は完成した一枚を目指す単位。AI案・手修正・採否の分岐をつなぎ、何を見て判断し、どこから次の制作を始めたかを追跡する。
-              </p>
-            </article>
-            <article
-              class="area-card"
-              data-search="LLM接続と費用Codex app-serverとCodex管理のChatGPTログインを採用する。scene-craftは作品・採否・制作履歴を管理し、契約枠の上限では停止して人間の再開を待つ。[[&#x27;認証&#x27;, &#x27;Codexがログイン・保存・トークン更新を担当。専用の保存領域を用い、資格情報を制作バックアップへ含めない。&#x27;], [&#x27;費用条件&#x27;, &#x27;ChatGPT Proの契約内。自動補充無効・既存クレジットなしは利用者が確認。API従量課金への切替は設けない。&#x27;], [&#x27;送信&#x27;, &#x27;アプリによる費用確認や確認済み記録は持たない。利用枠・残高を取得できないことだけでは送信を保留しない。&#x27;], [&#x27;制作モデル&#x27;, &#x27;新規会話へ直前チャットの選択を引き継ぐ。初回だけapp-serverの利用可能な既定値を使い、取得できなければ人間が選ぶ。&#x27;], [&#x27;設定の適用&#x27;, &#x27;変更は次の依頼から。実行中・自動再実行の途中で切り替えず、実際のモデル・推論強度・速度を記録する。&#x27;], [&#x27;命名・保存用要約&#x27;, &#x27;制作会話とは別に設定可能。初期値はGPT-6 Luna。失敗時も原文・制作結果を保存し、未命名・未要約と示す。&#x27;]][&#x27;選択モデル・provider・API課金へ自動で切り替える経路は設けない。&#x27;, &#x27;再認証・利用枠回復だけで再開しない。Codexのturn終端と外部Blenderの完了を区別する。&#x27;, &#x27;費用条件は利用者の運用前提。アプリによる将来の課金防止の保証ではない。&#x27;]"
+              </p></a
             >
-              <div class="card-top">
-                <span class="card-number">04</span
-                ><span class="badge">設計合意済み</span>
-              </div>
-              <h3><a href="llm-connection.html">LLM接続と費用</a></h3>
+            <a class="area-card" href="llm-connection.html"
+              ><h3>LLM接続と費用</h3>
               <p>
                 Codex
                 app-serverとCodex管理のChatGPTログインを採用する。scene-craftは作品・採否・制作履歴を管理し、契約枠の上限では停止して人間の再開を待つ。
-              </p>
-            </article>
-            <article
-              class="area-card"
-              data-search="工程別エージェントとツール人間が工程を選ぶ。同じチャットのthreadを続けながら、今回の役割と権限を受付側で照合する。既定は1案で、比較が必要なときに複数案を提示する。[[&#x27;参考調査・シーン計画&#x27;, &#x27;出典と検討事項、部品・位置関係・概寸・順序と仮説を提示。採用は人間。&#x27;], [&#x27;仮形状・定型モデリング&#x27;, &#x27;部品ごとに編集できる形状を作り、保存・依存・保護を検査して案を提示。&#x27;], [&#x27;アセット検索・取り込み&#x27;, &#x27;候補と利用条件を提示し、人間が選んだ実体を取得。取り込み結果は編集案で提示。&#x27;], [&#x27;周辺整備・植物・小物配置&#x27;, &#x27;配置範囲・密度・seedと素材を保持。個体の取り出しと二重生成防止を検証。&#x27;], [&#x27;UV・画像テクスチャ適用&#x27;, &#x27;UV・材質ノードと画像依存を残す。向き・縮尺・変更範囲を検査。&#x27;], [&#x27;空・海・照明・3Dの雲&#x27;, &#x27;オブジェクト・ノード・主要設定を残した編集案。見た目は人間が採否を判断。&#x27;], [&#x27;レンダー出力・引き渡し&#x27;, &#x27;Cyclesの実パスからPSD/PSBを通常プログラムで生成。13レイヤーと実体の検査で完了。&#x27;], [&#x27;振り返り・作風の言語化&#x27;, &#x27;対象作品の全履歴索引と実参照を固定。根拠付き仮説・項目別の制作方針案を提示。&#x27;], [&#x27;手作業の操作方法の相談&#x27;, &#x27;公式文書を参照して回答。独立した結果記録は作らず、アプリを自動操作しない。&#x27;]][&#x27;専用stdio MCP → 認可付きローカルRPC → 制作・実行管理。接続資格と依頼コンテキスト参照を、会話・turn・世代へ照合する。&#x27;, &#x27;「なし」はメインで相談・採否・記録に対応。サイド相談と補助モデルには更新権限を与えない。&#x27;, &#x27;保存・検査・変換はGit固定の通常処理。形状等は共通手順を優先し、足りない場合に生成Pythonを使う。生成コードも保護・停止・予算を通す。&#x27;, &#x27;定義は指示・手順のMarkdown＋JSON manifest。固定blob・実runtime・操作IDと結果を残し、生成コードを定義へ自動昇格しない。&#x27;, &#x27;MCP受付成功は制作完了ではない。長時間処理は操作IDで照合し、切断・停止・結果不明時に二重起動しない。&#x27;]"
+              </p></a
             >
-              <div class="card-top">
-                <span class="card-number">05</span
-                ><span class="badge">設計合意済み</span>
-              </div>
-              <h3>
-                <a href="agent-contracts.html">工程別エージェントとツール</a>
-              </h3>
+            <a class="area-card" href="agent-contracts.html"
+              ><h3>工程別エージェントとツール</h3>
               <p>
                 人間が工程を選ぶ。同じチャットのthreadを続けながら、今回の役割と権限を受付側で照合する。既定は1案で、比較が必要なときに複数案を提示する。
-              </p>
-            </article>
-            <article
-              class="area-card"
-              data-search="実行・停止・復旧同じ作品の更新は順番に行う。停止要求の受付、外部操作が実際に止まったこと、結果の保存をそれぞれ確認する。[[&#x27;9状態&#x27;, &#x27;待機、実行中、確認待ち、停止待ち、保留、中断、状態確認が必要、完了、失敗。&#x27;], [&#x27;作品単位の順序&#x27;, &#x27;編集・レンダー・採用・復元を直列化。固定状態を読む調査・振り返りは並行可能。開始直前に最新の前提を照合。&#x27;], [&#x27;確認と再開&#x27;, &#x27;安全な停止を確認して実行枠を解放。回答・再開後は待機列の末尾へ戻り、依存・起点・保護を再確認。&#x27;], [&#x27;最大2回の再実行&#x27;, &#x27;初回を含め最大3回。依頼全体・同じturnの修正も共有し、人間の再実行指示でも累積回数を維持。&#x27;], [&#x27;二重実行の防止&#x27;, &#x27;受付キー、操作ID・試行ID、内容ハッシュを保存。同じ内容の再送は照合し、異なる内容は拒否。&#x27;], [&#x27;世代と所有権&#x27;, &#x27;バックエンド世代とWindowsプロセス所有権を照合。5秒ごとの連絡、単調時計で30秒の期限。古い通知で現在の実行を更新しない。&#x27;], [&#x27;停止と完了の競合&#x27;, &#x27;全結果・保存を検証できれば完了とし、停止要求も残す。一部だけなら検証済み成果を残して中断する。&#x27;]][&#x27;このページの流れ図は主経路の要約。9状態の全遷移と異常系一覧は詳細Issueに保持する。&#x27;, &#x27;手動停止・認証待ち・利用上限・プロセス終了・結果不明では自動再開しない。状態照合後に人間が再開する。&#x27;, &#x27;Codex内部の通信再送は予算に数えない。制作操作のやり直しは工程名やモデル変更でも回数をリセットしない。&#x27;, &#x27;30秒は死亡判定でも保存中の強制終了期限でもない。停止待ちの間は競合操作を始めない。&#x27;, &#x27;個別の依頼を停止する。新しい作品全体停止機能は設けない。独立して検証できた途中成果は人間が利用できる。&#x27;]"
+              </p></a
             >
-              <div class="card-top">
-                <span class="card-number">06</span
-                ><span class="badge">設計合意済み</span>
-              </div>
-              <h3><a href="execution-lifecycle.html">実行・停止・復旧</a></h3>
+            <a class="area-card" href="execution-lifecycle.html"
+              ><h3>実行・停止・復旧</h3>
               <p>
                 同じ作品の更新は順番に行う。停止要求の受付、外部操作が実際に止まったこと、結果の保存をそれぞれ確認する。
-              </p>
-            </article>
-            <article
-              class="area-card"
-              data-search="編集案の採用と保護保存済み入力のコピーへ編集案を作り、確認した具体的な状態を人間が採用する。未採用の案に手修正とAI修正を交互に重ねられる。[[&#x27;独立と依存&#x27;, &#x27;植物と照明など独立した変更は別々に判断。依存があれば一組で確認。同じ目的の代替案から一つを選ぶ。&#x27;], [&#x27;部分採用と古い案&#x27;, &#x27;事前に分けた独立単位を採用。任意の細部は追加修正案へ。古い案は現在状態へ取り込む組合せ結果を別に作って確認。&#x27;], [&#x27;候補への追加修正&#x27;, &#x27;明示した候補状態を起点に、新しい依頼・案を作る。手修正の前後、AI修正元、指示者・変更者・理由を追跡。&#x27;], [&#x27;保護の対象&#x27;, &#x27;対象全体と、位置・回転・大きさ・形状・材質・主要カメラ／照明設定。共有材質・親子・制約を介した間接変更も検査。&#x27;], [&#x27;依頼限定許可&#x27;, &#x27;対象・項目・許可範囲を依頼と指示原文へ対応付ける。同じ依頼の再実行には引き継ぐが、新しい追加依頼には持ち越さない。&#x27;], [&#x27;検査と適用&#x27;, &#x27;違反・比較不能・対象同定不能な案は採用不可。検証後に固定実体とDBを照合し、現在状態を確定する。&#x27;]][&#x27;カメラ保護は撮影位置・設定の維持。植物の追加による遮蔽まで一律に禁止する意味ではない。&#x27;, &#x27;人間が保護対象を手修正しても保護は維持。AIへの継続解除・許可と解釈しない。&#x27;, &#x27;採用失敗は直前の状態を保ち、結果不明は二重適用せず照合する。&#x27;, &#x27;任意のBlender内部差分の自動マージ、後の手修正を維持した過去AI編集だけの取消は初期の保証にしない。&#x27;]"
+              </p></a
             >
-              <div class="card-top">
-                <span class="card-number">07</span
-                ><span class="badge">設計合意済み</span>
-              </div>
-              <h3><a href="edit-candidates.html">編集案の採用と保護</a></h3>
+            <a class="area-card" href="edit-candidates.html"
+              ><h3>編集案の採用と保護</h3>
               <p>
                 保存済み入力のコピーへ編集案を作り、確認した具体的な状態を人間が採用する。未採用の案に手修正とAI修正を交互に重ねられる。
-              </p>
-            </article>
-            <article
-              class="area-card"
-              data-search="Blender連携とレンダー出力WindowsのBlenderをbackground実行し、保存済み入力のコピーをPythonで処理する。Cyclesから16bit RGB・sRGBのPSDを生成し、上限時はPSBへ切り替える。[[&#x27;編集可能な制作データ&#x27;, &#x27;部品別形状、UV・画像接続、材質ノード、環境設定をblendへ残す。植物の個体取り出しは分布から除外し、再生成で二重化しない。&#x27;], [&#x27;色と表示&#x27;, &#x27;13枚を同じカメラ・フレーム・解像度に揃える。新規作品はAgX・露出0。見た目用の変換とデータ画像の符号化を分け、sRGB ICCを埋め込む。&#x27;], [&#x27;影とアルファ&#x27;, &#x27;Shadowsは指定受け面のShadow Catcher。影用コピーと通常Combinedを分ける。Global Alpha Maskは背景として指定した空を除く。&#x27;], [&#x27;深度とID&#x27;, &#x27;深度は近白・遠黒、範囲と元の距離EXRを保持。物体・材質ごとのID色を固定し、名称変更で変えず、削除した色を再利用しない。&#x27;], [&#x27;生成方式&#x27;, &#x27;PhotoshopAPI 0.9.1でレイヤーを作り、psd-tools 1.24.0で名称・merged imageを補修。再読込・画素・ICC検査後に完成として公開。&#x27;], [&#x27;形式と完成&#x27;, &#x27;統合レイヤーだけ初期表示、残り12枚は非表示。上限超過は同条件のPSBへ。必須パスの欠落を空画像や品質低下で隠さない。&#x27;]][&#x27;保存済みデータだけが対象。GUIの未保存内容を自動取得しない。同じデータを人間とAIが同時編集しない。&#x27;, &#x27;Shadows未指定なら指定を求める。人間が「対象なし」を明示したときだけ白いShadowsと対象なしの記録を残す。&#x27;, &#x27;停止は所有するプロセスを対象にし、編集・保存は安全な境目、レンダーは中断。未完成画像を成果物にしない。&#x27;, &#x27;小さな実EXRから13種類への変換は確認済み。Photoshop実機・2GB超・GPU・透明／ボリューム等の品質は受け入れへ。&#x27;]"
+              </p></a
             >
-              <div class="card-top">
-                <span class="card-number">08</span
-                ><span class="badge">設計合意済み</span>
-              </div>
-              <h3>
-                <a href="blender-integration.html">Blender連携とレンダー出力</a>
-              </h3>
+            <a class="area-card" href="blender-integration.html"
+              ><h3>Blender連携とレンダー出力</h3>
               <p>
                 WindowsのBlenderをbackground実行し、保存済み入力のコピーをPythonで処理する。Cyclesから16bit
                 RGB・sRGBのPSDを生成し、上限時はPSBへ切り替える。
-              </p>
-            </article>
-            <article
-              class="area-card"
-              data-search="保存・復元・バックアップ制作ファイルと依存素材を管理下へコピーし、サイズ・ハッシュ・構成を固定する。WSLのDBとWindowsのファイルは別々に確定し、完成記録を照合する。[[&#x27;固定と依存&#x27;, &#x27;作業用コピーと固定実体を分離。リンク・テクスチャ・キャッシュを再帰収集し、循環・実参照先・コピー中変更を検査。&#x27;], [&#x27;保存の確定&#x27;, &#x27;操作IDと受付キーを先に記録。必須ファイルと完成記録を照合してから公開。通知再送で保存状態を二重登録しない。&#x27;], [&#x27;過去へ戻す&#x27;, &#x27;未登録の手修正を先に保存・記録し、復元用コピーを検証。直前の状態と復元元を保持した新しい保存状態を作る。&#x27;], [&#x27;派生と削除&#x27;, &#x27;派生先の編集・削除を元作品から分離。明示的に大容量実体を削除しても履歴・理由は残し、共有実体を参照する状態を保護。&#x27;], [&#x27;バックアップ&#x27;, &#x27;書き込みと制作を安全に止め、全作品・会話・DB・Windows実行記録・実体を一つの非圧縮フォルダーへ。構成一覧とハッシュ検証後に完成記録を付ける。&#x27;], [&#x27;復元と移行&#x27;, &#x27;空の保存先へ復元し、IDと参照を維持してルートを再設定。既知不足と破損を区別。形式変更は確認・退避・検証後に変換する。&#x27;]][&#x27;既知の依存不足は一覧付きで残せるが、完全復元可能とはしない。必須ファイルのコピー失敗を不足へ読み替えない。&#x27;, &#x27;資格情報・Codex内部継続データ・実行許可は移行しない。原文と要約を使って新しい会話の文脈を構成する。&#x27;, &#x27;Git実体はバックアップへ含めずGitHubの保持用タグから復旧。未pushは別PCへ復旧できる扱いにしない。&#x27;, &#x27;復元・移行・アプリ起動だけで制作を自動再開しない。移行前退避は成功後も自動削除しない。&#x27;]"
+              </p></a
             >
-              <div class="card-top">
-                <span class="card-number">09</span
-                ><span class="badge">設計合意済み</span>
-              </div>
-              <h3>
-                <a href="artifact-storage.html">保存・復元・バックアップ</a>
-              </h3>
+            <a class="area-card" href="artifact-storage.html"
+              ><h3>保存・復元・バックアップ</h3>
               <p>
                 制作ファイルと依存素材を管理下へコピーし、サイズ・ハッシュ・構成を固定する。WSLのDBとWindowsのファイルは別々に確定し、完成記録を照合する。
-              </p>
-            </article>
-            <article
-              class="area-card"
-              data-search="参考資料と素材参考資料は表現や構造の根拠、素材は制作へ取り込むデータ。一般Web・指定フォルダー・Poly Haven・ambientCGを使い、人間の選択と取得実体を結び付ける。[[&#x27;候補に残す情報&#x27;, &#x27;名前・作者・出典・素材ID・利用条件の根拠と確認日、プレビュー、参考要素と制作意図との関係。不明は不明と記録。&#x27;], [&#x27;検索先&#x27;, &#x27;一般Webで参考調査。素材はPoly Haven・ambientCGの無料公開素材と、人間が指定した手元フォルダー。購入手続きは初期対象外。&#x27;], [&#x27;3Dの対応形式&#x27;, &#x27;blend、glTF/GLB、FBX、OBJ。必要なテクスチャ・リンクも収集し、追加アドオンや読めない内容は保留する。&#x27;], [&#x27;画像と品質&#x27;, &#x27;PNG/JPEG、EXR/HDR。テクスチャ2K・HDRI4Kが既定。取得前に形式・解像度・容量を提示し、実際の品質を固定。&#x27;], [&#x27;取得と取り込み&#x27;, &#x27;利用条件・人間の選択・実体ハッシュ・依存一覧を保持。Blenderの入力コピーへ取り込み、保存・再読込検証済みの編集案として提示。&#x27;], [&#x27;提供条件&#x27;, &#x27;Poly HavenのAPI出典表示と識別ヘッダー、ambientCGの文書化APIを使う。素材のCC0とAPIの条件、一般Webの保存条件を区別する。&#x27;]][&#x27;利用条件不明は取り込み保留。一般Web画像は保存できる根拠を確認できたものだけ保持し、未保持ならURLと記録を残す。&#x27;, &#x27;指定品質がなければ候補を示して確認。別素材・解像度・サービスへ黙って差し替えない。&#x27;, &#x27;取得完了・編集案完成・採用は別。人間が案を採用するまで現在状態を切り替えない。&#x27;, &#x27;検索失敗と結果なし、プレビュー欠落と実体欠落、既知不足と破損を区別する。実取得・Blender取り込みは後続で検証。&#x27;]"
+              </p></a
             >
-              <div class="card-top">
-                <span class="card-number">10</span
-                ><span class="badge">設計合意済み</span>
-              </div>
-              <h3><a href="reference-and-assets.html">参考資料と素材</a></h3>
+            <a class="area-card" href="reference-and-assets.html"
+              ><h3>参考資料と素材</h3>
               <p>
                 参考資料は表現や構造の根拠、素材は制作へ取り込むデータ。一般Web・指定フォルダー・Poly
                 Haven・ambientCGを使い、人間の選択と取得実体を結び付ける。
-              </p>
-            </article>
-            <article
-              class="area-card"
-              data-search="文脈・作風・制作方針作品の制作意図を最優先に、採用状態・保護・作風を共有する。Codexの文脈圧縮と、scene-craftが残す根拠付き要約を分ける。[[&#x27;会話の継続&#x27;, &#x27;同じthreadをCodexで継続し、圧縮もCodexに任せる。scene-craftは原文と根拠付き要約を独立保存。&#x27;], [&#x27;作品の共有情報&#x27;, &#x27;制作意図・採用状態・保護・固定作風を作品単位で管理。人間の明示更新を原文へ結び付け、古い要約で巻き戻さない。&#x27;], [&#x27;実行へ渡す文脈&#x27;, &#x27;依頼・起点・意図・範囲・保護・許可・作風を固定。他会話の関連要約と必要な原文・画像を追加取得し、実参照を残す。&#x27;], [&#x27;要約の区切り&#x27;, &#x27;完了・停止・確認待ちを区切りに追加発言を対象化。ただし停止後等は新たなLLM処理を起動せず未要約で保持。&#x27;], [&#x27;振り返り&#x27;, &#x27;人間が一作品または作品集合を選ぶ。対象は各作品の全履歴。未取得・削除・欠落と、実際に観察した範囲を説明する。&#x27;], [&#x27;制作方針への採用&#x27;, &#x27;作風の傾向は仮説。人間が項目別に採用・編集・保留し、採用変更をGitへコミット。作品へ使う版の適用は別途選ぶ。&#x27;]][&#x27;理由未入力を推測で埋めず、事実・人間の理由・AIの解釈を区別する。&#x27;, &#x27;後日の理由訂正で過去の分析根拠を変更しない。「根拠に更新あり」を示し、再分析は人間が起動する。&#x27;, &#x27;新規作品の作風は版を選択するか「なし」。前作や最新の版を自動適用しない。&#x27;, &#x27;対象が全履歴であることと、全画像・実体を観察済みであることを区別する。&#x27;]"
+              </p></a
             >
-              <div class="card-top">
-                <span class="card-number">11</span
-                ><span class="badge">設計合意済み</span>
-              </div>
-              <h3><a href="context-and-style.html">文脈・作風・制作方針</a></h3>
+            <a class="area-card" href="context-and-style.html"
+              ><h3>文脈・作風・制作方針</h3>
               <p>
                 作品の制作意図を最優先に、採用状態・保護・作風を共有する。Codexの文脈圧縮と、scene-craftが残す根拠付き要約を分ける。
-              </p>
-            </article>
-            <article
-              class="area-card"
-              data-search="Gitの版固定と更新定義と作風の版はGitを正とする。受付時のコミットを固定し、使ったファイルのblobと実行時の設定・runtimeを追跡する。[[&#x27;参照の固定&#x27;, &#x27;リポジトリ・フルコミットハッシュ・保持用タグ・使用パスとblobを記録。定義と作風は別コミットを使える。&#x27;], [&#x27;受付と待機&#x27;, &#x27;受付時の予定版を維持。待機中に作品の作風が変わったら旧版継続／新版切替を確認し、再実行中は黙って変えない。&#x27;], [&#x27;実行内容の分離&#x27;, &#x27;コミット済み内容を読み取り専用領域へ取り出す。未コミットの開発ファイルや暗黙の設定探索を混入させない。&#x27;], [&#x27;保持と公開&#x27;, &#x27;参照済み履歴をrebase・squashで置換しない。タグを移動・自動削除せず、GitHubへ対象タグを明示pushして一致確認。&#x27;], [&#x27;互換性&#x27;, &#x27;定義・作風形式・ツール契約・実runtimeを検査。異なるコミットでも対応可能なら利用し、欠損・非互換なら開始を止める。&#x27;], [&#x27;ローカル形式の移行&#x27;, &#x27;DB等の形式識別を内容の版と分ける。人間の確認、書き込み停止、必要範囲の退避・検証、変換と整合検査を経る。&#x27;], [&#x27;バックアップからのGit復旧&#x27;, &#x27;登録リポジトリから対象タグを取得し、コミット・使用blobを照合。同名タグ不一致をforceで上書きしない。&#x27;]][&#x27;未pushでもローカルが揃えば制作可能。「リモート未保存」と表示する。接続不能は最終確認結果と区別。&#x27;, &#x27;Gitコミットだけで外部runtimeの完全復元を保証しない。生成Pythonは恒久的な定義改訂と分ける。&#x27;, &#x27;制作データの一括バックアップへGit実体を含めない。復旧・版更新だけで過去の制作を再開しない。&#x27;, &#x27;短命なfeature・fix・styleブランチで進め、人間が確認して統合。初期構築完了後の定義・ツール更新に限り検証有無を毎回確認する。&#x27;]"
+              </p></a
             >
-              <div class="card-top">
-                <span class="card-number">12</span
-                ><span class="badge">設計合意済み</span>
-              </div>
-              <h3><a href="git-versioning.html">Gitの版固定と更新</a></h3>
+            <a class="area-card" href="git-versioning.html"
+              ><h3>Gitの版固定と更新</h3>
               <p>
                 定義と作風の版はGitを正とする。受付時のコミットを固定し、使ったファイルのblobと実行時の設定・runtimeを追跡する。
-              </p>
-            </article>
-            <article
-              class="area-card"
-              data-search="テスト・診断・受け入れこの領域は未確定。完了済みの各設計と調査から受け取った確認事項を、テスト境界・診断情報・実作品での受け入れへまとめる。[[&#x27;作品を通した受け入れ&#x27;, &#x27;各工程を個別に呼び、編集可能な3Dからレンダー出力、人間のレタッチ記録、採否・理由・復元を通す。&#x27;], [&#x27;制作履歴と作風&#x27;, &#x27;単作品・複数作品の振り返り、全履歴の対象化と実参照、方針の項目別採用、Git固定版の次作品への適用。&#x27;], [&#x27;停止と復旧&#x27;, &#x27;所有プロセス、二重受付、結果不明、5秒／30秒、停止と完了の競合、スリープ・再起動後の明示再開。&#x27;], [&#x27;保存と保護&#x27;, &#x27;依存不足・破損・容量不足、DBとWindowsファイルの途中確定、直接／間接変更、生成Python、退避と復元。&#x27;], [&#x27;外部ツール&#x27;, &#x27;MCP権限と工程切替、39機能のapp-server分担、素材サービスの実取得・取り込み、モデルと補助処理の失敗。&#x27;], [&#x27;Photoshopへの引き渡し&#x27;, &#x27;実アプリで13レイヤー・16bit・ICC・初期表示を確認。2GB超と大容量、透明・ボリューム等の品質。&#x27;]][&#x27;このページは引き継ぎ事項の案内。テスト方式・閾値・診断スキーマ・受け入れ手順を合意済みと扱わない。&#x27;, &#x27;設計の完了、小さな合成シーンの検証、製品全体の受け入れは別の状態として記録する。&#x27;]"
+              </p></a
             >
-              <div class="card-top">
-                <span class="card-number">13</span
-                ><span class="badge pending">未確定</span>
-              </div>
-              <h3>
-                <a href="testing-and-diagnostics.html"
-                  >テスト・診断・受け入れ</a
-                >
-              </h3>
-              <p>
-                この領域は未確定。完了済みの各設計と調査から受け取った確認事項を、テスト境界・診断情報・実作品での受け入れへまとめる。
-              </p>
-            </article>
-          </div>
-          <p id="no-results" hidden>
-            該当する領域がありません。検索語を短くするか、入力を消すと全領域を表示します。
-          </p>
-        </section>
-        <section>
-          <p class="eyebrow">04 / EVIDENCE & NEXT</p>
-          <h2>確認できたこと、これから確かめること</h2>
-          <div
-            class="table-scroll"
-            tabindex="0"
-            role="region"
-            aria-label="主要な契約"
-          >
-            <table>
-              <thead>
-                <tr>
-                  <th scope="col">項目</th>
-                  <th scope="col">決めたこと・受け渡すもの</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row">接続・画面の分担</th>
-                  <td>
-                    app-serverの公式資料・導入版schema・非推論RPCを照合し、39機能の分担と未確認事項を整理。
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">レンダーと変換</th>
-                  <td>
-                    小さなCycles実EXRから13レイヤーPSD/PSBへの変換と16bit値・ICC・初期表示を確認。
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">残る受け入れ</th>
-                  <td>
-                    WindowsとWSLをまたぐ停止・保存・復旧、権限、実素材、Photoshop実機・大容量等は後続。
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <div class="related">
-            <a
-              href="https://github.com/Kurarowa305/scene-craft/blob/main/docs/research/codex-app-server-ui-capabilities.md"
-              >app-serverの機能分担調査</a
-            ><a
-              href="https://github.com/Kurarowa305/scene-craft/blob/main/docs/research/psd16-conversion-validation.md"
-              >13レイヤーの変換検証</a
-            ><a href="testing-and-diagnostics.html">次のテスト・診断設計</a>
           </div>
         </section>
-        <section class="sources">
-          <h2>この資料の使い方</h2>
-          <p>
-            <a href="https://kurarowa305.github.io/scene-craft/"
-              >GitHub Pagesの公開ポータル</a
-            >からも閲覧できます。詳細なMarkdown資料はGitHub上で開きます。
-          </p>
-          <p>
-            HTMLはブラウザで
-            <code>docs/design/index.html</code>
-            を直接開くと読めます。外部CDNやビルドは不要です。GitHubではHTMLはソース表示になるため、リポジトリを取得して開いてください。ナビゲーションはJavaScriptなしでも使えます。
-          </p>
-          <p>
-            既存のMarkdownはすべて残し、このHTMLを別に併設しています。各ページ末尾の「詳細と根拠へ」から現在の詳細設計と設計Issueを参照できます。Issueに保存した固定時点の本文や固定コミットは履歴です。設計変更時はMarkdownとこのポータルの要点を揃えて更新します。
-          </p>
-          <p>
-            <a
-              href="https://github.com/Kurarowa305/scene-craft/blob/main/docs/design/README.md"
-              >詳細設計の一覧（Markdown）</a
-            >
-            ·
-            <a href="https://github.com/Kurarowa305/scene-craft/issues/1"
-              >設計マップと最新の進捗</a
-            >
-          </p>
-        </section>
-        <script src="portal.js" defer></script>
+
         <footer>
-          <p>scene-craft · 設計ポータル · 2026-10-31 時点の整理</p>
+          <p>scene-craft · 設計ポータル</p>
           <p>
             <a
               href="https://github.com/Kurarowa305/scene-craft/blob/main/docs/requirements/initial-scope.md"
-              >合意済み要件</a
+              target="_blank"
+              rel="noopener noreferrer"
+              >要件</a
             >
             ·
             <a
               href="https://github.com/Kurarowa305/scene-craft/blob/main/GLOSSARY.md"
+              target="_blank"
+              rel="noopener noreferrer"
               >用語集</a
             >
-            ·
-            <a
-              href="https://github.com/Kurarowa305/scene-craft/blob/main/docs/agents/development-workflow.md"
-              >開発フロー</a
-            >
-            ·
-            <a href="https://github.com/Kurarowa305/scene-craft/issues/33"
-              >このポータルの整備記録</a
-            >
-          </p>
-          <p>
-            設計の合意と、本実装・実機検証の完了は別です。最新の進捗は設計マップを参照してください。
           </p>
         </footer>
       </main>

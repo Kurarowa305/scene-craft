@@ -17,7 +17,7 @@ html {
   scroll-padding-top: 90px;
 }
 body {
-  margin: 0;
+  margin: 0px;
   background: var(--paper);
   color: var(--ink);
   font-family:
@@ -33,10 +33,8 @@ a:hover {
   text-decoration-thickness: 2px;
 }
 a:focus-visible,
-input:focus-visible,
-summary:focus-visible,
 [tabindex]:focus-visible {
-  outline: 3px solid #aa631d;
+  outline: rgb(170, 99, 29) solid 3px;
   outline-offset: 4px;
 }
 h1,
@@ -44,7 +42,7 @@ h2,
 h3,
 p,
 figure {
-  margin: 0;
+  margin: 0px;
 }
 p + p {
   margin-top: 0.8em;
@@ -58,7 +56,7 @@ h1 {
 h2 {
   font-size: 26px;
   line-height: 1.5;
-  margin: 8px 0 22px;
+  margin: 8px 0px 22px;
 }
 h3 {
   font-size: 18px;
@@ -81,10 +79,10 @@ code {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 36px;
+  padding: 0px 36px;
   background: rgba(248, 249, 244, 0.98);
   position: sticky;
-  top: 0;
+  top: 0px;
   z-index: 10;
   gap: 20px;
 }
@@ -116,7 +114,7 @@ code {
 }
 .layout {
   display: grid;
-  grid-template-columns: 252px minmax(0, 1fr);
+  grid-template-columns: 252px minmax(0px, 1fr);
   max-width: 1510px;
   margin: auto;
 }
@@ -126,13 +124,13 @@ aside {
   align-self: start;
   position: sticky;
   top: 72px;
-  max-height: calc(100vh - 72px);
+  max-height: calc(-72px + 100vh);
   overflow: auto;
 }
 nav a {
   display: block;
   padding: 7px 11px;
-  margin: 2px 0;
+  margin: 2px 0px;
   color: var(--muted);
   font-size: 13px;
   text-decoration: none;
@@ -141,8 +139,8 @@ nav a {
 }
 nav a:hover,
 nav [aria-current] {
-  background: #e3ece2;
-  color: #183f32;
+  background: rgb(227, 236, 226);
+  color: rgb(24, 63, 50);
 }
 nav [aria-current] {
   font-weight: 700;
@@ -152,18 +150,12 @@ nav [aria-current] {
   font-size: 11px;
   letter-spacing: 0.09em;
   margin: 23px 11px 7px;
-  color: #667970;
+  color: rgb(102, 121, 112);
 }
-.aside-note {
-  font-size: 11px;
-  color: var(--muted);
-  border-top: 1px solid var(--line);
-  padding-top: 20px;
-  margin: 28px 11px 0;
-}
+
 main {
   padding: 58px clamp(24px, 4.4vw, 70px) 35px;
-  min-width: 0;
+  min-width: 0px;
   max-width: 1258px;
 }
 .eyebrow {
@@ -188,23 +180,7 @@ main {
 main > .intro + p {
   margin-top: 22px;
 }
-.badge {
-  display: inline-block;
-  font-size: 11px;
-  padding: 3px 9px;
-  border-radius: 4px;
-  background: #e2ecdf;
-  color: #24503b;
-  white-space: nowrap;
-}
-.badge.pending {
-  background: #f9e9ce;
-  color: var(--warning);
-}
-.muted {
-  font-size: 12px;
-  color: var(--muted);
-}
+
 section {
   margin-top: 64px;
   padding-top: 38px;
@@ -213,45 +189,7 @@ section {
 section > p {
   max-width: 780px;
 }
-.metrics {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  margin: 36px 0;
-  border-top: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
-}
-.metrics div {
-  padding: 23px 18px;
-  border-right: 1px solid var(--line);
-}
-.metrics div:first-child {
-  padding-left: 0;
-}
-.metrics div:last-child {
-  border: 0;
-}
-.metrics strong {
-  display: block;
-  font-size: 31px;
-  line-height: 1.5;
-  font-weight: 500;
-  letter-spacing: 0.02em;
-}
-.metrics span {
-  display: block;
-  font-size: 12px;
-  color: var(--muted);
-}
-.notice {
-  padding: 20px 24px;
-  background: var(--soft);
-  border-left: 3px solid var(--accent);
-  font-size: 13px;
-}
-.notice p {
-  margin-top: 5px;
-  color: var(--muted);
-}
+
 figure {
   margin-top: 30px;
 }
@@ -269,33 +207,33 @@ svg {
   min-width: 680px;
 }
 .zone {
-  fill: #f4f1e7;
-  stroke: #d9d9ca;
+  fill: rgb(244, 241, 231);
+  stroke: rgb(217, 217, 202);
 }
 .zone.wsl {
-  fill: #eef4ed;
-  stroke: #ccdaca;
+  fill: rgb(238, 244, 237);
+  stroke: rgb(204, 218, 202);
 }
 .zone-title {
   font: 600 14px sans-serif;
   letter-spacing: 1px;
-  fill: #53675e;
+  fill: rgb(83, 103, 94);
 }
 .node rect {
   fill: white;
-  stroke: #ccd8ce;
+  stroke: rgb(204, 216, 206);
 }
 .node text {
   font:
     500 15px "Yu Gothic UI",
     Meiryo,
     sans-serif;
-  fill: #233b37;
+  fill: rgb(35, 59, 55);
   text-anchor: middle;
 }
 .node.primary rect {
-  fill: #245c4b;
-  stroke: #245c4b;
+  fill: rgb(36, 92, 75);
+  stroke: rgb(36, 92, 75);
 }
 .node.primary text {
   fill: white;
@@ -309,33 +247,33 @@ svg .sub {
   text-anchor: middle;
 }
 .node .sub {
-  fill: #526860;
+  fill: rgb(82, 104, 96);
 }
 .node.primary .sub {
-  fill: #e5f0e7;
+  fill: rgb(229, 240, 231);
 }
 .edge {
   fill: none;
-  stroke: #48716b;
+  stroke: rgb(72, 113, 107);
   stroke-width: 1.5;
-  marker-end: url(#arrow);
+  marker-end: url("#arrow");
 }
 .edge-label {
   font:
     11px "Yu Gothic UI",
     Meiryo,
     sans-serif;
-  fill: #365e53;
+  fill: rgb(54, 94, 83);
   text-anchor: middle;
 }
 .note {
-  fill: #526860;
+  fill: rgb(82, 104, 96);
 }
 .history-lines path {
   fill: none;
-  stroke: #48716b;
+  stroke: rgb(72, 113, 107);
   stroke-width: 1.5;
-  marker-end: url(#h-arrow);
+  marker-end: url("#h-arrow");
 }
 figcaption {
   font-size: 12px;
@@ -346,25 +284,25 @@ figcaption {
 .flow {
   list-style: none;
   display: flex;
-  margin: 0;
-  padding: 0;
+  margin: 0px;
+  padding: 0px;
   gap: 25px;
-  counter-reset: step;
+  counter-reset: step 0;
 }
 .flow li {
-  flex: 1;
-  min-width: 0;
+  flex: 1 1 0%;
+  min-width: 0px;
   position: relative;
-  margin: 0;
+  margin: 0px;
   background: var(--soft);
   border: 1px solid var(--line);
   border-radius: 7px;
   padding: 16px 13px;
   font-size: 13px;
   line-height: 1.65;
-  counter-increment: step;
+  counter-increment: step 1;
 }
-.flow li:before {
+.flow li::before {
   content: counter(step, decimal-leading-zero);
   display: block;
   color: var(--muted);
@@ -373,7 +311,7 @@ figcaption {
     monospace;
   margin-bottom: 9px;
 }
-.flow li:not(:last-child):after {
+.flow li:not(:last-child)::after {
   content: "→";
   position: absolute;
   right: -22px;
@@ -393,7 +331,7 @@ figcaption {
 }
 .cards {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0px, 1fr));
   gap: 18px;
   margin-top: 24px;
 }
@@ -407,50 +345,13 @@ figcaption {
 .area-card:hover {
   border-color: var(--accent);
 }
-.area-card h3 a {
-  color: var(--ink);
-  text-decoration: none;
-}
-.area-card h3 a:hover {
-  text-decoration: underline;
-}
+
 .area-card p {
   font-size: 13px;
   color: var(--muted);
   line-height: 1.85;
 }
-.card-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 17px;
-}
-.card-number {
-  font:
-    12px ui-monospace,
-    monospace;
-  color: var(--muted);
-}
-label {
-  display: block;
-  font-size: 13px;
-  font-weight: 600;
-  margin: 22px 0 7px;
-}
-input {
-  font: inherit;
-  padding: 10px 13px;
-  border: 1px solid #aebeb2;
-  background: white;
-  border-radius: 6px;
-  width: min(100%, 440px);
-  color: var(--ink);
-}
-#search-count {
-  font-size: 12px;
-  color: var(--muted);
-  margin-top: 7px;
-}
+
 table {
   border-collapse: collapse;
   width: 100%;
@@ -477,7 +378,7 @@ tbody th {
 }
 tr:last-child th,
 tr:last-child td {
-  border-bottom: 0;
+  border-bottom: 0px;
 }
 .rules {
   padding-left: 1.2em;
@@ -488,7 +389,7 @@ tr:last-child td {
   background: var(--soft);
   padding: 26px;
   border-radius: 8px;
-  border: 0;
+  border: 0px;
 }
 .sources h2 {
   font-size: 21px;
@@ -500,30 +401,7 @@ tr:last-child td {
 .sources a {
   overflow-wrap: anywhere;
 }
-details {
-  border-top: 1px solid var(--line);
-  margin-top: 22px;
-  padding-top: 16px;
-}
-summary {
-  cursor: pointer;
-  font-size: 13px;
-  font-weight: 600;
-}
-.related {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 20px;
-}
-.related a {
-  border: 1px solid var(--line);
-  background: #fff;
-  border-radius: 5px;
-  padding: 8px 13px;
-  font-size: 13px;
-  text-decoration: none;
-}
+
 footer {
   margin-top: 64px;
   padding-top: 23px;
@@ -547,7 +425,7 @@ footer {
 }
 @media (max-width: 1000px) {
   .layout {
-    grid-template-columns: 210px minmax(0, 1fr);
+    grid-template-columns: 210px minmax(0px, 1fr);
   }
   aside {
     padding: 25px 12px;
@@ -567,7 +445,7 @@ footer {
 }
 @media (max-width: 700px) {
   .top {
-    padding: 0 18px;
+    padding: 0px 18px;
     height: 64px;
   }
   .top .brand {
@@ -582,7 +460,7 @@ footer {
   aside {
     position: static;
     max-height: none;
-    border-right: 0;
+    border-right: 0px;
     border-bottom: 1px solid var(--line);
     padding: 16px;
   }
@@ -593,12 +471,11 @@ footer {
   }
   nav a {
     font-size: 11px;
-    background: #edf2eb;
+    background: rgb(237, 242, 235);
     padding: 5px 8px;
-    margin: 0;
+    margin: 0px;
   }
-  nav .nav-label,
-  .aside-note {
+  nav .nav-label {
     display: none;
   }
   main {
@@ -607,20 +484,12 @@ footer {
   .cards {
     grid-template-columns: 1fr;
   }
-  .metrics div {
-    padding: 17px 8px;
-  }
-  .metrics strong {
-    font-size: 25px;
-  }
-  .metrics span {
-    font-size: 10px;
-  }
+
   .flow {
     flex-direction: column;
     gap: 22px;
   }
-  .flow li:not(:last-child):after {
+  .flow li:not(:last-child)::after {
     content: "↓";
     top: auto;
     right: 50%;
@@ -652,8 +521,7 @@ footer {
 @media print {
   .top,
   aside,
-  .skip,
-  #search-controls {
+  .skip {
     display: none;
   }
   .layout {
@@ -661,12 +529,12 @@ footer {
   }
   main {
     max-width: none;
-    padding: 0;
+    padding: 0px;
   }
   body {
     background: white;
     font-size: 11pt;
-    color: #000;
+    color: rgb(0, 0, 0);
   }
   h1 {
     font-size: 26pt;
@@ -684,28 +552,19 @@ footer {
     grid-template-columns: repeat(2, 1fr);
   }
   .area-card,
-  figure,
-  .notice {
+  figure {
     break-inside: avoid;
   }
   svg {
-    min-width: 0;
+    min-width: 0px;
   }
   .table-scroll,
   .diagram-scroll {
     overflow: visible;
   }
-  details {
-    display: block;
-  }
-  details > ul {
-    display: block;
-  }
-  .related a {
-    padding: 3px;
-  }
+
   a {
-    color: #000;
+    color: rgb(0, 0, 0);
   }
   .flow {
     flex-wrap: wrap;
@@ -713,4 +572,17 @@ footer {
   footer {
     margin-top: 24px;
   }
+}
+a.area-card {
+  display: block;
+  color: var(--ink);
+  text-decoration: none;
+}
+a.area-card:hover {
+  border-color: var(--accent);
+  background: var(--soft);
+}
+a.area-card:focus-visible {
+  outline: rgb(170, 99, 29) solid 3px;
+  outline-offset: 4px;
 }

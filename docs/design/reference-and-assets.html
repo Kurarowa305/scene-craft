@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta
       name="description"
-      content="scene-craftの確定設計を全体図と要点から確認する人間向け資料。詳細な契約は設計Issueへ。"
+      content="scene-craftで作る機能・構成・制作の流れをまとめた設計資料。"
     />
     <title>参考資料と素材 | scene-craft 設計</title>
     <link rel="stylesheet" href="portal.css" />
@@ -16,8 +16,6 @@
       <a class="brand" href="index.html"
         ><span class="mark" aria-hidden="true">sc</span> scene-craft
         <span class="brand-sub">/ DESIGN NOTES</span></a
-      ><a href="https://github.com/Kurarowa305/scene-craft/issues/1"
-        >設計マップ ↗</a
       >
     </header>
     <div class="layout">
@@ -40,12 +38,7 @@
             >参考資料と素材</a
           ><a href="context-and-style.html">文脈・作風・制作方針</a
           ><a href="git-versioning.html">Gitの版固定と更新</a>
-          <p class="nav-label">次の設計</p>
-          <a href="testing-and-diagnostics.html">テスト・診断・受け入れ</a>
         </nav>
-        <div class="aside-note">
-          設計の要点はここで。<br />詳細はMarkdown、合意はIssueで。
-        </div>
       </aside>
       <main id="main" tabindex="-1">
         <p class="eyebrow">DESIGN / 10</p>
@@ -55,10 +48,7 @@
           参考資料は表現や構造の根拠、素材は制作へ取り込むデータ。一般Web・指定フォルダー・Poly
           Haven・ambientCGを使い、人間の選択と取得実体を結び付ける。
         </p>
-        <p>
-          <span class="badge">設計合意済み</span>
-          <span class="muted">本実装・実機受け入れは後続</span>
-        </p>
+
         <figure>
           <ol class="flow">
             <li>検索し候補を提示</li>
@@ -139,130 +129,57 @@
               取得完了・編集案完成・採用は別。人間が案を採用するまで現在状態を切り替えない。
             </li>
             <li>
-              検索失敗と結果なし、プレビュー欠落と実体欠落、既知不足と破損を区別する。実取得・Blender取り込みは後続で検証。
+              検索失敗と結果なし、プレビュー欠落と実体欠落、既知不足と破損を区別する。
             </li>
           </ul>
         </section>
         <section class="sources">
-          <h2>詳細と根拠へ</h2>
+          <h2>詳細資料</h2>
           <p>
-            <a href="https://github.com/Kurarowa305/scene-craft/issues/13"
+            <a
+              href="https://github.com/Kurarowa305/scene-craft/issues/13"
+              target="_blank"
+              rel="noopener noreferrer"
               >設計Issue：参考資料と素材</a
             >
           </p>
           <p>
             <a
               href="https://github.com/Kurarowa305/scene-craft/blob/main/docs/design/reference-and-assets.md"
+              target="_blank"
+              rel="noopener noreferrer"
               >現在の詳細設計（Markdown） →</a
             >
           </p>
-          <details>
-            <summary>詳細設計の内容を確認する</summary>
-            <p>以下の契約・説明は既存Markdownに保持しています。</p>
-            <ul>
-              <li>
-                <a
-                  href="https://github.com/Kurarowa305/scene-craft/blob/main/docs/design/reference-and-assets.md"
-                  >対象と選定理由</a
-                >
-              </li>
-              <li>
-                <a
-                  href="https://github.com/Kurarowa305/scene-craft/blob/main/docs/design/reference-and-assets.md"
-                  >検索・候補・人間の選択</a
-                >
-              </li>
-              <li>
-                <a
-                  href="https://github.com/Kurarowa305/scene-craft/blob/main/docs/design/reference-and-assets.md"
-                  >プレビューと参考画像の保存</a
-                >
-              </li>
-              <li>
-                <a
-                  href="https://github.com/Kurarowa305/scene-craft/blob/main/docs/design/reference-and-assets.md"
-                  >取得・Blenderへの取り込み</a
-                >
-              </li>
-              <li>
-                <a
-                  href="https://github.com/Kurarowa305/scene-craft/blob/main/docs/design/reference-and-assets.md"
-                  >失敗・不足・停止</a
-                >
-              </li>
-              <li>
-                <a
-                  href="https://github.com/Kurarowa305/scene-craft/blob/main/docs/design/reference-and-assets.md"
-                  >サービスの提供条件と確認範囲</a
-                >
-              </li>
-              <li>
-                <a
-                  href="https://github.com/Kurarowa305/scene-craft/blob/main/docs/design/reference-and-assets.md"
-                  >関連設計・後続への引き継ぎ</a
-                >
-              </li>
-              <li>
-                <a
-                  href="https://github.com/Kurarowa305/scene-craft/blob/main/docs/design/reference-and-assets.md"
-                  >合意の根拠</a
-                >
-              </li>
-              <li>
-                <a
-                  href="https://github.com/Kurarowa305/scene-craft/blob/main/docs/design/reference-and-assets.md"
-                  >app-serverとの分担に関する調査補足</a
-                >
-              </li>
-            </ul>
-            <p>
-              <a
-                href="https://github.com/Kurarowa305/scene-craft/issues/13#issuecomment-6542678356"
-                >2026-10-31時点の本文スナップショット（履歴）</a
-              >
-            </p>
-          </details>
+
           <ul>
             <li>
-              <a href="https://github.com/Kurarowa305/scene-craft/issues/13"
+              <a
+                href="https://github.com/Kurarowa305/scene-craft/issues/13"
+                target="_blank"
+                rel="noopener noreferrer"
                 >素材サービスの詳細・合意</a
               >
             </li>
           </ul>
         </section>
-        <section>
-          <h2>つながる設計</h2>
-          <div class="related">
-            <a href="agent-contracts.html">工程別エージェントとツール</a
-            ><a href="artifact-storage.html">保存・復元・バックアップ</a
-            ><a href="edit-candidates.html">編集案の採用と保護</a
-            ><a href="context-and-style.html">文脈・作風・制作方針</a>
-          </div>
-        </section>
+
         <footer>
-          <p>scene-craft · 設計ポータル · 2026-10-31 時点の整理</p>
+          <p>scene-craft · 設計ポータル</p>
           <p>
             <a
               href="https://github.com/Kurarowa305/scene-craft/blob/main/docs/requirements/initial-scope.md"
-              >合意済み要件</a
+              target="_blank"
+              rel="noopener noreferrer"
+              >要件</a
             >
             ·
             <a
               href="https://github.com/Kurarowa305/scene-craft/blob/main/GLOSSARY.md"
+              target="_blank"
+              rel="noopener noreferrer"
               >用語集</a
             >
-            ·
-            <a
-              href="https://github.com/Kurarowa305/scene-craft/blob/main/docs/agents/development-workflow.md"
-              >開発フロー</a
-            >
-            ·
-            <a href="https://github.com/Kurarowa305/scene-craft/issues/33"
-              >このポータルの整備記録</a
-            >
-          </p>
-          <p>
-            設計の合意と、本実装・実機検証の完了は別です。最新の進捗は設計マップを参照してください。
           </p>
         </footer>
       </main>
