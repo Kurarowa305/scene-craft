@@ -12,6 +12,8 @@ Issue の状態・依存関係・担当者は GitHub を正とする。この一
 
 2026-10-31、[参考調査・素材の検索と取り込み](reference-and-assets.md)を確定した。一般Web・指定フォルダー・Poly Haven／ambientCGを検索対象とし、出典・利用条件と確認日、人間の選択、取得実体・依存素材を結び付ける。素材は編集案を経由して採用し、利用条件不明時は保留する。対応形式とテクスチャ2K・HDRI4Kの既定、保存不可・取得失敗時の扱いを合意した。実取得・Blender取り込み・異常系の検証は後続へ引き継ぐ。
 
+2026-10-31、[工程別エージェントと外部ツール契約](agent-contracts.md)を合意した。10役割の入出力・完了条件、専用stdio MCPとWSL内ローカルRPC、同じthreadの工程切替、固定手順と生成Python、Git定義、提案数と補助モデルを確定した。操作相談は独立した結果記録を作らない。全体構成図へMCPプロセスを追加し、命名・要約のモデルは設定可能、初期値をGPT-6 Lunaとした。本実装と権限・停止・異常系の実機検証は後続へ引き継ぐ。
+
 ## 項目一覧
 
 設計がまとまった項目から資料を作成する。下表のファイル名は作成予定先であり、未作成の資料を設計済みとして扱わない。作成したらファイル名をリンクに更新する。大きい問いは追加 Issue に分割して、この領域の資料へ統合する。
@@ -25,7 +27,7 @@ Issue の状態・依存関係・担当者は GitHub を正とする。この一
 | 保存・復元・バックアップ | [制作データの保存・復元・バックアップ方式を決める](https://github.com/Kurarowa305/scene-craft/issues/6) | [artifact-storage.md](artifact-storage.md)（設計合意済み） |
 | 実行状態・再実行 | [実行状態・順序制御・再実行・復旧を決める](https://github.com/Kurarowa305/scene-craft/issues/7) | [execution-lifecycle.md](execution-lifecycle.md)（設計合意済み） |
 | 編集案・保護指定 | [編集案の採用と保護指定の適用方法を決める](https://github.com/Kurarowa305/scene-craft/issues/8) | [edit-candidates.md](edit-candidates.md)（設計合意済み） |
-| エージェント契約 | [工程別エージェントの入出力とツール契約を決める](https://github.com/Kurarowa305/scene-craft/issues/9) | `agent-contracts.md` |
+| エージェント契約 | [工程別エージェントの入出力とツール契約を決める](https://github.com/Kurarowa305/scene-craft/issues/9) | [agent-contracts.md](agent-contracts.md)（設計合意済み） |
 | 文脈・作風・制作方針 | [会話の文脈と作風・制作方針の利用方法を決める](https://github.com/Kurarowa305/scene-craft/issues/10) | [context-and-style.md](context-and-style.md)（設計合意済み） |
 | Git の版参照・保持 | [Git の版固定・保持・更新互換性を決める](https://github.com/Kurarowa305/scene-craft/issues/11) | [git-versioning.md](git-versioning.md)（設計合意済み） |
 | 画面・制作導線 | [専用アプリの画面と制作・記録の導線を決める](https://github.com/Kurarowa305/scene-craft/issues/12) | [user-interface.md](user-interface.md)（設計合意済み） |
