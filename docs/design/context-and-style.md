@@ -69,6 +69,8 @@ app-serverの`thread/resume`と`thread/compact/start`は[公式OpenAI documentat
 
 ## 後続への引き継ぎと確認範囲
 
+[app-serverの機能別分担調査](../research/codex-app-server-ui-capabilities.md)に、圧縮と根拠付き要約、全履歴対象の分析と実参照、相談への初期文脈と権限の区別を記録した。現行paginated履歴ではページングを使い、要約itemを完全な原文として保存しない。原文正本・参照の固定と明示更新の合意は変更しない。
+
 | 設計領域 | 引き継ぐ内容 |
 | --- | --- |
 | [工程別エージェントの入出力とツール契約](https://github.com/Kurarowa305/scene-craft/issues/9) | 必須文脈、対象範囲内の追加取得と参照記録、要約生成の停止・失敗契約、仮説・根拠・採用方針の構造と固定版からの取得 |

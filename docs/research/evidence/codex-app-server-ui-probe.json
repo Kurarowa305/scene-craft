@@ -1,0 +1,87 @@
+{
+  "checked_on": "2026-10-31",
+  "cli_version": "0.166.0-alpha.5.1",
+  "isolation": "temporary empty CODEX_HOME; no auth copied; no turn/start; no inference",
+  "initialize_user_agent": "Codex Desktop/0.166.0-alpha.5.1 (Ubuntu 26.4.0; x86_64) dumb (scene_craft_capability_probe; 0.1.0)",
+  "checks": [
+    {
+      "method": "initialize",
+      "ok": true
+    },
+    {
+      "method": "account/read",
+      "ok": true,
+      "account_is_null": true
+    },
+    {
+      "method": "model/list",
+      "ok": true,
+      "catalog_entries": 2,
+      "has_next_cursor": true
+    },
+    {
+      "method": "thread/start",
+      "ok": true,
+      "thread_alias": "A",
+      "status": {
+        "type": "idle"
+      },
+      "name": null,
+      "turn_count": 0,
+      "history_mode": "paginated"
+    },
+    {
+      "method": "thread/start",
+      "ok": true,
+      "thread_alias": "B",
+      "status": {
+        "type": "idle"
+      },
+      "name": null,
+      "turn_count": 0,
+      "history_mode": "paginated"
+    },
+    {
+      "method": "thread/name/set",
+      "ok": true
+    },
+    {
+      "method": "thread/read",
+      "ok": true,
+      "thread_alias": "A",
+      "status": {
+        "type": "idle"
+      },
+      "name": "scene-craft capability probe",
+      "turn_count": 0,
+      "history_mode": "paginated"
+    },
+    {
+      "method": "thread/loaded/list",
+      "ok": true,
+      "loaded_count": 2
+    },
+    {
+      "method": "thread/list",
+      "ok": true,
+      "stored_count": 0
+    },
+    {
+      "method": "thread/resume",
+      "ok": true,
+      "thread_alias": "A",
+      "status": {
+        "type": "idle"
+      },
+      "name": "scene-craft capability probe",
+      "turn_count": 0,
+      "history_mode": "paginated"
+    }
+  ],
+  "notification_methods": [
+    "deprecationNotice",
+    "remoteControl/status/changed",
+    "thread/name/updated",
+    "thread/started"
+  ]
+}

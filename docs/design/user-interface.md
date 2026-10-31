@@ -194,7 +194,7 @@ Photoshopでの作業は人間が保存したPSD/PSBとプレビューを登録�
 
 | 領域 | 引き継ぐ内容 |
 | --- | --- |
-| [app-server仕様とUI機能の分担](https://github.com/Kurarowa305/scene-craft/issues/26) | 本書とプロトタイプ `5298534` を入力に、仕様とUI機能の実現範囲・独自実装の分担表を後日作成する。Issue登録済み・調査と表の作成は未着手 |
+| [app-server仕様とUI機能の分担](https://github.com/Kurarowa305/scene-craft/issues/26) | 2026-10-31、[機能別対応表](../research/codex-app-server-ui-capabilities.md)を作成。会話・推論・ツール経路と、自前の画面・制作管理・保存・外部実行を区別。命名、モデル切替、相談権限、履歴取得等の未確認事項はエージェント契約／テスト・診断へ引き継ぐ。本書の操作契約は変更しない |
 | [エージェント契約](https://github.com/Kurarowa305/scene-craft/issues/9) | 手作業の操作相談、相談専用サイドチャットの文脈・ツール権限、会話からの採否・記録、成果物リンクとプルダウンの参照、LLM不要の記録・プレビューの契約 |
 | [参考調査・素材](https://github.com/Kurarowa305/scene-craft/issues/13) | 出典・参考要素・制作意図、素材候補の利用条件・取り込み不足を会話と成果物に結び付ける。サービスの選定は本書では行わない |
 | [テスト・診断](https://github.com/Kurarowa305/scene-craft/issues/14) | 上表の導線、タブからの固定参照、会話と実際の確定結果の一致、相談から更新できない権限、LLM利用不可時の記録・プレビュー・バックアップ、停止と再開を横断して確認 |

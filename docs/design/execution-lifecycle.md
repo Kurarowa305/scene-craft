@@ -182,6 +182,8 @@ stateDiagram-v2
 
 ## 関連設計への引き継ぎ
 
+[app-serverの機能別分担調査](../research/codex-app-server-ui-capabilities.md)に、turn中断・会話resumeと、外部制作操作の停止・照合・手動再開の境界を記録した。実験thread queueやthread状態も、作品単位の順序・9状態・依頼全体の再実行予算を代替しない。
+
 | 設計 Issue | 本書が定める契約と後続で具体化すること |
 | --- | --- |
 | [制作データの保存・復元・バックアップ方式を決める](https://github.com/Kurarowa305/scene-craft/issues/6) | 開始予定・完成記録とファイルを照合する。DBとWindowsのファイルを同時確定とみなさない。完成記録の物理形式、コピー確定、バックアップ中の整合性は保存設計で具体化 |

@@ -133,6 +133,8 @@ WSL と補助プロセスの交換には実行ごとの Windows 側ディレク�
 
 ## 後続への引き継ぎと完了の範囲
 
+[app-serverの機能別分担調査](../research/codex-app-server-ui-capabilities.md)に、標準の会話基盤とscene-craftのUI・DB・制作実行・Windows通常プログラムの境界を整理した。実験project APIやファイル／添付RPCの存在は、作品モデル・制作実体の管理・バックアップを代替しない。配置と通信の合意は変更しない。
+
 本 Issue の構成図、OS・プロセスの責務、通信、起動・終了・再接続の設計は合意済み。以下は未合意の構成判断ではなく、後続領域で具体化する契約と実装時の検証である。
 - [Blender の操作経路とレンダー出力契約を決める](https://github.com/Kurarowa305/scene-craft/issues/4): 設計完了。[確定した操作・出力・停止契約](blender-integration.md) を引き継ぐ。保存中の協調停止、補助プロセス障害後の照合など未検証の異常系を検証済みとは扱わない。
 - [作品と制作履歴のデータモデルを決める](https://github.com/Kurarowa305/scene-craft/issues/5)、[制作データの保存・復元・バックアップ方式を決める](https://github.com/Kurarowa305/scene-craft/issues/6): 記録の構造と二つの OS にまたがる実体の整合性、パス・バックアップ・移行。
