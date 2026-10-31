@@ -1,0 +1,1122 @@
+{
+  "checked_on": "2026-10-31",
+  "cli_version": "codex-cli 0.166.0-alpha.5.1",
+  "commands": [
+    "codex app-server generate-json-schema --out <stable-dir>",
+    "codex app-server generate-json-schema --experimental --out <experimental-dir>"
+  ],
+  "stable_methods": [
+    "initialize",
+    "thread/start",
+    "thread/resume",
+    "thread/fork",
+    "thread/archive",
+    "thread/delete",
+    "thread/unsubscribe",
+    "thread/name/set",
+    "thread/goal/set",
+    "thread/goal/get",
+    "thread/goal/clear",
+    "thread/metadata/update",
+    "thread/attachment/add",
+    "thread/attachment/list",
+    "thread/attachmentOwner/list",
+    "thread/attachment/remove",
+    "thread/section/move",
+    "thread/unarchive",
+    "thread/compact/start",
+    "thread/shellCommand",
+    "thread/approveGuardianDeniedAction",
+    "thread/revert",
+    "thread/list",
+    "threadSection/list",
+    "threadSection/create",
+    "threadSection/update",
+    "threadSection/delete",
+    "thread/loaded/list",
+    "thread/read",
+    "thread/turns/list",
+    "thread/items/list",
+    "thread/inject_items",
+    "skills/list",
+    "skills/extraRoots/set",
+    "hooks/list",
+    "marketplace/add",
+    "marketplace/remove",
+    "marketplace/upgrade",
+    "plugin/list",
+    "plugin/installed",
+    "plugin/reconcile",
+    "plugin/read",
+    "plugin/skill/read",
+    "plugin/share/save",
+    "plugin/share/updateTargets",
+    "plugin/share/list",
+    "plugin/share/checkout",
+    "plugin/share/delete",
+    "app/read",
+    "app/list",
+    "app/installed",
+    "fs/readFile",
+    "fs/writeFile",
+    "fs/createDirectory",
+    "fs/getMetadata",
+    "fs/readDirectory",
+    "fs/remove",
+    "fs/copy",
+    "fs/watch",
+    "fs/unwatch",
+    "skills/config/write",
+    "plugin/install",
+    "plugin/uninstall",
+    "turn/start",
+    "turn/steer",
+    "turn/interrupt",
+    "review/start",
+    "model/list",
+    "account/gatewayOAuth/read",
+    "account/gatewayOAuth/login",
+    "account/gatewayOAuth/cancel",
+    "modelProvider/capabilities/read",
+    "experimentalFeature/list",
+    "permissionProfile/list",
+    "experimentalFeature/enablement/set",
+    "mcpServer/oauth/login",
+    "config/mcpServer/reload",
+    "mcpServerStatus/list",
+    "mcpServer/resource/read",
+    "mcpServer/tool/call",
+    "windowsSandbox/setupStart",
+    "windowsSandbox/readiness",
+    "account/login/start",
+    "account/login/cancel",
+    "account/logout",
+    "account/rateLimits/read",
+    "account/rateLimitResetCredit/consume",
+    "account/usage/read",
+    "account/workspaceMessages/read",
+    "account/sendAddCreditsNudgeEmail",
+    "feedback/upload",
+    "feedback/save",
+    "command/exec",
+    "command/exec/write",
+    "command/exec/terminate",
+    "command/exec/resize",
+    "config/read",
+    "externalAgentConfig/detect",
+    "externalAgentConfig/import",
+    "externalAgentConfig/import/recordHistory",
+    "externalAgentConfig/import/readHistories",
+    "config/value/write",
+    "config/batchWrite",
+    "configRequirements/read",
+    "account/read",
+    "fuzzyFileSearch"
+  ],
+  "experimental_only_methods": [
+    "account/bedrock/checkGovCloudRequirements",
+    "account/bedrock/discover",
+    "account/bedrock/setup",
+    "account/gcp/setup",
+    "accountSession/list",
+    "accountSession/switch",
+    "collaborationMode/list",
+    "environment/add",
+    "environment/info",
+    "environment/status",
+    "fuzzyFileSearch/sessionStart",
+    "fuzzyFileSearch/sessionStop",
+    "fuzzyFileSearch/sessionUpdate",
+    "mcpServer/event/stream/start",
+    "mcpServer/event/stream/stop",
+    "memory/reset",
+    "memory/status",
+    "mock/experimentalMethod",
+    "plugin/search",
+    "process/kill",
+    "process/resizePty",
+    "process/spawn",
+    "process/writeStdin",
+    "project/create",
+    "project/delete",
+    "project/import",
+    "project/list",
+    "project/move",
+    "project/read",
+    "project/update",
+    "remoteControl/client/list",
+    "remoteControl/client/revoke",
+    "remoteControl/disable",
+    "remoteControl/enable",
+    "remoteControl/pairing/start",
+    "remoteControl/pairing/status",
+    "remoteControl/status/read",
+    "rollout/compress",
+    "server/diagnostics",
+    "thread/backgroundTerminals/clean",
+    "thread/backgroundTerminals/list",
+    "thread/backgroundTerminals/terminate",
+    "thread/decrement_elicitation",
+    "thread/increment_elicitation",
+    "thread/items/read",
+    "thread/memory/read",
+    "thread/memoryMode/set",
+    "thread/prediction/request",
+    "thread/queue/add",
+    "thread/queue/delete",
+    "thread/queue/list",
+    "thread/queue/reorder",
+    "thread/queue/start",
+    "thread/queue/update",
+    "thread/readState/update",
+    "thread/realtime/appendAudio",
+    "thread/realtime/appendSpeech",
+    "thread/realtime/appendText",
+    "thread/realtime/listVoices",
+    "thread/realtime/start",
+    "thread/realtime/stop",
+    "thread/sample",
+    "thread/sample/cancel",
+    "thread/search",
+    "thread/searchOccurrences",
+    "thread/settings/update",
+    "thread/timeline/list",
+    "turn/settings/update",
+    "userVerification/cancel",
+    "userVerification/delete",
+    "userVerification/enroll",
+    "userVerification/status",
+    "userVerification/verify"
+  ],
+  "schemas": [
+    {
+      "type": "ThreadStartParams",
+      "stable": {
+        "path": "v2/ThreadStartParams.json",
+        "sha256": "e9c6d3cc18d049bfbc0249add3808fb8e5a27e1a0b5a423767aafbc3859a9428",
+        "fields": [
+          "approvalPolicy",
+          "approvalsReviewer",
+          "baseInstructions",
+          "config",
+          "cwd",
+          "developerInstructions",
+          "ephemeral",
+          "model",
+          "modelProvider",
+          "personality",
+          "sandbox",
+          "serviceName",
+          "serviceTier",
+          "sessionStartSource",
+          "threadSource"
+        ],
+        "required": []
+      },
+      "experimental": {
+        "path": "v2/ThreadStartParams.json",
+        "sha256": "80a40a7fac15b4bf70efb7f893fb353acc0a0d30c68f54aee4f01923deca85de",
+        "fields": [
+          "allowProviderModelFallback",
+          "approvalPolicy",
+          "approvalsReviewer",
+          "baseInstructions",
+          "config",
+          "cwd",
+          "daybreakEnabled",
+          "developerInstructions",
+          "dynamicTools",
+          "environments",
+          "ephemeral",
+          "experimentalRawEvents",
+          "historyMode",
+          "mockExperimentalField",
+          "model",
+          "modelProvider",
+          "multiAgentMode",
+          "permissions",
+          "personality",
+          "projectId",
+          "runtimeWorkspaceRoots",
+          "sandbox",
+          "selectedCapabilityRoots",
+          "serviceName",
+          "serviceTier",
+          "sessionStartSource",
+          "threadSource"
+        ],
+        "required": []
+      }
+    },
+    {
+      "type": "ThreadResumeParams",
+      "stable": {
+        "path": "v2/ThreadResumeParams.json",
+        "sha256": "8dceca415b2c16693b55658ea629cba5ffc82ac300dcd403db0ba7455e491496",
+        "fields": [
+          "approvalPolicy",
+          "approvalsReviewer",
+          "baseInstructions",
+          "config",
+          "cwd",
+          "developerInstructions",
+          "excludeTurns",
+          "model",
+          "modelProvider",
+          "personality",
+          "sandbox",
+          "serviceTier",
+          "threadId"
+        ],
+        "required": [
+          "threadId"
+        ]
+      },
+      "experimental": {
+        "path": "v2/ThreadResumeParams.json",
+        "sha256": "8152ea774ace4eb5623081abd64a1135f28cbff1e73ca641cfb80ac16f6eed32",
+        "fields": [
+          "approvalPolicy",
+          "approvalsReviewer",
+          "baseInstructions",
+          "config",
+          "cwd",
+          "developerInstructions",
+          "excludeTurns",
+          "history",
+          "initialTurnsPage",
+          "model",
+          "modelProvider",
+          "path",
+          "permissions",
+          "personality",
+          "runtimeWorkspaceRoots",
+          "sandbox",
+          "serviceTier",
+          "threadId"
+        ],
+        "required": [
+          "threadId"
+        ]
+      }
+    },
+    {
+      "type": "ThreadReadParams",
+      "stable": {
+        "path": "v2/ThreadReadParams.json",
+        "sha256": "dfe040c6ac71d30795b8be3f3ff232e66f362a37f883b491e5d1ea367f470db4",
+        "fields": [
+          "includeTurns",
+          "threadId"
+        ],
+        "required": [
+          "threadId"
+        ]
+      },
+      "experimental": {
+        "path": "v2/ThreadReadParams.json",
+        "sha256": "dfe040c6ac71d30795b8be3f3ff232e66f362a37f883b491e5d1ea367f470db4",
+        "fields": [
+          "includeTurns",
+          "threadId"
+        ],
+        "required": [
+          "threadId"
+        ]
+      }
+    },
+    {
+      "type": "ThreadListParams",
+      "stable": {
+        "path": "v2/ThreadListParams.json",
+        "sha256": "e9da2e0bf099d21ab7982210073f927a50370c4e28be7140c314f82c524070bd",
+        "fields": [
+          "archived",
+          "cursor",
+          "cwd",
+          "excludedThreadIds",
+          "limit",
+          "modelProviders",
+          "originators",
+          "searchTerm",
+          "sectionId",
+          "sortDirection",
+          "sortKey",
+          "sourceKinds",
+          "useStateDbOnly"
+        ],
+        "required": []
+      },
+      "experimental": {
+        "path": "v2/ThreadListParams.json",
+        "sha256": "1781b1778cb08619f0bf12528b128e55648b86569114196b1b5ec565b9b7935d",
+        "fields": [
+          "ancestorThreadId",
+          "archived",
+          "attachedToThreadId",
+          "cursor",
+          "cwd",
+          "excludedThreadIds",
+          "limit",
+          "modelProviders",
+          "originators",
+          "parentThreadId",
+          "projectId",
+          "searchTerm",
+          "sectionId",
+          "sortDirection",
+          "sortKey",
+          "sourceKinds",
+          "useStateDbOnly"
+        ],
+        "required": []
+      }
+    },
+    {
+      "type": "ThreadSetNameParams",
+      "stable": {
+        "path": "v2/ThreadSetNameParams.json",
+        "sha256": "8e334c816bbaeb80f807aca61bf659246f3f60c245c21b5cb7e3ca4ee3ce4820",
+        "fields": [
+          "name",
+          "threadId"
+        ],
+        "required": [
+          "name",
+          "threadId"
+        ]
+      },
+      "experimental": {
+        "path": "v2/ThreadSetNameParams.json",
+        "sha256": "8e334c816bbaeb80f807aca61bf659246f3f60c245c21b5cb7e3ca4ee3ce4820",
+        "fields": [
+          "name",
+          "threadId"
+        ],
+        "required": [
+          "name",
+          "threadId"
+        ]
+      }
+    },
+    {
+      "type": "TurnStartParams",
+      "stable": {
+        "path": "v2/TurnStartParams.json",
+        "sha256": "49e53282f327c25e7b39d97afacd038ef10ad5c4fb0431608b354d3a7bf6bcea",
+        "fields": [
+          "approvalPolicy",
+          "approvalsReviewer",
+          "clientUserMessageId",
+          "cwd",
+          "disabledPluginIds",
+          "effort",
+          "input",
+          "model",
+          "outputSchema",
+          "parentTurnId",
+          "personality",
+          "rootTurnId",
+          "sandboxPolicy",
+          "serviceTier",
+          "serviceTierForTurn",
+          "summary",
+          "threadId",
+          "toolOutput",
+          "turnTrigger"
+        ],
+        "required": [
+          "input",
+          "threadId"
+        ]
+      },
+      "experimental": {
+        "path": "v2/TurnStartParams.json",
+        "sha256": "c7483aee79757d260c4fc1bb5c68b1a8d6f72846388e9f1e88d6f76f423287c8",
+        "fields": [
+          "additionalContext",
+          "approvalPolicy",
+          "approvalsReviewer",
+          "clientUserMessageId",
+          "collaborationMode",
+          "cwd",
+          "cyberAccessProgram",
+          "disabledPluginIds",
+          "effort",
+          "environments",
+          "input",
+          "model",
+          "multiAgentMode",
+          "outputSchema",
+          "parentTurnId",
+          "permissions",
+          "personality",
+          "responsesapiClientMetadata",
+          "responsesapiClientMetadataPatch",
+          "rootTurnId",
+          "runtimeWorkspaceRoots",
+          "sandboxPolicy",
+          "serviceTier",
+          "serviceTierForTurn",
+          "summary",
+          "threadId",
+          "toolOutput",
+          "turnTrigger"
+        ],
+        "required": [
+          "input",
+          "threadId"
+        ]
+      }
+    },
+    {
+      "type": "ThreadAttachmentAddParams",
+      "stable": {
+        "path": "v2/ThreadAttachmentAddParams.json",
+        "sha256": "9fb9d132c284d92759f39605177eef49ede6605106a211f121ad8b0cde240b3f",
+        "fields": [
+          "attachmentType",
+          "identityKey",
+          "payload",
+          "threadId"
+        ],
+        "required": [
+          "attachmentType",
+          "identityKey",
+          "payload",
+          "threadId"
+        ]
+      },
+      "experimental": {
+        "path": "v2/ThreadAttachmentAddParams.json",
+        "sha256": "9fb9d132c284d92759f39605177eef49ede6605106a211f121ad8b0cde240b3f",
+        "fields": [
+          "attachmentType",
+          "identityKey",
+          "payload",
+          "threadId"
+        ],
+        "required": [
+          "attachmentType",
+          "identityKey",
+          "payload",
+          "threadId"
+        ]
+      }
+    },
+    {
+      "type": "ThreadTurnsListParams",
+      "stable": {
+        "path": "v2/ThreadTurnsListParams.json",
+        "sha256": "2a8b93d7d4437cc25e16a1dde16d8db3c338d39e16c5eece2a56e943a21577d7",
+        "fields": [
+          "cursor",
+          "itemsView",
+          "limit",
+          "sortDirection",
+          "threadId"
+        ],
+        "required": [
+          "threadId"
+        ]
+      },
+      "experimental": {
+        "path": "v2/ThreadTurnsListParams.json",
+        "sha256": "2a8b93d7d4437cc25e16a1dde16d8db3c338d39e16c5eece2a56e943a21577d7",
+        "fields": [
+          "cursor",
+          "itemsView",
+          "limit",
+          "sortDirection",
+          "threadId"
+        ],
+        "required": [
+          "threadId"
+        ]
+      }
+    },
+    {
+      "type": "ThreadItemsListParams",
+      "stable": {
+        "path": "v2/ThreadItemsListParams.json",
+        "sha256": "d5cf9784413f1d1abba756e04e48b273a9d12ab2c5675442e91b6a4ee55e19f0",
+        "fields": [
+          "cursor",
+          "limit",
+          "sortDirection",
+          "threadId",
+          "turnId"
+        ],
+        "required": [
+          "threadId"
+        ]
+      },
+      "experimental": {
+        "path": "v2/ThreadItemsListParams.json",
+        "sha256": "d5cf9784413f1d1abba756e04e48b273a9d12ab2c5675442e91b6a4ee55e19f0",
+        "fields": [
+          "cursor",
+          "limit",
+          "sortDirection",
+          "threadId",
+          "turnId"
+        ],
+        "required": [
+          "threadId"
+        ]
+      }
+    },
+    {
+      "type": "ProjectCreateParams",
+      "stable": null,
+      "experimental": {
+        "path": "v2/ProjectCreateParams.json",
+        "sha256": "4fb1b90646d4af61d486b3616d09ff98909e446d14b5e6f3c5c6567341de9188",
+        "fields": [
+          "idempotencyKey",
+          "metadata",
+          "name",
+          "roots"
+        ],
+        "required": [
+          "idempotencyKey",
+          "name",
+          "roots"
+        ]
+      }
+    },
+    {
+      "type": "ThreadSettingsUpdateParams",
+      "stable": null,
+      "experimental": {
+        "path": "v2/ThreadSettingsUpdateParams.json",
+        "sha256": "749419634bb7ed66216d72bf9d8734ecf0e6efaa8cd46fe51a117d1b42ed9657",
+        "fields": [
+          "approvalPolicy",
+          "approvalsReviewer",
+          "collaborationMode",
+          "cwd",
+          "disabledPluginIds",
+          "effort",
+          "model",
+          "multiAgentMode",
+          "permissions",
+          "personality",
+          "sandboxPolicy",
+          "serviceTier",
+          "summary",
+          "threadId"
+        ],
+        "required": [
+          "threadId"
+        ]
+      }
+    },
+    {
+      "type": "ThreadQueueAddParams",
+      "stable": null,
+      "experimental": {
+        "path": "v2/ThreadQueueAddParams.json",
+        "sha256": "60f25b7d3e3357c215bef9d2fe7047200f545e030dca9e00527ac0620cd0c88f",
+        "fields": [
+          "clientUserMessageId",
+          "input",
+          "threadId"
+        ],
+        "required": [
+          "clientUserMessageId",
+          "input",
+          "threadId"
+        ]
+      }
+    },
+    {
+      "type": "InitializeParams",
+      "stable": {
+        "path": "v1/InitializeParams.json",
+        "sha256": "b55124e7c0f36a1789396daa5578217a92be67f053903696236686e59f6f212e",
+        "fields": [
+          "capabilities",
+          "clientInfo"
+        ],
+        "required": [
+          "clientInfo"
+        ]
+      },
+      "experimental": {
+        "path": "v1/InitializeParams.json",
+        "sha256": "b55124e7c0f36a1789396daa5578217a92be67f053903696236686e59f6f212e",
+        "fields": [
+          "capabilities",
+          "clientInfo"
+        ],
+        "required": [
+          "clientInfo"
+        ]
+      }
+    },
+    {
+      "type": "TurnInterruptParams",
+      "stable": {
+        "path": "v2/TurnInterruptParams.json",
+        "sha256": "6dff382dae73d1dbc58406ed045605f647e7a49660e2540fbd2c6c24d60c5f2b",
+        "fields": [
+          "threadId",
+          "turnId"
+        ],
+        "required": [
+          "threadId",
+          "turnId"
+        ]
+      },
+      "experimental": {
+        "path": "v2/TurnInterruptParams.json",
+        "sha256": "6dff382dae73d1dbc58406ed045605f647e7a49660e2540fbd2c6c24d60c5f2b",
+        "fields": [
+          "threadId",
+          "turnId"
+        ],
+        "required": [
+          "threadId",
+          "turnId"
+        ]
+      }
+    }
+  ],
+  "definitions": {
+    "UserInput": {
+      "oneOf": [
+        {
+          "properties": {
+            "text": {
+              "type": "string"
+            },
+            "text_elements": {
+              "default": [],
+              "description": "UI-defined spans within `text` used to render or persist special elements.",
+              "items": {
+                "$ref": "#/definitions/TextElement"
+              },
+              "type": "array"
+            },
+            "type": {
+              "enum": [
+                "text"
+              ],
+              "title": "TextUserInputType",
+              "type": "string"
+            }
+          },
+          "required": [
+            "text",
+            "type"
+          ],
+          "title": "TextUserInput",
+          "type": "object"
+        },
+        {
+          "anyOf": [
+            {
+              "properties": {
+                "url": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "url"
+              ],
+              "title": "UrlUserInput",
+              "type": "object"
+            },
+            {
+              "properties": {
+                "fileId": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "fileId"
+              ],
+              "title": "FileIdUserInput",
+              "type": "object"
+            }
+          ],
+          "properties": {
+            "detail": {
+              "anyOf": [
+                {
+                  "$ref": "#/definitions/ImageDetail"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null
+            },
+            "type": {
+              "enum": [
+                "image"
+              ],
+              "title": "ImageUserInputType",
+              "type": "string"
+            }
+          },
+          "required": [
+            "type"
+          ],
+          "title": "ImageUserInput",
+          "type": "object"
+        },
+        {
+          "properties": {
+            "detail": {
+              "anyOf": [
+                {
+                  "$ref": "#/definitions/ImageDetail"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null
+            },
+            "path": {
+              "type": "string"
+            },
+            "type": {
+              "enum": [
+                "localImage"
+              ],
+              "title": "LocalImageUserInputType",
+              "type": "string"
+            }
+          },
+          "required": [
+            "path",
+            "type"
+          ],
+          "title": "LocalImageUserInput",
+          "type": "object"
+        },
+        {
+          "properties": {
+            "type": {
+              "enum": [
+                "audio"
+              ],
+              "title": "AudioUserInputType",
+              "type": "string"
+            },
+            "url": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "type",
+            "url"
+          ],
+          "title": "AudioUserInput",
+          "type": "object"
+        },
+        {
+          "properties": {
+            "path": {
+              "type": "string"
+            },
+            "type": {
+              "enum": [
+                "localAudio"
+              ],
+              "title": "LocalAudioUserInputType",
+              "type": "string"
+            }
+          },
+          "required": [
+            "path",
+            "type"
+          ],
+          "title": "LocalAudioUserInput",
+          "type": "object"
+        },
+        {
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "path": {
+              "type": "string"
+            },
+            "type": {
+              "enum": [
+                "skill"
+              ],
+              "title": "SkillUserInputType",
+              "type": "string"
+            }
+          },
+          "required": [
+            "name",
+            "path",
+            "type"
+          ],
+          "title": "SkillUserInput",
+          "type": "object"
+        },
+        {
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "path": {
+              "type": "string"
+            },
+            "type": {
+              "enum": [
+                "mention"
+              ],
+              "title": "MentionUserInputType",
+              "type": "string"
+            }
+          },
+          "required": [
+            "name",
+            "path",
+            "type"
+          ],
+          "title": "MentionUserInput",
+          "type": "object"
+        }
+      ]
+    },
+    "ThreadStatus": {
+      "oneOf": [
+        {
+          "properties": {
+            "type": {
+              "enum": [
+                "notLoaded"
+              ],
+              "title": "NotLoadedThreadStatusType",
+              "type": "string"
+            }
+          },
+          "required": [
+            "type"
+          ],
+          "title": "NotLoadedThreadStatus",
+          "type": "object"
+        },
+        {
+          "properties": {
+            "type": {
+              "enum": [
+                "idle"
+              ],
+              "title": "IdleThreadStatusType",
+              "type": "string"
+            }
+          },
+          "required": [
+            "type"
+          ],
+          "title": "IdleThreadStatus",
+          "type": "object"
+        },
+        {
+          "properties": {
+            "type": {
+              "enum": [
+                "systemError"
+              ],
+              "title": "SystemErrorThreadStatusType",
+              "type": "string"
+            }
+          },
+          "required": [
+            "type"
+          ],
+          "title": "SystemErrorThreadStatus",
+          "type": "object"
+        },
+        {
+          "properties": {
+            "activeFlags": {
+              "items": {
+                "$ref": "#/definitions/ThreadActiveFlag"
+              },
+              "type": "array"
+            },
+            "type": {
+              "enum": [
+                "active"
+              ],
+              "title": "ActiveThreadStatusType",
+              "type": "string"
+            }
+          },
+          "required": [
+            "activeFlags",
+            "type"
+          ],
+          "title": "ActiveThreadStatus",
+          "type": "object"
+        }
+      ]
+    },
+    "DynamicToolSpec": {
+      "oneOf": [
+        {
+          "properties": {
+            "deferLoading": {
+              "type": "boolean"
+            },
+            "description": {
+              "type": "string"
+            },
+            "inputSchema": true,
+            "name": {
+              "type": "string"
+            },
+            "type": {
+              "enum": [
+                "function"
+              ],
+              "title": "FunctionDynamicToolSpecType",
+              "type": "string"
+            }
+          },
+          "required": [
+            "description",
+            "inputSchema",
+            "name",
+            "type"
+          ],
+          "title": "FunctionDynamicToolSpec",
+          "type": "object"
+        },
+        {
+          "properties": {
+            "description": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            },
+            "tools": {
+              "items": {
+                "$ref": "#/definitions/DynamicToolNamespaceTool"
+              },
+              "type": "array"
+            },
+            "type": {
+              "enum": [
+                "namespace"
+              ],
+              "title": "NamespaceDynamicToolSpecType",
+              "type": "string"
+            }
+          },
+          "required": [
+            "description",
+            "name",
+            "tools",
+            "type"
+          ],
+          "title": "NamespaceDynamicToolSpec",
+          "type": "object"
+        }
+      ]
+    }
+  },
+  "selected_descriptions": {
+    "model": {
+      "description": "Current configured model when loaded, otherwise the latest persisted model. Null when unavailable. This is not per-turn execution telemetry.",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "reasoningEffort": {
+      "anyOf": [
+        {
+          "$ref": "#/definitions/ReasoningEffort"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Current configured reasoning effort when loaded, otherwise the latest persisted effort. Null when unset or unavailable. This is not per-turn execution telemetry."
+    },
+    "historyMode": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/ThreadHistoryMode"
+        }
+      ],
+      "default": "legacy",
+      "description": "Persisted thread history contract selected when this thread was created."
+    },
+    "projectId": {
+      "description": "Canonical project assignment owned by app-server, if any.",
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  },
+  "model_fallback_field": {
+    "description": "Allow a provider with an authoritative static model catalog to replace an unavailable requested model with its default.",
+    "type": "boolean"
+  },
+  "scope": "Method/field presence and descriptions only; not proof of runtime support, entitlement, permission isolation or domain semantics.",
+  "notification_schemas": {
+    "ModelReroutedNotification": {
+      "properties": {
+        "fromModel": {
+          "type": "string"
+        },
+        "reason": {
+          "$ref": "#/definitions/ModelRerouteReason"
+        },
+        "threadId": {
+          "type": "string"
+        },
+        "toModel": {
+          "type": "string"
+        },
+        "turnId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "fromModel",
+        "reason",
+        "threadId",
+        "toModel",
+        "turnId"
+      ],
+      "title": "ModelReroutedNotification",
+      "type": "object",
+      "source_sha256": "37cd3c1b3a3560b85b01d4061a07d830fc9ed93b80e4663f975f9197cdb501ef"
+    },
+    "ThreadNameUpdatedNotification": {
+      "properties": {
+        "threadId": {
+          "type": "string"
+        },
+        "threadName": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "threadId"
+      ],
+      "title": "ThreadNameUpdatedNotification",
+      "type": "object",
+      "source_sha256": "06d5e6b0e1eaf03eb88891af58eff14368a76e300a40a9bed71bacce2093b960"
+    }
+  }
+}

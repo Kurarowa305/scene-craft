@@ -110,3 +110,7 @@ Poly Havenの出典表示は候補に添えるサービス名と出典リンク�
 - [第2ラウンドの合意](https://github.com/Kurarowa305/scene-craft/issues/13#issuecomment-6540340619)：2サービス、候補の情報、利用条件不明時の保留、編集案を経由する反映。
 - [第3ラウンドの合意](https://github.com/Kurarowa305/scene-craft/issues/13#issuecomment-6540398873)：参考画像の保存、対象形式、テクスチャ2K・HDRI4K。
 - 2026-10-31、利用者が本書の設計全体を承認し、IssueのクローズとPR作成を指示した。
+
+## app-serverとの分担に関する調査補足
+
+[app-serverの機能別分担調査](../research/codex-app-server-ui-capabilities.md)で、一般Web検索・画像入力・ツール呼び出しと、出典・利用条件の記録、サービス別取得・管理下コピー・Blender取り込みを区別した。具体的な検索経路と取得の実機確認は引き続きエージェント契約／テスト・診断へ渡す。

@@ -36,7 +36,7 @@ Issue の状態・依存関係・担当者は GitHub を正とする。この一
 
 | 調査Issue | 成果物と状態 |
 | --- | --- |
-| [Codex app-serverの仕様を調査し、画面機能の実現範囲と独自実装の分担表を作成する](https://github.com/Kurarowa305/scene-craft/issues/26) | app-server提供部分・scene-craft独自実装・外部ツール・根拠・制約の機能別対応表。2026-10-26はIssue登録のみ。調査と表の作成は未着手 |
+| [Codex app-serverの仕様を調査し、画面機能の実現範囲と独自実装の分担表を作成する](https://github.com/Kurarowa305/scene-craft/issues/26) | [機能別対応表と確認結果](../research/codex-app-server-ui-capabilities.md)。2026-10-31、公式文書・固定ソース・導入版0.166.0-alpha.5.1のschemaと非推論RPCを照合。実験API・未検証事項とエージェント契約／テスト・診断への引き継ぎを記録 |
 
 ## 資料にまとめる内容
 
