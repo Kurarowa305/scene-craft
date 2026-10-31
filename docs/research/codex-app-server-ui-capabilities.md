@@ -50,6 +50,59 @@ app-server は会話・推論・ツール呼び出しの基盤として利用で
 | 一般Web検索・参考画像を調べる | Web検索ツールの呼び出しと、検索・ページ参照などのitemを会話で扱う。取得した画像をモデル入力として渡す経路も提供する。 | 検索目的と制作意図を結び付け、出典・確認日・参考にする要素・人間の選択を保存する。画像を保持できる条件を確認し、保存できる実体は管理下へコピーする。参照URLだけを残した場合は画像未保持として扱い、選択した資料を次工程へ渡す。 | Web取得プログラム、SQLite、ファイル保存 |
 | Poly Haven／ambientCG・指定フォルダー検索と素材取得 | MCPや動的ツールを介して、サービス別APIやローカル検索を行う外部処理を呼び出す。候補情報や取得結果を会話へ返し、人間の選択を扱うために利用する。 | サービス別の検索・ページ取得・キャッシュと、指定フォルダー内の検索を実装する。候補の出典・利用条件・品質を示し、人間が選んだ素材と依存ファイルを管理下へ取得する。Blenderへ取り込んだ結果を編集案として提示し、選択・取得・採用を別々に記録する。 | Poly Haven/ambientCG API、HTTPクライアント、ファイル検索、Windows Blender |
 
+## app-serverの管理情報とデータモデルの対応
+
+[データモデル設計](../design/domain-data-model.md)から、app-serverとの接続に関係する会話・原文メッセージ・依頼・実行・再実行の記録を示す。scene-craftのエンティティはそれぞれ独自の永続IDを持ち、Codexのthread／turn／item IDは接続対応記録で結び付ける。
+
+実線はapp-server内の履歴構造と、図中に示すscene-craftの所属関係を表す。点線は両者を照合するための対応を表し、同じデータを共有することや一対一の関係を意味しない。エンティティ間の参照は、対応を説明するために必要なものだけを描いている。
+
+```mermaid
+---
+config:
+  layout: elk
+  theme: neutral
+---
+flowchart LR
+  subgraph AS["Codex app-server：会話の継続と実行を管理"]
+    direction TB
+    AThread["thread<br/>会話の履歴・継続設定"]
+    ATurn["turn<br/>一回のモデル処理とその状態"]
+    AItem["item<br/>発言・ツール要求／結果・圧縮項目"]
+    AContext["モデル用の文脈<br/>圧縮後の継続情報"]
+    AThread --> ATurn
+    ATurn --> AItem
+    AThread --> AContext
+  end
+
+  subgraph SC["scene-craft：独自IDで制作記録を保持（WSLのSQLite）"]
+    subgraph SR["会話・依頼・処理の記録"]
+      direction TB
+      SConversation["会話"]
+      SMessage["原文メッセージ"]
+      SRequest["依頼"]
+      SExecution["実行"]
+      SRetry["再実行の記録"]
+      SMessage --> SConversation
+      SRequest --> SConversation
+      SExecution --> SRequest
+      SRetry --> SRequest
+    end
+  end
+
+  SConversation -. "thread IDを対応付け" .-> AThread
+  SExecution -. "AI処理をturn IDへ対応付け" .-> ATurn
+  SMessage -. "発言itemを保存・照合" .-> AItem
+  SExecution -. "ツール要求／結果を操作へ対応付け" .-> AItem
+```
+
+**thread IDを対応付け**：scene-craftの会話IDと、会話を継続するapp-serverのthread IDを接続対応記録で結び付ける。所属作品・振り返り対象・モデル選択はscene-craftの会話に保持し、その会話でLLMへ依頼するときに対応するthreadを利用する。Codex内部の継続データを移行しない場合も、scene-craftの会話IDと保存済み原文を保持する。
+
+**AI処理をturn IDへ対応付け**：scene-craftのAI処理の実行と、app-serverでその処理を進めるturnを対応付け、開始・終了・中断・失敗を照合する。依頼は目的と停止・再実行予算の単位であり、その下に実行を記録する。一つの依頼が複数turnにまたがる場合もあるため、依頼・実行・turnを一対一に固定しない。再実行の記録は依頼と対象実行に結び付け、turnの変更だけで累積回数をリセットしない。
+
+**発言itemを保存・照合**：app-serverの利用者・AIの発言itemを、scene-craftの原文メッセージとして保存し、両者の識別子を対応付けて本文・順序・受信完了状態を照合する。一つのturnには発言以外のitemも含まれるため、ツール項目や内部推論をすべて原文メッセージへ変換する前提は置かない。LLMなしの記録送信や外部取り込みの原文は、対応するitemがなくてもscene-craftで保持する。
+
+**ツール要求／結果を操作へ対応付け**：app-serverのツール要求・結果を、scene-craftが受け付けた外部操作の実行へ結び付ける。Windows制作操作では、親のAI実行とWindows側の実行ID・開始・停止・完成記録を関連付け、要求と結果を照合する。同じturn内で複数の操作ややり直しが発生しても個別に記録し、制作の再実行とCodex内部の通信再送を分ける。LLMを呼ばないプレビュー生成等の実行は、対応するツールitemがなくてもscene-craftで記録する。
+
 ## 根拠資料と確認範囲
 
 - **D**：[公式 app-server 文書](https://learn.chatgpt.com/docs/app-server)。確認時点の更新される文書。API 名の記載だけでは実機確認済みを意味しない。取得URLは `https://learn.chatgpt.com/docs/app-server.md`、本文SHA-256は `f879715bb0d440db60b71e7a5bfe1258d045520feabe3fc6b11847100c8d064b`。公開文書には版固定がないため、追跡可能な公式ソースの固定コミットとPも併用する。
