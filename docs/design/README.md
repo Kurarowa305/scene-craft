@@ -10,6 +10,8 @@ Issue の状態・依存関係・担当者は GitHub を正とする。この一
 
 2026-10-26、現在のプロトタイプを基準に[画面・制作導線](user-interface.md)を確定した。作品別チャット、右側の横タブとタブ内の種類選択、会話による採否・記録、相談専用サイドチャット、送信時のエージェント選択、前チャットからのモデル引き継ぎ、左から右への履歴、全履歴の振り返りを採用した。試作は別ブランチのコミットで参照し、本実装・実機検証とapp-serverの実装分担調査は後続へ引き継ぐ。
 
+2026-10-31、[参考調査・素材の検索と取り込み](reference-and-assets.md)を確定した。一般Web・指定フォルダー・Poly Haven／ambientCGを検索対象とし、出典・利用条件と確認日、人間の選択、取得実体・依存素材を結び付ける。素材は編集案を経由して採用し、利用条件不明時は保留する。対応形式とテクスチャ2K・HDRI4Kの既定、保存不可・取得失敗時の扱いを合意した。実取得・Blender取り込み・異常系の検証は後続へ引き継ぐ。
+
 ## 項目一覧
 
 設計がまとまった項目から資料を作成する。下表のファイル名は作成予定先であり、未作成の資料を設計済みとして扱わない。作成したらファイル名をリンクに更新する。大きい問いは追加 Issue に分割して、この領域の資料へ統合する。
@@ -27,7 +29,7 @@ Issue の状態・依存関係・担当者は GitHub を正とする。この一
 | 文脈・作風・制作方針 | [会話の文脈と作風・制作方針の利用方法を決める](https://github.com/Kurarowa305/scene-craft/issues/10) | [context-and-style.md](context-and-style.md)（設計合意済み） |
 | Git の版参照・保持 | [Git の版固定・保持・更新互換性を決める](https://github.com/Kurarowa305/scene-craft/issues/11) | [git-versioning.md](git-versioning.md)（設計合意済み） |
 | 画面・制作導線 | [専用アプリの画面と制作・記録の導線を決める](https://github.com/Kurarowa305/scene-craft/issues/12) | [user-interface.md](user-interface.md)（設計合意済み） |
-| 参考調査・素材サービス | [参考調査と素材サービスの選定・取り込み契約を決める](https://github.com/Kurarowa305/scene-craft/issues/13) | `reference-and-assets.md` |
+| 参考調査・素材サービス | [参考調査と素材サービスの選定・取り込み契約を決める](https://github.com/Kurarowa305/scene-craft/issues/13) | [reference-and-assets.md](reference-and-assets.md)（設計合意済み） |
 | テスト・診断・受け入れ | [テスト境界・診断情報・初期版の受け入れ手順を決める](https://github.com/Kurarowa305/scene-craft/issues/14) | `testing-and-diagnostics.md` |
 
 ## 追加の設計調査
