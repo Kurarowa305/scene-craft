@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta
+      name="description"
+      content="scene-craftの確定設計を全体図と要点から確認する人間向け資料。詳細な契約は設計Issueへ。"
+    />
+    <title>保存・復元・バックアップ | scene-craft 設計</title>
+    <link rel="stylesheet" href="portal.css" />
+  </head>
+  <body>
+    <a class="skip" href="#main">本文へ移動</a>
+    <header class="top">
+      <a class="brand" href="index.html"
+        ><span class="mark" aria-hidden="true">sc</span> scene-craft
+        <span class="brand-sub">/ DESIGN NOTES</span></a
+      ><a href="https://github.com/Kurarowa305/scene-craft/issues/1"
+        >設計マップ ↗</a
+      >
+    </header>
+    <div class="layout">
+      <aside>
+        <nav aria-label="設計領域">
+          <a href="index.html">全体像</a>
+          <p class="nav-label">全体を知る</p>
+          <a href="application-architecture.html">全体構成とOSの責務</a
+          ><a href="user-interface.html">画面と制作の導線</a
+          ><a href="domain-data-model.html">作品と制作履歴</a>
+          <p class="nav-label">制作を進める</p>
+          <a href="llm-connection.html">LLM接続と費用</a
+          ><a href="agent-contracts.html">工程別エージェントとツール</a
+          ><a href="execution-lifecycle.html">実行・停止・復旧</a
+          ><a href="edit-candidates.html">編集案の採用と保護</a
+          ><a href="blender-integration.html">Blender連携とレンダー出力</a>
+          <p class="nav-label">残して活かす</p>
+          <a href="artifact-storage.html" aria-current="page"
+            >保存・復元・バックアップ</a
+          ><a href="reference-and-assets.html">参考資料と素材</a
+          ><a href="context-and-style.html">文脈・作風・制作方針</a
+          ><a href="git-versioning.html">Gitの版固定と更新</a>
+          <p class="nav-label">次の設計</p>
+          <a href="testing-and-diagnostics.html">テスト・診断・受け入れ</a>
+        </nav>
+        <div class="aside-note">
+          設計の要点はここで。<br />詳細はMarkdown、合意はIssueで。
+        </div>
+      </aside>
+      <main id="main" tabindex="-1">
+        <p class="eyebrow">DESIGN / 09</p>
+        <h1>保存・復元・バックアップ</h1>
+        <p class="lead">過去の実体を固定し、戻れる状態を残す</p>
+        <p class="intro">
+          制作ファイルと依存素材を管理下へコピーし、サイズ・ハッシュ・構成を固定する。WSLのDBとWindowsのファイルは別々に確定し、完成記録を照合する。
+        </p>
+        <p>
+          <span class="badge">設計合意済み</span>
+          <span class="muted">本実装・実機受け入れは後続</span>
+        </p>
+        <figure>
+          <ol class="flow">
+            <li>一時領域へコピー</li>
+            <li>依存・サイズ・ハッシュを検証</li>
+            <li>完成記録とDBを照合</li>
+            <li>保存状態として公開</li>
+          </ol>
+          <figcaption>主要な流れの要約。人間が工程と採否を選ぶ。</figcaption>
+        </figure>
+        <section aria-labelledby="contracts">
+          <h2 id="contracts">主要な契約</h2>
+          <div
+            class="table-scroll"
+            tabindex="0"
+            role="region"
+            aria-label="主要な契約"
+          >
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">項目</th>
+                  <th scope="col">決めたこと・受け渡すもの</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">固定と依存</th>
+                  <td>
+                    作業用コピーと固定実体を分離。リンク・テクスチャ・キャッシュを再帰収集し、循環・実参照先・コピー中変更を検査。
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">保存の確定</th>
+                  <td>
+                    操作IDと受付キーを先に記録。必須ファイルと完成記録を照合してから公開。通知再送で保存状態を二重登録しない。
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">過去へ戻す</th>
+                  <td>
+                    未登録の手修正を先に保存・記録し、復元用コピーを検証。直前の状態と復元元を保持した新しい保存状態を作る。
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">派生と削除</th>
+                  <td>
+                    派生先の編集・削除を元作品から分離。明示的に大容量実体を削除しても履歴・理由は残し、共有実体を参照する状態を保護。
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">バックアップ</th>
+                  <td>
+                    書き込みと制作を安全に止め、全作品・会話・DB・Windows実行記録・実体を一つの非圧縮フォルダーへ。構成一覧とハッシュ検証後に完成記録を付ける。
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">復元と移行</th>
+                  <td>
+                    空の保存先へ復元し、IDと参照を維持してルートを再設定。既知不足と破損を区別。形式変更は確認・退避・検証後に変換する。
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+        <section>
+          <h2>制約と失敗時の扱い</h2>
+          <ul class="rules">
+            <li>
+              既知の依存不足は一覧付きで残せるが、完全復元可能とはしない。必須ファイルのコピー失敗を不足へ読み替えない。
+            </li>
+            <li>
+              資格情報・Codex内部継続データ・実行許可は移行しない。原文と要約を使って新しい会話の文脈を構成する。
+            </li>
+            <li>
+              Git実体はバックアップへ含めずGitHubの保持用タグから復旧。未pushは別PCへ復旧できる扱いにしない。
+            </li>
+            <li>
+              復元・移行・アプリ起動だけで制作を自動再開しない。移行前退避は成功後も自動削除しない。
+            </li>
+          </ul>
+        </section>
+        <section class="sources">
+          <h2>詳細と根拠へ</h2>
+          <p>
+            <a href="https://github.com/Kurarowa305/scene-craft/issues/6"
+              >設計Issue：保存・復元・バックアップ</a
+            >
+          </p>
+          <p><a href="artifact-storage.md">現在の詳細設計（Markdown） →</a></p>
+          <details>
+            <summary>詳細設計の内容を確認する</summary>
+            <p>以下の契約・説明は既存Markdownに保持しています。</p>
+            <ul>
+              <li><a href="artifact-storage.md">責務と保存単位</a></li>
+              <li><a href="artifact-storage.md">依存素材の取り込み</a></li>
+              <li><a href="artifact-storage.md">保存の確定と照合</a></li>
+              <li><a href="artifact-storage.md">保存状態への復元と派生</a></li>
+              <li><a href="artifact-storage.md">可用性と明示削除</a></li>
+              <li>
+                <a href="artifact-storage.md">全体バックアップの形式と手順</a>
+              </li>
+              <li>
+                <a href="artifact-storage.md"
+                  >バックアップからの復元・別環境への移行</a
+                >
+              </li>
+              <li><a href="artifact-storage.md">ローカル保存形式の移行</a></li>
+              <li>
+                <a href="artifact-storage.md">後続への引き継ぎと確認範囲</a>
+              </li>
+              <li><a href="artifact-storage.md">根拠</a></li>
+            </ul>
+            <p>
+              <a
+                href="https://github.com/Kurarowa305/scene-craft/issues/6#issuecomment-6542676442"
+                >2026-10-31時点の本文スナップショット（履歴）</a
+              >
+            </p>
+          </details>
+        </section>
+        <section>
+          <h2>つながる設計</h2>
+          <div class="related">
+            <a href="domain-data-model.html">作品と制作履歴</a
+            ><a href="git-versioning.html">Gitの版固定と更新</a
+            ><a href="execution-lifecycle.html">実行・停止・復旧</a
+            ><a href="reference-and-assets.html">参考資料と素材</a>
+          </div>
+        </section>
+        <footer>
+          <p>scene-craft · 設計ポータル · 2026-10-31 時点の整理</p>
+          <p>
+            <a href="../requirements/initial-scope.md">合意済み要件</a> ·
+            <a href="../../GLOSSARY.md">用語集</a> ·
+            <a href="../agents/development-workflow.md">開発フロー</a> ·
+            <a href="https://github.com/Kurarowa305/scene-craft/issues/33"
+              >このポータルの整備記録</a
+            >
+          </p>
+          <p>
+            設計の合意と、本実装・実機検証の完了は別です。最新の進捗は設計マップを参照してください。
+          </p>
+        </footer>
+      </main>
+    </div>
+  </body>
+</html>

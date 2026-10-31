@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta
+      name="description"
+      content="scene-craftの確定設計を全体図と要点から確認する人間向け資料。詳細な契約は設計Issueへ。"
+    />
+    <title>Blender連携とレンダー出力 | scene-craft 設計</title>
+    <link rel="stylesheet" href="portal.css" />
+  </head>
+  <body>
+    <a class="skip" href="#main">本文へ移動</a>
+    <header class="top">
+      <a class="brand" href="index.html"
+        ><span class="mark" aria-hidden="true">sc</span> scene-craft
+        <span class="brand-sub">/ DESIGN NOTES</span></a
+      ><a href="https://github.com/Kurarowa305/scene-craft/issues/1"
+        >設計マップ ↗</a
+      >
+    </header>
+    <div class="layout">
+      <aside>
+        <nav aria-label="設計領域">
+          <a href="index.html">全体像</a>
+          <p class="nav-label">全体を知る</p>
+          <a href="application-architecture.html">全体構成とOSの責務</a
+          ><a href="user-interface.html">画面と制作の導線</a
+          ><a href="domain-data-model.html">作品と制作履歴</a>
+          <p class="nav-label">制作を進める</p>
+          <a href="llm-connection.html">LLM接続と費用</a
+          ><a href="agent-contracts.html">工程別エージェントとツール</a
+          ><a href="execution-lifecycle.html">実行・停止・復旧</a
+          ><a href="edit-candidates.html">編集案の採用と保護</a
+          ><a href="blender-integration.html" aria-current="page"
+            >Blender連携とレンダー出力</a
+          >
+          <p class="nav-label">残して活かす</p>
+          <a href="artifact-storage.html">保存・復元・バックアップ</a
+          ><a href="reference-and-assets.html">参考資料と素材</a
+          ><a href="context-and-style.html">文脈・作風・制作方針</a
+          ><a href="git-versioning.html">Gitの版固定と更新</a>
+          <p class="nav-label">次の設計</p>
+          <a href="testing-and-diagnostics.html">テスト・診断・受け入れ</a>
+        </nav>
+        <div class="aside-note">
+          設計の要点はここで。<br />詳細はMarkdown、合意はIssueで。
+        </div>
+      </aside>
+      <main id="main" tabindex="-1">
+        <p class="eyebrow">DESIGN / 08</p>
+        <h1>Blender連携とレンダー出力</h1>
+        <p class="lead">編集できる3Dから、13レイヤーへ</p>
+        <p class="intro">
+          WindowsのBlenderをbackground実行し、保存済み入力のコピーをPythonで処理する。Cyclesから16bit
+          RGB・sRGBのPSDを生成し、上限時はPSBへ切り替える。
+        </p>
+        <p>
+          <span class="badge">設計合意済み</span>
+          <span class="muted">本実装・実機受け入れは後続</span>
+        </p>
+        <figure>
+          <ol class="flow">
+            <li>入力・依存を固定</li>
+            <li>Blenderで編集・レンダー</li>
+            <li>EXRから変換</li>
+            <li>PSD/PSBを検査して引き渡し</li>
+          </ol>
+          <figcaption>主要な流れの要約。人間が工程と採否を選ぶ。</figcaption>
+        </figure>
+        <section aria-labelledby="contracts">
+          <h2 id="contracts">主要な契約</h2>
+          <div
+            class="table-scroll"
+            tabindex="0"
+            role="region"
+            aria-label="主要な契約"
+          >
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">項目</th>
+                  <th scope="col">決めたこと・受け渡すもの</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">編集可能な制作データ</th>
+                  <td>
+                    部品別形状、UV・画像接続、材質ノード、環境設定をblendへ残す。植物の個体取り出しは分布から除外し、再生成で二重化しない。
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">色と表示</th>
+                  <td>
+                    13枚を同じカメラ・フレーム・解像度に揃える。新規作品はAgX・露出0。見た目用の変換とデータ画像の符号化を分け、sRGB
+                    ICCを埋め込む。
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">影とアルファ</th>
+                  <td>
+                    Shadowsは指定受け面のShadow
+                    Catcher。影用コピーと通常Combinedを分ける。Global Alpha
+                    Maskは背景として指定した空を除く。
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">深度とID</th>
+                  <td>
+                    深度は近白・遠黒、範囲と元の距離EXRを保持。物体・材質ごとのID色を固定し、名称変更で変えず、削除した色を再利用しない。
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">生成方式</th>
+                  <td>
+                    PhotoshopAPI 0.9.1でレイヤーを作り、psd-tools
+                    1.24.0で名称・merged
+                    imageを補修。再読込・画素・ICC検査後に完成として公開。
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">形式と完成</th>
+                  <td>
+                    統合レイヤーだけ初期表示、残り12枚は非表示。上限超過は同条件のPSBへ。必須パスの欠落を空画像や品質低下で隠さない。
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+        <section>
+          <h2>13レイヤーの役割</h2>
+          <p>
+            Material IDとObject
+            IDは別レイヤー。成分を重ねて元画像を厳密に再合成する要件は持たない。
+          </p>
+          <div
+            class="table-scroll"
+            tabindex="0"
+            role="region"
+            aria-label="主要な契約"
+          >
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">項目</th>
+                  <th scope="col">決めたこと・受け渡すもの</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">統合レイヤー</th>
+                  <td>Combined。初期表示する画像。</td>
+                </tr>
+                <tr>
+                  <th scope="row">Material ID / Object ID</th>
+                  <td>材質・物体ごとの色分け。個別の白黒マスクは作らない。</td>
+                </tr>
+                <tr>
+                  <th scope="row">Material color</th>
+                  <td>Diffuse Color。万能なベース色ではない。</td>
+                </tr>
+                <tr>
+                  <th scope="row">Specular Lighting</th>
+                  <td>Glossy Direct × Glossy Color。</td>
+                </tr>
+                <tr>
+                  <th scope="row">Diffuse Lighting</th>
+                  <td>Diffuse Direct。材質色を掛けず、影を含む。</td>
+                </tr>
+                <tr>
+                  <th scope="row">Z Depth</th>
+                  <td>距離を指定範囲の白黒へ変換。原値はEXRに保持。</td>
+                </tr>
+                <tr>
+                  <th scope="row">Global Alpha Mask</th>
+                  <td>空を除く物体のAlpha。</td>
+                </tr>
+                <tr>
+                  <th scope="row">Shadows</th>
+                  <td>指定受け面のShadow Catcher。</td>
+                </tr>
+                <tr>
+                  <th scope="row">Refractions</th>
+                  <td>TransmissionのDirect＋IndirectにColorを掛ける。</td>
+                </tr>
+                <tr>
+                  <th scope="row">Reflections</th>
+                  <td>Glossy Indirect × Glossy Color。</td>
+                </tr>
+                <tr>
+                  <th scope="row">Indirect Lighting</th>
+                  <td>Diffuse Indirect。材質色を掛けない。</td>
+                </tr>
+                <tr>
+                  <th scope="row">Ambient Occlusion</th>
+                  <td>AO。補助調整用。</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+        <section>
+          <h2>制約と失敗時の扱い</h2>
+          <ul class="rules">
+            <li>
+              保存済みデータだけが対象。GUIの未保存内容を自動取得しない。同じデータを人間とAIが同時編集しない。
+            </li>
+            <li>
+              Shadows未指定なら指定を求める。人間が「対象なし」を明示したときだけ白いShadowsと対象なしの記録を残す。
+            </li>
+            <li>
+              停止は所有するプロセスを対象にし、編集・保存は安全な境目、レンダーは中断。未完成画像を成果物にしない。
+            </li>
+            <li>
+              小さな実EXRから13種類への変換は確認済み。Photoshop実機・2GB超・GPU・透明／ボリューム等の品質は受け入れへ。
+            </li>
+          </ul>
+        </section>
+        <section class="sources">
+          <h2>詳細と根拠へ</h2>
+          <p>
+            <a href="https://github.com/Kurarowa305/scene-craft/issues/4"
+              >設計Issue：Blender連携とレンダー出力</a
+            >
+          </p>
+          <p>
+            <a href="blender-integration.md">現在の詳細設計（Markdown） →</a>
+          </p>
+          <details>
+            <summary>詳細設計の内容を確認する</summary>
+            <p>以下の契約・説明は既存Markdownに保持しています。</p>
+            <ul>
+              <li>
+                <a href="blender-integration.md">合意した制作時の使い方</a>
+              </li>
+              <li>
+                <a href="blender-integration.md">採用する操作経路と確認範囲</a>
+              </li>
+              <li>
+                <a href="blender-integration.md">標準レンダー機能の利用</a>
+              </li>
+              <li><a href="blender-integration.md">設計の確定範囲</a></li>
+              <li>
+                <a href="blender-integration.md"
+                  >利用者が指定したレタッチ用レイヤー</a
+                >
+              </li>
+              <li><a href="blender-integration.md">PSD への引き渡し</a></li>
+              <li><a href="blender-integration.md">Shadows の採用方式</a></li>
+              <li>
+                <a href="blender-integration.md">入力・編集可能性の契約</a>
+              </li>
+              <li><a href="blender-integration.md">出力の契約</a></li>
+              <li>
+                <a href="blender-integration.md"
+                  >Blender操作ModuleのInterface</a
+                >
+              </li>
+              <li>
+                <a href="blender-integration.md"
+                  >確認済み範囲と後続への引き継ぎ</a
+                >
+              </li>
+            </ul>
+            <p>
+              <a
+                href="https://github.com/Kurarowa305/scene-craft/issues/4#issuecomment-6542675825"
+                >2026-10-31時点の本文スナップショット（履歴）</a
+              >
+            </p>
+          </details>
+          <ul>
+            <li>
+              <a href="../research/psd16-conversion-validation.md"
+                >実EXR→13レイヤーの変換と再現手順</a
+              >
+            </li>
+            <li>
+              <a href="../research/blender-execution-validation.md"
+                >Blender実行・停止の確認</a
+              >
+            </li>
+            <li>
+              <a href="../research/blender-shadow-validation.md"
+                >指定地面のShadow Catcher</a
+              >
+            </li>
+          </ul>
+        </section>
+        <section>
+          <h2>つながる設計</h2>
+          <div class="related">
+            <a href="agent-contracts.html">工程別エージェントとツール</a
+            ><a href="artifact-storage.html">保存・復元・バックアップ</a
+            ><a href="edit-candidates.html">編集案の採用と保護</a
+            ><a href="testing-and-diagnostics.html">テスト・診断・受け入れ</a>
+          </div>
+        </section>
+        <footer>
+          <p>scene-craft · 設計ポータル · 2026-10-31 時点の整理</p>
+          <p>
+            <a href="../requirements/initial-scope.md">合意済み要件</a> ·
+            <a href="../../GLOSSARY.md">用語集</a> ·
+            <a href="../agents/development-workflow.md">開発フロー</a> ·
+            <a href="https://github.com/Kurarowa305/scene-craft/issues/33"
+              >このポータルの整備記録</a
+            >
+          </p>
+          <p>
+            設計の合意と、本実装・実機検証の完了は別です。最新の進捗は設計マップを参照してください。
+          </p>
+        </footer>
+      </main>
+    </div>
+  </body>
+</html>
