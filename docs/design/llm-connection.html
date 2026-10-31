@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta
+      name="description"
+      content="scene-craftの確定設計を全体図と要点から確認する人間向け資料。詳細な契約は設計Issueへ。"
+    />
+    <title>LLM接続と費用 | scene-craft 設計</title>
+    <link rel="stylesheet" href="portal.css" />
+  </head>
+  <body>
+    <a class="skip" href="#main">本文へ移動</a>
+    <header class="top">
+      <a class="brand" href="index.html"
+        ><span class="mark" aria-hidden="true">sc</span> scene-craft
+        <span class="brand-sub">/ DESIGN NOTES</span></a
+      ><a href="https://github.com/Kurarowa305/scene-craft/issues/1"
+        >設計マップ ↗</a
+      >
+    </header>
+    <div class="layout">
+      <aside>
+        <nav aria-label="設計領域">
+          <a href="index.html">全体像</a>
+          <p class="nav-label">全体を知る</p>
+          <a href="application-architecture.html">全体構成とOSの責務</a
+          ><a href="user-interface.html">画面と制作の導線</a
+          ><a href="domain-data-model.html">作品と制作履歴</a>
+          <p class="nav-label">制作を進める</p>
+          <a href="llm-connection.html" aria-current="page">LLM接続と費用</a
+          ><a href="agent-contracts.html">工程別エージェントとツール</a
+          ><a href="execution-lifecycle.html">実行・停止・復旧</a
+          ><a href="edit-candidates.html">編集案の採用と保護</a
+          ><a href="blender-integration.html">Blender連携とレンダー出力</a>
+          <p class="nav-label">残して活かす</p>
+          <a href="artifact-storage.html">保存・復元・バックアップ</a
+          ><a href="reference-and-assets.html">参考資料と素材</a
+          ><a href="context-and-style.html">文脈・作風・制作方針</a
+          ><a href="git-versioning.html">Gitの版固定と更新</a>
+          <p class="nav-label">次の設計</p>
+          <a href="testing-and-diagnostics.html">テスト・診断・受け入れ</a>
+        </nav>
+        <div class="aside-note">
+          設計の要点はここで。<br />詳細はMarkdown、合意はIssueで。
+        </div>
+      </aside>
+      <main id="main" tabindex="-1">
+        <p class="eyebrow">DESIGN / 04</p>
+        <h1>LLM接続と費用</h1>
+        <p class="lead">Codexに会話の実行と認証を任せる</p>
+        <p class="intro">
+          Codex
+          app-serverとCodex管理のChatGPTログインを採用する。scene-craftは作品・採否・制作履歴を管理し、契約枠の上限では停止して人間の再開を待つ。
+        </p>
+        <p>
+          <span class="badge">設計合意済み</span>
+          <span class="muted">本実装・実機受け入れは後続</span>
+        </p>
+        <figure>
+          <ol class="flow">
+            <li>専用領域でログイン</li>
+            <li>会話とthreadを対応付け</li>
+            <li>依頼とturnを記録</li>
+            <li>結果・外部操作を照合</li>
+          </ol>
+          <figcaption>主要な流れの要約。人間が工程と採否を選ぶ。</figcaption>
+        </figure>
+        <section aria-labelledby="contracts">
+          <h2 id="contracts">主要な契約</h2>
+          <div
+            class="table-scroll"
+            tabindex="0"
+            role="region"
+            aria-label="主要な契約"
+          >
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">項目</th>
+                  <th scope="col">決めたこと・受け渡すもの</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">認証</th>
+                  <td>
+                    Codexがログイン・保存・トークン更新を担当。専用の保存領域を用い、資格情報を制作バックアップへ含めない。
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">費用条件</th>
+                  <td>
+                    ChatGPT
+                    Proの契約内。自動補充無効・既存クレジットなしは利用者が確認。API従量課金への切替は設けない。
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">送信</th>
+                  <td>
+                    アプリによる費用確認や確認済み記録は持たない。利用枠・残高を取得できないことだけでは送信を保留しない。
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">制作モデル</th>
+                  <td>
+                    新規会話へ直前チャットの選択を引き継ぐ。初回だけapp-serverの利用可能な既定値を使い、取得できなければ人間が選ぶ。
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">設定の適用</th>
+                  <td>
+                    変更は次の依頼から。実行中・自動再実行の途中で切り替えず、実際のモデル・推論強度・速度を記録する。
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">命名・保存用要約</th>
+                  <td>
+                    制作会話とは別に設定可能。初期値はGPT-6
+                    Luna。失敗時も原文・制作結果を保存し、未命名・未要約と示す。
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+        <section>
+          <h2>制約と失敗時の扱い</h2>
+          <ul class="rules">
+            <li>
+              選択モデル・provider・API課金へ自動で切り替える経路は設けない。
+            </li>
+            <li>
+              再認証・利用枠回復だけで再開しない。Codexのturn終端と外部Blenderの完了を区別する。
+            </li>
+            <li>
+              費用条件は利用者の運用前提。アプリによる将来の課金防止の保証ではない。
+            </li>
+          </ul>
+        </section>
+        <section class="sources">
+          <h2>詳細と根拠へ</h2>
+          <p>
+            <a href="https://github.com/Kurarowa305/scene-craft/issues/2"
+              >設計Issue：LLM接続と費用</a
+            >
+          </p>
+          <p><a href="llm-connection.md">現在の詳細設計（Markdown） →</a></p>
+          <details>
+            <summary>詳細設計の内容を確認する</summary>
+            <p>以下の契約・説明は既存Markdownに保持しています。</p>
+            <ul>
+              <li><a href="llm-connection.md">合意済みの構成と責務</a></li>
+              <li><a href="llm-connection.md">認証方式（合意済み）</a></li>
+              <li><a href="llm-connection.md">接続と復旧の契約</a></li>
+              <li><a href="llm-connection.md">モデル選択</a></li>
+              <li><a href="llm-connection.md">費用確認と接続・復旧</a></li>
+              <li>
+                <a href="llm-connection.md"
+                  >検証済み範囲と app-server の実接続確認</a
+                >
+              </li>
+              <li>
+                <a href="llm-connection.md">後続への引き継ぎと完了の範囲</a>
+              </li>
+            </ul>
+            <p>
+              <a
+                href="https://github.com/Kurarowa305/scene-craft/issues/2#issuecomment-6542675329"
+                >2026-10-31時点の本文スナップショット（履歴）</a
+              >
+            </p>
+          </details>
+          <ul>
+            <li>
+              <a href="../adr/0004-codex-app-server-runtime.md"
+                >ADR：Codex app-server</a
+              >
+            </li>
+            <li>
+              <a href="../research/codex-app-server-connection-validation.md"
+                >実接続・圧縮後の継続の検証</a
+              >
+            </li>
+          </ul>
+        </section>
+        <section>
+          <h2>つながる設計</h2>
+          <div class="related">
+            <a href="agent-contracts.html">工程別エージェントとツール</a
+            ><a href="execution-lifecycle.html">実行・停止・復旧</a
+            ><a href="context-and-style.html">文脈・作風・制作方針</a>
+          </div>
+        </section>
+        <footer>
+          <p>scene-craft · 設計ポータル · 2026-10-31 時点の整理</p>
+          <p>
+            <a href="../requirements/initial-scope.md">合意済み要件</a> ·
+            <a href="../../GLOSSARY.md">用語集</a> ·
+            <a href="../agents/development-workflow.md">開発フロー</a> ·
+            <a href="https://github.com/Kurarowa305/scene-craft/issues/33"
+              >このポータルの整備記録</a
+            >
+          </p>
+          <p>
+            設計の合意と、本実装・実機検証の完了は別です。最新の進捗は設計マップを参照してください。
+          </p>
+        </footer>
+      </main>
+    </div>
+  </body>
+</html>

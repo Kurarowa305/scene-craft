@@ -1,5 +1,7 @@
 # 設計項目と資料
 
+人間向けの全体図と領域別の要点は[設計ポータル](index.html)にまとめる。`index.html`をブラウザで直接開く。既存Markdownはすべて維持し、現在の詳細設計は引き続き下記資料を正とする。合意・検討経緯は設計Issueを参照し、設計変更時は詳細資料とHTMLの要点を揃えて更新する。
+
 [scene-craft 初期構築の設計マップ](https://github.com/Kurarowa305/scene-craft/issues/1) を設計作業の入口とする。[初期要件](../requirements/initial-scope.md) は合意済みで、以下は実装前に決める13領域である。2026-10-06 に設計 Issue を登録した。2026-10-12 に LLM 接続・費用制約の設計を合意した。Codex app-server と Codex 管理の認証を採用し、費用条件の確認は利用者が担う。モデル選択、停止・再開、再実行の契約と後続への引き継ぎは [接続設計](llm-connection.md) にまとめる。同日、[Blender連携設計](blender-integration.md)も最終合意した。Windowsのbackground操作、編集可能な制作データ、13レイヤーの16bit sRGB PSD／上限時PSB、停止・失敗契約を確定した。同日、[全体設計](application-architecture.md)も最終合意し、Windows 起動管理・WSL バックエンド・Windows 実行補助プロセスの責務、通信、停止と再接続を確定した。同日、[データモデル設計](domain-data-model.md)も最終合意し、ブランチグラフを支える保存状態・変更・採否、理由の訂正履歴、復元・派生・振り返りの参照関係を確定した。2026-10-18、[Git版管理設計](git-versioning.md)で受付時の版固定、保持用タグとGitHubへの明示push、作風更新・互換性・ローカル形式の移行を合意した。Git専用の独自バックアップ機能は初期の必須範囲から外す。同日、[保存・復元・バックアップ設計](artifact-storage.md)も合意した。管理下コピーと保存状態の固定、復元・派生・削除保護、停止後の全体バックアップと空の保存先への復元、不足・破損の区別、Codex内部データを移行しない方針を確定した。設計完了と本実装・異常系の検証完了は区別する。
 
 Issue の状態・依存関係・担当者は GitHub を正とする。この一覧は領域と資料化先の対応を示す。開始時は親 Issue の子 Issue と依存関係を取得する。登録時点で着手可能なのは「LLM 接続と費用制約を満たす方式を決める」と「Blender の操作経路とレンダー出力契約を決める」。それ以後の進捗は GitHub で確認する。
@@ -14,6 +16,8 @@ Issue の状態・依存関係・担当者は GitHub を正とする。この一
 
 2026-10-31、[工程別エージェントと外部ツール契約](agent-contracts.md)を合意した。10役割の入出力・完了条件、専用stdio MCPとWSL内ローカルRPC、同じthreadの工程切替、固定手順と生成Python、Git定義、提案数と補助モデルを確定した。操作相談は独立した結果記録を作らない。全体構成図へMCPプロセスを追加し、命名・要約のモデルは設定可能、初期値をGPT-6 Lunaとした。本実装と権限・停止・異常系の実機検証は後続へ引き継ぐ。
 
+2026-10-31、[13レイヤーPSD出力の変換調査](../research/psd16-conversion-validation.md)で、小さなCycles実EXRからPSD/PSBへの一貫変換を確認した。PhotoshopAPIとpsd-toolsの組合せ、名称・merged imageの補修、Blender付属の表示変換、データ画像の符号化、容量・メモリの検査方針を確定し、確認用ファイルを保存した。Photoshop実機・2GB超の実生成・透明/ボリューム品質は受け入れ設計へ引き継ぐ。
+
 ## 項目一覧
 
 設計がまとまった項目から資料を作成する。下表のファイル名は作成予定先であり、未作成の資料を設計済みとして扱わない。作成したらファイル名をリンクに更新する。大きい問いは追加 Issue に分割して、この領域の資料へ統合する。
@@ -22,7 +26,7 @@ Issue の状態・依存関係・担当者は GitHub を正とする。この一
 | --- | --- | --- |
 | LLM 接続・費用制約 | [LLM 接続と費用制約を満たす方式を決める](https://github.com/Kurarowa305/scene-craft/issues/2) | [llm-connection.md](llm-connection.md)（設計合意済み） |
 | 全体構成・OS の責務 | [アプリ全体と Windows・WSL の責務を決める](https://github.com/Kurarowa305/scene-craft/issues/3) | [application-architecture.md](application-architecture.md)（設計合意済み） |
-| Blender 連携・出力 | [Blender の操作経路とレンダー出力契約を決める](https://github.com/Kurarowa305/scene-craft/issues/4) | [blender-integration.md](blender-integration.md)（設計合意済み。出力方式の実装検証は[後続調査](https://github.com/Kurarowa305/scene-craft/issues/16)） |
+| Blender 連携・出力 | [Blender の操作経路とレンダー出力契約を決める](https://github.com/Kurarowa305/scene-craft/issues/4) | [blender-integration.md](blender-integration.md)（設計合意済み。[13種類の変換検証](../research/psd16-conversion-validation.md)済み。Photoshop実機と大容量検証は後続） |
 | ドメイン・データモデル | [作品と制作履歴のデータモデルを決める](https://github.com/Kurarowa305/scene-craft/issues/5) | [domain-data-model.md](domain-data-model.md)（設計合意済み） |
 | 保存・復元・バックアップ | [制作データの保存・復元・バックアップ方式を決める](https://github.com/Kurarowa305/scene-craft/issues/6) | [artifact-storage.md](artifact-storage.md)（設計合意済み） |
 | 実行状態・再実行 | [実行状態・順序制御・再実行・復旧を決める](https://github.com/Kurarowa305/scene-craft/issues/7) | [execution-lifecycle.md](execution-lifecycle.md)（設計合意済み） |

@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta
+      name="description"
+      content="scene-craftの確定設計を全体図と要点から確認する人間向け資料。詳細な契約は設計Issueへ。"
+    />
+    <title>実行・停止・復旧 | scene-craft 設計</title>
+    <link rel="stylesheet" href="portal.css" />
+  </head>
+  <body>
+    <a class="skip" href="#main">本文へ移動</a>
+    <header class="top">
+      <a class="brand" href="index.html"
+        ><span class="mark" aria-hidden="true">sc</span> scene-craft
+        <span class="brand-sub">/ DESIGN NOTES</span></a
+      ><a href="https://github.com/Kurarowa305/scene-craft/issues/1"
+        >設計マップ ↗</a
+      >
+    </header>
+    <div class="layout">
+      <aside>
+        <nav aria-label="設計領域">
+          <a href="index.html">全体像</a>
+          <p class="nav-label">全体を知る</p>
+          <a href="application-architecture.html">全体構成とOSの責務</a
+          ><a href="user-interface.html">画面と制作の導線</a
+          ><a href="domain-data-model.html">作品と制作履歴</a>
+          <p class="nav-label">制作を進める</p>
+          <a href="llm-connection.html">LLM接続と費用</a
+          ><a href="agent-contracts.html">工程別エージェントとツール</a
+          ><a href="execution-lifecycle.html" aria-current="page"
+            >実行・停止・復旧</a
+          ><a href="edit-candidates.html">編集案の採用と保護</a
+          ><a href="blender-integration.html">Blender連携とレンダー出力</a>
+          <p class="nav-label">残して活かす</p>
+          <a href="artifact-storage.html">保存・復元・バックアップ</a
+          ><a href="reference-and-assets.html">参考資料と素材</a
+          ><a href="context-and-style.html">文脈・作風・制作方針</a
+          ><a href="git-versioning.html">Gitの版固定と更新</a>
+          <p class="nav-label">次の設計</p>
+          <a href="testing-and-diagnostics.html">テスト・診断・受け入れ</a>
+        </nav>
+        <div class="aside-note">
+          設計の要点はここで。<br />詳細はMarkdown、合意はIssueで。
+        </div>
+      </aside>
+      <main id="main" tabindex="-1">
+        <p class="eyebrow">DESIGN / 06</p>
+        <h1>実行・停止・復旧</h1>
+        <p class="lead">止めたことを確かめてから、次へ進む</p>
+        <p class="intro">
+          同じ作品の更新は順番に行う。停止要求の受付、外部操作が実際に止まったこと、結果の保存をそれぞれ確認する。
+        </p>
+        <p>
+          <span class="badge">設計合意済み</span>
+          <span class="muted">本実装・実機受け入れは後続</span>
+        </p>
+        <figure>
+          <ol class="flow">
+            <li>待機</li>
+            <li>実行中</li>
+            <li>終端・結果・保存を検査</li>
+            <li>完了／失敗／中断</li>
+          </ol>
+          <figcaption>主要な流れの要約。人間が工程と採否を選ぶ。</figcaption>
+        </figure>
+        <section aria-labelledby="contracts">
+          <h2 id="contracts">主要な契約</h2>
+          <div
+            class="table-scroll"
+            tabindex="0"
+            role="region"
+            aria-label="主要な契約"
+          >
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">項目</th>
+                  <th scope="col">決めたこと・受け渡すもの</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">9状態</th>
+                  <td>
+                    待機、実行中、確認待ち、停止待ち、保留、中断、状態確認が必要、完了、失敗。
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">作品単位の順序</th>
+                  <td>
+                    編集・レンダー・採用・復元を直列化。固定状態を読む調査・振り返りは並行可能。開始直前に最新の前提を照合。
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">確認と再開</th>
+                  <td>
+                    安全な停止を確認して実行枠を解放。回答・再開後は待機列の末尾へ戻り、依存・起点・保護を再確認。
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">最大2回の再実行</th>
+                  <td>
+                    初回を含め最大3回。依頼全体・同じturnの修正も共有し、人間の再実行指示でも累積回数を維持。
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">二重実行の防止</th>
+                  <td>
+                    受付キー、操作ID・試行ID、内容ハッシュを保存。同じ内容の再送は照合し、異なる内容は拒否。
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">世代と所有権</th>
+                  <td>
+                    バックエンド世代とWindowsプロセス所有権を照合。5秒ごとの連絡、単調時計で30秒の期限。古い通知で現在の実行を更新しない。
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">停止と完了の競合</th>
+                  <td>
+                    全結果・保存を検証できれば完了とし、停止要求も残す。一部だけなら検証済み成果を残して中断する。
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+        <section>
+          <h2>制約と失敗時の扱い</h2>
+          <ul class="rules">
+            <li>
+              このページの流れ図は主経路の要約。9状態の全遷移と異常系一覧は詳細Issueに保持する。
+            </li>
+            <li>
+              手動停止・認証待ち・利用上限・プロセス終了・結果不明では自動再開しない。状態照合後に人間が再開する。
+            </li>
+            <li>
+              Codex内部の通信再送は予算に数えない。制作操作のやり直しは工程名やモデル変更でも回数をリセットしない。
+            </li>
+            <li>
+              30秒は死亡判定でも保存中の強制終了期限でもない。停止待ちの間は競合操作を始めない。
+            </li>
+            <li>
+              個別の依頼を停止する。新しい作品全体停止機能は設けない。独立して検証できた途中成果は人間が利用できる。
+            </li>
+          </ul>
+        </section>
+        <section class="sources">
+          <h2>詳細と根拠へ</h2>
+          <p>
+            <a href="https://github.com/Kurarowa305/scene-craft/issues/7"
+              >設計Issue：実行・停止・復旧</a
+            >
+          </p>
+          <p>
+            <a href="execution-lifecycle.md">現在の詳細設計（Markdown） →</a>
+          </p>
+          <details>
+            <summary>詳細設計の内容を確認する</summary>
+            <p>以下の契約・説明は既存Markdownに保持しています。</p>
+            <ul>
+              <li><a href="execution-lifecycle.md">責務と前提</a></li>
+              <li>
+                <a href="execution-lifecycle.md">順序・再実行・起動の契約</a>
+              </li>
+              <li>
+                <a href="execution-lifecycle.md">停止後の継続と途中成果</a>
+              </li>
+              <li><a href="execution-lifecycle.md">状態と遷移</a></li>
+              <li>
+                <a href="execution-lifecycle.md">受付・停止・復旧の契約</a>
+              </li>
+              <li><a href="execution-lifecycle.md">遷移時の共通条件</a></li>
+              <li>
+                <a href="execution-lifecycle.md">主要な異常系と受け入れ観点</a>
+              </li>
+              <li><a href="execution-lifecycle.md">関連設計への引き継ぎ</a></li>
+              <li><a href="execution-lifecycle.md">根拠と合意履歴</a></li>
+            </ul>
+            <p>
+              <a
+                href="https://github.com/Kurarowa305/scene-craft/issues/7#issuecomment-6542676824"
+                >2026-10-31時点の本文スナップショット（履歴）</a
+              >
+            </p>
+          </details>
+        </section>
+        <section>
+          <h2>つながる設計</h2>
+          <div class="related">
+            <a href="application-architecture.html">全体構成とOSの責務</a
+            ><a href="artifact-storage.html">保存・復元・バックアップ</a
+            ><a href="edit-candidates.html">編集案の採用と保護</a
+            ><a href="agent-contracts.html">工程別エージェントとツール</a>
+          </div>
+        </section>
+        <footer>
+          <p>scene-craft · 設計ポータル · 2026-10-31 時点の整理</p>
+          <p>
+            <a href="../requirements/initial-scope.md">合意済み要件</a> ·
+            <a href="../../GLOSSARY.md">用語集</a> ·
+            <a href="../agents/development-workflow.md">開発フロー</a> ·
+            <a href="https://github.com/Kurarowa305/scene-craft/issues/33"
+              >このポータルの整備記録</a
+            >
+          </p>
+          <p>
+            設計の合意と、本実装・実機検証の完了は別です。最新の進捗は設計マップを参照してください。
+          </p>
+        </footer>
+      </main>
+    </div>
+  </body>
+</html>

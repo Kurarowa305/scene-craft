@@ -3,7 +3,8 @@
 Blender と Photoshop を使った背景イラスト制作を支援する基盤。現在は初期要件の合意が完了し、実装前の設計を進める段階です。
 
 - [初期要件](docs/requirements/initial-scope.md)
-- [設計項目と設計 Issue](docs/design/README.md)
+- [設計ポータル（全体図と領域別の要点）](docs/design/index.html)
+- [詳細設計の一覧と設計 Issue（Markdown）](docs/design/README.md)
 - [開発の進め方と使用スキル](docs/agents/development-workflow.md)
 - [用語集](GLOSSARY.md)
 - [確定した画面・制作導線の設計](docs/design/user-interface.md)
@@ -11,3 +12,5 @@ Blender と Photoshop を使った背景イラスト制作を支援する基盤�
 画面設計の根拠となる[操作できるプロトタイプ](https://github.com/Kurarowa305/scene-craft/blob/5298534c2939aa44683baa6ebd3ced8285801466/docs/design/prototypes/user-interface/README.md)は、`prototype/user-interface-12`ブランチのコミット`5298534`に保存しています。
 
 別セッションで再開するときは、開発の進め方を読み、設計一覧から未着手かつ依存先が完了した Issue を選んでください。
+
+設計ポータルは `docs/design/index.html` をブラウザで直接開いてください。ビルド・サーバー・外部CDNは不要です。GitHubではHTMLがソース表示になるため、取得したリポジトリから開きます。既存Markdownはすべて維持し、現在の詳細設計はMarkdown、合意と経緯は設計Issue、全体像と要点はHTMLで確認できます。
