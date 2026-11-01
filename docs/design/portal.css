@@ -13,6 +13,8 @@
   box-sizing: border-box;
 }
 html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
   scroll-behavior: smooth;
   scroll-padding-top: 90px;
 }
@@ -644,6 +646,29 @@ a.area-card:focus-visible {
 }
 .spec-table {
   min-width: 680px;
+  font-size: 12px;
+  line-height: 1.7;
+  table-layout: fixed;
+}
+.spec-table th,
+.spec-table td {
+  font-size: inherit;
+  line-height: inherit;
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+.spec-table th code,
+.spec-table td code {
+  font-size: 0.95em;
+}
+.spec-table thead th {
+  font-size: 12px;
+}
+.spec-table thead th:first-child {
+  width: 20%;
+}
+.spec-table tbody th {
+  font-weight: 600;
 }
 .spec-table.wide-table {
   min-width: 940px;
