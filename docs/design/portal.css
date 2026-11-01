@@ -289,10 +289,10 @@ figcaption {
   margin: 0px;
   padding: 0px;
   gap: 25px;
+  flex-direction: column;
   counter-reset: step 0;
 }
 .flow li {
-  flex: 1 1 0%;
   min-width: 0px;
   position: relative;
   margin: 0px;
@@ -314,10 +314,11 @@ figcaption {
   margin-bottom: 9px;
 }
 .flow li:not(:last-child)::after {
-  content: "→";
+  content: "↓";
   position: absolute;
-  right: -22px;
-  top: 40%;
+  left: 50%;
+  top: 100%;
+  transform: translateX(-50%);
   font-size: 17px;
   color: var(--accent);
 }
@@ -438,12 +439,6 @@ footer {
   .principles {
     grid-template-columns: 1fr;
   }
-  .flow {
-    flex-wrap: wrap;
-  }
-  .flow li {
-    flex-basis: 40%;
-  }
 }
 @media (max-width: 700px) {
   .top {
@@ -487,16 +482,6 @@ footer {
     grid-template-columns: 1fr;
   }
 
-  .flow {
-    flex-direction: column;
-    gap: 22px;
-  }
-  .flow li:not(:last-child)::after {
-    content: "↓";
-    top: auto;
-    right: 50%;
-    bottom: -25px;
-  }
   .sources {
     padding: 21px;
   }
@@ -567,9 +552,6 @@ footer {
 
   a {
     color: rgb(0, 0, 0);
-  }
-  .flow {
-    flex-wrap: wrap;
   }
   footer {
     margin-top: 24px;
@@ -809,40 +791,5 @@ a.area-card:focus-visible {
   }
   .process-flow > li {
     break-inside: avoid;
-  }
-}
-.compact-process .process-flow {
-  flex-direction: row;
-  gap: 22px;
-}
-.compact-process .process-flow > li {
-  flex: 1;
-  min-width: 0;
-  padding: 16px 12px 16px 38px;
-}
-.compact-process .process-flow > li::before {
-  left: 10px;
-  top: 20px;
-}
-.compact-process .process-flow > li:not(:last-child)::after {
-  content: "→";
-  top: 35%;
-  left: auto;
-  right: -20px;
-  bottom: auto;
-}
-.compact-process strong {
-  font-size: 13px;
-}
-@media (max-width: 700px) {
-  .compact-process .process-flow {
-    flex-direction: column;
-  }
-  .compact-process .process-flow > li:not(:last-child)::after {
-    content: "↓";
-    top: auto;
-    left: 18px;
-    right: auto;
-    bottom: -25px;
   }
 }

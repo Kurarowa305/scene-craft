@@ -1452,56 +1452,48 @@
               <svg
                 aria-labelledby="hist-title hist-desc"
                 role="img"
-                viewbox="0 0 820 245"
+                viewbox="0 0 560 640"
               >
                 <title id="hist-title">未採用の案を修正して採用する例</title>
                 <desc id="hist-desc">
-                  保存状態Sから案Aと案Bに分岐。案Aから人間の手修正H、追加AI修正A2へ進み、A2を修正して採用して次の制作へ進む。採用前の現在状態はSのまま。案Bの記録も残る。
+                  上から下へ変更が進む。保存状態Sから案Aと案Bに分岐。案Aから人間の手修正H、追加AI修正A2へ進み、A2を修正して採用して次の制作へ進む。採用前の現在状態はSのまま。案Bの記録も残る。
                 </desc>
                 <defs>
-                  <marker
-                    id="h-arrow"
-                    markerheight="8"
-                    markerwidth="8"
-                    orient="auto"
-                    refx="7"
-                    refy="4"
-                  >
+                  <marker id="h-arrow" markerheight="8" markerwidth="8"
+                    orient="auto" refx="7" refy="4">
                     <path d="M0 0L8 4L0 8Z" fill="#48716b"></path>
                   </marker>
                 </defs>
                 <g class="history-lines">
-                  <path
-                    d="M112 88H180M112 88V187H180M282 88H330M432 88H480M582 88H650"
-                  ></path>
+                  <path d="M280 76V106H150V136"></path>
+                  <path d="M280 106H410V136"></path>
+                  <path d="M150 192V252"></path>
+                  <path d="M150 308V368"></path>
+                  <path d="M150 424V504"></path>
                 </g>
                 <g class="node">
-                  <rect height="56" rx="8" width="102" x="10" y="60"></rect>
-                  <text x="61" y="93">基準 S</text>
-                  <rect height="56" rx="8" width="102" x="180" y="60"></rect>
-                  <text x="231" y="93">AI案 A</text>
-                  <rect height="56" rx="8" width="102" x="180" y="158"></rect>
-                  <text x="231" y="191">別案 B</text>
-                  <rect height="56" rx="8" width="102" x="330" y="60"></rect>
-                  <text x="381" y="93">手修正 H</text>
-                  <rect height="56" rx="8" width="102" x="480" y="60"></rect>
-                  <text x="531" y="93">AI修正 A2</text>
+                  <rect height="56" rx="8" width="160" x="200" y="20"></rect>
+                  <text x="280" y="53">基準 S</text>
+                  <rect height="56" rx="8" width="160" x="70" y="136"></rect>
+                  <text x="150" y="169">AI案 A</text>
+                  <rect height="56" rx="8" width="160" x="330" y="136"></rect>
+                  <text x="410" y="169">別案 B</text>
+                  <rect height="56" rx="8" width="160" x="70" y="252"></rect>
+                  <text x="150" y="285">手修正 H</text>
+                  <rect height="56" rx="8" width="160" x="70" y="368"></rect>
+                  <text x="150" y="401">AI修正 A2</text>
                 </g>
                 <g class="node primary">
-                  <rect height="56" rx="8" width="155" x="650" y="60"></rect>
-                  <text x="727" y="93">次の制作へ</text>
+                  <rect height="56" rx="8" width="160" x="70" y="504"></rect>
+                  <text x="150" y="537">次の制作へ</text>
                 </g>
-                <text class="edge-label" x="614" y="43">修正して採用</text>
-                <text class="sub note" x="420" y="192">
-                  採用前の現在状態は S のまま
-                </text>
-                <text class="sub note" x="420" y="217">
-                  別案・理由・指示原文も残す
-                </text>
+                <text class="edge-label" x="224" y="468">修正して採用</text>
+                <text class="sub note" x="280" y="600">採用前の現在状態は S のまま</text>
+                <text class="sub note" x="280" y="626">別案・理由・指示原文も残す</text>
               </svg>
             </div>
             <figcaption>
-              矢印は変更の順序。採否は確認したA2の保存状態を参照する。
+              矢印は上から下へ進む変更の順序。採否は確認したA2の保存状態を参照する。製品画面では、この履歴を左から右へ表示する。
             </figcaption>
           </figure>
           <div
