@@ -44,31 +44,40 @@
       <main id="main" tabindex="-1">
         <p class="eyebrow">DESIGN / 09</p>
         <h1>保存・復元・バックアップ</h1>
-        <nav aria-label="このページの目次" class="page-toc">
-          <h2>このページの内容</h2>
+        <nav aria-label="目次" class="page-toc">
+          <h2>目次</h2>
           <ol>
-            <li><a href="#責務と保存単位">保存単位</a></li>
-            <li><a href="#依存素材の取り込み">依存素材の取り込み</a></li>
-            <li><a href="#保存の確定と照合">保存の確定</a></li>
-            <li><a href="#過去の保存状態へ戻す">過去の保存状態へ戻す</a></li>
-            <li><a href="#派生作品">派生作品</a></li>
-            <li><a href="#可用性と明示削除">制作実体の管理</a></li>
             <li>
-              <a href="#全体バックアップの形式と手順">全体バックアップ</a>
+              <a href="#責務と保存単位">1. 保存単位</a>
+              <ol>
+                <li>
+                  <a href="#依存素材の取り込み">1-1. 依存素材の取り込み</a>
+                </li>
+                <li><a href="#保存の確定と照合">1-2. 保存の確定</a></li>
+              </ol>
             </li>
-            <li><a href="#git情報と除外対象">Git参照</a></li>
+            <li><a href="#過去の保存状態へ戻す">2. 過去の保存状態へ戻す</a></li>
+            <li><a href="#派生作品">3. 派生作品</a></li>
+            <li><a href="#可用性と明示削除">4. 制作実体の管理</a></li>
             <li>
-              <a href="#バックアップからの復元別環境への移行"
-                >バックアップからの復元・別環境への移行</a
-              >
+              <a href="#全体バックアップの形式と手順">5. 全体バックアップ</a>
+              <ol>
+                <li><a href="#git情報と除外対象">5-1. Git参照</a></li>
+                <li>
+                  <a href="#バックアップからの復元別環境への移行"
+                    >5-2. バックアップからの復元・別環境への移行</a
+                  >
+                </li>
+              </ol>
             </li>
             <li>
-              <a href="#ローカル保存形式の移行">ローカル保存形式の移行</a>
+              <a href="#ローカル保存形式の移行">6. ローカル保存形式の移行</a>
             </li>
+            <li><a href="#sources">7. 詳細資料</a></li>
           </ol>
         </nav>
         <section aria-labelledby="責務と保存単位" class="spec-section">
-          <h2 id="責務と保存単位">保存単位</h2>
+          <h2 id="責務と保存単位">1. 保存単位</h2>
           <div
             aria-label="保存単位"
             class="table-scroll"
@@ -202,197 +211,194 @@
                       </li>
                       <li>採用しても固定内容と削除保護の契約を維持する。</li>
                     </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">保存状態</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        PSD/PSBが参照したレンダーと、その入力保存状態を記録する。
-                      </li>
-                      <li>新しい保存状態として確定する。</li>
-                    </ul>
+                    <div class="contract-detail">
+                      <ul class="cell-list">
+                        <li>
+                          PSD/PSBが参照したレンダーと、その入力保存状態を記録する。
+                        </li>
+                        <li>新しい保存状態として確定する。</li>
+                      </ul>
+                    </div>
                   </td>
                 </tr>
               </tbody>
             </table>
           </div>
-        </section>
-        <section aria-labelledby="依存素材の取り込み" class="spec-section">
-          <h2 id="依存素材の取り込み">依存素材の取り込み</h2>
-          <div
-            aria-label="依存素材の取り込み"
-            class="table-scroll"
-            role="region"
-            tabindex="0"
-          >
-            <table class="spec-table">
-              <thead>
-                <tr>
-                  <th scope="col">項目</th>
-                  <th scope="col">仕様</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row">処理内容</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        元ファイルと依存関係を確認し、依存先も再帰的に収集する。
-                      </li>
-                      <li>循環や未解決の参照を検知する。</li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">参照</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        素材を管理下へコピーし、作業用コピーの参照先を管理下の素材へ変更する。
-                      </li>
-                      <li>
-                        ルートからの逸脱、リンクの実際の参照先も確認する。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">整合性</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        元の所在と取り込み後のファイル参照、ハッシュ、出典・利用条件等の記録への対応を残す。
-                      </li>
-                      <li>
-                        依存素材の必須メタデータとサービス別の取り込みは<a
-                          href="reference-and-assets.html"
-                          >参考調査・素材の設計</a
-                        >を参照する。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">参照</th>
-                  <td>コピーした内容と参照先を検証する。</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <div
-            aria-label="依存素材の取り込み"
-            class="table-scroll"
-            role="region"
-            tabindex="0"
-          >
-            <table class="spec-table">
-              <thead>
-                <tr>
-                  <th scope="col">項目</th>
-                  <th scope="col">仕様</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row">記録</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        取り込み不可・所在不明の素材は、不足の対象・理由・必要な操作を記録する。
-                      </li>
-                      <li>
-                        アドオン・実行環境など制作ファイルだけで保存できない依存も必要条件として記録する。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">処理内容</th>
-                  <td>
-                    必須の制作ファイルのコピー失敗と、外部依存の不足を区別する。
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
-        <section aria-labelledby="保存の確定と照合" class="spec-section">
-          <h2 id="保存の確定と照合">保存の確定</h2>
-          <p>以下の手順で両者を照合して確定する。</p>
-          <figure class="process-diagram">
-            <ol aria-label="保存の確定と照合" class="process-flow">
-              <li>
-                <strong>参照</strong>
-                <div class="process-detail">
-                  保存操作ごとにID・受付キー・対象・入力参照・予定先・進行段階を記録する。同じキー・同じ内容の再送は同じ操作を照合し、異なる内容は拒否する。同じ要求の再送には既存の保存状態を返す。
-                </div>
-              </li>
-              <li>
-                <strong>整合性</strong>
-                <div class="process-detail">
-                  一時領域にコピーし、必須ファイル・サイズ・ハッシュ・依存関係を検証する。Windows側には操作IDとファイル一覧に対応する完成記録を残す。
-                </div>
-              </li>
-              <li>
-                <strong>保存状態</strong>
-                <div class="process-detail">
-                  固定実体の配置・完成記録とDB側の構成を照合してから、保存状態・変更記録を公開する。現在状態を切り替える操作では、更新記録と現在状態の参照更新をDB内で一体として確定する。
-                </div>
-              </li>
-              <li>
-                <strong>記録</strong>
-                <div class="process-detail">
-                  途中終了・通知の欠落後は、操作ID・完成記録・実体とDBを照合する。照合できない操作は失敗・状態不明として保持する。
-                </div>
-              </li>
-            </ol>
-            <figcaption>
-              矢印は手順の順序を表す。各段階の条件に従って処理を進める。
-            </figcaption>
-          </figure>
-          <div
-            aria-label="保存の確定と照合"
-            class="table-scroll"
-            role="region"
-            tabindex="0"
-          >
-            <table class="spec-table">
-              <thead>
-                <tr>
-                  <th scope="col">項目</th>
-                  <th scope="col">仕様</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row">適用条件</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        ファイル確定後にDB保存が失敗した場合も、その実体を照合対象として保持する。
-                      </li>
-                      <li>履歴・根拠を保持して照合する。</li>
-                      <li>
-                        実行の試行ID・世代・所有権と結果の一度だけの登録は<a
-                          href="execution-lifecycle.html"
-                          >実行状態設計</a
-                        >に従う。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">処理内容</th>
-                  <td>
-                    具体的なテーブル・キー生成・保持方法は実装仕様で決める。
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+
+          <section aria-labelledby="依存素材の取り込み" class="spec-subsection">
+            <h3 id="依存素材の取り込み">1-1. 依存素材の取り込み</h3>
+            <div
+              aria-label="依存素材の取り込み"
+              class="table-scroll"
+              role="region"
+              tabindex="0"
+            >
+              <table class="spec-table">
+                <thead>
+                  <tr>
+                    <th scope="col">項目</th>
+                    <th scope="col">仕様</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row">処理内容</th>
+                    <td>
+                      <ul class="cell-list">
+                        <li>
+                          元ファイルと依存関係を確認し、依存先も再帰的に収集する。
+                        </li>
+                        <li>循環や未解決の参照を検知する。</li>
+                      </ul>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">参照</th>
+                    <td>
+                      <ul class="cell-list">
+                        <li>
+                          素材を管理下へコピーし、作業用コピーの参照先を管理下の素材へ変更する。
+                        </li>
+                        <li>
+                          ルートからの逸脱、リンクの実際の参照先も確認する。
+                        </li>
+                      </ul>
+                      <div class="contract-detail">
+                        コピーした内容と参照先を検証する。
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">整合性</th>
+                    <td>
+                      <ul class="cell-list">
+                        <li>
+                          元の所在と取り込み後のファイル参照、ハッシュ、出典・利用条件等の記録への対応を残す。
+                        </li>
+                        <li>
+                          依存素材の必須メタデータとサービス別の取り込みは<a
+                            href="reference-and-assets.html"
+                            >参考調査・素材の設計</a
+                          >を参照する。
+                        </li>
+                      </ul>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div
+              aria-label="依存素材の取り込み"
+              class="table-scroll"
+              role="region"
+              tabindex="0"
+            >
+              <table class="spec-table">
+                <thead>
+                  <tr>
+                    <th scope="col">項目</th>
+                    <th scope="col">仕様</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row">記録</th>
+                    <td>
+                      <ul class="cell-list">
+                        <li>
+                          取り込み不可・所在不明の素材は、不足の対象・理由・必要な操作を記録する。
+                        </li>
+                        <li>
+                          アドオン・実行環境など制作ファイルだけで保存できない依存も必要条件として記録する。
+                        </li>
+                      </ul>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">処理内容</th>
+                    <td>
+                      必須の制作ファイルのコピー失敗と、外部依存の不足を区別する。
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+          <section aria-labelledby="保存の確定と照合" class="spec-subsection">
+            <h3 id="保存の確定と照合">1-2. 保存の確定</h3>
+            <p>以下の手順で両者を照合して確定する。</p>
+            <figure class="process-diagram">
+              <ol aria-label="保存の確定と照合" class="process-flow">
+                <li>
+                  <strong>参照</strong>
+                  <div class="process-detail">
+                    保存操作ごとにID・受付キー・対象・入力参照・予定先・進行段階を記録する。同じキー・同じ内容の再送は同じ操作を照合し、異なる内容は拒否する。同じ要求の再送には既存の保存状態を返す。
+                  </div>
+                </li>
+                <li>
+                  <strong>整合性</strong>
+                  <div class="process-detail">
+                    一時領域にコピーし、必須ファイル・サイズ・ハッシュ・依存関係を検証する。Windows側には操作IDとファイル一覧に対応する完成記録を残す。
+                  </div>
+                </li>
+                <li>
+                  <strong>保存状態</strong>
+                  <div class="process-detail">
+                    固定実体の配置・完成記録とDB側の構成を照合してから、保存状態・変更記録を公開する。現在状態を切り替える操作では、更新記録と現在状態の参照更新をDB内で一体として確定する。
+                  </div>
+                </li>
+                <li>
+                  <strong>記録</strong>
+                  <div class="process-detail">
+                    途中終了・通知の欠落後は、操作ID・完成記録・実体とDBを照合する。照合できない操作は失敗・状態不明として保持する。
+                  </div>
+                </li>
+              </ol>
+              <figcaption>
+                矢印は手順の順序を表す。各段階の条件に従って処理を進める。
+              </figcaption>
+            </figure>
+            <div
+              aria-label="保存の確定と照合"
+              class="table-scroll"
+              role="region"
+              tabindex="0"
+            >
+              <table class="spec-table">
+                <thead>
+                  <tr>
+                    <th scope="col">項目</th>
+                    <th scope="col">仕様</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row">適用条件</th>
+                    <td>
+                      <ul class="cell-list">
+                        <li>
+                          ファイル確定後にDB保存が失敗した場合も、その実体を照合対象として保持する。
+                        </li>
+                        <li>履歴・根拠を保持して照合する。</li>
+                        <li>
+                          実行の試行ID・世代・所有権と結果の一度だけの登録は<a
+                            href="execution-lifecycle.html"
+                            >実行状態設計</a
+                          >に従う。
+                        </li>
+                      </ul>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">処理内容</th>
+                    <td>
+                      具体的なテーブル・キー生成・保持方法は実装仕様で決める。
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
         </section>
         <section aria-labelledby="過去の保存状態へ戻す" class="spec-section">
           <span
@@ -400,7 +406,7 @@
             class="anchor-alias"
             id="保存状態への復元と派生"
           ></span>
-          <h2 id="過去の保存状態へ戻す">過去の保存状態へ戻す</h2>
+          <h2 id="過去の保存状態へ戻す">2. 過去の保存状態へ戻す</h2>
           <div
             aria-label="過去の保存状態へ戻す"
             class="table-scroll"
@@ -435,24 +441,18 @@
                       <li>復元元の制作ファイル・依存素材を確認する。</li>
                       <li>不足・破損があれば、その状態への復元を止める。</li>
                     </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">復元</th>
-                  <td>
-                    別の作業領域に復元用のコピーを準備し、依存参照を含めて検証する。
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">復元</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        復元元の内容に対応する新しい保存状態と変更記録を確定し、変更前・復元元を別々に参照する。
-                      </li>
-                      <li>成功後に現在状態を切り替える。</li>
-                      <li>失敗時は直前の状態を保つ。</li>
-                    </ul>
+                    <div class="contract-detail">
+                      別の作業領域に復元用のコピーを準備し、依存参照を含めて検証する。
+                    </div>
+                    <div class="contract-detail">
+                      <ul class="cell-list">
+                        <li>
+                          復元元の内容に対応する新しい保存状態と変更記録を確定し、変更前・復元元を別々に参照する。
+                        </li>
+                        <li>成功後に現在状態を切り替える。</li>
+                        <li>失敗時は直前の状態を保つ。</li>
+                      </ul>
+                    </div>
                   </td>
                 </tr>
               </tbody>
@@ -461,7 +461,7 @@
           <p>復元元より後の履歴と理由を保持する。</p>
         </section>
         <section aria-labelledby="派生作品" class="spec-section">
-          <h2 id="派生作品">派生作品</h2>
+          <h2 id="派生作品">3. 派生作品</h2>
           <div
             aria-label="派生作品"
             class="table-scroll"
@@ -503,7 +503,7 @@
           </div>
         </section>
         <section aria-labelledby="可用性と明示削除" class="spec-section">
-          <h2 id="可用性と明示削除">制作実体の管理</h2>
+          <h2 id="可用性と明示削除">4. 制作実体の管理</h2>
           <p>
             <a href="domain-data-model.html">データモデル</a
             >に従い、作成の確定状態と現在の可用性を分ける。可用性には存在確認済み・未確認・欠落・明示削除・破損を持たせ、確認時刻を記録する。保存状態の制作実体を復元できることと、Git・runtimeを含む制作実行が可能なことも区別する。
@@ -593,7 +593,7 @@
           aria-labelledby="全体バックアップの形式と手順"
           class="spec-section"
         >
-          <h2 id="全体バックアップの形式と手順">全体バックアップ</h2>
+          <h2 id="全体バックアップの形式と手順">5. 全体バックアップ</h2>
           <div
             aria-label="全体バックアップの形式と手順"
             class="table-scroll"
@@ -619,12 +619,9 @@
                         LLMやCodex接続なしで通常のプログラムとして動作する。
                       </li>
                     </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">処理内容</th>
-                  <td>
-                    以下は論理構成であり、ファイル名・スキーマ・配置の詳細は実装仕様で固定する。
+                    <div class="contract-detail">
+                      以下は論理構成であり、ファイル名・スキーマ・配置の詳細は実装仕様で固定する。
+                    </div>
                   </td>
                 </tr>
               </tbody>
@@ -680,116 +677,117 @@
               矢印は手順の順序を表す。各段階の条件に従って処理を進める。
             </figcaption>
           </figure>
-        </section>
-        <section aria-labelledby="git情報と除外対象" class="spec-section">
-          <h2 id="git情報と除外対象">Git参照</h2>
-          <div
-            aria-label="Git参照"
-            class="table-scroll"
-            role="region"
-            tabindex="0"
-          >
-            <table class="spec-table">
-              <thead>
-                <tr>
-                  <th scope="col">観点</th>
-                  <th scope="col">仕様</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row">参照情報</th>
-                  <td>
-                    <a href="git-versioning.html">Git版管理設計</a
-                    >に従い、リポジトリ識別・資格情報を含まないGitHubの所在・Gitオブジェクト形式と、参照するフルコミットハッシュ・保持用タグを含める。
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">対象記録</th>
-                  <td>
-                    作品・依頼・成功／失敗の全実行・版切替の参照を対象とする。
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">可用性</th>
-                  <td>
-                    書き出し時のローカル可用性、リモート保存の最終確認結果・時刻、未push・欠損・確認不能も保持する。
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
-        <section
-          aria-labelledby="バックアップからの復元別環境への移行"
-          class="spec-section"
-        >
-          <h2 id="バックアップからの復元別環境への移行">
-            バックアップからの復元・別環境への移行
-          </h2>
-          <figure class="process-diagram">
-            <ol
-              aria-label="バックアップからの復元・別環境への移行"
-              class="process-flow"
+
+          <section aria-labelledby="git情報と除外対象" class="spec-subsection">
+            <h3 id="git情報と除外対象">5-1. Git参照</h3>
+            <div
+              aria-label="Git参照"
+              class="table-scroll"
+              role="region"
+              tabindex="0"
             >
-              <li>
-                <strong>記録</strong>
-                <div class="process-detail">
-                  完成を示す記録と形式識別を検査する。
-                </div>
-              </li>
-              <li>
-                <strong>整合性</strong>
-                <div class="process-detail">
-                  構成一覧、DBの整合性・参照、含まれる実体のサイズ・ハッシュを検証する。相対パスの逸脱・不正なリンク先を拒否する。新しい領域へコピーしてから、復元先でも検証する。
-                </div>
-              </li>
-              <li>
-                <strong>復元</strong>
-                <div class="process-detail">
-                  既知の不足が記録されたデータは残存部分を復元できる。書き出せたはずの実体の破損・欠落やDB・構成一覧の不整合は復元失敗として扱う。不足のある正常なバックアップと、破損したバックアップを区別する。
-                </div>
-              </li>
-              <li>
-                <strong>派生</strong>
-                <div class="process-detail">
-                  永続ID、理由の訂正履歴、派生・振り返り等の参照を保持し、Windows／WSLの新しいルートを対応付ける。過去の実行記録として保持する。未完了依頼は照合・手動再開の対象とする。
-                </div>
-              </li>
-              <li>
-                <strong>復元</strong>
-                <div class="process-detail">
-                  検証後に復元した保存先を利用可能にする。途中失敗・中断時は未完成領域と元バックアップを保つ。
-                </div>
-              </li>
-              <li>
-                <strong>Git参照</strong>
-                <div class="process-detail">
-                  GitHubから必要な保持用タグを明示取得し、コミット・内容を照合する。オフライン・未push・取得失敗はGit未復旧とし、欠けた定義・作風が必要な実行だけを止める。
-                </div>
-              </li>
-              <li>
-                <strong>認証</strong>
-                <div class="process-detail">
-                  移行先のCodex専用領域で別途認証し、新しいCodex会話へ必要な制作記録を渡す。文脈の構築は<a
-                    href="https://github.com/Kurarowa305/scene-craft/issues/10"
-                    rel="noopener noreferrer"
-                    target="_blank"
-                    >会話・作風の設計</a
-                  >で具体化する。
-                </div>
-              </li>
-            </ol>
-            <figcaption>
-              矢印は手順の順序を表す。各段階の条件に従って処理を進める。
-            </figcaption>
-          </figure>
-          <p>
-            作品の制作実体が不足する場合は、その実体が必要な復元・派生・実行を止め、残存データの閲覧・記録は利用できる。
-          </p>
+              <table class="spec-table">
+                <thead>
+                  <tr>
+                    <th scope="col">観点</th>
+                    <th scope="col">仕様</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row">参照情報</th>
+                    <td>
+                      <a href="git-versioning.html">Git版管理設計</a
+                      >に従い、リポジトリ識別・資格情報を含まないGitHubの所在・Gitオブジェクト形式と、参照するフルコミットハッシュ・保持用タグを含める。
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">対象記録</th>
+                    <td>
+                      作品・依頼・成功／失敗の全実行・版切替の参照を対象とする。
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">可用性</th>
+                    <td>
+                      書き出し時のローカル可用性、リモート保存の最終確認結果・時刻、未push・欠損・確認不能も保持する。
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+          <section
+            aria-labelledby="バックアップからの復元別環境への移行"
+            class="spec-subsection"
+          >
+            <h3 id="バックアップからの復元別環境への移行">
+              5-2. バックアップからの復元・別環境への移行
+            </h3>
+            <figure class="process-diagram">
+              <ol
+                aria-label="バックアップからの復元・別環境への移行"
+                class="process-flow"
+              >
+                <li>
+                  <strong>記録</strong>
+                  <div class="process-detail">
+                    完成を示す記録と形式識別を検査する。
+                  </div>
+                </li>
+                <li>
+                  <strong>整合性</strong>
+                  <div class="process-detail">
+                    構成一覧、DBの整合性・参照、含まれる実体のサイズ・ハッシュを検証する。相対パスの逸脱・不正なリンク先を拒否する。新しい領域へコピーしてから、復元先でも検証する。
+                  </div>
+                </li>
+                <li>
+                  <strong>復元</strong>
+                  <div class="process-detail">
+                    既知の不足が記録されたデータは残存部分を復元できる。書き出せたはずの実体の破損・欠落やDB・構成一覧の不整合は復元失敗として扱う。不足のある正常なバックアップと、破損したバックアップを区別する。
+                  </div>
+                </li>
+                <li>
+                  <strong>派生</strong>
+                  <div class="process-detail">
+                    永続ID、理由の訂正履歴、派生・振り返り等の参照を保持し、Windows／WSLの新しいルートを対応付ける。過去の実行記録として保持する。未完了依頼は照合・手動再開の対象とする。
+                  </div>
+                </li>
+                <li>
+                  <strong>復元</strong>
+                  <div class="process-detail">
+                    検証後に復元した保存先を利用可能にする。途中失敗・中断時は未完成領域と元バックアップを保つ。
+                  </div>
+                </li>
+                <li>
+                  <strong>Git参照</strong>
+                  <div class="process-detail">
+                    GitHubから必要な保持用タグを明示取得し、コミット・内容を照合する。オフライン・未push・取得失敗はGit未復旧とし、欠けた定義・作風が必要な実行だけを止める。
+                  </div>
+                </li>
+                <li>
+                  <strong>認証</strong>
+                  <div class="process-detail">
+                    移行先のCodex専用領域で別途認証し、新しいCodex会話へ必要な制作記録を渡す。文脈の構築は<a
+                      href="https://github.com/Kurarowa305/scene-craft/issues/10"
+                      rel="noopener noreferrer"
+                      target="_blank"
+                      >会話・作風の設計</a
+                    >で具体化する。
+                  </div>
+                </li>
+              </ol>
+              <figcaption>
+                矢印は手順の順序を表す。各段階の条件に従って処理を進める。
+              </figcaption>
+            </figure>
+            <p>
+              作品の制作実体が不足する場合は、その実体が必要な復元・派生・実行を止め、残存データの閲覧・記録は利用できる。
+            </p>
+          </section>
         </section>
         <section aria-labelledby="ローカル保存形式の移行" class="spec-section">
-          <h2 id="ローカル保存形式の移行">ローカル保存形式の移行</h2>
+          <h2 id="ローカル保存形式の移行">6. ローカル保存形式の移行</h2>
           <div
             aria-label="ローカル保存形式の移行"
             class="table-scroll"
@@ -845,7 +843,7 @@
           </div>
         </section>
         <section class="sources">
-          <h2>詳細資料</h2>
+          <h2 id="sources">7. 詳細資料</h2>
           <p>
             <a
               href="https://github.com/Kurarowa305/scene-craft/issues/6"

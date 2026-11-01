@@ -45,35 +45,42 @@
       <main id="main" tabindex="-1">
         <p class="eyebrow">DESIGN / 12</p>
         <h1>Gitの版固定と更新</h1>
-        <nav aria-label="このページの目次" class="page-toc">
-          <h2>このページの内容</h2>
+        <nav aria-label="目次" class="page-toc">
+          <h2>目次</h2>
           <ol>
-            <li><a href="#責務と前提">責務</a></li>
+            <li><a href="#責務と前提">1. 責務</a></li>
             <li>
-              <a href="#ローカル記録の参照契約">ローカル記録の参照契約</a>
+              <a href="#ローカル記録の参照契約">2. ローカル記録の参照契約</a>
             </li>
-            <li><a href="#依頼受付開始切替">依頼受付・開始・切替</a></li>
-            <li><a href="#保持用タグとgithubへの保存">Git参照の保持</a></li>
+            <li><a href="#依頼受付開始切替">3. 依頼受付・開始・切替</a></li>
             <li>
-              <a href="#コミット内容の取り出しと実行">固定コミットの利用</a>
+              <a href="#保持用タグとgithubへの保存">4. Git参照の保持</a>
+              <ol>
+                <li>
+                  <a href="#コミット内容の取り出しと実行"
+                    >4-1. 固定コミットの利用</a
+                  >
+                </li>
+              </ol>
             </li>
             <li>
               <a href="#定義作風現在環境の互換性"
-                >定義・作風・現在環境の互換性</a
+                >5. 定義・作風・現在環境の互換性</a
               >
             </li>
             <li>
-              <a href="#ローカル保存形式の変更">ローカル保存形式の変更</a>
+              <a href="#ローカル保存形式の変更">6. ローカル保存形式の変更</a>
             </li>
             <li>
               <a href="#制作データのバックアップとgitの復元"
-                >制作データのバックアップとGitの復元</a
+                >7. 制作データのバックアップとGitの復元</a
               >
             </li>
+            <li><a href="#sources">8. 詳細資料</a></li>
           </ol>
         </nav>
         <section aria-labelledby="責務と前提" class="spec-section">
-          <h2 id="責務と前提">責務</h2>
+          <h2 id="責務と前提">1. 責務</h2>
           <div
             aria-label="責務と前提"
             class="table-scroll"
@@ -108,6 +115,16 @@
                       <li>定義・作風の版の正はGitフルコミットハッシュ。</li>
                       <li>作品・実行・保存状態のIDとは区別する。</li>
                     </ul>
+                    <div class="contract-detail">
+                      <ul class="cell-list">
+                        <li>
+                          版管理はコミットの解決・保持・内容の取り出し・互換性確認を担当する。
+                        </li>
+                        <li>
+                          実行管理は受付・停止・順序・再実行予算、保存はDB・制作ファイルとの整合性とバックアップ全体、エージェント契約は定義の具体的な構造を担当する。
+                        </li>
+                      </ul>
+                    </div>
                   </td>
                 </tr>
                 <tr>
@@ -123,19 +140,7 @@
                     </ul>
                   </td>
                 </tr>
-                <tr>
-                  <th scope="row">処理内容</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        版管理はコミットの解決・保持・内容の取り出し・互換性確認を担当する。
-                      </li>
-                      <li>
-                        実行管理は受付・停止・順序・再実行予算、保存はDB・制作ファイルとの整合性とバックアップ全体、エージェント契約は定義の具体的な構造を担当する。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
+
                 <tr>
                   <th scope="row">復元</th>
                   <td>
@@ -147,7 +152,7 @@
           </div>
         </section>
         <section aria-labelledby="ローカル記録の参照契約" class="spec-section">
-          <h2 id="ローカル記録の参照契約">ローカル記録の参照契約</h2>
+          <h2 id="ローカル記録の参照契約">2. ローカル記録の参照契約</h2>
           <div
             aria-label="ローカル記録の参照契約"
             class="table-scroll"
@@ -273,7 +278,7 @@
           </div>
         </section>
         <section aria-labelledby="依頼受付開始切替" class="spec-section">
-          <h2 id="依頼受付開始切替">依頼受付・開始・切替</h2>
+          <h2 id="依頼受付開始切替">3. 依頼受付・開始・切替</h2>
           <div
             aria-label="依頼受付・開始・切替"
             class="table-scroll"
@@ -374,7 +379,7 @@
           aria-labelledby="保持用タグとgithubへの保存"
           class="spec-section"
         >
-          <h2 id="保持用タグとgithubへの保存">Git参照の保持</h2>
+          <h2 id="保持用タグとgithubへの保存">4. Git参照の保持</h2>
           <p>
             既存の定義・作風リポジトリに保持用タグを作る。通常のローカルリポジトリとGitHubのremoteを使う。
           </p>
@@ -407,6 +412,34 @@
                         タグ名は保持のための参照であり、ローカル記録の版は引き続きフルコミットハッシュとする。
                       </li>
                     </ul>
+                    <div class="contract-detail">
+                      <ul class="cell-list">
+                        <li>
+                          <code>git update-ref</code>
+                          の未作成確認付き操作等で作成する。
+                        </li>
+                        <li>
+                          既存の同名タグが同じコミットを直接指せば再利用できる。
+                        </li>
+                        <li>保持用タグとその参照先を維持する。</li>
+                      </ul>
+                    </div>
+                    <div class="contract-detail">
+                      <ul class="cell-list">
+                        <li>
+                          試行ブランチを削除する前に保持用タグを確認する。
+                        </li>
+                        <li>元コミットを保つマージを使う。</li>
+                      </ul>
+                    </div>
+                    <div class="contract-detail">
+                      <ul class="cell-list">
+                        <li>タグ作成をDB確定より先に行う。</li>
+                        <li>
+                          起動・保存状態の確認時にはDB参照とローカルのタグ・オブジェクトを照合する。
+                        </li>
+                      </ul>
+                    </div>
                   </td>
                 </tr>
                 <tr>
@@ -420,41 +453,7 @@
                     </ul>
                   </td>
                 </tr>
-                <tr>
-                  <th scope="row">処理内容</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        <code>git update-ref</code>
-                        の未作成確認付き操作等で作成する。
-                      </li>
-                      <li>
-                        既存の同名タグが同じコミットを直接指せば再利用できる。
-                      </li>
-                      <li>保持用タグとその参照先を維持する。</li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">処理内容</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>試行ブランチを削除する前に保持用タグを確認する。</li>
-                      <li>元コミットを保つマージを使う。</li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">処理内容</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>タグ作成をDB確定より先に行う。</li>
-                      <li>
-                        起動・保存状態の確認時にはDB参照とローカルのタグ・オブジェクトを照合する。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
+
                 <tr>
                   <th scope="row">Git参照</th>
                   <td>
@@ -558,99 +557,95 @@
               </tbody>
             </table>
           </div>
-        </section>
-        <section
-          aria-labelledby="コミット内容の取り出しと実行"
-          class="spec-section"
-        >
-          <h2 id="コミット内容の取り出しと実行">固定コミットの利用</h2>
-          <div
-            aria-label="コミット内容の取り出しと実行"
-            class="table-scroll"
-            role="region"
-            tabindex="0"
+
+          <section
+            aria-labelledby="コミット内容の取り出しと実行"
+            class="spec-subsection"
           >
-            <table class="spec-table">
-              <thead>
-                <tr>
-                  <th scope="col">項目</th>
-                  <th scope="col">仕様</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row">処理内容</th>
-                  <td>
-                    使用対象のパス一覧を確定し、コミットのtree／blobから取り出す。
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">処理内容</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>定義と作風は別領域へ取り出す。</li>
-                      <li>
-                        定義が読み込む指示・手順・同梱ツール等も固定対象に含める。
-                      </li>
-                      <li>
-                        外部パスへのリンク、欠けたsubmodule・LFS実体等は未解決依存として扱う。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">出力</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        生成スクリプト・ログ・制作出力は別の実行領域へ保存する。
-                      </li>
-                      <li>
-                        取り出し時に使用パスとblobを照合し、キャッシュを再利用するときも内容の一致を確認する。
-                      </li>
-                      <li>保持用タグが指すオブジェクトから再構築する。</li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">処理内容</th>
-                  <td>
-                    固定した領域の指示・ツールを読み込み、使用内容を照合する。
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">処理内容</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>定義内に同梱するツールはそのblobまで固定する。</li>
-                      <li>
-                        Node、Codex、Blender、ライブラリ等の外部runtimeは実際の版・設定を記録して互換性を確認する。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">整合性</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        その場で生成した操作スクリプトは実体またはハッシュと保持先を記録し、恒久的な定義の改訂とは分ける。
-                      </li>
-                      <li>
-                        Git管理の定義そのものを直す場合は人間の採用・コミットを経る。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+            <h3 id="コミット内容の取り出しと実行">4-1. 固定コミットの利用</h3>
+            <div
+              aria-label="コミット内容の取り出しと実行"
+              class="table-scroll"
+              role="region"
+              tabindex="0"
+            >
+              <table class="spec-table">
+                <thead>
+                  <tr>
+                    <th scope="col">項目</th>
+                    <th scope="col">仕様</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row">処理内容</th>
+                    <td>
+                      使用対象のパス一覧を確定し、コミットのtree／blobから取り出す。
+                      <div class="contract-detail">
+                        <ul class="cell-list">
+                          <li>定義と作風は別領域へ取り出す。</li>
+                          <li>
+                            定義が読み込む指示・手順・同梱ツール等も固定対象に含める。
+                          </li>
+                          <li>
+                            外部パスへのリンク、欠けたsubmodule・LFS実体等は未解決依存として扱う。
+                          </li>
+                        </ul>
+                      </div>
+                      <div class="contract-detail">
+                        固定した領域の指示・ツールを読み込み、使用内容を照合する。
+                      </div>
+                      <div class="contract-detail">
+                        <ul class="cell-list">
+                          <li>
+                            定義内に同梱するツールはそのblobまで固定する。
+                          </li>
+                          <li>
+                            Node、Codex、Blender、ライブラリ等の外部runtimeは実際の版・設定を記録して互換性を確認する。
+                          </li>
+                        </ul>
+                      </div>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <th scope="row">出力</th>
+                    <td>
+                      <ul class="cell-list">
+                        <li>
+                          生成スクリプト・ログ・制作出力は別の実行領域へ保存する。
+                        </li>
+                        <li>
+                          取り出し時に使用パスとblobを照合し、キャッシュを再利用するときも内容の一致を確認する。
+                        </li>
+                        <li>保持用タグが指すオブジェクトから再構築する。</li>
+                      </ul>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <th scope="row">整合性</th>
+                    <td>
+                      <ul class="cell-list">
+                        <li>
+                          その場で生成した操作スクリプトは実体またはハッシュと保持先を記録し、恒久的な定義の改訂とは分ける。
+                        </li>
+                        <li>
+                          Git管理の定義そのものを直す場合は人間の採用・コミットを経る。
+                        </li>
+                      </ul>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
         </section>
         <section
           aria-labelledby="定義作風現在環境の互換性"
           class="spec-section"
         >
-          <h2 id="定義作風現在環境の互換性">定義・作風・現在環境の互換性</h2>
+          <h2 id="定義作風現在環境の互換性">5. 定義・作風・現在環境の互換性</h2>
           <p>
             定義側の要求、作風側の提供形式、実行基盤側が扱える契約を検査する。契約の識別子は形式・必須項目を判別するためのもので、作風内容の版は引き続きGitコミットで識別する。
           </p>
@@ -700,7 +695,7 @@
           </p>
         </section>
         <section aria-labelledby="ローカル保存形式の変更" class="spec-section">
-          <h2 id="ローカル保存形式の変更">ローカル保存形式の変更</h2>
+          <h2 id="ローカル保存形式の変更">6. ローカル保存形式の変更</h2>
           <p>
             DB・ローカル記録・バックアップ形式のスキーマ識別と、定義・作風のGit版を分ける。
           </p>
@@ -750,7 +745,7 @@
           class="spec-section"
         >
           <h2 id="制作データのバックアップとgitの復元">
-            制作データのバックアップとGitの復元
+            7. 制作データのバックアップとGitの復元
           </h2>
           <p>
             制作ファイル・依存素材・会話・制作履歴DBの一括書き出しと復元は引き続き必要とし、通常プログラムで実装する。Gitデータの実体はGitHubへ保存する。保存設計へは次の情報を渡す。
@@ -861,7 +856,7 @@
           </div>
         </section>
         <section class="sources">
-          <h2>詳細資料</h2>
+          <h2 id="sources">8. 詳細資料</h2>
           <p>
             <a
               href="https://github.com/Kurarowa305/scene-craft/issues/11"

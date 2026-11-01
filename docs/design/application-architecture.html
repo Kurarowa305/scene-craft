@@ -44,27 +44,29 @@
       <main id="main" tabindex="-1">
         <p class="eyebrow">DESIGN / 01</p>
         <h1>全体構成とOSの責務</h1>
-        <nav aria-label="このページの目次" class="page-toc">
-          <h2>このページの内容</h2>
+        <nav aria-label="目次" class="page-toc">
+          <h2>目次</h2>
           <ol>
-            <li><a href="#配置と利用方法">実行環境</a></li>
-            <li><a href="#構成">構成</a></li>
-            <li><a href="#技術とプロセス">採用技術</a></li>
-            <li><a href="#プロセス">プロセス</a></li>
+            <li><a href="#配置と利用方法">1. 実行環境</a></li>
+            <li><a href="#構成">2. 構成</a></li>
+            <li><a href="#技術とプロセス">3. 採用技術</a></li>
+            <li><a href="#プロセス">4. プロセス</a></li>
             <li>
-              <a href="#通信とモジュールの責務">通信とモジュールの責務</a>
+              <a href="#通信とモジュールの責務">5. 通信とモジュールの責務</a>
             </li>
-            <li><a href="#保存領域とパス">保存領域とパス</a></li>
-            <li><a href="#起動終了再接続">起動・終了・再接続</a></li>
-            <li><a href="#生存管理">生存管理</a></li>
+            <li><a href="#保存領域とパス">6. 保存領域とパス</a></li>
+            <li>
+              <a href="#起動終了再接続">7. 起動・終了・再接続</a>
+              <ol>
+                <li><a href="#生存管理">7-1. 生存管理</a></li>
+              </ol>
+            </li>
+            <li><a href="#sources">8. 詳細資料</a></li>
           </ol>
         </nav>
         <section aria-labelledby="配置と利用方法" class="spec-section">
-          <h2 id="配置と利用方法">実行環境</h2>
-          <p>
-            scene-craft専用stdio
-            MCPを採用する。制作操作のbackground方式と、制作管理・実行管理による検査は維持する。
-          </p>
+          <h2 id="配置と利用方法">1. 実行環境</h2>
+
           <div
             aria-label="配置と利用方法"
             class="table-scroll"
@@ -110,71 +112,19 @@
               </tbody>
             </table>
           </div>
-          <div
-            aria-label="配置と利用方法"
-            class="table-scroll"
-            role="region"
-            tabindex="0"
-          >
-            <table class="spec-table">
-              <thead>
-                <tr>
-                  <th scope="col">項目</th>
-                  <th scope="col">仕様</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row">起動</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>Windows のショートカットから使うときに起動する。</li>
-                      <li>
-                        ブラウザを閉じてもローカルの処理を継続し、明示的な「アプリ終了」で停止する。
-                      </li>
-                      <li>
-                        PC 再起動後はアプリを開き、人間が制作の再開を指示する。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">処理内容</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        WSL 上で成立した app-server の接続を活かし、Windows
-                        の制作アプリから扱うファイルを Windows 側に置く。
-                      </li>
-                      <li>
-                        OS
-                        をまたぐファイルアクセス・プロセス管理が必要になる負担を引き受ける。
-                      </li>
-                      <li>
-                        具体的なドライブと保存ルートは利用開始時に設定し、接続経路は以下の契約に従う。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">記録</th>
-                  <td>
-                    OS と保存領域を分ける判断の理由・負担は
-                    <a
-                      href="https://github.com/Kurarowa305/scene-craft/blob/main/docs/adr/0005-wsl-runtime-and-windows-production-files.md"
-                      rel="noopener noreferrer"
-                      target="_blank"
-                      >ADR 0005</a
-                    >
-                    に記録する。
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+          <p>
+            OS と保存領域を分ける判断の理由・負担は
+            <a
+              href="https://github.com/Kurarowa305/scene-craft/blob/main/docs/adr/0005-wsl-runtime-and-windows-production-files.md"
+              rel="noopener noreferrer"
+              target="_blank"
+              >ADR 0005</a
+            >
+            に記録する。
+          </p>
         </section>
         <section aria-labelledby="構成" class="spec-section">
-          <h2 id="構成">構成</h2>
+          <h2 id="構成">2. 構成</h2>
           <figure class="architecture">
             <div
               aria-label="WindowsとWSLの全体構成図"
@@ -260,7 +210,10 @@
                 </g>
                 <path class="edge" d="M816 253V317"></path>
                 <text class="edge-label" x="843" y="289">stdio</text>
-                <path class="edge" d="M727 350H695V140"></path>
+                <path
+                  class="edge"
+                  d="M727 350L705 350Q695 350 695 340L695 140"
+                ></path>
                 <text class="edge-label" x="595" y="340">認可付き</text>
                 <text class="edge-label" x="595" y="362">Unix socket RPC</text>
                 <g class="node">
@@ -270,7 +223,10 @@
                     実行ごとの記録・プロセス所有権
                   </text>
                 </g>
-                <path class="edge" d="M490 126H465V222H390"></path>
+                <path
+                  class="edge"
+                  d="M490 126L475 126Q465 126 465 136L465 212Q465 222 455 222L390 222"
+                ></path>
                 <text class="edge-label" x="430" y="277">開始・照合・停止</text>
                 <g class="node">
                   <rect height="60" rx="9" width="350" x="40" y="310"></rect>
@@ -308,7 +264,7 @@
           </figure>
         </section>
         <section aria-labelledby="技術とプロセス" class="spec-section">
-          <h2 id="技術とプロセス">採用技術</h2>
+          <h2 id="技術とプロセス">3. 採用技術</h2>
           <div
             aria-label="採用技術"
             class="table-scroll"
@@ -427,7 +383,7 @@
           </div>
         </section>
         <section aria-labelledby="プロセス" class="spec-section">
-          <h2 id="プロセス">プロセス</h2>
+          <h2 id="プロセス">4. プロセス</h2>
           <figure class="process-diagram">
             <ol aria-label="プロセスの起動関係" class="process-flow">
               <li><strong>Windowsの起動管理</strong></li>
@@ -446,24 +402,83 @@
             role="region"
             tabindex="0"
           >
-            <table class="spec-table">
+            <table class="spec-table process-table">
               <thead>
                 <tr>
-                  <th scope="col">項目</th>
-                  <th scope="col">仕様</th>
+                  <th scope="col">プロセス</th>
+                  <th scope="col">起動・担当・障害時の扱い</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
-                  <th scope="row">バックエンド</th>
+                  <th scope="row">Windowsの起動管理</th>
+                  <td>
+                    <ul class="cell-list">
+                      <li>
+                        Windowsのショートカットから起動する。ブラウザから独立し、準備完了後に画面を開く。
+                      </li>
+                      <li>
+                        既存インスタンスの確認・終了監視・起動失敗の通知を担い、<code>wsl.exe</code>を終了まで保持する。
+                      </li>
+                    </ul>
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">wsl.exe</th>
+                  <td>
+                    <ul class="cell-list">
+                      <li>
+                        Windowsの起動管理が指定のWSLディストリビューションを起動する。
+                      </li>
+                      <li>WSL内のバックエンドをforegroundで動かす。</li>
+                    </ul>
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">WSLバックエンド</th>
                   <td>
                     一つの常駐プロセスに画面配信・制作管理・実行管理を置き
                     、app-server、専用ローカルMCP、Blender
                     は別プロセスとして扱う。
+
+                    <ul class="cell-list">
+                      <li>
+                        <strong>依頼管理：</strong
+                        >バックエンドが依頼を永続管理する。
+                      </li>
+                      <li>
+                        バックエンドが依頼を記録して受け付け、進捗と終端を保存する。
+                      </li>
+                      <li>長時間のCPU処理はHTTP受付と独立して実行する。</li>
+                    </ul>
+                    <ul class="cell-list">
+                      <li>
+                        <strong>障害時の利用：</strong
+                        >一つのバックエンドが終了すると画面配信も使えなくなる。
+                      </li>
+                      <li>
+                        一方、Codex の認証切れ・利用上限・app-server
+                        の障害だけなら、履歴閲覧・手作業の記録・バックアップは継続できるよう責務を分ける。
+                      </li>
+                    </ul>
                   </td>
                 </tr>
                 <tr>
-                  <th scope="row">専用MCP</th>
+                  <th scope="row">Codex app-server</th>
+                  <td>
+                    <ul class="cell-list">
+                      <li>
+                        WSLバックエンドからstdioで接続し、会話・モデルの実行とCodex管理の認証を担う。
+                      </li>
+                      <li>
+                        Codexが専用stdio
+                        MCPを起動する。認証切れ・利用上限・app-server障害時も、バックエンドの履歴閲覧・手作業の記録・バックアップは継続できる。
+                      </li>
+                    </ul>
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">専用stdio MCP</th>
                   <td>
                     <ul class="cell-list">
                       <li>
@@ -480,32 +495,6 @@
                     </ul>
                   </td>
                 </tr>
-                <tr>
-                  <th scope="row">依頼管理</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>バックエンドが依頼を永続管理する。</li>
-                      <li>
-                        バックエンドが依頼を記録して受け付け、進捗と終端を保存する。
-                      </li>
-                      <li>長時間のCPU処理はHTTP受付と独立して実行する。</li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">障害時の利用</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        一つのバックエンドが終了すると画面配信も使えなくなる。
-                      </li>
-                      <li>
-                        一方、Codex の認証切れ・利用上限・app-server
-                        の障害だけなら、履歴閲覧・手作業の記録・バックアップは継続できるよう責務を分ける。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
               </tbody>
             </table>
           </div>
@@ -514,11 +503,10 @@
             class="anchor-alias"
             id="実行基盤の境界"
           ></span>
-
           <p>起動時は実行ファイルの絶対パス等を明示する。</p>
         </section>
         <section aria-labelledby="通信とモジュールの責務" class="spec-section">
-          <h2 id="通信とモジュールの責務">通信とモジュールの責務</h2>
+          <h2 id="通信とモジュールの責務">5. 通信とモジュールの責務</h2>
           <div
             aria-label="通信とモジュールの責務"
             class="table-scroll"
@@ -632,81 +620,77 @@
           </p>
         </section>
         <section aria-labelledby="保存領域とパス" class="spec-section">
-          <h2 id="保存領域とパス">保存領域とパス</h2>
-          <div
-            aria-label="保存領域とパス"
-            class="table-scroll"
-            role="region"
-            tabindex="0"
-          >
-            <table class="spec-table">
-              <thead>
-                <tr>
-                  <th scope="col">項目</th>
-                  <th scope="col">仕様</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row">処理内容</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>Windows の制作ルートと WSL の管理データを分ける。</li>
-                      <li>
-                        制作ファイルは保存ルート ID と相対パスで参照し、実際の
-                        Windows パスと WSL
-                        パスへの変換を保存モジュールに集める。
-                      </li>
-                      <li>
-                        ブラウザには作品・生成物の ID
-                        を渡し、ローカルファイルの表示・取得はバックエンドを通す。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">復元</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        整合性・復元・バックアップの契約は保存設計へ引き継ぐ。
-                      </li>
-                      <li>ルートからの逸脱やリンク先も確認する。</li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">認証</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        Codex 用には WSL に scene-craft
-                        専用の保存領域を用意し、普段の開発用 Codex
-                        の設定・会話・認証ファイルと分ける。
-                      </li>
-                      <li>
-                        初回はその領域で同じ ChatGPT アカウントへログインする。
-                      </li>
-                      <li>
-                        Codex
-                        標準のファイル保管を採用し、所有ユーザーにアクセスを限定する。
-                      </li>
-                      <li>
-                        Codex
-                        の会話継続用データをどこまで移行対象にするかは、制作記録との区別を保って保存設計で決める。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">設定</th>
-                  <td>
-                    Codex
-                    のプロジェクト設定など別の設定層もあるため、許可するツールと実行設定を接続時に確認する。
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+          <h2 id="保存領域とパス">6. 保存領域とパス</h2>
+          <div class="contract-cards">
+            <article class="contract-card" aria-label="処理内容">
+              <p class="contract-card-title">処理内容</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>Windows の制作ルートと WSL の管理データを分ける。</li>
+                    <li>
+                      制作ファイルは保存ルート ID と相対パスで参照し、実際の
+                      Windows パスと WSL パスへの変換を保存モジュールに集める。
+                    </li>
+                    <li>
+                      ブラウザには作品・生成物の ID
+                      を渡し、ローカルファイルの表示・取得はバックエンドを通す。
+                    </li>
+                  </ul>
+                </dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="復元">
+              <p class="contract-card-title">復元</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>
+                      整合性・復元・バックアップの契約は保存設計へ引き継ぐ。
+                    </li>
+                    <li>ルートからの逸脱やリンク先も確認する。</li>
+                  </ul>
+                </dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="認証">
+              <p class="contract-card-title">認証</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>
+                      Codex 用には WSL に scene-craft
+                      専用の保存領域を用意し、普段の開発用 Codex
+                      の設定・会話・認証ファイルと分ける。
+                    </li>
+                    <li>
+                      初回はその領域で同じ ChatGPT アカウントへログインする。
+                    </li>
+                    <li>
+                      Codex
+                      標準のファイル保管を採用し、所有ユーザーにアクセスを限定する。
+                    </li>
+                    <li>
+                      Codex
+                      の会話継続用データをどこまで移行対象にするかは、制作記録との区別を保って保存設計で決める。
+                    </li>
+                  </ul>
+                </dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="設定">
+              <p class="contract-card-title">設定</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  Codex
+                  のプロジェクト設定など別の設定層もあるため、許可するツールと実行設定を接続時に確認する。
+                </dd>
+              </dl>
+            </article>
           </div>
           <span
             aria-hidden="true"
@@ -786,7 +770,59 @@
           </div>
         </section>
         <section aria-labelledby="起動終了再接続" class="spec-section">
-          <h2 id="起動終了再接続">起動・終了・再接続</h2>
+          <h2 id="起動終了再接続">7. 起動・終了・再接続</h2>
+          <p>
+            Windowsのショートカットから起動し、PC再起動後の制作は人間が再開を指示する。
+          </p>
+          <div
+            class="table-scroll"
+            role="region"
+            aria-label="起動とOS間の処理"
+            tabindex="0"
+          >
+            <table class="spec-table">
+              <thead>
+                <tr>
+                  <th scope="col">項目</th>
+                  <th scope="col">仕様</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">起動</th>
+                  <td>
+                    <ul class="cell-list">
+                      <li>Windows のショートカットから使うときに起動する。</li>
+                      <li>
+                        ブラウザを閉じてもローカルの処理を継続し、明示的な「アプリ終了」で停止する。
+                      </li>
+                      <li>
+                        PC 再起動後はアプリを開き、人間が制作の再開を指示する。
+                      </li>
+                    </ul>
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">OS間の処理</th>
+                  <td>
+                    <ul class="cell-list">
+                      <li>
+                        WSL 上で成立した app-server の接続を活かし、Windows
+                        の制作アプリから扱うファイルを Windows 側に置く。
+                      </li>
+                      <li>
+                        OS
+                        をまたぐファイルアクセス・プロセス管理が必要になる負担を引き受ける。
+                      </li>
+                      <li>
+                        具体的なドライブと保存ルートは利用開始時に設定し、接続経路は以下の契約に従う。
+                      </li>
+                    </ul>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
           <figure class="process-diagram">
             <ol aria-label="起動・終了・再接続" class="process-flow">
               <li>
@@ -840,164 +876,169 @@
           <p>
             バックエンドがWindows側の実行記録を照合する。アプリ終了時も制作操作の停止・記録を先に確認してから、Codexと専用MCPを含む所有プロセスを終了する。
           </p>
-        </section>
-        <section aria-labelledby="生存管理" class="spec-section">
-          <h2 id="生存管理">生存管理</h2>
-          <div
-            aria-label="生存管理"
-            class="table-scroll"
-            role="region"
-            tabindex="0"
-          >
-            <table class="spec-table">
-              <thead>
-                <tr>
-                  <th scope="col">項目</th>
-                  <th scope="col">仕様</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row">起動</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        Windowsのショートカットからバックグラウンドの起動管理プロセスを開始する。
-                      </li>
-                      <li>
-                        そのプロセスが
-                        <code>wsl.exe</code> を起動して終了まで保持し、WSL
-                        内ではバックエンドを foreground で動かす。
-                      </li>
-                      <li>
-                        管理プロセスはブラウザから独立し、準備完了後に画面を開く。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">起動</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        管理プロセスの責務は起動・既存インスタンスの確認・終了監視・起動失敗の通知に限定する。
-                      </li>
-                      <li>制作の順序や再実行は WSL 側が判断する。</li>
-                      <li>
-                        画面を開けない場合も、起動失敗とログの場所を確認できる入口を用意する。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">所有権</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        Windows 補助プロセスは実行ごとに所有権を持ち、Blender
-                        のプロセスハンドルと実行
-                        ID・PID・起動時刻・実行ファイル・実行用ディレクトリを対応付ける。
-                      </li>
-                      <li>実行開始の受付記録を先に残す。</li>
-                      <li>
-                        開始直後に落ちて所有権を確定できなかった実行は状態不明とする。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">起動</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        補助プロセスは Windows
-                        側で起動元のシェルから独立して実行し、ログ・要求・処理に必要な入力を
-                        Windows 側へ置く。
-                      </li>
-                      <li>
-                        WSL の標準入出力や WSL
-                        内のファイルがなくても、現在の操作を安全な境目まで進めて記録できる構成とする。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">処理内容</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        WSL と補助プロセスの交換には実行ごとの Windows
-                        側ディレクトリを使う。
-                      </li>
-                      <li>
-                        開始・停止要求、進捗、チェックポイント、完成記録を分け、書き込み完了後の記録を読む。
-                      </li>
-                      <li>
-                        固定の補助プログラムと要求ファイルの参照を起動引数にする。
-                      </li>
-                      <li>通知がなくても永続記録を再読できるようにする。</li>
-                    </ul>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <div
-            aria-label="生存管理"
-            class="table-scroll"
-            role="region"
-            tabindex="0"
-          >
-            <table class="spec-table">
-              <thead>
-                <tr>
-                  <th scope="col">失われたもの</th>
-                  <th scope="col">合意した扱い</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row">ブラウザの接続</th>
-                  <td>実行を継続。再接続時に現在状態を取得する</td>
-                </tr>
-                <tr>
-                  <th scope="row">WSL／バックエンドとの連絡</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        Windows
-                        補助プロセスが連絡の期限切れを検出し、新しい操作・工程への進行を止める。
-                      </li>
-                      <li>
-                        編集中・保存中は安全な境目でチェックポイントを残して止める。
-                      </li>
-                      <li>
-                        レンダーは保存済み入力を持つ専用プロセスを終了する 。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">Windows 補助プロセス</th>
-                  <td>
-                    バックエンドが状態不明として記録。残った Blender
-                    の所有権と保存状態を照合し、競合する新しい操作を止める
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">PC・Windows セッション</th>
-                  <td>次回起動時に記録と実体を照合し、人間の再開指示を待つ</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <p>
-            停止状態と記録を照合する。期限、更新方法、停止要求との競合、二重起動の排他方式は実行状態設計で具体化する。保存処理は安全な停止を待ち、強制終了は人間の明示操作で行う。
-          </p>
+
+          <section aria-labelledby="生存管理" class="spec-subsection">
+            <h3 id="生存管理">7-1. 生存管理</h3>
+            <div
+              aria-label="生存管理"
+              class="table-scroll"
+              role="region"
+              tabindex="0"
+            >
+              <table class="spec-table grouped-table">
+                <thead>
+                  <tr>
+                    <th scope="col">大分類</th>
+                    <th scope="col">項目</th>
+                    <th scope="col">仕様</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row">Windowsの起動管理</th>
+                    <td>起動</td>
+                    <td>
+                      <ul class="cell-list">
+                        <li>
+                          Windowsのショートカットからバックグラウンドの起動管理プロセスを開始する。
+                        </li>
+                        <li>
+                          そのプロセスが
+                          <code>wsl.exe</code> を起動して終了まで保持し、WSL
+                          内ではバックエンドを foreground で動かす。
+                        </li>
+                        <li>
+                          管理プロセスはブラウザから独立し、準備完了後に画面を開く。
+                        </li>
+                      </ul>
+                      <div class="contract-detail">
+                        <ul class="cell-list">
+                          <li>
+                            管理プロセスの責務は起動・既存インスタンスの確認・終了監視・起動失敗の通知に限定する。
+                          </li>
+                          <li>制作の順序や再実行は WSL 側が判断する。</li>
+                          <li>
+                            画面を開けない場合も、起動失敗とログの場所を確認できる入口を用意する。
+                          </li>
+                        </ul>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Windows実行補助プロセス</th>
+                    <td>所有権</td>
+                    <td>
+                      <ul class="cell-list">
+                        <li>
+                          Windows 補助プロセスは実行ごとに所有権を持ち、Blender
+                          のプロセスハンドルと実行
+                          ID・PID・起動時刻・実行ファイル・実行用ディレクトリを対応付ける。
+                        </li>
+                        <li>実行開始の受付記録を先に残す。</li>
+                        <li>
+                          開始直後に落ちて所有権を確定できなかった実行は状態不明とする。
+                        </li>
+                      </ul>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Windows実行補助プロセス</th>
+                    <td>起動</td>
+                    <td>
+                      <ul class="cell-list">
+                        <li>
+                          補助プロセスは Windows
+                          側で起動元のシェルから独立して実行し、ログ・要求・処理に必要な入力を
+                          Windows 側へ置く。
+                        </li>
+                        <li>
+                          WSL の標準入出力や WSL
+                          内のファイルがなくても、現在の操作を安全な境目まで進めて記録できる構成とする。
+                        </li>
+                      </ul>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Windows実行補助プロセス</th>
+                    <td>処理内容</td>
+                    <td>
+                      <ul class="cell-list">
+                        <li>
+                          WSL と補助プロセスの交換には実行ごとの Windows
+                          側ディレクトリを使う。
+                        </li>
+                        <li>
+                          開始・停止要求、進捗、チェックポイント、完成記録を分け、書き込み完了後の記録を読む。
+                        </li>
+                        <li>
+                          固定の補助プログラムと要求ファイルの参照を起動引数にする。
+                        </li>
+                        <li>通知がなくても永続記録を再読できるようにする。</li>
+                      </ul>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div
+              aria-label="生存管理"
+              class="table-scroll"
+              role="region"
+              tabindex="0"
+            >
+              <table class="spec-table">
+                <thead>
+                  <tr>
+                    <th scope="col">失われたもの</th>
+                    <th scope="col">合意した扱い</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row">ブラウザの接続</th>
+                    <td>実行を継続。再接続時に現在状態を取得する</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">WSL／バックエンドとの連絡</th>
+                    <td>
+                      <ul class="cell-list">
+                        <li>
+                          Windows
+                          補助プロセスが連絡の期限切れを検出し、新しい操作・工程への進行を止める。
+                        </li>
+                        <li>
+                          編集中・保存中は安全な境目でチェックポイントを残して止める。
+                        </li>
+                        <li>
+                          レンダーは保存済み入力を持つ専用プロセスを終了する 。
+                        </li>
+                      </ul>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Windows 補助プロセス</th>
+                    <td>
+                      バックエンドが状態不明として記録。残った Blender
+                      の所有権と保存状態を照合し、競合する新しい操作を止める
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">PC・Windows セッション</th>
+                    <td>
+                      次回起動時に記録と実体を照合し、人間の再開指示を待つ
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p>
+              停止状態と記録を照合する。期限、更新方法、停止要求との競合、二重起動の排他方式は実行状態設計で具体化する。保存処理は安全な停止を待ち、強制終了は人間の明示操作で行う。
+            </p>
+          </section>
         </section>
 
         <section class="sources">
-          <h2>詳細資料</h2>
+          <h2 id="sources">8. 詳細資料</h2>
           <p>
             <a
               href="https://github.com/Kurarowa305/scene-craft/issues/3"

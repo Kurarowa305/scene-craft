@@ -43,33 +43,58 @@
       <main id="main" tabindex="-1">
         <p class="eyebrow">DESIGN / 04</p>
         <h1>LLM接続と費用</h1>
-        <nav aria-label="このページの目次" class="page-toc">
-          <h2>このページの内容</h2>
+        <nav aria-label="目次" class="page-toc">
+          <h2>目次</h2>
           <ol>
-            <li><a href="#構成と責務">担当範囲</a></li>
-            <li><a href="#保持するデータとその紐付け">データの対応</a></li>
-            <li><a href="#認証方式">認証方式</a></li>
             <li>
-              <a href="#codex-管理の認証で分かった費用上の条件">費用条件</a>
+              <a href="#構成と責務">1. 担当範囲</a>
+              <ol>
+                <li>
+                  <a href="#保持するデータとその紐付け">1-1. データの対応</a>
+                </li>
+              </ol>
             </li>
-            <li><a href="#接続と復旧の契約">接続契約</a></li>
-            <li><a href="#選択単位">選択単位</a></li>
-            <li><a href="#初期値と変更の適用">モデル設定</a></li>
             <li>
-              <a href="#命名保存用要約の補助モデル"
-                >命名・保存用要約の補助モデル</a
-              >
+              <a href="#認証方式">2. 認証方式</a>
+              <ol>
+                <li>
+                  <a href="#codex-管理の認証で分かった費用上の条件"
+                    >2-1. 費用条件</a
+                  >
+                </li>
+                <li>
+                  <a href="#費用条件の責務2026-10-12-合意"
+                    >2-2. 費用条件の確認</a
+                  >
+                </li>
+              </ol>
             </li>
-            <li><a href="#費用条件の責務2026-10-12-合意">費用条件の確認</a></li>
-            <li><a href="#送信と停止の境界">送信と停止の境界</a></li>
-            <li><a href="#停止復旧の判断">停止・復旧の判断</a></li>
-            <li><a href="#再実行回数と自作範囲">再実行</a></li>
-            <li><a href="#異常時の確認条件">異常時の確認条件</a></li>
-            <li><a href="#モデルと履歴の取得契約">取得APIの契約</a></li>
+            <li>
+              <a href="#接続と復旧の契約">3. 接続契約</a>
+              <ol>
+                <li><a href="#選択単位">3-1. 選択単位</a></li>
+                <li><a href="#初期値と変更の適用">3-2. モデル設定</a></li>
+                <li>
+                  <a href="#命名保存用要約の補助モデル"
+                    >3-3. 命名・保存用要約の補助モデル</a
+                  >
+                </li>
+              </ol>
+            </li>
+            <li>
+              <a href="#送信と停止の境界">4. 送信と停止の境界</a>
+              <ol>
+                <li><a href="#停止復旧の判断">4-1. 停止・復旧の判断</a></li>
+                <li><a href="#再実行回数と自作範囲">4-2. 再実行</a></li>
+                <li><a href="#異常時の確認条件">4-3. 異常時の確認条件</a></li>
+              </ol>
+            </li>
+            <li><a href="#モデルと履歴の取得契約">5. 取得APIの契約</a></li>
+            <li><a href="#sources">6. 詳細資料</a></li>
           </ol>
         </nav>
         <section aria-labelledby="構成と責務" class="spec-section">
-          <h2 id="構成と責務">担当範囲</h2>
+          <h2 id="構成と責務">1. 担当範囲</h2>
           <div
             aria-label="構成と責務"
             class="table-scroll"
@@ -176,215 +201,266 @@
               </tbody>
             </table>
           </div>
-        </section>
-        <section
-          aria-labelledby="保持するデータとその紐付け"
-          class="spec-section"
-        >
-          <h2 id="保持するデータとその紐付け">データの対応</h2>
-          <div>
-            <p>
-              Codexは会話の継続とモデル処理を管理し、scene-craftは独自IDで原文・依頼・制作記録を保持する。接続対応記録で両者のIDを結び、結果を照合する。
-            </p>
-            <figure>
-              <div
-                aria-label="保持するデータと接続対応"
-                class="diagram-scroll"
-                role="region"
-                tabindex="0"
-              >
-                <svg
-                  aria-labelledby="mapping-title mapping-desc"
-                  role="img"
-                  viewbox="0 0 860 685"
+
+          <section
+            aria-labelledby="保持するデータとその紐付け"
+            class="spec-subsection"
+          >
+            <h3 id="保持するデータとその紐付け">1-1. データの対応</h3>
+            <div>
+              <p>
+                Codexは会話の継続とモデル処理を管理し、scene-craftは独自IDで原文・依頼・制作記録を保持する。接続対応記録で両者のIDを結び、結果を照合する。
+              </p>
+              <figure>
+                <div
+                  aria-label="保持するデータと接続対応"
+                  class="diagram-scroll"
+                  role="region"
+                  tabindex="0"
                 >
-                  <title id="mapping-title">保持するデータと接続対応</title>
-                  <desc id="mapping-desc">
-                    実線は各システム内の履歴構造・所属、点線はIDによる照合を表す。会話とthread、AI実行とturn、原文と発言item、外部操作とツールitemを対応付ける。
-                  </desc>
-                  <defs>
-                    <marker
-                      id="mapping-arrow"
-                      markerheight="8"
-                      markerwidth="8"
-                      orient="auto"
-                      refx="7"
-                      refy="4"
-                    >
-                      <path d="M0 0L8 4L0 8Z" fill="#48716b"></path>
-                    </marker>
-                  </defs>
-                  <rect
-                    class="zone wsl"
-                    height="650"
-                    rx="10"
-                    width="335"
-                    x="15"
-                    y="15"
-                  ></rect>
-                  <rect
-                    class="zone"
-                    height="650"
-                    rx="10"
-                    width="335"
-                    x="510"
-                    y="15"
-                  ></rect>
-                  <text class="zone-title" x="35" y="48">
-                    scene-craft / SQLite
-                  </text>
-                  <text class="zone-title" x="530" y="48">
-                    Codex app-server
-                  </text>
-                  <path
-                    d="M85 180V148"
-                    fill="none"
-                    marker-end="url(#mapping-arrow)"
-                    stroke="#48716b"
-                    stroke-width="1.5"
-                  ></path>
-                  <path
-                    d="M175 289H330V160H185V148"
-                    fill="none"
-                    marker-end="url(#mapping-arrow)"
-                    stroke="#48716b"
-                    stroke-width="1.5"
-                  ></path>
-                  <path
-                    d="M35 409H25V209H35"
-                    fill="none"
-                    marker-end="url(#mapping-arrow)"
-                    stroke="#48716b"
-                    stroke-width="1.5"
-                  ></path>
-                  <path
-                    d="M315 509H340V209H175"
-                    fill="none"
-                    marker-end="url(#mapping-arrow)"
-                    stroke="#48716b"
-                    stroke-width="1.5"
-                  ></path>
-                  <path
-                    d="M805 119H825V409H805"
-                    fill="none"
-                    marker-end="url(#mapping-arrow)"
-                    stroke="#48716b"
-                    stroke-width="1.5"
-                  ></path>
-                  <path
-                    d="M760 380V318"
-                    fill="none"
-                    marker-end="url(#mapping-arrow)"
-                    stroke="#48716b"
-                    stroke-width="1.5"
-                  ></path>
-                  <path
-                    d="M805 129H835V594H805"
-                    fill="none"
-                    marker-end="url(#mapping-arrow)"
-                    stroke="#48716b"
-                    stroke-width="1.5"
-                  ></path>
-                  <path
-                    d="M315 119H545"
-                    fill="none"
-                    marker-end="url(#mapping-arrow)"
-                    stroke="#48716b"
-                    stroke-dasharray="5 5"
-                    stroke-width="1.5"
-                  ></path>
-                  <path
-                    d="M175 289H545"
-                    fill="none"
-                    marker-end="url(#mapping-arrow)"
-                    stroke="#48716b"
-                    stroke-dasharray="5 5"
-                    stroke-width="1.5"
-                  ></path>
-                  <path
-                    d="M175 409H545"
-                    fill="none"
-                    marker-end="url(#mapping-arrow)"
-                    stroke="#48716b"
-                    stroke-dasharray="5 5"
-                    stroke-width="1.5"
-                  ></path>
-                  <path
-                    d="M175 419H470V318H545"
-                    fill="none"
-                    marker-end="url(#mapping-arrow)"
-                    stroke="#48716b"
-                    stroke-dasharray="5 5"
-                    stroke-width="1.5"
-                  ></path>
-                  <g class="node">
-                    <rect height="58" rx="8" width="280" x="35" y="90"></rect>
-                    <text x="175.0" y="115">会話</text>
-                    <text class="sub" x="175.0" y="136">
-                      作品・対象集合・モデル選択
+                  <svg
+                    aria-labelledby="mapping-title mapping-desc"
+                    role="img"
+                    viewbox="0 0 860 685"
+                  >
+                    <title id="mapping-title">保持するデータと接続対応</title>
+                    <desc id="mapping-desc">
+                      実線は各システム内の履歴構造・所属、点線はIDによる照合を表す。会話とthread、AI実行とturn、原文と発言item、外部操作とツールitemを対応付ける。
+                    </desc>
+                    <defs>
+                      <marker
+                        id="mapping-arrow"
+                        markerheight="8"
+                        markerwidth="8"
+                        orient="auto"
+                        refx="7"
+                        refy="4"
+                      >
+                        <path d="M0 0L8 4L0 8Z" fill="#48716b"></path>
+                      </marker>
+                    </defs>
+                    <rect
+                      class="zone wsl"
+                      height="650"
+                      rx="10"
+                      width="335"
+                      x="15"
+                      y="15"
+                    ></rect>
+                    <rect
+                      class="zone"
+                      height="650"
+                      rx="10"
+                      width="335"
+                      x="510"
+                      y="15"
+                    ></rect>
+                    <text class="zone-title" x="35" y="48">
+                      scene-craft / SQLite
                     </text>
-                  </g>
-                  <g class="node">
-                    <rect height="58" rx="8" width="140" x="35" y="180"></rect>
-                    <text x="105.0" y="215">依頼</text>
-                  </g>
-                  <g class="node">
-                    <rect height="58" rx="8" width="140" x="35" y="260"></rect>
-                    <text x="105.0" y="295">原文メッセージ</text>
-                  </g>
-                  <g class="node">
-                    <rect height="58" rx="8" width="140" x="35" y="380"></rect>
-                    <text x="105.0" y="415">実行</text>
-                  </g>
-                  <g class="node">
-                    <rect height="58" rx="8" width="280" x="35" y="480"></rect>
-                    <text x="175.0" y="515">再実行の記録</text>
-                  </g>
-                  <g class="node">
-                    <rect height="58" rx="8" width="260" x="545" y="90"></rect>
-                    <text x="675.0" y="115">thread</text>
-                    <text class="sub" x="675.0" y="136">
-                      会話履歴・継続設定
+                    <text class="zone-title" x="530" y="48">
+                      Codex app-server
                     </text>
-                  </g>
-                  <g class="node">
-                    <rect height="58" rx="8" width="260" x="545" y="260"></rect>
-                    <text x="675.0" y="285">item</text>
-                    <text class="sub" x="675.0" y="306">
-                      発言・ツール要求／結果・圧縮項目
-                    </text>
-                  </g>
-                  <g class="node">
-                    <rect height="58" rx="8" width="260" x="545" y="380"></rect>
-                    <text x="675.0" y="405">turn</text>
-                    <text class="sub" x="675.0" y="426">
-                      モデル処理とその状態
-                    </text>
-                  </g>
-                  <g class="node">
-                    <rect height="58" rx="8" width="260" x="545" y="565"></rect>
-                    <text x="675.0" y="590">モデル用の文脈</text>
-                    <text class="sub" x="675.0" y="611">圧縮後の継続情報</text>
-                  </g>
-                </svg>
-              </div>
-              <figcaption>
-                実線は各システム内の履歴構造・所属、点線はIDによる照合を表す。会話↔thread、AI実行↔turn、原文↔発言item、外部操作の実行↔ツールitemを対応付ける。
-              </figcaption>
-            </figure>
-            <ul class="rules">
-              <li>
-                一つの依頼が複数turnにまたがる場合も、同じturnで複数の外部操作を行う場合も、実行と再実行を個別に記録する。
-              </li>
-              <li>発言itemを原文として保存する。</li>
-              <li>
-                LLMなしの記録送信や外部取り込みの原文、通常プログラムの実行は、対応するitemがなくても保持する。Codexの内部継続データを移行しなくても会話IDと保存済み原文は残す。
-              </li>
-            </ul>
-          </div>
+                    <path
+                      d="M85 180V148"
+                      fill="none"
+                      marker-end="url(#mapping-arrow)"
+                      stroke="#48716b"
+                      stroke-width="1.5"
+                    ></path>
+                    <path
+                      d="M175 289L320 289Q330 289 330 279L330 170Q330 160 320 160L191 160Q185 160 185 154L185 148"
+                      fill="none"
+                      marker-end="url(#mapping-arrow)"
+                      stroke="#48716b"
+                      stroke-width="1.5"
+                    ></path>
+                    <path
+                      d="M35 409L30 409Q25 409 25 404L25 214Q25 209 30 209L35 209"
+                      fill="none"
+                      marker-end="url(#mapping-arrow)"
+                      stroke="#48716b"
+                      stroke-width="1.5"
+                    ></path>
+                    <path
+                      d="M315 509L330 509Q340 509 340 499L340 219Q340 209 330 209L175 209"
+                      fill="none"
+                      marker-end="url(#mapping-arrow)"
+                      stroke="#48716b"
+                      stroke-width="1.5"
+                    ></path>
+                    <path
+                      d="M805 119L815 119Q825 119 825 129L825 399Q825 409 815 409L805 409"
+                      fill="none"
+                      marker-end="url(#mapping-arrow)"
+                      stroke="#48716b"
+                      stroke-width="1.5"
+                    ></path>
+                    <path
+                      d="M760 380V318"
+                      fill="none"
+                      marker-end="url(#mapping-arrow)"
+                      stroke="#48716b"
+                      stroke-width="1.5"
+                    ></path>
+                    <path
+                      d="M805 129L825 129Q835 129 835 139L835 584Q835 594 825 594L805 594"
+                      fill="none"
+                      marker-end="url(#mapping-arrow)"
+                      stroke="#48716b"
+                      stroke-width="1.5"
+                    ></path>
+                    <path
+                      d="M315 119H545"
+                      fill="none"
+                      marker-end="url(#mapping-arrow)"
+                      stroke="#48716b"
+                      stroke-dasharray="5 5"
+                      stroke-width="1.5"
+                    ></path>
+                    <path
+                      d="M175 289H545"
+                      fill="none"
+                      marker-end="url(#mapping-arrow)"
+                      stroke="#48716b"
+                      stroke-dasharray="5 5"
+                      stroke-width="1.5"
+                    ></path>
+                    <path
+                      d="M175 409H545"
+                      fill="none"
+                      marker-end="url(#mapping-arrow)"
+                      stroke="#48716b"
+                      stroke-dasharray="5 5"
+                      stroke-width="1.5"
+                    ></path>
+                    <path
+                      d="M175 419L460 419Q470 419 470 409L470 328Q470 318 480 318L545 318"
+                      fill="none"
+                      marker-end="url(#mapping-arrow)"
+                      stroke="#48716b"
+                      stroke-dasharray="5 5"
+                      stroke-width="1.5"
+                    ></path>
+                    <g class="node">
+                      <rect height="58" rx="8" width="280" x="35" y="90"></rect>
+                      <text x="175.0" y="115">会話</text>
+                      <text class="sub" x="175.0" y="136">
+                        作品・対象集合・モデル選択
+                      </text>
+                    </g>
+                    <g class="node">
+                      <rect
+                        height="58"
+                        rx="8"
+                        width="140"
+                        x="35"
+                        y="180"
+                      ></rect>
+                      <text x="105.0" y="215">依頼</text>
+                    </g>
+                    <g class="node">
+                      <rect
+                        height="58"
+                        rx="8"
+                        width="140"
+                        x="35"
+                        y="260"
+                      ></rect>
+                      <text x="105.0" y="295">原文メッセージ</text>
+                    </g>
+                    <g class="node">
+                      <rect
+                        height="58"
+                        rx="8"
+                        width="140"
+                        x="35"
+                        y="380"
+                      ></rect>
+                      <text x="105.0" y="415">実行</text>
+                    </g>
+                    <g class="node">
+                      <rect
+                        height="58"
+                        rx="8"
+                        width="280"
+                        x="35"
+                        y="480"
+                      ></rect>
+                      <text x="175.0" y="515">再実行の記録</text>
+                    </g>
+                    <g class="node">
+                      <rect
+                        height="58"
+                        rx="8"
+                        width="260"
+                        x="545"
+                        y="90"
+                      ></rect>
+                      <text x="675.0" y="115">thread</text>
+                      <text class="sub" x="675.0" y="136">
+                        会話履歴・継続設定
+                      </text>
+                    </g>
+                    <g class="node">
+                      <rect
+                        height="58"
+                        rx="8"
+                        width="260"
+                        x="545"
+                        y="260"
+                      ></rect>
+                      <text x="675.0" y="285">item</text>
+                      <text class="sub" x="675.0" y="306">
+                        発言・ツール要求／結果・圧縮項目
+                      </text>
+                    </g>
+                    <g class="node">
+                      <rect
+                        height="58"
+                        rx="8"
+                        width="260"
+                        x="545"
+                        y="380"
+                      ></rect>
+                      <text x="675.0" y="405">turn</text>
+                      <text class="sub" x="675.0" y="426">
+                        モデル処理とその状態
+                      </text>
+                    </g>
+                    <g class="node">
+                      <rect
+                        height="58"
+                        rx="8"
+                        width="260"
+                        x="545"
+                        y="565"
+                      ></rect>
+                      <text x="675.0" y="590">モデル用の文脈</text>
+                      <text class="sub" x="675.0" y="611">
+                        圧縮後の継続情報
+                      </text>
+                    </g>
+                  </svg>
+                </div>
+                <figcaption>
+                  実線は各システム内の履歴構造・所属、点線はIDによる照合を表す。会話↔thread、AI実行↔turn、原文↔発言item、外部操作の実行↔ツールitemを対応付ける。
+                </figcaption>
+              </figure>
+              <ul class="rules">
+                <li>
+                  一つの依頼が複数turnにまたがる場合も、同じturnで複数の外部操作を行う場合も、実行と再実行を個別に記録する。
+                </li>
+                <li>発言itemを原文として保存する。</li>
+                <li>
+                  LLMなしの記録送信や外部取り込みの原文、通常プログラムの実行は、対応するitemがなくても保持する。Codexの内部継続データを移行しなくても会話IDと保存済み原文は残す。
+                </li>
+              </ul>
+            </div>
+          </section>
         </section>
         <section aria-labelledby="認証方式" class="spec-section">
-          <h2 id="認証方式">認証方式</h2>
+          <h2 id="認証方式">2. 認証方式</h2>
           <div
             aria-label="認証方式"
             class="table-scroll"
@@ -459,59 +535,107 @@
               </tbody>
             </table>
           </div>
-        </section>
-        <section
-          aria-labelledby="codex-管理の認証で分かった費用上の条件"
-          class="spec-section"
-        >
-          <h2 id="codex-管理の認証で分かった費用上の条件">費用条件</h2>
-          <p>費用条件は利用者が確認する。</p>
-          <div
-            aria-label="Codex 管理の認証で分かった費用上の条件"
-            class="table-scroll"
-            role="region"
-            tabindex="0"
+
+          <section
+            aria-labelledby="codex-管理の認証で分かった費用上の条件"
+            class="spec-subsection"
           >
-            <table class="spec-table">
-              <thead>
-                <tr>
-                  <th scope="col">項目</th>
-                  <th scope="col">仕様</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row">認証</th>
-                  <td>
-                    API キーの課金経路は、ChatGPT 認証の強制、接続先の固定、API
-                    キーや別 provider 設定の混入防止で制限する。
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">認証</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        ChatGPT認証では契約枠を超えると既存クレジットを消費し得る。
-                      </li>
-                      <li>
-                        自動補充が有効なら、残高低下による追加購入が発生する。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">採用判断</th>
-                  <td>
-                    利用者による自動補充無効・既存クレジットなしの確認を採用判断の根拠とし、契約枠限定の条件は維持する。
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+            <h3 id="codex-管理の認証で分かった費用上の条件">2-1. 費用条件</h3>
+            <p>費用条件は利用者が確認する。</p>
+            <div
+              aria-label="Codex 管理の認証で分かった費用上の条件"
+              class="table-scroll"
+              role="region"
+              tabindex="0"
+            >
+              <table class="spec-table">
+                <thead>
+                  <tr>
+                    <th scope="col">項目</th>
+                    <th scope="col">仕様</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row">認証</th>
+                    <td>
+                      API キーの課金経路は、ChatGPT
+                      認証の強制、接続先の固定、API キーや別 provider
+                      設定の混入防止で制限する。
+                      <div class="contract-detail">
+                        <ul class="cell-list">
+                          <li>
+                            ChatGPT認証では契約枠を超えると既存クレジットを消費し得る。
+                          </li>
+                          <li>
+                            自動補充が有効なら、残高低下による追加購入が発生する。
+                          </li>
+                        </ul>
+                      </div>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <th scope="row">採用判断</th>
+                    <td>
+                      利用者による自動補充無効・既存クレジットなしの確認を採用判断の根拠とし、契約枠限定の条件は維持する。
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+          <section
+            aria-labelledby="費用条件の責務2026-10-12-合意"
+            class="spec-subsection"
+          >
+            <span
+              aria-hidden="true"
+              class="anchor-alias"
+              id="費用確認と接続復旧"
+            ></span>
+            <h3 id="費用条件の責務2026-10-12-合意">2-2. 費用条件の確認</h3>
+            <div
+              aria-label="費用条件の責務（2026-10-12 合意）"
+              class="table-scroll"
+              role="region"
+              tabindex="0"
+            >
+              <table class="spec-table">
+                <thead>
+                  <tr>
+                    <th scope="col">項目</th>
+                    <th scope="col">仕様</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row">処理内容</th>
+                    <td>
+                      自動補充が無効で既存クレジットがないことは、利用者が確認・管理する。
+                      <div class="contract-detail">
+                        <ul class="cell-list">
+                          <li>
+                            この判断は費用条件の確認を利用者へ委ね、基盤側の確認処理を不要にするためである。
+                          </li>
+                          <li>ChatGPT Pro の契約内で利用する。</li>
+                        </ul>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">適用条件</th>
+                    <td>
+                      利用情報の表示を設ける場合も、取得できなければ不明として表示し、送信可否の条件とは分ける。
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
         </section>
         <section aria-labelledby="接続と復旧の契約" class="spec-section">
-          <h2 id="接続と復旧の契約">接続契約</h2>
+          <h2 id="接続と復旧の契約">3. 接続契約</h2>
           <p>接続と復旧では、通信の回復と制作操作の再実行を分けて扱う。</p>
           <div
             aria-label="接続と復旧の契約"
@@ -624,182 +748,139 @@
             >
             を参照する。
           </p>
-        </section>
-        <section aria-labelledby="選択単位" class="spec-section">
-          <span aria-hidden="true" class="anchor-alias" id="モデル選択"></span>
-          <h2 id="選択単位">選択単位</h2>
-          <p>
-            会話ごとに利用者がモデルを変更できる。実行に使ったモデルを記録し、選んだモデルが使えない場合は利用者へ変更を求める。モデルの変更は利用者が選ぶ。
-          </p>
-        </section>
-        <section aria-labelledby="初期値と変更の適用" class="spec-section">
-          <h2 id="初期値と変更の適用">モデル設定</h2>
-          <div
-            aria-label="初期値と変更の適用"
-            class="table-scroll"
-            role="region"
-            tabindex="0"
+
+          <section aria-labelledby="選択単位" class="spec-subsection">
+            <span
+              aria-hidden="true"
+              class="anchor-alias"
+              id="モデル選択"
+            ></span>
+            <h3 id="選択単位">3-1. 選択単位</h3>
+            <p>
+              会話ごとに利用者がモデルを変更できる。実行に使ったモデルを記録し、選んだモデルが使えない場合は利用者へ変更を求める。モデルの変更は利用者が選ぶ。
+            </p>
+          </section>
+          <section aria-labelledby="初期値と変更の適用" class="spec-subsection">
+            <h3 id="初期値と変更の適用">3-2. モデル設定</h3>
+            <div
+              aria-label="初期値と変更の適用"
+              class="table-scroll"
+              role="region"
+              tabindex="0"
+            >
+              <table class="spec-table">
+                <thead>
+                  <tr>
+                    <th scope="col">項目</th>
+                    <th scope="col">仕様</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row">初回</th>
+                    <td>
+                      過去にモデルの選択がない初回のみ、app-server
+                      が示す利用可能な既定モデルを初期選択として使う。
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">新規会話</th>
+                    <td>
+                      <ul class="cell-list">
+                        <li>
+                          新しい会話は直前のチャットで選択していたモデルを引き継いで保存する。
+                        </li>
+                        <li>作品作成や振り返り専用会話でも同じ扱いとする。</li>
+                      </ul>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">適用時点</th>
+                    <td>
+                      <ul class="cell-list">
+                        <li>会話のモデル変更は次の依頼から適用する。</li>
+                        <li>
+                          停止した依頼を別モデルで再開する場合は利用者が明示して選び、同じ依頼の再実行回数は維持する。
+                        </li>
+                      </ul>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">推論設定</th>
+                    <td>
+                      <ul class="cell-list">
+                        <li>
+                          初期の推論強度は選択モデルの既定値、速度は標準とする。
+                        </li>
+                        <li>モデル・推論強度・速度の実行設定を記録する。</li>
+                        <li>設定画面の詳細は画面設計で扱う。</li>
+                      </ul>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+          <section
+            aria-labelledby="命名保存用要約の補助モデル"
+            class="spec-subsection"
           >
-            <table class="spec-table">
-              <thead>
-                <tr>
-                  <th scope="col">項目</th>
-                  <th scope="col">仕様</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row">初回</th>
-                  <td>
-                    過去にモデルの選択がない初回のみ、app-server
-                    が示す利用可能な既定モデルを初期選択として使う。
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">新規会話</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        新しい会話は直前のチャットで選択していたモデルを引き継いで保存する。
-                      </li>
-                      <li>作品作成や振り返り専用会話でも同じ扱いとする。</li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">適用時点</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>会話のモデル変更は次の依頼から適用する。</li>
-                      <li>
-                        停止した依頼を別モデルで再開する場合は利用者が明示して選び、同じ依頼の再実行回数は維持する。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">推論設定</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        初期の推論強度は選択モデルの既定値、速度は標準とする。
-                      </li>
-                      <li>モデル・推論強度・速度の実行設定を記録する。</li>
-                      <li>設定画面の詳細は画面設計で扱う。</li>
-                    </ul>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
-        <section
-          aria-labelledby="命名保存用要約の補助モデル"
-          class="spec-section"
-        >
-          <h2 id="命名保存用要約の補助モデル">命名・保存用要約の補助モデル</h2>
-          <div
-            aria-label="命名・保存用要約の補助モデル"
-            class="table-scroll"
-            role="region"
-            tabindex="0"
-          >
-            <table class="spec-table">
-              <thead>
-                <tr>
-                  <th scope="col">項目</th>
-                  <th scope="col">仕様</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row">モデル</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        <a
-                          href="https://github.com/Kurarowa305/scene-craft/blob/main/docs/design/agent-contracts.md#提案数と補助モデル合意済み"
-                          rel="noopener noreferrer"
-                          target="_blank"
-                          >エージェント契約の設計</a
-                        >で、利用量・コストを抑えるため、命名・保存用要約には制作会話と別のモデルを使うとする。
-                      </li>
-                      <li>
-                        設定に「命名・保存用要約モデル」を設け、初期値はGPT-6
-                        Luna（<code>gpt-6-luna</code>）、利用者が変更できるようにする。
-                      </li>
-                      <li>
-                        制作会話のモデル引き継ぎ・会話別選択は引き続き上記の契約に従う。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">モデル</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>補助処理ごとに選択モデルと対象を固定・記録する。</li>
-                      <li>未命名・未要約として原文と制作結果を保存する。</li>
-                    </ul>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
-        <section
-          aria-labelledby="費用条件の責務2026-10-12-合意"
-          class="spec-section"
-        >
-          <span
-            aria-hidden="true"
-            class="anchor-alias"
-            id="費用確認と接続復旧"
-          ></span>
-          <h2 id="費用条件の責務2026-10-12-合意">費用条件の確認</h2>
-          <div
-            aria-label="費用条件の責務（2026-10-12 合意）"
-            class="table-scroll"
-            role="region"
-            tabindex="0"
-          >
-            <table class="spec-table">
-              <thead>
-                <tr>
-                  <th scope="col">項目</th>
-                  <th scope="col">仕様</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row">処理内容</th>
-                  <td>
-                    自動補充が無効で既存クレジットがないことは、利用者が確認・管理する。
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">適用条件</th>
-                  <td>
-                    利用情報の表示を設ける場合も、取得できなければ不明として表示し、送信可否の条件とは分ける。
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">処理内容</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        この判断は費用条件の確認を利用者へ委ね、基盤側の確認処理を不要にするためである。
-                      </li>
-                      <li>ChatGPT Pro の契約内で利用する。</li>
-                    </ul>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+            <h3 id="命名保存用要約の補助モデル">
+              3-3. 命名・保存用要約の補助モデル
+            </h3>
+            <div
+              aria-label="命名・保存用要約の補助モデル"
+              class="table-scroll"
+              role="region"
+              tabindex="0"
+            >
+              <table class="spec-table">
+                <thead>
+                  <tr>
+                    <th scope="col">項目</th>
+                    <th scope="col">仕様</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row">モデル</th>
+                    <td>
+                      <ul class="cell-list">
+                        <li>
+                          <a
+                            href="https://github.com/Kurarowa305/scene-craft/blob/main/docs/design/agent-contracts.md#提案数と補助モデル合意済み"
+                            rel="noopener noreferrer"
+                            target="_blank"
+                            >エージェント契約の設計</a
+                          >で、利用量・コストを抑えるため、命名・保存用要約には制作会話と別のモデルを使うとする。
+                        </li>
+                        <li>
+                          設定に「命名・保存用要約モデル」を設け、初期値はGPT-6
+                          Luna（<code>gpt-6-luna</code>）、利用者が変更できるようにする。
+                        </li>
+                        <li>
+                          制作会話のモデル引き継ぎ・会話別選択は引き続き上記の契約に従う。
+                        </li>
+                      </ul>
+                      <div class="contract-detail">
+                        <ul class="cell-list">
+                          <li>
+                            補助処理ごとに選択モデルと対象を固定・記録する。
+                          </li>
+                          <li>
+                            未命名・未要約として原文と制作結果を保存する。
+                          </li>
+                        </ul>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
         </section>
         <section aria-labelledby="送信と停止の境界" class="spec-section">
-          <h2 id="送信と停止の境界">送信と停止の境界</h2>
+          <h2 id="送信と停止の境界">4. 送信と停止の境界</h2>
           <p>送信時は、費用情報の取得と実際の停止条件を区別する。</p>
           <div
             aria-label="送信と停止の境界"
@@ -855,146 +936,143 @@
               </tbody>
             </table>
           </div>
-        </section>
-        <section aria-labelledby="停止復旧の判断" class="spec-section">
-          <h2 id="停止復旧の判断">停止・復旧の判断</h2>
-          <p>
-            認証切れ、PC・実行プロセス終了後は、人間の再開指示を待つ。実行済み操作を照合し、実行結果を確定してから継続する。
-          </p>
-          <div
-            aria-label="停止・復旧の判断"
-            class="table-scroll"
-            role="region"
-            tabindex="0"
+
+          <section aria-labelledby="停止復旧の判断" class="spec-subsection">
+            <h3 id="停止復旧の判断">4-1. 停止・復旧の判断</h3>
+            <p>
+              認証切れ、PC・実行プロセス終了後は、人間の再開指示を待つ。実行済み操作を照合し、実行結果を確定してから継続する。
+            </p>
+            <div
+              aria-label="停止・復旧の判断"
+              class="table-scroll"
+              role="region"
+              tabindex="0"
+            >
+              <table class="spec-table">
+                <thead>
+                  <tr>
+                    <th scope="col">状況</th>
+                    <th scope="col">scene-craft の扱い</th>
+                    <th scope="col">再開・再送</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row">
+                      Codex 内部で復旧中（<code>error.willRetry=true</code>）
+                    </th>
+                    <td>進捗として表示し、同じ turn のイベントを受け続ける</td>
+                    <td>
+                      同じturnのイベントと終端を待つ。契約枠上限・人間の停止条件は別途優先する
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">正常終了</th>
+                    <td>
+                      <code>turn/completed.status=completed</code>
+                      を確認し、終端と結果を保存する
+                    </td>
+                    <td>終端・結果・保存の確認後に完了とする</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">契約枠の利用上限到達</th>
+                    <td>新しい依頼と制作操作を止め、途中状態を残す</td>
+                    <td>人間の再開を待つ</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">認証が必要</th>
+                    <td>
+                      Codex
+                      の通常の更新で回復しなければ、再ログインが必要と表示する
+                    </td>
+                    <td>再ログイン・途中状態の照合後、人間が再開する</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">確定した一時障害による失敗</th>
+                    <td>
+                      <ul class="cell-list">
+                        <li>最終失敗</li>
+                        <li>実行済み操作</li>
+                        <li>残りの再実行回数を確認する</li>
+                      </ul>
+                    </td>
+                    <td>
+                      同じ制作結果を維持でき、重複実行を防げる場合だけ自動再実行する
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">
+                      <code>turn/start</code> の受付結果が不明
+                    </th>
+                    <td>
+                      ローカルの依頼記録、既知の turn/item、<code
+                        >thread/read</code
+                      >
+                      の履歴を照合する
+                    </td>
+                    <td>対応を確定して再送可否を判断する</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">人間の停止</th>
+                    <td>
+                      停止要求を保存し、新しい操作を止め、<code
+                        >turn/interrupt</code
+                      >
+                      を要求する
+                    </td>
+                    <td>
+                      人間の再開指示を待つ。停止完了前は「停止中」とし、終端不明なら「状態確認が必要」とする
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">PC・実行プロセスの終了</th>
+                    <td>
+                      中断として記録し、再起動後に会話履歴と制作操作の記録を照合する
+                    </td>
+                    <td>人間が再開を指示する</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">一般的な HTTP 429・原因不明のエラー</th>
+                    <td>エラー種別と利用枠を取得して原因を分類する</td>
+                    <td>原因を確認して再実行の可否を判定する</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">
+                      保護指定・権限・設定・文脈上限などのエラー
+                    </th>
+                    <td>原因と必要な対処を表示し、関連する処理を止める</td>
+                    <td>必要な設定変更と対処を人間が選ぶ</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p>
+              <code>error</code> の受信と turn
+              の終端は別である。終端通知を待つ。通知を受け取れない切断では「状態確認が必要」とする。停止要求と完了通知が競合した場合も、実際に確認できた結果と停止要求を両方残す。
+            </p>
+          </section>
+          <section
+            aria-labelledby="再実行回数と自作範囲"
+            class="spec-subsection"
           >
-            <table class="spec-table">
-              <thead>
-                <tr>
-                  <th scope="col">状況</th>
-                  <th scope="col">scene-craft の扱い</th>
-                  <th scope="col">再開・再送</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row">
-                    Codex 内部で復旧中（<code>error.willRetry=true</code>）
-                  </th>
-                  <td>進捗として表示し、同じ turn のイベントを受け続ける</td>
-                  <td>
-                    同じturnのイベントと終端を待つ。契約枠上限・人間の停止条件は別途優先する
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">正常終了</th>
-                  <td>
-                    <code>turn/completed.status=completed</code>
-                    を確認し、終端と結果を保存する
-                  </td>
-                  <td>終端・結果・保存の確認後に完了とする</td>
-                </tr>
-                <tr>
-                  <th scope="row">契約枠の利用上限到達</th>
-                  <td>新しい依頼と制作操作を止め、途中状態を残す</td>
-                  <td>人間の再開を待つ</td>
-                </tr>
-                <tr>
-                  <th scope="row">認証が必要</th>
-                  <td>
-                    Codex
-                    の通常の更新で回復しなければ、再ログインが必要と表示する
-                  </td>
-                  <td>再ログイン・途中状態の照合後、人間が再開する</td>
-                </tr>
-                <tr>
-                  <th scope="row">確定した一時障害による失敗</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>最終失敗</li>
-                      <li>実行済み操作</li>
-                      <li>残りの再実行回数を確認する</li>
-                    </ul>
-                  </td>
-                  <td>
-                    同じ制作結果を維持でき、重複実行を防げる場合だけ自動再実行する
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row"><code>turn/start</code> の受付結果が不明</th>
-                  <td>
-                    ローカルの依頼記録、既知の turn/item、<code
-                      >thread/read</code
-                    >
-                    の履歴を照合する
-                  </td>
-                  <td>対応を確定して再送可否を判断する</td>
-                </tr>
-                <tr>
-                  <th scope="row">人間の停止</th>
-                  <td>
-                    停止要求を保存し、新しい操作を止め、<code
-                      >turn/interrupt</code
-                    >
-                    を要求する
-                  </td>
-                  <td>
-                    人間の再開指示を待つ。停止完了前は「停止中」とし、終端不明なら「状態確認が必要」とする
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">PC・実行プロセスの終了</th>
-                  <td>
-                    中断として記録し、再起動後に会話履歴と制作操作の記録を照合する
-                  </td>
-                  <td>人間が再開を指示する</td>
-                </tr>
-                <tr>
-                  <th scope="row">一般的な HTTP 429・原因不明のエラー</th>
-                  <td>エラー種別と利用枠を取得して原因を分類する</td>
-                  <td>原因を確認して再実行の可否を判定する</td>
-                </tr>
-                <tr>
-                  <th scope="row">
-                    保護指定・権限・設定・文脈上限などのエラー
-                  </th>
-                  <td>原因と必要な対処を表示し、関連する処理を止める</td>
-                  <td>必要な設定変更と対処を人間が選ぶ</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <p>
-            <code>error</code> の受信と turn
-            の終端は別である。終端通知を待つ。通知を受け取れない切断では「状態確認が必要」とする。停止要求と完了通知が競合した場合も、実際に確認できた結果と停止要求を両方残す。
-          </p>
-        </section>
-        <section aria-labelledby="再実行回数と自作範囲" class="spec-section">
-          <h2 id="再実行回数と自作範囲">再実行</h2>
-          <div
-            aria-label="再実行回数と自作範囲"
-            class="table-scroll"
-            role="region"
-            tabindex="0"
-          >
-            <table class="spec-table">
-              <thead>
-                <tr>
-                  <th scope="col">項目</th>
-                  <th scope="col">仕様</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row">依頼</th>
-                  <td>
+            <h3 id="再実行回数と自作範囲">4-2. 再実行</h3>
+            <div class="contract-cards">
+              <article class="contract-card" aria-label="依頼">
+                <p class="contract-card-title">依頼</p>
+                <dl>
+                  <dt>仕様</dt>
+                  <dd>
                     Codex 内部の HTTP/ストリーム再送は Codex に任せ、scene-craft
                     が制作依頼をやり直す回数を一依頼あたり最大 2
                     回（初回を含め最大 3 回）とする。
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">再実行</th>
-                  <td>
+                  </dd>
+                </dl>
+              </article>
+              <article class="contract-card" aria-label="再実行">
+                <p class="contract-card-title">再実行</p>
+                <dl>
+                  <dt>仕様</dt>
+                  <dd>
                     <ul class="cell-list">
                       <li>
                         scene-craft は元の依頼 ID と累積の再実行回数を保持する。
@@ -1006,40 +1084,40 @@
                         デザインが変わる、判断できない、既に何が実行されたか分からない場合は、人間が判断する。
                       </li>
                     </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">再実行</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>制作操作側でも依頼全体の再実行予算を管理する。</li>
-                      <li>
-                        モデルが同一 turn
-                        内で制作操作を修正して再度呼ぶ場合も、制作操作側で同じ依頼の再実行予算を確認する必要がある。
-                      </li>
-                      <li>
-                        何を一回として数え、成功した操作と再実行をどう対応付けるかは、<a
-                          href="https://github.com/Kurarowa305/scene-craft/issues/7"
-                          rel="noopener noreferrer"
-                          target="_blank"
-                          >実行状態・順序制御・再実行・復旧を決める</a
-                        >
-                        と
-                        <a
-                          href="https://github.com/Kurarowa305/scene-craft/issues/9"
-                          rel="noopener noreferrer"
-                          target="_blank"
-                          >工程別エージェントの入出力とツール契約を決める</a
-                        >
-                        で具体化する。
-                      </li>
-                      <li>再実行回数は制作操作のやり直しに対応付ける。</li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">停止</th>
-                  <td>
+                    <div class="contract-detail">
+                      <ul class="cell-list">
+                        <li>制作操作側でも依頼全体の再実行予算を管理する。</li>
+                        <li>
+                          モデルが同一 turn
+                          内で制作操作を修正して再度呼ぶ場合も、制作操作側で同じ依頼の再実行予算を確認する必要がある。
+                        </li>
+                        <li>
+                          何を一回として数え、成功した操作と再実行をどう対応付けるかは、<a
+                            href="https://github.com/Kurarowa305/scene-craft/issues/7"
+                            rel="noopener noreferrer"
+                            target="_blank"
+                            >実行状態・順序制御・再実行・復旧を決める</a
+                          >
+                          と
+                          <a
+                            href="https://github.com/Kurarowa305/scene-craft/issues/9"
+                            rel="noopener noreferrer"
+                            target="_blank"
+                            >工程別エージェントの入出力とツール契約を決める</a
+                          >
+                          で具体化する。
+                        </li>
+                        <li>再実行回数は制作操作のやり直しに対応付ける。</li>
+                      </ul>
+                    </div>
+                  </dd>
+                </dl>
+              </article>
+              <article class="contract-card" aria-label="停止">
+                <p class="contract-card-title">停止</p>
+                <dl>
+                  <dt>仕様</dt>
+                  <dd>
                     <ul class="cell-list">
                       <li>
                         scene-craft
@@ -1058,93 +1136,96 @@
                         OS と一緒に後続設計で決める。
                       </li>
                     </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">出力</th>
-                  <td>
+                  </dd>
+                </dl>
+              </article>
+              <article class="contract-card" aria-label="出力">
+                <p class="contract-card-title">出力</p>
+                <dl>
+                  <dt>仕様</dt>
+                  <dd>
                     検証済みの入出力・画像・会話再開・ツール往復という確認観点を再利用する。
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
-        <section aria-labelledby="異常時の確認条件" class="spec-section">
-          <h2 id="異常時の確認条件">異常時の確認条件</h2>
-          <p>
-            接続処理の入口でイベントと取得応答を模擬し、異常時の判断を確認する。
-          </p>
-          <div
-            aria-label="異常時の確認条件"
-            class="table-scroll"
-            role="region"
-            tabindex="0"
-          >
-            <table class="spec-table">
-              <thead>
-                <tr>
-                  <th scope="col">模擬する状況</th>
-                  <th scope="col">必ず確認する結果</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row">自動更新通知、利用枠・残高の取得失敗</th>
-                  <td>認証状態と実行条件に従って送信を継続する</td>
-                </tr>
-                <tr>
-                  <th scope="row">
-                    ログアウト・認証失効、実行時の契約枠上限到達
-                  </th>
-                  <td>
-                    認証が必要な状態と上限到達を区別する。上限到達では停止して途中状態を残す
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">再試行通知の後に成功／最終失敗</th>
-                  <td>内部再試行中の重複送信がなく、終端を一度だけ扱う</td>
-                </tr>
-                <tr>
-                  <th scope="row">
-                    受付応答の喪失、遅れて来る通知、履歴との対応不明
-                  </th>
-                  <td>依頼・turn/item・履歴を照合して対応を確定する</td>
-                </tr>
-                <tr>
-                  <th scope="row">
-                    停止と完了の競合、停止要求後のツール呼び出し
-                  </th>
-                  <td>確定した結果を正しく残す</td>
-                </tr>
-                <tr>
-                  <th scope="row">
-                    エラー種別・turn が変わる再実行、プロセス再起動
-                  </th>
-                  <td>元の依頼の回数を保持する</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <p>
-            外部ツールが既に変更した制作データの整合性は、制作操作とその記録を使う別の検証が必要となる。技術上の根拠と限界は
-            <a
-              href="https://github.com/Kurarowa305/scene-craft/blob/main/docs/research/codex-app-server-connection-validation.md#recovery-notes"
-              rel="noopener noreferrer"
-              target="_blank"
-              >実接続記録の復旧設計補足</a
+                  </dd>
+                </dl>
+              </article>
+            </div>
+          </section>
+          <section aria-labelledby="異常時の確認条件" class="spec-subsection">
+            <h3 id="異常時の確認条件">4-3. 異常時の確認条件</h3>
+            <p>
+              接続処理の入口でイベントと取得応答を模擬し、異常時の判断を確認する。
+            </p>
+            <div
+              aria-label="異常時の確認条件"
+              class="table-scroll"
+              role="region"
+              tabindex="0"
             >
-            に記す。
-          </p>
+              <table class="spec-table">
+                <thead>
+                  <tr>
+                    <th scope="col">模擬する状況</th>
+                    <th scope="col">必ず確認する結果</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row">自動更新通知、利用枠・残高の取得失敗</th>
+                    <td>認証状態と実行条件に従って送信を継続する</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">
+                      ログアウト・認証失効、実行時の契約枠上限到達
+                    </th>
+                    <td>
+                      認証が必要な状態と上限到達を区別する。上限到達では停止して途中状態を残す
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">再試行通知の後に成功／最終失敗</th>
+                    <td>内部再試行中の重複送信がなく、終端を一度だけ扱う</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">
+                      受付応答の喪失、遅れて来る通知、履歴との対応不明
+                    </th>
+                    <td>依頼・turn/item・履歴を照合して対応を確定する</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">
+                      停止と完了の競合、停止要求後のツール呼び出し
+                    </th>
+                    <td>確定した結果を正しく残す</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">
+                      エラー種別・turn が変わる再実行、プロセス再起動
+                    </th>
+                    <td>元の依頼の回数を保持する</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p>
+              外部ツールが既に変更した制作データの整合性は、制作操作とその記録を使う別の検証が必要となる。技術上の根拠と限界は
+              <a
+                href="https://github.com/Kurarowa305/scene-craft/blob/main/docs/research/codex-app-server-connection-validation.md#recovery-notes"
+                rel="noopener noreferrer"
+                target="_blank"
+                >実接続記録の復旧設計補足</a
+              >
+              に記す。
+            </p>
+          </section>
         </section>
         <section aria-labelledby="モデルと履歴の取得契約" class="spec-section">
-          <h2 id="モデルと履歴の取得契約">取得APIの契約</h2>
+          <h2 id="モデルと履歴の取得契約">5. 取得APIの契約</h2>
           <p>
             turns/itemsをページングで取得する。要求モデルと実行モデルを区別して記録する。
           </p>
         </section>
         <section class="sources">
-          <h2>詳細資料</h2>
+          <h2 id="sources">6. 詳細資料</h2>
           <p>
             <a
               href="https://github.com/Kurarowa305/scene-craft/issues/2"

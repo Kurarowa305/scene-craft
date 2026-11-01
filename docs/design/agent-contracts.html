@@ -44,46 +44,69 @@
       <main id="main" tabindex="-1">
         <p class="eyebrow">DESIGN / 05</p>
         <h1>工程別エージェントとツール</h1>
-        <nav aria-label="このページの目次" class="page-toc">
-          <h2>このページの内容</h2>
+        <nav aria-label="目次" class="page-toc">
+          <h2>目次</h2>
           <ol>
-            <li><a href="#責務と基本方針">基本方針</a></li>
-            <li><a href="#引き継ぐ前提">引き継ぐ前提</a></li>
             <li>
-              <a href="#10役割の入出力完了条件">10役割の入出力・完了条件</a>
+              <a href="#責務と基本方針">1. 基本方針</a>
+              <ol>
+                <li><a href="#引き継ぐ前提">1-1. 引き継ぐ前提</a></li>
+              </ol>
             </li>
-            <li><a href="#外部ツールの採用と版の記録">外部ツール</a></li>
             <li>
-              <a href="#制作ツールと生成pythonの分担"
-                >制作ツールと生成Pythonの分担</a
+              <a href="#10役割の入出力完了条件">2. 10役割の入出力・完了条件</a>
+            </li>
+            <li>
+              <a href="#外部ツールの採用と版の記録">3. 外部ツール</a>
+              <ol>
+                <li>
+                  <a href="#制作ツールと生成pythonの分担"
+                    >3-1. 制作ツールと生成Pythonの分担</a
+                  >
+                </li>
+                <li><a href="#接続方式">3-2. 接続方式</a></li>
+              </ol>
+            </li>
+            <li><a href="#提案数と補助モデル">4. 提案数</a></li>
+            <li>
+              <a href="#補助モデル">5. 補助モデル</a>
+              <ol>
+                <li>
+                  <a href="#命名保存用要約の起動"
+                    >5-1. 命名・保存用要約の起動</a
+                  >
+                </li>
+              </ol>
+            </li>
+            <li>
+              <a href="#同じチャット内の工程切替"
+                >6. 同じチャット内の工程切替</a
               >
             </li>
-            <li><a href="#接続方式">接続方式</a></li>
-            <li><a href="#提案数と補助モデル">提案数</a></li>
-            <li><a href="#補助モデル">補助モデル</a></li>
             <li>
-              <a href="#同じチャット内の工程切替">同じチャット内の工程切替</a>
+              <a href="#共通ツール契約">7. 共通ツール契約</a>
+              <ol>
+                <li>
+                  <a href="#専用mcpからバックエンドへの接続"
+                    >7-1. 専用MCPからバックエンドへの接続</a
+                  >
+                </li>
+                <li><a href="#信頼する受付情報と入力">7-2. 依頼の受付</a></li>
+                <li><a href="#操作と結果の記録">7-3. 実行記録</a></li>
+              </ol>
             </li>
-            <li><a href="#共通ツール契約">共通ツール契約</a></li>
-            <li>
-              <a href="#専用mcpからバックエンドへの接続"
-                >専用MCPからバックエンドへの接続</a
-              >
-            </li>
-            <li><a href="#信頼する受付情報と入力">依頼の受付</a></li>
-            <li><a href="#操作と結果の記録">実行記録</a></li>
-            <li><a href="#git管理する定義">Git管理する定義</a></li>
-            <li><a href="#成果物の構造と工程間の引き継ぎ">工程成果物</a></li>
-            <li><a href="#命名保存用要約の起動">命名・保存用要約の起動</a></li>
+            <li><a href="#git管理する定義">8. Git管理する定義</a></li>
+            <li><a href="#成果物の構造と工程間の引き継ぎ">9. 工程成果物</a></li>
             <li>
               <a href="#契約を満たせない操作の扱い"
-                >契約を満たせない操作の扱い</a
+                >10. 契約を満たせない操作の扱い</a
               >
             </li>
+            <li><a href="#sources">11. 詳細資料</a></li>
           </ol>
         </nav>
         <section aria-labelledby="責務と基本方針" class="spec-section">
-          <h2 id="責務と基本方針">基本方針</h2>
+          <h2 id="責務と基本方針">1. 基本方針</h2>
           <div
             aria-label="責務と基本方針"
             class="table-scroll"
@@ -120,14 +143,12 @@
                       </li>
                       <li>新しい制作操作は工程を選んで依頼する。</li>
                     </ul>
+                    <div class="contract-detail">
+                      「記録として送信」は通常送信とは別経路で、LLMを使わず保存する。
+                    </div>
                   </td>
                 </tr>
-                <tr>
-                  <th scope="row">記録</th>
-                  <td>
-                    「記録として送信」は通常送信とは別経路で、LLMを使わず保存する。
-                  </td>
-                </tr>
+
                 <tr>
                   <th scope="row">処理内容</th>
                   <td>
@@ -249,102 +270,103 @@
               >全体構成図とプロセス責務</a
             >にも反映した。
           </p>
-        </section>
-        <section aria-labelledby="引き継ぐ前提" class="spec-section">
-          <h2 id="引き継ぐ前提">引き継ぐ前提</h2>
-          <div
-            aria-label="引き継ぐ前提"
-            class="table-scroll"
-            role="region"
-            tabindex="0"
-          >
-            <table class="spec-table">
-              <thead>
-                <tr>
-                  <th scope="col">項目</th>
-                  <th scope="col">仕様</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row">役割選択</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        初期対象は<a
-                          href="https://github.com/Kurarowa305/scene-craft/blob/main/docs/requirements/initial-scope.md#scope"
-                          rel="noopener noreferrer"
-                          target="_blank"
-                          >要件</a
-                        >の10役割。
-                      </li>
-                      <li>人間が工程を選択する。</li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">制作操作</th>
-                  <td>
-                    制作操作は<a href="blender-integration.html"
-                      >Blender連携設計</a
-                    >の保存済み入力コピーとWindows
-                    Blenderのbackground実行を使う。
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">文脈</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        制作意図・採用状態・保護指定・作風・根拠は<a
-                          href="context-and-style.html"
-                          >文脈設計</a
-                        >から取得し、実際に渡した参照を固定する。
-                      </li>
-                      <li>追加取得も記録する。</li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">保護検査</th>
-                  <td>
-                    変更範囲・直接および間接変更の保護検査・採用可否は<a
-                      href="edit-candidates.html"
-                      >編集案設計</a
-                    >に従い、実行側で強制する。
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">実行管理</th>
-                  <td>
-                    停止・結果不明・二重実行防止・依頼全体の最大2回の再実行は<a
-                      href="execution-lifecycle.html"
-                      >実行状態設計</a
-                    >に従う。
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">固定版</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        定義・作風の固定コミットと使用blob、runtimeの実版は<a
-                          href="git-versioning.html"
-                          >Git版管理設計</a
-                        >に従う。
-                      </li>
-                      <li>
-                        実行時の生成スクリプトと恒久的な定義改訂を区別する。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+
+          <section aria-labelledby="引き継ぐ前提" class="spec-subsection">
+            <h3 id="引き継ぐ前提">1-1. 引き継ぐ前提</h3>
+            <div
+              aria-label="引き継ぐ前提"
+              class="table-scroll"
+              role="region"
+              tabindex="0"
+            >
+              <table class="spec-table">
+                <thead>
+                  <tr>
+                    <th scope="col">項目</th>
+                    <th scope="col">仕様</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row">役割選択</th>
+                    <td>
+                      <ul class="cell-list">
+                        <li>
+                          初期対象は<a
+                            href="https://github.com/Kurarowa305/scene-craft/blob/main/docs/requirements/initial-scope.md#scope"
+                            rel="noopener noreferrer"
+                            target="_blank"
+                            >要件</a
+                          >の10役割。
+                        </li>
+                        <li>人間が工程を選択する。</li>
+                      </ul>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">制作操作</th>
+                    <td>
+                      制作操作は<a href="blender-integration.html"
+                        >Blender連携設計</a
+                      >の保存済み入力コピーとWindows
+                      Blenderのbackground実行を使う。
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">文脈</th>
+                    <td>
+                      <ul class="cell-list">
+                        <li>
+                          制作意図・採用状態・保護指定・作風・根拠は<a
+                            href="context-and-style.html"
+                            >文脈設計</a
+                          >から取得し、実際に渡した参照を固定する。
+                        </li>
+                        <li>追加取得も記録する。</li>
+                      </ul>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">保護検査</th>
+                    <td>
+                      変更範囲・直接および間接変更の保護検査・採用可否は<a
+                        href="edit-candidates.html"
+                        >編集案設計</a
+                      >に従い、実行側で強制する。
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">実行管理</th>
+                    <td>
+                      停止・結果不明・二重実行防止・依頼全体の最大2回の再実行は<a
+                        href="execution-lifecycle.html"
+                        >実行状態設計</a
+                      >に従う。
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">固定版</th>
+                    <td>
+                      <ul class="cell-list">
+                        <li>
+                          定義・作風の固定コミットと使用blob、runtimeの実版は<a
+                            href="git-versioning.html"
+                            >Git版管理設計</a
+                          >に従う。
+                        </li>
+                        <li>
+                          実行時の生成スクリプトと恒久的な定義改訂を区別する。
+                        </li>
+                      </ul>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
         </section>
         <section aria-labelledby="10役割の入出力完了条件" class="spec-section">
-          <h2 id="10役割の入出力完了条件">10役割の入出力・完了条件</h2>
+          <h2 id="10役割の入出力完了条件">2. 10役割の入出力・完了条件</h2>
           <p>
             全役割に対象作品・依頼原文と必要な共有文脈を渡す。制作操作の成功・編集案の完成・人間の採用は別々に記録する。会話へ回答したら完了する。会話原文と参照文脈の保存は共通の会話契約に従う。
           </p>
@@ -562,7 +584,7 @@
           aria-labelledby="外部ツールの採用と版の記録"
           class="spec-section"
         >
-          <h2 id="外部ツールの採用と版の記録">外部ツール</h2>
+          <h2 id="外部ツールの採用と版の記録">3. 外部ツール</h2>
           <div
             aria-label="外部ツールの採用と版の記録"
             class="table-scroll"
@@ -695,159 +717,159 @@
                         >へ記録した。
                       </li>
                     </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">処理内容</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        調査した既製MCP for
-                        Blenderの固定ソースは、backgroundモードでサーバー開始を明示的に拒否する。
-                      </li>
-                      <li>
-                        Windows補助プロセスとBlender
-                        Pythonを共通制作ツールとして公開する。
-                      </li>
-                      <li>入口には専用stdio MCPを用いる。</li>
-                    </ul>
+                    <div class="contract-detail">
+                      <ul class="cell-list">
+                        <li>
+                          調査した既製MCP for
+                          Blenderの固定ソースは、backgroundモードでサーバー開始を明示的に拒否する。
+                        </li>
+                        <li>
+                          Windows補助プロセスとBlender
+                          Pythonを共通制作ツールとして公開する。
+                        </li>
+                        <li>入口には専用stdio MCPを用いる。</li>
+                      </ul>
+                    </div>
                   </td>
                 </tr>
               </tbody>
             </table>
           </div>
-        </section>
-        <section
-          aria-labelledby="制作ツールと生成pythonの分担"
-          class="spec-section"
-        >
-          <h2 id="制作ツールと生成pythonの分担">
-            制作ツールと生成Pythonの分担
-          </h2>
-          <div
-            aria-label="制作ツールと生成Pythonの分担"
-            class="table-scroll"
-            role="region"
-            tabindex="0"
+
+          <section
+            aria-labelledby="制作ツールと生成pythonの分担"
+            class="spec-subsection"
           >
-            <table class="spec-table">
-              <thead>
-                <tr>
-                  <th scope="col">項目</th>
-                  <th scope="col">仕様</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row">Git参照</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        素材取得・対応形式の取り込み、入力コピー、保存・検査・プレビュー、レンダーパス取得とPSD/PSB生成はGit固定の通常プログラムで実行する。
-                      </li>
-                      <li>
-                        保存・停止・色変換等の基盤処理はGit固定の通常プログラムが担当する。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">依頼</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        形状・配置・UV・材質・環境の具体化は、固定した共通手順を優先し、共通手順で表せない依頼に生成Pythonを使う。
-                      </li>
-                      <li>
-                        生成スクリプトも依頼の変更範囲、保護検査、停止、再実行予算を通し、入力とコード実体・ハッシュ、使用runtime、出力と検査結果を結び付ける。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">モデル</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        モデルには対象ID・操作内容等を渡すInterfaceを公開し、入力コピー・所有する実行プロセス・出力先・保存確定は通常プログラムが管理する。
-                      </li>
-                      <li>依頼・権限・起点の正本は実行側から解決する。</li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">出力</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>生成Pythonは実行環境の制限と出力検査を通す。</li>
-                      <li>実行環境の制限と実際の出力検査を含めて検証する。</li>
-                      <li>
-                        範囲外・保護違反・比較不能は既存契約どおり採用不可。
-                      </li>
-                      <li>原因と対応可能な方法を示す。</li>
-                    </ul>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
-        <section aria-labelledby="接続方式" class="spec-section">
-          <h2 id="接続方式">接続方式</h2>
-          <div
-            aria-label="接続方式"
-            class="table-scroll"
-            role="region"
-            tabindex="0"
-          >
-            <table class="spec-table">
-              <thead>
-                <tr>
-                  <th scope="col">項目</th>
-                  <th scope="col">仕様</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row">採用判断</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>scene-craft専用のstdio MCPを初期採用する。</li>
-                      <li>
-                        MCPの入口から呼ぶ実処理は、合意済みの制作管理・実行管理・Windows補助プロセスである。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">処理内容</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        動的ツールはapp-serverの呼出にthread・turn・callの対応を持ち、scene-craft側で直接要求を扱いやすい一方、実験APIへの依存とthreadに保存された定義の継続を考慮する必要がある。
-                      </li>
-                      <li>受付側が接続と保存済み依頼から権限を解決する。</li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">停止</th>
-                  <td>
-                    工程切替時の指示・ツール権限、相談用接続の更新拒否、停止・結果不明時の照合を検証する。
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+            <h3 id="制作ツールと生成pythonの分担">
+              3-1. 制作ツールと生成Pythonの分担
+            </h3>
+            <div
+              aria-label="制作ツールと生成Pythonの分担"
+              class="table-scroll"
+              role="region"
+              tabindex="0"
+            >
+              <table class="spec-table">
+                <thead>
+                  <tr>
+                    <th scope="col">項目</th>
+                    <th scope="col">仕様</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row">Git参照</th>
+                    <td>
+                      <ul class="cell-list">
+                        <li>
+                          素材取得・対応形式の取り込み、入力コピー、保存・検査・プレビュー、レンダーパス取得とPSD/PSB生成はGit固定の通常プログラムで実行する。
+                        </li>
+                        <li>
+                          保存・停止・色変換等の基盤処理はGit固定の通常プログラムが担当する。
+                        </li>
+                      </ul>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">依頼</th>
+                    <td>
+                      <ul class="cell-list">
+                        <li>
+                          形状・配置・UV・材質・環境の具体化は、固定した共通手順を優先し、共通手順で表せない依頼に生成Pythonを使う。
+                        </li>
+                        <li>
+                          生成スクリプトも依頼の変更範囲、保護検査、停止、再実行予算を通し、入力とコード実体・ハッシュ、使用runtime、出力と検査結果を結び付ける。
+                        </li>
+                      </ul>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">モデル</th>
+                    <td>
+                      <ul class="cell-list">
+                        <li>
+                          モデルには対象ID・操作内容等を渡すInterfaceを公開し、入力コピー・所有する実行プロセス・出力先・保存確定は通常プログラムが管理する。
+                        </li>
+                        <li>依頼・権限・起点の正本は実行側から解決する。</li>
+                      </ul>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">出力</th>
+                    <td>
+                      <ul class="cell-list">
+                        <li>生成Pythonは実行環境の制限と出力検査を通す。</li>
+                        <li>
+                          実行環境の制限と実際の出力検査を含めて検証する。
+                        </li>
+                        <li>
+                          範囲外・保護違反・比較不能は既存契約どおり採用不可。
+                        </li>
+                        <li>原因と対応可能な方法を示す。</li>
+                      </ul>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+          <section aria-labelledby="接続方式" class="spec-subsection">
+            <h3 id="接続方式">3-2. 接続方式</h3>
+            <div
+              aria-label="接続方式"
+              class="table-scroll"
+              role="region"
+              tabindex="0"
+            >
+              <table class="spec-table">
+                <thead>
+                  <tr>
+                    <th scope="col">項目</th>
+                    <th scope="col">仕様</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row">採用判断</th>
+                    <td>
+                      <ul class="cell-list">
+                        <li>scene-craft専用のstdio MCPを初期採用する。</li>
+                        <li>
+                          MCPの入口から呼ぶ実処理は、合意済みの制作管理・実行管理・Windows補助プロセスである。
+                        </li>
+                      </ul>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">処理内容</th>
+                    <td>
+                      <ul class="cell-list">
+                        <li>
+                          動的ツールはapp-serverの呼出にthread・turn・callの対応を持ち、scene-craft側で直接要求を扱いやすい一方、実験APIへの依存とthreadに保存された定義の継続を考慮する必要がある。
+                        </li>
+                        <li>受付側が接続と保存済み依頼から権限を解決する。</li>
+                      </ul>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">停止</th>
+                    <td>
+                      工程切替時の指示・ツール権限、相談用接続の更新拒否、停止・結果不明時の照合を検証する。
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
         </section>
         <section aria-labelledby="提案数と補助モデル" class="spec-section">
-          <h2 id="提案数と補助モデル">提案数</h2>
+          <h2 id="提案数と補助モデル">4. 提案数</h2>
           <p>
             依頼あたりの既定の提案数は1案。人間が比較を指定した場合や、前提・方向性を選ぶ必要がある場合に複数案を出す。一つの提案に含まれる独立した変更は既存契約どおり別々に採否を判断できる単位にする。
           </p>
         </section>
         <section aria-labelledby="補助モデル" class="spec-section">
-          <h2 id="補助モデル">補助モデル</h2>
+          <h2 id="補助モデル">5. 補助モデル</h2>
           <p>
             利用量・コストを抑えるため、命名・保存用要約には制作依頼と別のモデルを使い、設定で変更できるようにする。
           </p>
@@ -877,36 +899,32 @@
                         制作会話で選ぶモデルや、直前のチャットからの引き継ぎとは別に保存する。
                       </li>
                     </ul>
+                    <div class="contract-detail">
+                      <ul class="cell-list">
+                        <li>
+                          補助処理を受け付ける時点の設定を固定し、モデル・対象原文範囲・起点依頼と実行結果を記録する。
+                        </li>
+                        <li>設定変更は以後の補助処理へ適用する。</li>
+                      </ul>
+                    </div>
                   </td>
                 </tr>
-                <tr>
-                  <th scope="row">モデル</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        補助処理を受け付ける時点の設定を固定し、モデル・対象原文範囲・起点依頼と実行結果を記録する。
-                      </li>
-                      <li>設定変更は以後の補助処理へ適用する。</li>
-                    </ul>
-                  </td>
-                </tr>
+
                 <tr>
                   <th scope="row">上限</th>
                   <td>
                     必要な認証・利用上限・停止契約は既存のCodex管理認証に従う。
+                    <div class="contract-detail">
+                      <ul class="cell-list">
+                        <li>
+                          補助モデルが利用不可・認証待ち・利用上限・処理失敗なら、原文・制作結果を保持し、未命名／未要約として示す。
+                        </li>
+                        <li>必要に応じて利用者が設定を変更する。</li>
+                      </ul>
+                    </div>
                   </td>
                 </tr>
-                <tr>
-                  <th scope="row">上限</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        補助モデルが利用不可・認証待ち・利用上限・処理失敗なら、原文・制作結果を保持し、未命名／未要約として示す。
-                      </li>
-                      <li>必要に応じて利用者が設定を変更する。</li>
-                    </ul>
-                  </td>
-                </tr>
+
                 <tr>
                   <th scope="row">処理内容</th>
                   <td>専用処理として結果を保存する。</td>
@@ -915,12 +933,84 @@
             </table>
           </div>
           <p>モデルIDはgpt-6-luna。実アカウントでの利用可否は別途確認する。</p>
+
+          <section
+            aria-labelledby="命名保存用要約の起動"
+            class="spec-subsection"
+          >
+            <h3 id="命名保存用要約の起動">5-1. 命名・保存用要約の起動</h3>
+            <div
+              aria-label="命名・保存用要約の起動"
+              class="table-scroll"
+              role="region"
+              tabindex="0"
+            >
+              <table class="spec-table">
+                <thead>
+                  <tr>
+                    <th scope="col">項目</th>
+                    <th scope="col">仕様</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row">命名開始</th>
+                    <td>
+                      <ul class="cell-list">
+                        <li>
+                          命名は最初のLLMを使う依頼の原文を起点にクライアント側で起動し、設定した補助モデルに短い会話名を生成させる。
+                        </li>
+                        <li>
+                          命名処理は通常送信・原文・結果の保存と独立して進める。
+                        </li>
+                      </ul>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">会話名</th>
+                    <td>
+                      <ul class="cell-list">
+                        <li>会話名がない間は仮の表示名を使う。</li>
+                        <li>命名の失敗・停止・上限では未命名として残す。</li>
+                        <li>人間の明示した名称変更を尊重する。</li>
+                      </ul>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">要約開始</th>
+                    <td>
+                      <ul class="cell-list">
+                        <li>
+                          保存用要約は既存の文脈設計どおり、依頼の完了・停止・確認待ちを区切りとして追加原文を対象にする。
+                        </li>
+                        <li>
+                          未要約範囲を保持し、後の明示再開時等に補えるようにする。
+                        </li>
+                      </ul>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">保存内容</th>
+                    <td>
+                      <ul class="cell-list">
+                        <li>
+                          補助処理のモデル、対象原文IDと範囲、起点依頼、参照、結果、失敗・停止を保存する。
+                        </li>
+                        <li>要約は保存済み原文へ対応付けて追加する。</li>
+                        <li>Codexの内部圧縮とは独立した処理とする。</li>
+                      </ul>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
         </section>
         <section
           aria-labelledby="同じチャット内の工程切替"
           class="spec-section"
         >
-          <h2 id="同じチャット内の工程切替">同じチャット内の工程切替</h2>
+          <h2 id="同じチャット内の工程切替">6. 同じチャット内の工程切替</h2>
           <div
             aria-label="同じチャット内の工程切替"
             class="table-scroll"
@@ -947,24 +1037,22 @@
                         送信ごとの依頼入力に、選択工程の固定指示・手順と必要文脈を渡す。
                       </li>
                     </ul>
+                    <div class="contract-detail">
+                      <ul class="cell-list">
+                        <li>
+                          専用MCPの信頼済み接続とバックエンドの依頼記録を照合する。
+                        </li>
+                        <li>
+                          現在の役割・対象・範囲・保護・世代を受付側で強制し、古い指示をモデルが使っても許可外操作を拒否する。
+                        </li>
+                        <li>
+                          同じthreadでは一つの進行中turnとし、前turn・ツール・外部操作の終端と遅延通知を照合してから次の依頼へ権限を渡す。
+                        </li>
+                      </ul>
+                    </div>
                   </td>
                 </tr>
-                <tr>
-                  <th scope="row">依頼</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        専用MCPの信頼済み接続とバックエンドの依頼記録を照合する。
-                      </li>
-                      <li>
-                        現在の役割・対象・範囲・保護・世代を受付側で強制し、古い指示をモデルが使っても許可外操作を拒否する。
-                      </li>
-                      <li>
-                        同じthreadでは一つの進行中turnとし、前turn・ツール・外部操作の終端と遅延通知を照合してから次の依頼へ権限を渡す。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
+
                 <tr>
                   <th scope="row">要約</th>
                   <td>
@@ -1004,7 +1092,7 @@
           </div>
         </section>
         <section aria-labelledby="共通ツール契約" class="spec-section">
-          <h2 id="共通ツール契約">共通ツール契約</h2>
+          <h2 id="共通ツール契約">7. 共通ツール契約</h2>
           <p>
             以下は機能単位のInterface。呼出名は実装時に確定する。工程で使える機能は、役割と依頼の変更範囲に照合する。
           </p>
@@ -1197,285 +1285,286 @@
               </tbody>
             </table>
           </div>
-        </section>
-        <section
-          aria-labelledby="専用mcpからバックエンドへの接続"
-          class="spec-section"
-        >
-          <h2 id="専用mcpからバックエンドへの接続">
-            専用MCPからバックエンドへの接続
-          </h2>
-          <div
-            aria-label="専用MCPからバックエンドへの接続"
-            class="table-scroll"
-            role="region"
-            tabindex="0"
+
+          <section
+            aria-labelledby="専用mcpからバックエンドへの接続"
+            class="spec-subsection"
           >
-            <table class="spec-table">
-              <thead>
-                <tr>
-                  <th scope="col">項目</th>
-                  <th scope="col">仕様</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row">処理内容</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        MCPとバックエンドはWSL内のUnix domain
-                        socketによるローカルRPCを使う。
-                      </li>
-                      <li>
-                        ブラウザのHTTP入口とは別にし、所有ユーザーだけが使えるソケットと専用起動時の接続資格でMCPを識別する。
-                      </li>
-                      <li>接続資格は専用の認証経路で管理する。</li>
-                      <li>
-                        stdioと内部RPCの要求・結果・切断はMCPアダプターが変換し、業務判断はバックエンドが行う。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">依頼</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        バックエンドが各実行へ固定した依頼コンテキスト参照を発行する。
-                      </li>
-                      <li>
-                        モデルには今回の参照を渡し、すべての専用MCPツール呼出で提示させる。
-                      </li>
-                      <li>
-                        コンテキスト参照を接続・会話・依頼・AI実行・世代・現在turnへ照合する。
-                      </li>
-                      <li>サイド相談へは参照権限だけの参照を発行する。</li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">参照</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>接続・世代・実行が一致する参照を受け付ける。</li>
-                      <li>受付原文と操作内容への権限はさらに検査する。</li>
-                      <li>遅れて届いたMCP要求は元の参照と実行へ照合する。</li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">参照</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        MCPが複数の会話を扱う場合も、接続資格と各コンテキスト参照の対応を検査する。
-                      </li>
-                      <li>
-                        共有するMCPプロセスの数に応じて、接続と参照の対応を検査する。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
-        <section aria-labelledby="信頼する受付情報と入力" class="spec-section">
-          <h2 id="信頼する受付情報と入力">依頼の受付</h2>
-          <div
-            aria-label="信頼する受付情報と入力"
-            class="table-scroll"
-            role="region"
-            tabindex="0"
+            <h3 id="専用mcpからバックエンドへの接続">
+              7-1. 専用MCPからバックエンドへの接続
+            </h3>
+            <div
+              aria-label="専用MCPからバックエンドへの接続"
+              class="table-scroll"
+              role="region"
+              tabindex="0"
+            >
+              <table class="spec-table">
+                <thead>
+                  <tr>
+                    <th scope="col">項目</th>
+                    <th scope="col">仕様</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row">処理内容</th>
+                    <td>
+                      <ul class="cell-list">
+                        <li>
+                          MCPとバックエンドはWSL内のUnix domain
+                          socketによるローカルRPCを使う。
+                        </li>
+                        <li>
+                          ブラウザのHTTP入口とは別にし、所有ユーザーだけが使えるソケットと専用起動時の接続資格でMCPを識別する。
+                        </li>
+                        <li>接続資格は専用の認証経路で管理する。</li>
+                        <li>
+                          stdioと内部RPCの要求・結果・切断はMCPアダプターが変換し、業務判断はバックエンドが行う。
+                        </li>
+                      </ul>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">依頼</th>
+                    <td>
+                      <ul class="cell-list">
+                        <li>
+                          バックエンドが各実行へ固定した依頼コンテキスト参照を発行する。
+                        </li>
+                        <li>
+                          モデルには今回の参照を渡し、すべての専用MCPツール呼出で提示させる。
+                        </li>
+                        <li>
+                          コンテキスト参照を接続・会話・依頼・AI実行・世代・現在turnへ照合する。
+                        </li>
+                        <li>サイド相談へは参照権限だけの参照を発行する。</li>
+                      </ul>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">参照</th>
+                    <td>
+                      <ul class="cell-list">
+                        <li>接続・世代・実行が一致する参照を受け付ける。</li>
+                        <li>受付原文と操作内容への権限はさらに検査する。</li>
+                        <li>遅れて届いたMCP要求は元の参照と実行へ照合する。</li>
+                      </ul>
+                      <div class="contract-detail">
+                        <ul class="cell-list">
+                          <li>
+                            MCPが複数の会話を扱う場合も、接続資格と各コンテキスト参照の対応を検査する。
+                          </li>
+                          <li>
+                            共有するMCPプロセスの数に応じて、接続と参照の対応を検査する。
+                          </li>
+                        </ul>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+          <section
+            aria-labelledby="信頼する受付情報と入力"
+            class="spec-subsection"
           >
-            <table class="spec-table">
-              <thead>
-                <tr>
-                  <th scope="col">項目</th>
-                  <th scope="col">仕様</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row">所有権</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        モデルの引数とは別に、バックエンドが依頼ID、親のAI実行、受付原文、会話の種別、現在の役割、対象作品集合、実行世代・所有権を接続へ結び付ける。
-                      </li>
-                      <li>
-                        許可される操作と対象はこの情報と保存済みの合意から解決する。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">保護指定</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        操作前に、起点、変更対象と項目、最新の保護・依頼限定許可、必要依存、前提の版を検査する。
-                      </li>
-                      <li>
-                        曖昧な対象・人間の判断が必要な事項は具体的な問いとして返す。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">再実行</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        モデルへ返す共通結果は、依頼コンテキスト参照、永続操作ID、操作種別、入力参照、結果・進捗、成果物参照、検査結果、確認事項、失敗原因と再実行判定を持つ。
-                      </li>
-                      <li>既存の実行状態を使う。</li>
-                      <li>
-                        長時間処理は受付済みの操作IDを返し、状態取得を継続する。
-                      </li>
-                      <li>
-                        ソケット・MCPの受付応答と実行の完成記録を区別する。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
-        <section aria-labelledby="操作と結果の記録" class="spec-section">
-          <h2 id="操作と結果の記録">実行記録</h2>
-          <div
-            aria-label="操作と結果の記録"
-            class="table-scroll"
-            role="region"
-            tabindex="0"
-          >
-            <table class="spec-table">
-              <thead>
-                <tr>
-                  <th scope="col">項目</th>
-                  <th scope="col">仕様</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row">実行の対応</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        実行管理がツール呼出と操作ID、実行ID、試行の対応を永続化する。
-                      </li>
-                      <li>
-                        入力の正規化内容・ハッシュ、起点、使用コード・定義版・runtime、開始と終端、出力参照・ハッシュ、検査方法・結果を結び付ける。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">同じ操作の再送</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        同じ操作IDで同じ内容を再送した場合は、受付済みの進捗・結果を返す。
-                      </li>
-                      <li>同じIDで内容が異なれば拒否する。</li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">結果</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        ツール結果には、操作の参照、完了の有無、進捗、生成物・編集案・保存状態等の参照、検査結果、確認が必要な点、失敗原因を返す。
-                      </li>
-                      <li>
-                        MCPの成功は制作実体の完成・採用の成功とは区別する。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">長時間処理</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        外部処理が続くときは操作参照を返し、後続の状態取得で照合できるようにする。
-                      </li>
-                      <li>待機・停止・終端は既存の実行管理を正とする。</li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">失敗分類</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        失敗は、入力や依存不足、保護・範囲違反、未対応・検証不能、認証・利用上限、既知の一時障害、停止、結果不明等の原因を区別する。
-                      </li>
-                      <li>
-                        実行管理が同じ依頼の累積予算と結果同一性・重複防止を検査する。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">予算消費</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        失敗した制作処理の修正・やり直しは同じturn内でも依頼全体の再実行回数を消費する。
-                      </li>
-                      <li>
-                        正常な別操作の続行、状態取得、同じ操作の通知・通信再送は制作のやり直しと区別する。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <div
-            aria-label="操作と結果の記録"
-            class="table-scroll"
-            role="region"
-            tabindex="0"
-          >
-            <table class="spec-table">
-              <thead>
-                <tr>
-                  <th scope="col">項目</th>
-                  <th scope="col">仕様</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row">原文</th>
-                  <td>
-                    受付原文・元の目的・失敗操作との対応は実行管理で保持する。
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">停止</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        人間の停止は画面からバックエンドへ直接要求できる。
-                      </li>
-                      <li>
-                        LLMなしの記録・プレビュー生成も同じ制作管理・保存・実行処理を直接使う。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+            <h3 id="信頼する受付情報と入力">7-2. 依頼の受付</h3>
+            <div
+              aria-label="信頼する受付情報と入力"
+              class="table-scroll"
+              role="region"
+              tabindex="0"
+            >
+              <table class="spec-table">
+                <thead>
+                  <tr>
+                    <th scope="col">項目</th>
+                    <th scope="col">仕様</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row">所有権</th>
+                    <td>
+                      <ul class="cell-list">
+                        <li>
+                          モデルの引数とは別に、バックエンドが依頼ID、親のAI実行、受付原文、会話の種別、現在の役割、対象作品集合、実行世代・所有権を接続へ結び付ける。
+                        </li>
+                        <li>
+                          許可される操作と対象はこの情報と保存済みの合意から解決する。
+                        </li>
+                      </ul>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">保護指定</th>
+                    <td>
+                      <ul class="cell-list">
+                        <li>
+                          操作前に、起点、変更対象と項目、最新の保護・依頼限定許可、必要依存、前提の版を検査する。
+                        </li>
+                        <li>
+                          曖昧な対象・人間の判断が必要な事項は具体的な問いとして返す。
+                        </li>
+                      </ul>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">再実行</th>
+                    <td>
+                      <ul class="cell-list">
+                        <li>
+                          モデルへ返す共通結果は、依頼コンテキスト参照、永続操作ID、操作種別、入力参照、結果・進捗、成果物参照、検査結果、確認事項、失敗原因と再実行判定を持つ。
+                        </li>
+                        <li>既存の実行状態を使う。</li>
+                        <li>
+                          長時間処理は受付済みの操作IDを返し、状態取得を継続する。
+                        </li>
+                        <li>
+                          ソケット・MCPの受付応答と実行の完成記録を区別する。
+                        </li>
+                      </ul>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+          <section aria-labelledby="操作と結果の記録" class="spec-subsection">
+            <h3 id="操作と結果の記録">7-3. 実行記録</h3>
+            <div
+              aria-label="操作と結果の記録"
+              class="table-scroll"
+              role="region"
+              tabindex="0"
+            >
+              <table class="spec-table">
+                <thead>
+                  <tr>
+                    <th scope="col">項目</th>
+                    <th scope="col">仕様</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row">実行の対応</th>
+                    <td>
+                      <ul class="cell-list">
+                        <li>
+                          実行管理がツール呼出と操作ID、実行ID、試行の対応を永続化する。
+                        </li>
+                        <li>
+                          入力の正規化内容・ハッシュ、起点、使用コード・定義版・runtime、開始と終端、出力参照・ハッシュ、検査方法・結果を結び付ける。
+                        </li>
+                      </ul>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">同じ操作の再送</th>
+                    <td>
+                      <ul class="cell-list">
+                        <li>
+                          同じ操作IDで同じ内容を再送した場合は、受付済みの進捗・結果を返す。
+                        </li>
+                        <li>同じIDで内容が異なれば拒否する。</li>
+                      </ul>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">結果</th>
+                    <td>
+                      <ul class="cell-list">
+                        <li>
+                          ツール結果には、操作の参照、完了の有無、進捗、生成物・編集案・保存状態等の参照、検査結果、確認が必要な点、失敗原因を返す。
+                        </li>
+                        <li>
+                          MCPの成功は制作実体の完成・採用の成功とは区別する。
+                        </li>
+                      </ul>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">長時間処理</th>
+                    <td>
+                      <ul class="cell-list">
+                        <li>
+                          外部処理が続くときは操作参照を返し、後続の状態取得で照合できるようにする。
+                        </li>
+                        <li>待機・停止・終端は既存の実行管理を正とする。</li>
+                      </ul>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">失敗分類</th>
+                    <td>
+                      <ul class="cell-list">
+                        <li>
+                          失敗は、入力や依存不足、保護・範囲違反、未対応・検証不能、認証・利用上限、既知の一時障害、停止、結果不明等の原因を区別する。
+                        </li>
+                        <li>
+                          実行管理が同じ依頼の累積予算と結果同一性・重複防止を検査する。
+                        </li>
+                      </ul>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">予算消費</th>
+                    <td>
+                      <ul class="cell-list">
+                        <li>
+                          失敗した制作処理の修正・やり直しは同じturn内でも依頼全体の再実行回数を消費する。
+                        </li>
+                        <li>
+                          正常な別操作の続行、状態取得、同じ操作の通知・通信再送は制作のやり直しと区別する。
+                        </li>
+                      </ul>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div
+              aria-label="操作と結果の記録"
+              class="table-scroll"
+              role="region"
+              tabindex="0"
+            >
+              <table class="spec-table">
+                <thead>
+                  <tr>
+                    <th scope="col">項目</th>
+                    <th scope="col">仕様</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row">原文</th>
+                    <td>
+                      受付原文・元の目的・失敗操作との対応は実行管理で保持する。
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">停止</th>
+                    <td>
+                      <ul class="cell-list">
+                        <li>
+                          人間の停止は画面からバックエンドへ直接要求できる。
+                        </li>
+                        <li>
+                          LLMなしの記録・プレビュー生成も同じ制作管理・保存・実行処理を直接使う。
+                        </li>
+                      </ul>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
         </section>
         <section aria-labelledby="git管理する定義" class="spec-section">
-          <h2 id="git管理する定義">Git管理する定義</h2>
+          <h2 id="git管理する定義">8. Git管理する定義</h2>
           <div
             aria-label="Git管理する定義"
             class="table-scroll"
@@ -1502,6 +1591,16 @@
                       </li>
                       <li>manifestで指定したパスから定義を読み取る。</li>
                     </ul>
+                    <div class="contract-detail">
+                      <ul class="cell-list">
+                        <li>
+                          受付時に固定したコミットから使用パス・blobと依存を列挙し、読み取り専用の実行用領域へ取り出す。
+                        </li>
+                        <li>
+                          実際に有効なCodex設定・ツール構成・モデルと要求値を記録し、迂回経路の制限は実装時に検証する。
+                        </li>
+                      </ul>
+                    </div>
                   </td>
                 </tr>
                 <tr>
@@ -1530,19 +1629,7 @@
                     </ul>
                   </td>
                 </tr>
-                <tr>
-                  <th scope="row">処理内容</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        受付時に固定したコミットから使用パス・blobと依存を列挙し、読み取り専用の実行用領域へ取り出す。
-                      </li>
-                      <li>
-                        実際に有効なCodex設定・ツール構成・モデルと要求値を記録し、迂回経路の制限は実装時に検証する。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
+
                 <tr>
                   <th scope="row">出力</th>
                   <td>
@@ -1565,7 +1652,7 @@
           aria-labelledby="成果物の構造と工程間の引き継ぎ"
           class="spec-section"
         >
-          <h2 id="成果物の構造と工程間の引き継ぎ">工程成果物</h2>
+          <h2 id="成果物の構造と工程間の引き継ぎ">9. 工程成果物</h2>
           <p>
             既存の文章記録・ファイル参照・保存状態等へ結び付いた構造化項目も保存する。
           </p>
@@ -1645,85 +1732,14 @@
                       </li>
                       <li>次工程には人間が採用した仮説・案を渡す。</li>
                     </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">採用判断</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        未採用の編集案を起点として追加修正する場合は、指定した候補の保存状態を維持し、上記の採用済み本流の引き継ぎと区別する。
-                      </li>
-                      <li>どの場合も、次工程は人間が選んで依頼する。</li>
-                    </ul>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
-        <section aria-labelledby="命名保存用要約の起動" class="spec-section">
-          <h2 id="命名保存用要約の起動">命名・保存用要約の起動</h2>
-          <div
-            aria-label="命名・保存用要約の起動"
-            class="table-scroll"
-            role="region"
-            tabindex="0"
-          >
-            <table class="spec-table">
-              <thead>
-                <tr>
-                  <th scope="col">項目</th>
-                  <th scope="col">仕様</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row">命名開始</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        命名は最初のLLMを使う依頼の原文を起点にクライアント側で起動し、設定した補助モデルに短い会話名を生成させる。
-                      </li>
-                      <li>
-                        命名処理は通常送信・原文・結果の保存と独立して進める。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">会話名</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>会話名がない間は仮の表示名を使う。</li>
-                      <li>命名の失敗・停止・上限では未命名として残す。</li>
-                      <li>人間の明示した名称変更を尊重する。</li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">要約開始</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        保存用要約は既存の文脈設計どおり、依頼の完了・停止・確認待ちを区切りとして追加原文を対象にする。
-                      </li>
-                      <li>
-                        未要約範囲を保持し、後の明示再開時等に補えるようにする。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">保存内容</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        補助処理のモデル、対象原文IDと範囲、起点依頼、参照、結果、失敗・停止を保存する。
-                      </li>
-                      <li>要約は保存済み原文へ対応付けて追加する。</li>
-                      <li>Codexの内部圧縮とは独立した処理とする。</li>
-                    </ul>
+                    <div class="contract-detail">
+                      <ul class="cell-list">
+                        <li>
+                          未採用の編集案を起点として追加修正する場合は、指定した候補の保存状態を維持し、上記の採用済み本流の引き継ぎと区別する。
+                        </li>
+                        <li>どの場合も、次工程は人間が選んで依頼する。</li>
+                      </ul>
+                    </div>
                   </td>
                 </tr>
               </tbody>
@@ -1734,11 +1750,13 @@
           aria-labelledby="契約を満たせない操作の扱い"
           class="spec-section"
         >
-          <h2 id="契約を満たせない操作の扱い">契約を満たせない操作の扱い</h2>
+          <h2 id="契約を満たせない操作の扱い">
+            10. 契約を満たせない操作の扱い
+          </h2>
           <p>原因と対処を示す。要件を満たせない場合は設計を見直す。</p>
         </section>
         <section class="sources">
-          <h2>詳細資料</h2>
+          <h2 id="sources">11. 詳細資料</h2>
           <p>
             <a
               href="https://github.com/Kurarowa305/scene-craft/issues/9"

@@ -44,22 +44,33 @@
       <main id="main" tabindex="-1">
         <p class="eyebrow">DESIGN / 11</p>
         <h1>文脈・作風・制作方針</h1>
-        <nav aria-label="このページの目次" class="page-toc">
-          <h2>このページの内容</h2>
+        <nav aria-label="目次" class="page-toc">
+          <h2>目次</h2>
           <ol>
-            <li><a href="#責務">責務</a></li>
-            <li><a href="#共有情報と制作意図">制作意図</a></li>
-            <li><a href="#実行に渡す文脈">実行に渡す文脈</a></li>
-            <li><a href="#要約の更新と原文">会話の要約</a></li>
-            <li><a href="#振り返りと根拠">振り返り</a></li>
             <li>
-              <a href="#作風の傾向から制作方針へ">作風の傾向から制作方針へ</a>
+              <a href="#責務">1. 責務</a>
+              <ol>
+                <li><a href="#共有情報と制作意図">1-1. 制作意図</a></li>
+              </ol>
             </li>
-            <li><a href="#会話履歴の取得">会話履歴の取得</a></li>
+            <li>
+              <a href="#実行に渡す文脈">2. 実行に渡す文脈</a>
+              <ol>
+                <li><a href="#要約の更新と原文">2-1. 会話の要約</a></li>
+                <li><a href="#会話履歴の取得">2-2. 会話履歴の取得</a></li>
+              </ol>
+            </li>
+            <li><a href="#振り返りと根拠">3. 振り返り</a></li>
+            <li>
+              <a href="#作風の傾向から制作方針へ"
+                >4. 作風の傾向から制作方針へ</a
+              >
+            </li>
+            <li><a href="#sources">5. 詳細資料</a></li>
           </ol>
         </nav>
         <section aria-labelledby="責務" class="spec-section">
-          <h2 id="責務">責務</h2>
+          <h2 id="責務">1. 責務</h2>
           <div
             aria-label="責務"
             class="table-scroll"
@@ -147,67 +158,68 @@
               >公式OpenAI documentation</a
             >に記載されている。
           </p>
-        </section>
-        <section aria-labelledby="共有情報と制作意図" class="spec-section">
-          <h2 id="共有情報と制作意図">制作意図</h2>
-          <div
-            aria-label="共有情報と制作意図"
-            class="table-scroll"
-            role="region"
-            tabindex="0"
-          >
-            <table class="spec-table">
-              <thead>
-                <tr>
-                  <th scope="col">項目</th>
-                  <th scope="col">仕様</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row">作品の共有情報</th>
-                  <td>
-                    制作意図、現在採用状態、採否と手修正、保護指定、固定した作風は作品単位を正とする。
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">更新指示</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>「夕景もいいかも」は検討中の案。</li>
-                      <li>
-                        「この作品は夕景に変更して」のような明示的な指示を共有する制作意図の更新根拠にできる。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">訂正履歴</th>
-                  <td>
-                    更新時は指示原文と新しい文章記録を関連付け、訂正前の意図・記入者・時刻も維持する。
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">優先順位</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>制作方針より作品の制作意図を優先する。</li>
-                      <li>作品の制作意図を優先して依頼を扱う。</li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">判断の確認</th>
-                  <td>
-                    「静かな夜景」の作品で「昼のように明るくして」と頼まれ、両立する調整か意図の変更か判断できない場合は確認する。
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+
+          <section aria-labelledby="共有情報と制作意図" class="spec-subsection">
+            <h3 id="共有情報と制作意図">1-1. 制作意図</h3>
+            <div
+              aria-label="共有情報と制作意図"
+              class="table-scroll"
+              role="region"
+              tabindex="0"
+            >
+              <table class="spec-table">
+                <thead>
+                  <tr>
+                    <th scope="col">項目</th>
+                    <th scope="col">仕様</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row">作品の共有情報</th>
+                    <td>
+                      制作意図、現在採用状態、採否と手修正、保護指定、固定した作風は作品単位を正とする。
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">更新指示</th>
+                    <td>
+                      <ul class="cell-list">
+                        <li>「夕景もいいかも」は検討中の案。</li>
+                        <li>
+                          「この作品は夕景に変更して」のような明示的な指示を共有する制作意図の更新根拠にできる。
+                        </li>
+                      </ul>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">訂正履歴</th>
+                    <td>
+                      更新時は指示原文と新しい文章記録を関連付け、訂正前の意図・記入者・時刻も維持する。
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">優先順位</th>
+                    <td>
+                      <ul class="cell-list">
+                        <li>制作方針より作品の制作意図を優先する。</li>
+                        <li>作品の制作意図を優先して依頼を扱う。</li>
+                      </ul>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">判断の確認</th>
+                    <td>
+                      「静かな夜景」の作品で「昼のように明るくして」と頼まれ、両立する調整か意図の変更か判断できない場合は確認する。
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
         </section>
         <section aria-labelledby="実行に渡す文脈" class="spec-section">
-          <h2 id="実行に渡す文脈">実行に渡す文脈</h2>
+          <h2 id="実行に渡す文脈">2. 実行に渡す文脈</h2>
           <figure class="process-diagram">
             <ol aria-label="実行に渡す文脈" class="process-flow">
               <li>
@@ -285,83 +297,92 @@
               </tbody>
             </table>
           </div>
-        </section>
-        <section aria-labelledby="要約の更新と原文" class="spec-section">
-          <h2 id="要約の更新と原文">会話の要約</h2>
-          <div
-            aria-label="要約の更新と原文"
-            class="table-scroll"
-            role="region"
-            tabindex="0"
-          >
-            <table class="spec-table">
-              <thead>
-                <tr>
-                  <th scope="col">項目</th>
-                  <th scope="col">仕様</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row">生成時点</th>
-                  <td>
-                    依頼の完了・停止・確認待ちを更新の区切りとし、追加された発言を要約する。
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">根拠</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        要約は対象メッセージID／範囲、作成者・時刻、根拠の参照を持つ。
-                      </li>
-                      <li>訂正時は新しい文章記録を作り、訂正元を残す。</li>
-                      <li>原文を保持する。</li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">次の依頼</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        次の実行では最新の共有情報、利用可能な要約、要約に未反映の原文を区別する。
-                      </li>
-                      <li>
-                        確定記録にある最新の採否・意図・保護指定を優先する。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">失敗</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        要約失敗や中断時も原文・依頼・途中結果を保存する。
-                      </li>
-                      <li>未要約の範囲と失敗を示す。</li>
-                      <li>受信途中・欠落は完全な原文と区別する。</li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">停止条件</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        要約処理のLLM呼び出しにも既存の認証・利用上限・停止契約を適用する。
-                      </li>
-                      <li>要約の具体的な工程契約はエージェント設計へ渡す。</li>
-                    </ul>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+
+          <section aria-labelledby="要約の更新と原文" class="spec-subsection">
+            <h3 id="要約の更新と原文">2-1. 会話の要約</h3>
+            <div
+              aria-label="要約の更新と原文"
+              class="table-scroll"
+              role="region"
+              tabindex="0"
+            >
+              <table class="spec-table">
+                <thead>
+                  <tr>
+                    <th scope="col">項目</th>
+                    <th scope="col">仕様</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row">生成時点</th>
+                    <td>
+                      依頼の完了・停止・確認待ちを更新の区切りとし、追加された発言を要約する。
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">根拠</th>
+                    <td>
+                      <ul class="cell-list">
+                        <li>
+                          要約は対象メッセージID／範囲、作成者・時刻、根拠の参照を持つ。
+                        </li>
+                        <li>訂正時は新しい文章記録を作り、訂正元を残す。</li>
+                        <li>原文を保持する。</li>
+                      </ul>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">次の依頼</th>
+                    <td>
+                      <ul class="cell-list">
+                        <li>
+                          次の実行では最新の共有情報、利用可能な要約、要約に未反映の原文を区別する。
+                        </li>
+                        <li>
+                          確定記録にある最新の採否・意図・保護指定を優先する。
+                        </li>
+                      </ul>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">失敗</th>
+                    <td>
+                      <ul class="cell-list">
+                        <li>
+                          要約失敗や中断時も原文・依頼・途中結果を保存する。
+                        </li>
+                        <li>未要約の範囲と失敗を示す。</li>
+                        <li>受信途中・欠落は完全な原文と区別する。</li>
+                      </ul>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">停止条件</th>
+                    <td>
+                      <ul class="cell-list">
+                        <li>
+                          要約処理のLLM呼び出しにも既存の認証・利用上限・停止契約を適用する。
+                        </li>
+                        <li>
+                          要約の具体的な工程契約はエージェント設計へ渡す。
+                        </li>
+                      </ul>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+          <section aria-labelledby="会話履歴の取得" class="spec-subsection">
+            <h3 id="会話履歴の取得">2-2. 会話履歴の取得</h3>
+            <p>
+              paginated履歴はページングで取得する。保存済み原文を正とし、実行・分析で使った参照の固定と、制作意図・方針の明示更新を維持する。
+            </p>
+          </section>
         </section>
         <section aria-labelledby="振り返りと根拠" class="spec-section">
-          <h2 id="振り返りと根拠">振り返り</h2>
+          <h2 id="振り返りと根拠">3. 振り返り</h2>
           <p>
             人間が一作品または複数作品を選んで起動する。複数作品の場合は専用会話として対象作品集合を保持する。対象作品の全履歴を分析対象にする。全履歴を対象とすることと、実際に分析で取得・観察できた範囲の説明を区別する。
           </p>
@@ -429,7 +450,7 @@
           aria-labelledby="作風の傾向から制作方針へ"
           class="spec-section"
         >
-          <h2 id="作風の傾向から制作方針へ">作風の傾向から制作方針へ</h2>
+          <h2 id="作風の傾向から制作方針へ">4. 作風の傾向から制作方針へ</h2>
           <div
             aria-label="作風の傾向から制作方針へ"
             class="table-scroll"
@@ -454,6 +475,14 @@
                         「暖色が多い」という観察を「主役を暖色で際立たせる」という方針へ編集できる。
                       </li>
                     </ul>
+                    <div class="contract-detail">
+                      <ul class="cell-list">
+                        <li>
+                          新しい作品は作風の版を選ぶか、作風なしで始める。
+                        </li>
+                        <li>派生開始時も参照元と派生先の選択を区別する。</li>
+                      </ul>
+                    </div>
                   </td>
                 </tr>
                 <tr>
@@ -465,30 +494,19 @@
                       </li>
                       <li>理由がなければ未入力とする。</li>
                     </ul>
+                    <div class="contract-detail">
+                      <ul class="cell-list">
+                        <li>
+                          採用した変更をGitへコミットし、作品への適用は別に選ぶ。
+                        </li>
+                        <li>
+                          通常制作では選択した版の採用済み制作方針を使い、未確認の作風の傾向は振り返り・方針の検討時に参照する。
+                        </li>
+                      </ul>
+                    </div>
                   </td>
                 </tr>
-                <tr>
-                  <th scope="row">採用判断</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        採用した変更をGitへコミットし、作品への適用は別に選ぶ。
-                      </li>
-                      <li>
-                        通常制作では選択した版の採用済み制作方針を使い、未確認の作風の傾向は振り返り・方針の検討時に参照する。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">処理内容</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>新しい作品は作風の版を選ぶか、作風なしで始める。</li>
-                      <li>派生開始時も参照元と派生先の選択を区別する。</li>
-                    </ul>
-                  </td>
-                </tr>
+
                 <tr>
                   <th scope="row">Git参照</th>
                   <td>
@@ -509,14 +527,8 @@
             </table>
           </div>
         </section>
-        <section aria-labelledby="会話履歴の取得" class="spec-section">
-          <h2 id="会話履歴の取得">会話履歴の取得</h2>
-          <p>
-            paginated履歴はページングで取得する。保存済み原文を正とし、実行・分析で使った参照の固定と、制作意図・方針の明示更新を維持する。
-          </p>
-        </section>
         <section class="sources">
-          <h2>詳細資料</h2>
+          <h2 id="sources">5. 詳細資料</h2>
           <p>
             <a
               href="https://github.com/Kurarowa305/scene-craft/issues/10"
