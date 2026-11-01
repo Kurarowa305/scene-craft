@@ -44,28 +44,39 @@
       <main id="main" tabindex="-1">
         <p class="eyebrow">DESIGN / 10</p>
         <h1>参考資料と素材</h1>
-        <nav aria-label="このページの目次" class="page-toc">
-          <h2>このページの内容</h2>
+        <nav aria-label="目次" class="page-toc">
+          <h2>目次</h2>
           <ol>
-            <li><a href="#対象と選定理由">検索対象</a></li>
-            <li><a href="#検索候補人間の選択">検索・候補・人間の選択</a></li>
+            <li><a href="#対象と選定理由">1. 検索対象</a></li>
             <li>
-              <a href="#候補と実際の取り込みに残す情報"
-                >候補と実際の取り込みに残す情報</a
-              >
+              <a href="#検索候補人間の選択">2. 検索・候補・人間の選択</a>
+              <ol>
+                <li>
+                  <a href="#候補と実際の取り込みに残す情報"
+                    >2-1. 候補と実際の取り込みに残す情報</a
+                  >
+                </li>
+                <li>
+                  <a href="#プレビューと参考画像の保存">2-2. 参考画像の保存</a>
+                </li>
+              </ol>
             </li>
-            <li><a href="#プレビューと参考画像の保存">参考画像の保存</a></li>
-            <li><a href="#対応形式と品質">取得条件</a></li>
-            <li><a href="#手順と完成の境界">素材の取り込み手順</a></li>
-            <li><a href="#失敗不足停止">失敗・不足・停止</a></li>
+            <li><a href="#対応形式と品質">3. 取得条件</a></li>
             <li>
-              <a href="#サービスの提供条件と確認範囲">サービスの提供条件</a>
+              <a href="#手順と完成の境界">4. 素材の取り込み手順</a>
+              <ol>
+                <li><a href="#失敗不足停止">4-1. 失敗・不足・停止</a></li>
+              </ol>
             </li>
-            <li><a href="#検索と制作操作の境界">検索と制作操作の境界</a></li>
+            <li>
+              <a href="#サービスの提供条件と確認範囲">5. サービスの提供条件</a>
+            </li>
+            <li><a href="#検索と制作操作の境界">6. 検索と制作操作の境界</a></li>
+            <li><a href="#sources">7. 詳細資料</a></li>
           </ol>
         </nav>
         <section aria-labelledby="対象と選定理由" class="spec-section">
-          <h2 id="対象と選定理由">検索対象</h2>
+          <h2 id="対象と選定理由">1. 検索対象</h2>
           <p>
             参考資料は表現・構造等を検討する根拠、素材は制作データへ取り込んで使うデータとする。同じ画像が両方の役割を持つ場合も、参考として選ぶ判断と制作データへの取り込みを区別する。
           </p>
@@ -115,7 +126,7 @@
           </p>
         </section>
         <section aria-labelledby="検索候補人間の選択" class="spec-section">
-          <h2 id="検索候補人間の選択">検索・候補・人間の選択</h2>
+          <h2 id="検索候補人間の選択">2. 検索・候補・人間の選択</h2>
           <figure class="process-diagram">
             <ol aria-label="検索・候補・人間の選択" class="process-flow">
               <li>
@@ -156,188 +167,186 @@
               矢印は手順の順序を表す。各段階の条件に従って処理を進める。
             </figcaption>
           </figure>
-        </section>
-        <section
-          aria-labelledby="候補と実際の取り込みに残す情報"
-          class="spec-section"
-        >
-          <h2 id="候補と実際の取り込みに残す情報">
-            候補と実際の取り込みに残す情報
-          </h2>
-          <div
-            aria-label="候補と実際の取り込みに残す情報"
-            class="table-scroll"
-            role="region"
-            tabindex="0"
+
+          <section
+            aria-labelledby="候補と実際の取り込みに残す情報"
+            class="spec-subsection"
           >
-            <table class="spec-table">
-              <thead>
-                <tr>
-                  <th scope="col">段階</th>
-                  <th scope="col">記録する内容</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row">検索</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>作品・会話・依頼・実行への参照</li>
-                      <li>検索語・対象サービスまたは指定フォルダー</li>
-                      <li>検索時刻</li>
-                      <li>結果と取得失敗の区別</li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">候補共通</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>候補を識別する参照</li>
-                      <li>名前</li>
-                      <li>出典URLまたは元の所在</li>
-                      <li>サービスの素材ID（ある場合）</li>
-                      <li>作者</li>
-                      <li>プレビューまたは欠けている理由</li>
-                      <li>利用条件・根拠のURLまたは文書参照・確認日</li>
-                      <li>参考にする要素と制作意図との関係</li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">素材候補</th>
-                  <td>
-                    提供される形式・解像度・容量、品質やモデルの違い、
-                    既知の依存素材・必要なアドオン等。未取得の詳細は未確認とする
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">人間の選択</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>対象候補</li>
-                      <li>参考としての選択／素材取り込みの指示の区別</li>
-                      <li>指示原文・人間・時刻への参照</li>
-                      <li>理由（入力された場合）</li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">取得・取り込み</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>実際の取得元・時刻・形式・解像度・品質</li>
-                      <li>利用条件の確認根拠</li>
-                      <li>人間の補足</li>
-                      <li>元ファイルと管理下ファイルの対応</li>
-                      <li>サイズ・ハッシュ・依存一覧</li>
-                      <li>検証結果</li>
-                      <li>編集案・保存状態・実行への参照</li>
-                    </ul>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <div
-            aria-label="候補と実際の取り込みに残す情報"
-            class="table-scroll"
-            role="region"
-            tabindex="0"
+            <h3 id="候補と実際の取り込みに残す情報">
+              2-1. 候補と実際の取り込みに残す情報
+            </h3>
+            <div
+              aria-label="候補と実際の取り込みに残す情報"
+              class="table-scroll"
+              role="region"
+              tabindex="0"
+            >
+              <table class="spec-table">
+                <thead>
+                  <tr>
+                    <th scope="col">段階</th>
+                    <th scope="col">記録する内容</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row">検索</th>
+                    <td>
+                      <ul class="cell-list">
+                        <li>作品・会話・依頼・実行への参照</li>
+                        <li>検索語・対象サービスまたは指定フォルダー</li>
+                        <li>検索時刻</li>
+                        <li>結果と取得失敗の区別</li>
+                      </ul>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">候補共通</th>
+                    <td>
+                      <ul class="cell-list">
+                        <li>候補を識別する参照</li>
+                        <li>名前</li>
+                        <li>出典URLまたは元の所在</li>
+                        <li>サービスの素材ID（ある場合）</li>
+                        <li>作者</li>
+                        <li>プレビューまたは欠けている理由</li>
+                        <li>利用条件・根拠のURLまたは文書参照・確認日</li>
+                        <li>参考にする要素と制作意図との関係</li>
+                      </ul>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">素材候補</th>
+                    <td>
+                      提供される形式・解像度・容量、品質やモデルの違い、
+                      既知の依存素材・必要なアドオン等。未取得の詳細は未確認とする
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">人間の選択</th>
+                    <td>
+                      <ul class="cell-list">
+                        <li>対象候補</li>
+                        <li>参考としての選択／素材取り込みの指示の区別</li>
+                        <li>指示原文・人間・時刻への参照</li>
+                        <li>理由（入力された場合）</li>
+                      </ul>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">取得・取り込み</th>
+                    <td>
+                      <ul class="cell-list">
+                        <li>実際の取得元・時刻・形式・解像度・品質</li>
+                        <li>利用条件の確認根拠</li>
+                        <li>人間の補足</li>
+                        <li>元ファイルと管理下ファイルの対応</li>
+                        <li>サイズ・ハッシュ・依存一覧</li>
+                        <li>検証結果</li>
+                        <li>編集案・保存状態・実行への参照</li>
+                      </ul>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div
+              aria-label="候補と実際の取り込みに残す情報"
+              class="table-scroll"
+              role="region"
+              tabindex="0"
+            >
+              <table class="spec-table">
+                <thead>
+                  <tr>
+                    <th scope="col">項目</th>
+                    <th scope="col">仕様</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row">記録</th>
+                    <td>
+                      <ul class="cell-list">
+                        <li>作者・容量等が分からない場合は不明と記録する。</li>
+                        <li>
+                          利用条件が不明な場合は、他の項目が揃っていても取り込みを保留する。
+                        </li>
+                        <li>取得した実体と依存素材をハッシュで固定する。</li>
+                      </ul>
+                      <div class="contract-detail">
+                        <ul class="cell-list">
+                          <li>
+                            検索・参考資料の選択は会話・出典の記録として保存する。
+                          </li>
+                          <li>具体的なテーブル分割は実装仕様へ引き継ぐ。</li>
+                        </ul>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+          <section
+            aria-labelledby="プレビューと参考画像の保存"
+            class="spec-subsection"
           >
-            <table class="spec-table">
-              <thead>
-                <tr>
-                  <th scope="col">項目</th>
-                  <th scope="col">仕様</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row">記録</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>作者・容量等が分からない場合は不明と記録する。</li>
-                      <li>
-                        利用条件が不明な場合は、他の項目が揃っていても取り込みを保留する。
-                      </li>
-                      <li>取得した実体と依存素材をハッシュで固定する。</li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">記録</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        検索・参考資料の選択は会話・出典の記録として保存する。
-                      </li>
-                      <li>具体的なテーブル分割は実装仕様へ引き継ぐ。</li>
-                    </ul>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
-        <section
-          aria-labelledby="プレビューと参考画像の保存"
-          class="spec-section"
-        >
-          <h2 id="プレビューと参考画像の保存">参考画像の保存</h2>
-          <div
-            aria-label="プレビューと参考画像の保存"
-            class="table-scroll"
-            role="region"
-            tabindex="0"
-          >
-            <table class="spec-table">
-              <thead>
-                <tr>
-                  <th scope="col">項目</th>
-                  <th scope="col">仕様</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row">出典</th>
-                  <td>
-                    プレビューの出典と、制作へ取り込むファイルの出典・利用条件を区別する。
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">保存条件</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        一般Webの参考画像は、保存できる条件を確認できたものを管理下へコピーする。
-                      </li>
-                      <li>
-                        保存可否が不明なら出典URL・参考要素・制作意図との関係と、画像の可用性を記録する。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">記録保持</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        リンク切れや画像の欠落が起きても文章と当時の選択の記録は残す。
-                      </li>
-                      <li>当時の参考資料と出典を保持する。</li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">素材への用途変更</th>
-                  <td>
-                    役割を変えて取り込む際は素材としての利用条件を確認する。
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+            <h3 id="プレビューと参考画像の保存">2-2. 参考画像の保存</h3>
+            <div
+              aria-label="プレビューと参考画像の保存"
+              class="table-scroll"
+              role="region"
+              tabindex="0"
+            >
+              <table class="spec-table">
+                <thead>
+                  <tr>
+                    <th scope="col">項目</th>
+                    <th scope="col">仕様</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row">出典</th>
+                    <td>
+                      プレビューの出典と、制作へ取り込むファイルの出典・利用条件を区別する。
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">保存条件</th>
+                    <td>
+                      <ul class="cell-list">
+                        <li>
+                          一般Webの参考画像は、保存できる条件を確認できたものを管理下へコピーする。
+                        </li>
+                        <li>
+                          保存可否が不明なら出典URL・参考要素・制作意図との関係と、画像の可用性を記録する。
+                        </li>
+                      </ul>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">記録保持</th>
+                    <td>
+                      <ul class="cell-list">
+                        <li>
+                          リンク切れや画像の欠落が起きても文章と当時の選択の記録は残す。
+                        </li>
+                        <li>当時の参考資料と出典を保持する。</li>
+                      </ul>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">素材への用途変更</th>
+                    <td>
+                      役割を変えて取り込む際は素材としての利用条件を確認する。
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
         </section>
         <section aria-labelledby="対応形式と品質" class="spec-section">
           <span
@@ -345,7 +354,7 @@
             class="anchor-alias"
             id="取得blenderへの取り込み"
           ></span>
-          <h2 id="対応形式と品質">取得条件</h2>
+          <h2 id="対応形式と品質">3. 取得条件</h2>
           <div
             aria-label="対応形式と品質"
             class="table-scroll"
@@ -397,7 +406,7 @@
           </p>
         </section>
         <section aria-labelledby="手順と完成の境界" class="spec-section">
-          <h2 id="手順と完成の境界">素材の取り込み手順</h2>
+          <h2 id="手順と完成の境界">4. 素材の取り込み手順</h2>
           <figure class="process-diagram">
             <ol aria-label="手順と完成の境界" class="process-flow">
               <li>
@@ -448,80 +457,81 @@
           <p>
             取得後の素材・条件の記録は、その実行が何を使ったかを示す根拠として残す。再取得で内容が異なり、人間が選んだ前提・品質・デザインが変わる場合は確認し直す。
           </p>
-        </section>
-        <section aria-labelledby="失敗不足停止" class="spec-section">
-          <h2 id="失敗不足停止">失敗・不足・停止</h2>
-          <div
-            aria-label="失敗・不足・停止"
-            class="table-scroll"
-            role="region"
-            tabindex="0"
-          >
-            <table class="spec-table">
-              <thead>
-                <tr>
-                  <th scope="col">状況</th>
-                  <th scope="col">扱い</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row">検索サービスが利用不可・応答失敗</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        検索失敗と検索結果なしを区別し、取得済みの候補と出典を残す。
-                      </li>
-                      <li>手元の候補は確認できる。</li>
-                      <li>人間が選んだサービス・素材を取得する 。</li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">ダウンロード失敗・容量不足・破損</th>
-                  <td>
-                    失敗した取得先・形式・品質と原因、検証済みの途中成果を記録する。取得失敗と原因を返す
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">利用条件不明</th>
-                  <td>
-                    候補の記録は残せるが取り込みは保留。手元の購入済み素材も同様とし、人間が購入時の規約や利用許諾を補足した後に進める
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">保存できない素材・不足する依存</th>
-                  <td>対象・理由・必要な操作を保存側へ渡す</td>
-                </tr>
-                <tr>
-                  <th scope="row">未対応形式・追加アドオンが必要</th>
-                  <td>
-                    原因を示して保留する。原因と対応可能な形式・必要な依存を示して人間の選択を待つ
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">プレビューだけ取得できない</th>
-                  <td>候補に画像がない理由を示す</td>
-                </tr>
-                <tr>
-                  <th scope="row">停止・アプリ再起動・結果不明</th>
-                  <td>
-                    <a href="execution-lifecycle.html">実行状態設計</a
-                    >に従い、新規操作の開始を止め、検証済み実体・外部実行・保存記録を照合する
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <p>
-            依頼全体の最大2回、同じ試行の通信再送と制作操作のやり直しの区別は実行状態設計を引き継ぐ。検証済みの同一素材を再利用できる場合も同一性を照合する。
-          </p>
+
+          <section aria-labelledby="失敗不足停止" class="spec-subsection">
+            <h3 id="失敗不足停止">4-1. 失敗・不足・停止</h3>
+            <div
+              aria-label="失敗・不足・停止"
+              class="table-scroll"
+              role="region"
+              tabindex="0"
+            >
+              <table class="spec-table">
+                <thead>
+                  <tr>
+                    <th scope="col">状況</th>
+                    <th scope="col">扱い</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row">検索サービスが利用不可・応答失敗</th>
+                    <td>
+                      <ul class="cell-list">
+                        <li>
+                          検索失敗と検索結果なしを区別し、取得済みの候補と出典を残す。
+                        </li>
+                        <li>手元の候補は確認できる。</li>
+                        <li>人間が選んだサービス・素材を取得する 。</li>
+                      </ul>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">ダウンロード失敗・容量不足・破損</th>
+                    <td>
+                      失敗した取得先・形式・品質と原因、検証済みの途中成果を記録する。取得失敗と原因を返す
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">利用条件不明</th>
+                    <td>
+                      候補の記録は残せるが取り込みは保留。手元の購入済み素材も同様とし、人間が購入時の規約や利用許諾を補足した後に進める
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">保存できない素材・不足する依存</th>
+                    <td>対象・理由・必要な操作を保存側へ渡す</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">未対応形式・追加アドオンが必要</th>
+                    <td>
+                      原因を示して保留する。原因と対応可能な形式・必要な依存を示して人間の選択を待つ
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">プレビューだけ取得できない</th>
+                    <td>候補に画像がない理由を示す</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">停止・アプリ再起動・結果不明</th>
+                    <td>
+                      <a href="execution-lifecycle.html">実行状態設計</a
+                      >に従い、新規操作の開始を止め、検証済み実体・外部実行・保存記録を照合する
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p>
+              依頼全体の最大2回、同じ試行の通信再送と制作操作のやり直しの区別は実行状態設計を引き継ぐ。検証済みの同一素材を再利用できる場合も同一性を照合する。
+            </p>
+          </section>
         </section>
         <section
           aria-labelledby="サービスの提供条件と確認範囲"
           class="spec-section"
         >
-          <h2 id="サービスの提供条件と確認範囲">サービスの提供条件</h2>
+          <h2 id="サービスの提供条件と確認範囲">5. サービスの提供条件</h2>
           <p>
             APIの利用条件と素材の利用条件は分けて記録する。提供条件は2026-10-31の公式資料を根拠とする。
           </p>
@@ -614,7 +624,7 @@
           </p>
         </section>
         <section aria-labelledby="検索と制作操作の境界" class="spec-section">
-          <h2 id="検索と制作操作の境界">検索と制作操作の境界</h2>
+          <h2 id="検索と制作操作の境界">6. 検索と制作操作の境界</h2>
           <div
             aria-label="検索と制作操作の境界"
             class="table-scroll"
@@ -646,7 +656,7 @@
           </div>
         </section>
         <section class="sources">
-          <h2>詳細資料</h2>
+          <h2 id="sources">7. 詳細資料</h2>
           <p>
             <a
               href="https://github.com/Kurarowa305/scene-craft/issues/13"

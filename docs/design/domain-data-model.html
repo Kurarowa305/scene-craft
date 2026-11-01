@@ -43,37 +43,54 @@
       <main id="main" tabindex="-1">
         <p class="eyebrow">DESIGN / 03</p>
         <h1>データモデル</h1>
-        <nav aria-label="このページの目次" class="page-toc">
-          <h2>このページの内容</h2>
+        <nav aria-label="目次" class="page-toc">
+          <h2>目次</h2>
           <ol>
-            <li><a href="#対象と責務">データモデルの責務</a></li>
-            <li><a href="#識別と共通契約">識別子の契約</a></li>
             <li>
-              <a href="#エンティティの所属関係">エンティティの所属関係</a>
+              <a href="#対象と責務">1. データモデルの責務</a>
+              <ol>
+                <li><a href="#識別と共通契約">1-1. 識別子の契約</a></li>
+              </ol>
             </li>
-            <li><a href="#主要データの契約">主要データの契約</a></li>
-            <li><a href="#保存状態の内容と成立">保存状態の契約</a></li>
-            <li><a href="#分岐組合せ採用">分岐、組合せ、採用</a></li>
-            <li><a href="#復元と派生">復元</a></li>
-            <li><a href="#派生作品のデータ">派生作品</a></li>
-            <li><a href="#会話共有情報原文と要約">会話の共有情報</a></li>
-            <li><a href="#会話の要約記録">会話の要約記録</a></li>
-            <li><a href="#振り返りのデータ">振り返りの記録</a></li>
             <li>
-              <a href="#実行windows-の記録エージェント改訂履歴">実行記録</a>
+              <a href="#エンティティの所属関係">2. エンティティの所属関係</a>
             </li>
-            <li><a href="#エージェント改訂履歴">エージェント改訂履歴</a></li>
-            <li><a href="#記録が成立する単位と不変条件">記録の成立条件</a></li>
+            <li><a href="#主要データの契約">3. 主要データの契約</a></li>
+            <li><a href="#保存状態の内容と成立">4. 保存状態の契約</a></li>
+            <li><a href="#分岐組合せ採用">5. 分岐、組合せ、採用</a></li>
+            <li><a href="#復元と派生">6. 復元</a></li>
+            <li><a href="#派生作品のデータ">7. 派生作品</a></li>
+            <li>
+              <a href="#会話共有情報原文と要約">8. 会話の共有情報</a>
+              <ol>
+                <li><a href="#会話の要約記録">8-1. 会話の要約記録</a></li>
+              </ol>
+            </li>
+            <li><a href="#振り返りのデータ">9. 振り返りの記録</a></li>
+            <li>
+              <a href="#実行windows-の記録エージェント改訂履歴">10. 実行記録</a>
+              <ol>
+                <li>
+                  <a href="#エージェント改訂履歴">10-1. エージェント改訂履歴</a>
+                </li>
+              </ol>
+            </li>
+            <li>
+              <a href="#記録が成立する単位と不変条件">11. 記録の成立条件</a>
+            </li>
             <li>
               <a href="#ブランチグラフによる制作履歴の表示"
-                >ブランチグラフによる制作履歴の表示</a
+                >12. ブランチグラフによる制作履歴の表示</a
               >
+              <ol>
+                <li><a href="#具体例による確認">12-1. 具体例による確認</a></li>
+              </ol>
             </li>
-            <li><a href="#具体例による確認">具体例による確認</a></li>
+            <li><a href="#sources">13. 詳細資料</a></li>
           </ol>
         </nav>
         <section aria-labelledby="対象と責務" class="spec-section">
-          <h2 id="対象と責務">データモデルの責務</h2>
+          <h2 id="対象と責務">1. データモデルの責務</h2>
           <div
             aria-label="対象と責務"
             class="table-scroll"
@@ -121,93 +138,95 @@
               </tbody>
             </table>
           </div>
-        </section>
-        <section aria-labelledby="識別と共通契約" class="spec-section">
-          <h2 id="識別と共通契約">識別子の契約</h2>
-          <div
-            aria-label="識別と共通契約"
-            class="table-scroll"
-            role="region"
-            tabindex="0"
-          >
-            <table class="spec-table">
-              <thead>
-                <tr>
-                  <th scope="col">項目</th>
-                  <th scope="col">仕様</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row">永続ID</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        下記の契約表に挙げる各概念は、それぞれ永続 ID を持つ。
-                      </li>
-                      <li>ID は対象の同一性を示す。</li>
-                      <li>表示名・保存場所の変更や復元後も同じIDを使う。</li>
-                      <li>
-                        取り込み時の重複・衝突の扱いは保存設計で具体化する。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">時刻</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        記録時刻を必須とし、後日登録で実際の作業時刻が分かる場合は別に記録する。
-                      </li>
-                      <li>
-                        同時刻でも参照関係と確定順を識別できるようにする。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">所属</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>作品に属する記録は作品 ID を持つ。</li>
-                      <li>
-                        複数作品の振り返りは対象作品集合を持ち、通常の制作依頼の変更先は一作品に限る。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">履歴の保持</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>確定済み保存状態の内容・変更元を保持する。</li>
-                      <li>
-                        理由・要約は訂正元を指す新しい文章記録として追加する。
-                      </li>
-                      <li>
-                        状態遷移・採否変更・現在状態の切替は以前の判断とともに記録する。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">Git参照</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        Git 参照はリポジトリの識別とフルコミットハッシュを持つ。
-                      </li>
-                      <li>定義と作風は別の参照を持てる。</li>
-                    </ul>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+
+          <section aria-labelledby="識別と共通契約" class="spec-subsection">
+            <h3 id="識別と共通契約">1-1. 識別子の契約</h3>
+            <div
+              aria-label="識別と共通契約"
+              class="table-scroll"
+              role="region"
+              tabindex="0"
+            >
+              <table class="spec-table">
+                <thead>
+                  <tr>
+                    <th scope="col">項目</th>
+                    <th scope="col">仕様</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row">永続ID</th>
+                    <td>
+                      <ul class="cell-list">
+                        <li>
+                          下記の契約表に挙げる各概念は、それぞれ永続 ID を持つ。
+                        </li>
+                        <li>ID は対象の同一性を示す。</li>
+                        <li>表示名・保存場所の変更や復元後も同じIDを使う。</li>
+                        <li>
+                          取り込み時の重複・衝突の扱いは保存設計で具体化する。
+                        </li>
+                      </ul>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">時刻</th>
+                    <td>
+                      <ul class="cell-list">
+                        <li>
+                          記録時刻を必須とし、後日登録で実際の作業時刻が分かる場合は別に記録する。
+                        </li>
+                        <li>
+                          同時刻でも参照関係と確定順を識別できるようにする。
+                        </li>
+                      </ul>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">所属</th>
+                    <td>
+                      <ul class="cell-list">
+                        <li>作品に属する記録は作品 ID を持つ。</li>
+                        <li>
+                          複数作品の振り返りは対象作品集合を持ち、通常の制作依頼の変更先は一作品に限る。
+                        </li>
+                      </ul>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">履歴の保持</th>
+                    <td>
+                      <ul class="cell-list">
+                        <li>確定済み保存状態の内容・変更元を保持する。</li>
+                        <li>
+                          理由・要約は訂正元を指す新しい文章記録として追加する。
+                        </li>
+                        <li>
+                          状態遷移・採否変更・現在状態の切替は以前の判断とともに記録する。
+                        </li>
+                      </ul>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Git参照</th>
+                    <td>
+                      <ul class="cell-list">
+                        <li>
+                          Git
+                          参照はリポジトリの識別とフルコミットハッシュを持つ。
+                        </li>
+                        <li>定義と作風は別の参照を持てる。</li>
+                      </ul>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
         </section>
         <section aria-labelledby="エンティティの所属関係" class="spec-section">
-          <h2 id="エンティティの所属関係">エンティティの所属関係</h2>
+          <h2 id="エンティティの所属関係">2. エンティティの所属関係</h2>
           <figure>
             <div
               aria-label="エンティティの所属関係"
@@ -237,56 +256,56 @@
                   </marker>
                 </defs>
                 <path
-                  d="M525 59H620V310H680"
+                  d="M525 59L610 59Q620 59 620 69L620 300Q620 310 630 310L680 310"
                   fill="none"
                   marker-end="url(#entity-arrow)"
                   stroke="#48716b"
                   stroke-width="1.5"
                 ></path>
                 <path
-                  d="M525 189H620V310H680"
+                  d="M525 189L610 189Q620 189 620 199L620 300Q620 310 630 310L680 310"
                   fill="none"
                   marker-end="url(#entity-arrow)"
                   stroke="#48716b"
                   stroke-width="1.5"
                 ></path>
                 <path
-                  d="M525 265H620V310H680"
+                  d="M525 265L610 265Q620 265 620 275L620 300Q620 310 630 310L680 310"
                   fill="none"
                   marker-end="url(#entity-arrow)"
                   stroke="#48716b"
                   stroke-width="1.5"
                 ></path>
                 <path
-                  d="M525 341H620V310H680"
+                  d="M525 341L610 341Q620 341 620 331L620 320Q620 310 630 310L680 310"
                   fill="none"
                   marker-end="url(#entity-arrow)"
                   stroke="#48716b"
                   stroke-width="1.5"
                 ></path>
                 <path
-                  d="M525 417H620V310H680"
+                  d="M525 417L610 417Q620 417 620 407L620 320Q620 310 630 310L680 310"
                   fill="none"
                   marker-end="url(#entity-arrow)"
                   stroke="#48716b"
                   stroke-width="1.5"
                 ></path>
                 <path
-                  d="M525 493H620V310H680"
+                  d="M525 493L610 493Q620 493 620 483L620 320Q620 310 630 310L680 310"
                   fill="none"
                   marker-end="url(#entity-arrow)"
                   stroke="#48716b"
                   stroke-width="1.5"
                 ></path>
                 <path
-                  d="M525 569H620V310H680"
+                  d="M525 569L610 569Q620 569 620 559L620 320Q620 310 630 310L680 310"
                   fill="none"
                   marker-end="url(#entity-arrow)"
                   stroke="#48716b"
                   stroke-width="1.5"
                 ></path>
                 <path
-                  d="M525 645H620V310H680"
+                  d="M525 645L610 645Q620 645 620 635L620 320Q620 310 630 310L680 310"
                   fill="none"
                   marker-end="url(#entity-arrow)"
                   stroke="#48716b"
@@ -300,7 +319,7 @@
                   stroke-width="1.5"
                 ></path>
                 <path
-                  d="M265 119H300V59H335"
+                  d="M265 119L290 119Q300 119 300 109L300 69Q300 59 310 59L335 59"
                   fill="none"
                   marker-end="url(#entity-arrow)"
                   stroke="#48716b"
@@ -314,7 +333,7 @@
                   stroke-width="1.5"
                 ></path>
                 <path
-                  d="M205 318H290V119H265"
+                  d="M205 318L280 318Q290 318 290 308L290 129Q290 119 280 119L265 119"
                   fill="none"
                   marker-end="url(#entity-arrow)"
                   stroke="#48716b"
@@ -388,7 +407,7 @@
           </figure>
         </section>
         <section aria-labelledby="主要データの契約" class="spec-section">
-          <h2 id="主要データの契約">主要データの契約</h2>
+          <h2 id="主要データの契約">3. 主要データの契約</h2>
           <div
             aria-label="主要データの契約"
             class="table-scroll"
@@ -408,7 +427,7 @@
                   <td>
                     <ul class="cell-list">
                       <li>
-                        各行は、それぞれの ID
+                        各カードは、それぞれの ID
                         で独立して識別・参照する一つの概念を表す。
                       </li>
                       <li>
@@ -424,329 +443,371 @@
               </tbody>
             </table>
           </div>
-          <div
-            aria-label="主要データの契約"
-            class="table-scroll"
-            role="region"
-            tabindex="0"
-          >
-            <table class="spec-table">
-              <thead>
-                <tr>
-                  <th scope="col">概念</th>
-                  <th scope="col">必須情報・条件付き情報</th>
-                  <th scope="col">責務</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row">作品</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>作品 ID</li>
-                      <li>名前</li>
-                      <li>作成時刻</li>
-                      <li>開始方法（新規／取り込み／派生）</li>
-                      <li>制作意図の文章参照</li>
-                      <li>固定した作風の Git 参照（未選択なら明示）</li>
-                      <li>現在状態の更新記録への参照</li>
-                      <li>保存状態作成前は現在状態なし</li>
-                    </ul>
-                  </td>
-                  <td>完成した一枚を目指す単位。会話間の共有情報の所属先</td>
-                </tr>
-                <tr>
-                  <th scope="row">会話</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>会話 ID</li>
-                      <li>用途（制作／複数作品の振り返り）</li>
-                      <li>所属作品または対象作品集合</li>
-                      <li>モデル選択</li>
-                      <li>作成時刻</li>
-                    </ul>
-                  </td>
-                  <td>
-                    原文の所属と依頼の入口。Codex thread ID
-                    は別の接続対応記録で保持する
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">原文メッセージ</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>メッセージ ID</li>
-                      <li>会話 ID</li>
-                      <li>発言者</li>
-                      <li>順序</li>
-                      <li>本文・添付参照</li>
-                      <li>記録時刻</li>
-                      <li>受信完了／途中／欠落の区別</li>
-                      <li>外部取り込みなら出典と取り込み時刻</li>
-                    </ul>
-                  </td>
-                  <td>原文を保持する。訂正や要約と分けて原文を保持する</td>
-                </tr>
-                <tr>
-                  <th scope="row">依頼</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>依頼 ID</li>
-                      <li>会話 ID</li>
-                      <li>対象作品または振り返り対象集合</li>
-                      <li>指示原文への参照</li>
-                      <li>依頼種別</li>
-                      <li>受付時刻</li>
-                      <li>状態</li>
-                      <li>
-                        起点の指定（実行直前の現在状態／明示した保存状態）
-                      </li>
-                      <li>
-                        候補への修正依頼なら修正元の編集案 ID
-                        と明示した起点の保存状態 ID
-                      </li>
-                      <li>
-                        制作変更なら合意した変更範囲・保護指定とその依頼限定許可への参照
-                      </li>
-                    </ul>
-                  </td>
-                  <td>一つの目的と停止・再実行予算の単位</td>
-                </tr>
-                <tr>
-                  <th scope="row">実行</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>実行 ID</li>
-                      <li>依頼 ID</li>
-                      <li>種別</li>
-                      <li>開始／終了時刻</li>
-                      <li>状態・失敗情報</li>
-                      <li>入力参照</li>
-                      <li>使用設定</li>
-                      <li>出力参照</li>
-                      <li>子処理なら親実行 ID</li>
-                      <li>やり直しなら再実行記録への参照</li>
-                    </ul>
-                  </td>
-                  <td>
-                    AI 処理と Windows 側制作操作を識別する。Windows
-                    側操作にも固有の実行 ID を与え、親の AI 実行と関連付ける
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">再実行の記録</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>記録 ID</li>
-                      <li>依頼 ID</li>
-                      <li>原因</li>
-                      <li>対象実行</li>
-                      <li>累積回数</li>
-                      <li>開始の根拠（自動／人間の指示）</li>
-                    </ul>
-                  </td>
-                  <td>
-                    <ul class="cell-list">
-                      <li>同一 turn 内の制作操作のやり直しも対応付ける。</li>
-                      <li>通常の子処理開始や通信再送と区別する。</li>
-                      <li>何を一回として消費するかは実行状態設計で具体化 。</li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">ファイル参照</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>ファイル ID</li>
-                      <li>所属作品</li>
-                      <li>役割・形式</li>
-                      <li>由来</li>
-                      <li>保存ルート ID＋相対パス</li>
-                      <li>内容ハッシュ</li>
-                      <li>確定・可用性の記録</li>
-                      <li>書き込み途中・不明なら未取得項目と理由を明示</li>
-                    </ul>
-                  </td>
-                  <td>保存済みの特定の実体を識別する</td>
-                </tr>
-                <tr>
-                  <th scope="row">生成物</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>生成物 ID</li>
-                      <li>作品 ID</li>
-                      <li>作成した実行 ID</li>
-                      <li>内容参照（ファイルまたは文章）</li>
-                      <li>種類</li>
-                      <li>完成判定とその根拠</li>
-                    </ul>
-                  </td>
-                  <td>
-                    <ul class="cell-list">
-                      <li>AI の成果物。</li>
-                      <li>成功・完成と、人間による採用を区別する。</li>
-                      <li>
-                        通常プログラムによるレンダー・変換も作成した制作実行へ結び付ける
-                        。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">保存状態</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>保存状態 ID</li>
-                      <li>作品 ID</li>
-                      <li>作成時刻</li>
-                      <li>構成ファイル参照と役割</li>
-                      <li>依存素材一覧</li>
-                      <li>プレビュー参照（ない場合は理由）</li>
-                      <li>成立状態</li>
-                      <li>復元可能性の確認記録</li>
-                      <li>作成元の変更記録</li>
-                    </ul>
-                  </td>
-                  <td>
-                    ある時点の制作データを固定する。初回を除き親となる状態を変更記録からたどれる
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">変更記録</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>変更 ID</li>
-                      <li>作品 ID</li>
-                      <li>
-                        種別（初期作成／取り込み／AI編集／レンダー出力登録／手修正／組合せ／復元／派生開始）
-                      </li>
-                      <li>変更後の保存状態</li>
-                      <li>変更前の保存状態（初回はなし）</li>
-                      <li>由来の参照</li>
-                      <li>要約・理由の文章参照</li>
-                      <li>
-                        種別が手修正なら操作者・作業アプリ・作業内容・前後のプレビュー参照・対象編集案（該当時）を保持し
-                      </li>
-                      <li>理由は任意</li>
-                    </ul>
-                  </td>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        制作データの変更前後と由来を一まとまりとして記録する。
-                      </li>
-                      <li>
-                        手修正もこの概念に含め、人間が指定した意味のあるまとまりを単位とする。
-                      </li>
-                      <li>取り込み・派生・復元の特別な参照は下記に従う 。</li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">編集案</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>編集案 ID</li>
-                      <li>作品 ID</li>
-                      <li>依頼 ID</li>
-                      <li>基準の保存状態</li>
-                      <li>AI が作成した保存状態</li>
-                      <li>作成実行</li>
-                      <li>変更範囲</li>
-                      <li>同じ目的の代替案を束ねる識別子</li>
-                      <li>独立／依存関係</li>
-                      <li>修正元の編集案 ID（AIによる追加修正の場合）</li>
-                    </ul>
-                  </td>
-                  <td>
-                    何と何を比較するかを表す。手修正後も AI
-                    の結果への参照を維持し、AIによる追加修正は新しい編集案から修正元へつなぐ
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">採否記録</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>判断 ID</li>
-                      <li>作品 ID</li>
-                      <li>編集案 ID</li>
-                      <li>判断対象の保存状態</li>
-                      <li>判断（採用／修正して採用／不採用）</li>
-                      <li>判断者・時刻</li>
-                      <li>任意の理由</li>
-                      <li>採用範囲（全体／指定部分）</li>
-                      <li>
-                        適用状態（未適用／適用済み／失敗／不明）と結果の参照
-                      </li>
-                      <li>訂正・変更時は以前の判断への参照</li>
-                    </ul>
-                  </td>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        最新の枝先ではなく、実際に見て判断した編集案と保存状態を指す。
-                      </li>
-                      <li>
-                        AI修正・手修正を経た結果も「修正して採用」として記録でき、変更者は各変更記録から判別する。
-                      </li>
-                      <li>判断前・未選択は明示的な不採用と区別 。</li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">現在状態の更新記録</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>更新 ID</li>
-                      <li>作品 ID</li>
-                      <li>更新前／更新後の保存状態</li>
-                      <li>
-                        根拠となる採否記録または変更記録（手修正・取り込み・復元等）
-                      </li>
-                      <li>確定時刻</li>
-                    </ul>
-                  </td>
-                  <td>どの状態を次の制作の出発点にしたかを保持する</td>
-                </tr>
-                <tr>
-                  <th scope="row">文章記録</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>文章 ID</li>
-                      <li>対象記録 ID</li>
-                      <li>用途（理由／要約／制作意図等）</li>
-                      <li>本文</li>
-                      <li>記入者（人間／AI）</li>
-                      <li>記入時刻</li>
-                      <li>訂正元 ID（該当時）</li>
-                      <li>根拠となる原文・履歴参照</li>
-                    </ul>
-                  </td>
-                  <td>
-                    変更理由と採用理由を別の対象へ結び付ける。未入力は本文なしとして扱い、後から追加できる
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">振り返りの参照記録</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>参照記録 ID</li>
-                      <li>依頼・実行 ID</li>
-                      <li>対象作品と保存状態</li>
-                      <li>採否記録・変更記録（手修正を含む）・文章記録の ID</li>
-                      <li>分析結果への参照</li>
-                    </ul>
-                  </td>
-                  <td>
-                    当時何を根拠に振り返ったかを固定する。当時の分析根拠を固定して保持する
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+          <div class="contract-cards">
+            <article class="contract-card" aria-label="作品">
+              <p class="contract-card-title">作品</p>
+              <dl>
+                <dt>必須情報・条件付き情報</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>作品 ID</li>
+                    <li>名前</li>
+                    <li>作成時刻</li>
+                    <li>開始方法（新規／取り込み／派生）</li>
+                    <li>制作意図の文章参照</li>
+                    <li>固定した作風の Git 参照（未選択なら明示）</li>
+                    <li>現在状態の更新記録への参照</li>
+                    <li>保存状態作成前は現在状態なし</li>
+                  </ul>
+                </dd>
+                <dt>責務</dt>
+                <dd>完成した一枚を目指す単位。会話間の共有情報の所属先</dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="会話">
+              <p class="contract-card-title">会話</p>
+              <dl>
+                <dt>必須情報・条件付き情報</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>会話 ID</li>
+                    <li>用途（制作／複数作品の振り返り）</li>
+                    <li>所属作品または対象作品集合</li>
+                    <li>モデル選択</li>
+                    <li>作成時刻</li>
+                  </ul>
+                </dd>
+                <dt>責務</dt>
+                <dd>
+                  原文の所属と依頼の入口。Codex thread ID
+                  は別の接続対応記録で保持する
+                </dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="原文メッセージ">
+              <p class="contract-card-title">原文メッセージ</p>
+              <dl>
+                <dt>必須情報・条件付き情報</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>メッセージ ID</li>
+                    <li>会話 ID</li>
+                    <li>発言者</li>
+                    <li>順序</li>
+                    <li>本文・添付参照</li>
+                    <li>記録時刻</li>
+                    <li>受信完了／途中／欠落の区別</li>
+                    <li>外部取り込みなら出典と取り込み時刻</li>
+                  </ul>
+                </dd>
+                <dt>責務</dt>
+                <dd>原文を保持する。訂正や要約と分けて原文を保持する</dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="依頼">
+              <p class="contract-card-title">依頼</p>
+              <dl>
+                <dt>必須情報・条件付き情報</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>依頼 ID</li>
+                    <li>会話 ID</li>
+                    <li>対象作品または振り返り対象集合</li>
+                    <li>指示原文への参照</li>
+                    <li>依頼種別</li>
+                    <li>受付時刻</li>
+                    <li>状態</li>
+                    <li>起点の指定（実行直前の現在状態／明示した保存状態）</li>
+                    <li>
+                      候補への修正依頼なら修正元の編集案 ID
+                      と明示した起点の保存状態 ID
+                    </li>
+                    <li>
+                      制作変更なら合意した変更範囲・保護指定とその依頼限定許可への参照
+                    </li>
+                  </ul>
+                </dd>
+                <dt>責務</dt>
+                <dd>一つの目的と停止・再実行予算の単位</dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="実行">
+              <p class="contract-card-title">実行</p>
+              <dl>
+                <dt>必須情報・条件付き情報</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>実行 ID</li>
+                    <li>依頼 ID</li>
+                    <li>種別</li>
+                    <li>開始／終了時刻</li>
+                    <li>状態・失敗情報</li>
+                    <li>入力参照</li>
+                    <li>使用設定</li>
+                    <li>出力参照</li>
+                    <li>子処理なら親実行 ID</li>
+                    <li>やり直しなら再実行記録への参照</li>
+                  </ul>
+                </dd>
+                <dt>責務</dt>
+                <dd>
+                  AI 処理と Windows 側制作操作を識別する。Windows
+                  側操作にも固有の実行 ID を与え、親の AI 実行と関連付ける
+                </dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="再実行の記録">
+              <p class="contract-card-title">再実行の記録</p>
+              <dl>
+                <dt>必須情報・条件付き情報</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>記録 ID</li>
+                    <li>依頼 ID</li>
+                    <li>原因</li>
+                    <li>対象実行</li>
+                    <li>累積回数</li>
+                    <li>開始の根拠（自動／人間の指示）</li>
+                  </ul>
+                </dd>
+                <dt>責務</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>同一 turn 内の制作操作のやり直しも対応付ける。</li>
+                    <li>通常の子処理開始や通信再送と区別する。</li>
+                    <li>何を一回として消費するかは実行状態設計で具体化 。</li>
+                  </ul>
+                </dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="ファイル参照">
+              <p class="contract-card-title">ファイル参照</p>
+              <dl>
+                <dt>必須情報・条件付き情報</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>ファイル ID</li>
+                    <li>所属作品</li>
+                    <li>役割・形式</li>
+                    <li>由来</li>
+                    <li>保存ルート ID＋相対パス</li>
+                    <li>内容ハッシュ</li>
+                    <li>確定・可用性の記録</li>
+                    <li>書き込み途中・不明なら未取得項目と理由を明示</li>
+                  </ul>
+                </dd>
+                <dt>責務</dt>
+                <dd>保存済みの特定の実体を識別する</dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="生成物">
+              <p class="contract-card-title">生成物</p>
+              <dl>
+                <dt>必須情報・条件付き情報</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>生成物 ID</li>
+                    <li>作品 ID</li>
+                    <li>作成した実行 ID</li>
+                    <li>内容参照（ファイルまたは文章）</li>
+                    <li>種類</li>
+                    <li>完成判定とその根拠</li>
+                  </ul>
+                </dd>
+                <dt>責務</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>AI の成果物。</li>
+                    <li>成功・完成と、人間による採用を区別する。</li>
+                    <li>
+                      通常プログラムによるレンダー・変換も作成した制作実行へ結び付ける
+                      。
+                    </li>
+                  </ul>
+                </dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="保存状態">
+              <p class="contract-card-title">保存状態</p>
+              <dl>
+                <dt>必須情報・条件付き情報</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>保存状態 ID</li>
+                    <li>作品 ID</li>
+                    <li>作成時刻</li>
+                    <li>構成ファイル参照と役割</li>
+                    <li>依存素材一覧</li>
+                    <li>プレビュー参照（ない場合は理由）</li>
+                    <li>成立状態</li>
+                    <li>復元可能性の確認記録</li>
+                    <li>作成元の変更記録</li>
+                  </ul>
+                </dd>
+                <dt>責務</dt>
+                <dd>
+                  ある時点の制作データを固定する。初回を除き親となる状態を変更記録からたどれる
+                </dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="変更記録">
+              <p class="contract-card-title">変更記録</p>
+              <dl>
+                <dt>必須情報・条件付き情報</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>変更 ID</li>
+                    <li>作品 ID</li>
+                    <li>
+                      種別（初期作成／取り込み／AI編集／レンダー出力登録／手修正／組合せ／復元／派生開始）
+                    </li>
+                    <li>変更後の保存状態</li>
+                    <li>変更前の保存状態（初回はなし）</li>
+                    <li>由来の参照</li>
+                    <li>要約・理由の文章参照</li>
+                    <li>
+                      種別が手修正なら操作者・作業アプリ・作業内容・前後のプレビュー参照・対象編集案（該当時）を保持し
+                    </li>
+                    <li>理由は任意</li>
+                  </ul>
+                </dd>
+                <dt>責務</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>
+                      制作データの変更前後と由来を一まとまりとして記録する。
+                    </li>
+                    <li>
+                      手修正もこの概念に含め、人間が指定した意味のあるまとまりを単位とする。
+                    </li>
+                    <li>取り込み・派生・復元の特別な参照は下記に従う 。</li>
+                  </ul>
+                </dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="編集案">
+              <p class="contract-card-title">編集案</p>
+              <dl>
+                <dt>必須情報・条件付き情報</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>編集案 ID</li>
+                    <li>作品 ID</li>
+                    <li>依頼 ID</li>
+                    <li>基準の保存状態</li>
+                    <li>AI が作成した保存状態</li>
+                    <li>作成実行</li>
+                    <li>変更範囲</li>
+                    <li>同じ目的の代替案を束ねる識別子</li>
+                    <li>独立／依存関係</li>
+                    <li>修正元の編集案 ID（AIによる追加修正の場合）</li>
+                  </ul>
+                </dd>
+                <dt>責務</dt>
+                <dd>
+                  何と何を比較するかを表す。手修正後も AI
+                  の結果への参照を維持し、AIによる追加修正は新しい編集案から修正元へつなぐ
+                </dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="採否記録">
+              <p class="contract-card-title">採否記録</p>
+              <dl>
+                <dt>必須情報・条件付き情報</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>判断 ID</li>
+                    <li>作品 ID</li>
+                    <li>編集案 ID</li>
+                    <li>判断対象の保存状態</li>
+                    <li>判断（採用／修正して採用／不採用）</li>
+                    <li>判断者・時刻</li>
+                    <li>任意の理由</li>
+                    <li>採用範囲（全体／指定部分）</li>
+                    <li>
+                      適用状態（未適用／適用済み／失敗／不明）と結果の参照
+                    </li>
+                    <li>訂正・変更時は以前の判断への参照</li>
+                  </ul>
+                </dd>
+                <dt>責務</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>
+                      最新の枝先ではなく、実際に見て判断した編集案と保存状態を指す。
+                    </li>
+                    <li>
+                      AI修正・手修正を経た結果も「修正して採用」として記録でき、変更者は各変更記録から判別する。
+                    </li>
+                    <li>判断前・未選択は明示的な不採用と区別 。</li>
+                  </ul>
+                </dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="現在状態の更新記録">
+              <p class="contract-card-title">現在状態の更新記録</p>
+              <dl>
+                <dt>必須情報・条件付き情報</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>更新 ID</li>
+                    <li>作品 ID</li>
+                    <li>更新前／更新後の保存状態</li>
+                    <li>
+                      根拠となる採否記録または変更記録（手修正・取り込み・復元等）
+                    </li>
+                    <li>確定時刻</li>
+                  </ul>
+                </dd>
+                <dt>責務</dt>
+                <dd>どの状態を次の制作の出発点にしたかを保持する</dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="文章記録">
+              <p class="contract-card-title">文章記録</p>
+              <dl>
+                <dt>必須情報・条件付き情報</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>文章 ID</li>
+                    <li>対象記録 ID</li>
+                    <li>用途（理由／要約／制作意図等）</li>
+                    <li>本文</li>
+                    <li>記入者（人間／AI）</li>
+                    <li>記入時刻</li>
+                    <li>訂正元 ID（該当時）</li>
+                    <li>根拠となる原文・履歴参照</li>
+                  </ul>
+                </dd>
+                <dt>責務</dt>
+                <dd>
+                  変更理由と採用理由を別の対象へ結び付ける。未入力は本文なしとして扱い、後から追加できる
+                </dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="振り返りの参照記録">
+              <p class="contract-card-title">振り返りの参照記録</p>
+              <dl>
+                <dt>必須情報・条件付き情報</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>参照記録 ID</li>
+                    <li>依頼・実行 ID</li>
+                    <li>対象作品と保存状態</li>
+                    <li>採否記録・変更記録（手修正を含む）・文章記録の ID</li>
+                    <li>分析結果への参照</li>
+                  </ul>
+                </dd>
+                <dt>責務</dt>
+                <dd>
+                  当時何を根拠に振り返ったかを固定する。当時の分析根拠を固定して保持する
+                </dd>
+              </dl>
+            </article>
           </div>
         </section>
         <section aria-labelledby="保存状態の内容と成立" class="spec-section">
-          <h2 id="保存状態の内容と成立">保存状態の契約</h2>
+          <h2 id="保存状態の内容と成立">4. 保存状態の契約</h2>
           <div
             aria-label="保存状態の内容と成立"
             class="table-scroll"
@@ -774,23 +835,21 @@
                         変更していないファイルは前回の固定参照を引き継げる。
                       </li>
                     </ul>
+                    <div class="contract-detail">
+                      <ul class="cell-list">
+                        <li>
+                          PSD
+                          が参照したレンダーと、そのレンダーの入力保存状態を結び付ける。
+                        </li>
+                        <li>レンダーの入力と出力は別 ID で識別する。</li>
+                        <li>
+                          作品の保存状態に出力を含めるときは新しい保存状態として記録する。
+                        </li>
+                      </ul>
+                    </div>
                   </td>
                 </tr>
-                <tr>
-                  <th scope="row">保存状態</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        PSD
-                        が参照したレンダーと、そのレンダーの入力保存状態を結び付ける。
-                      </li>
-                      <li>レンダーの入力と出力は別 ID で識別する。</li>
-                      <li>
-                        作品の保存状態に出力を含めるときは新しい保存状態として記録する。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
+
                 <tr>
                   <th scope="row">処理内容</th>
                   <td>
@@ -803,28 +862,22 @@
                       </li>
                       <li>人間による後日の補足は補足として保持する。</li>
                     </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">処理内容</th>
-                  <td>
-                    登録処理の失敗と、確定後に素材の不足・削除が判明したことを分ける。
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">処理内容</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        ファイルの状態は、作成の確定（途中／確定／失敗・不明）と現在の可用性（存在確認済み／未確認／欠落／明示削除／破損）を分ける。
-                      </li>
-                      <li>
-                        現在の可用性と当時の保存状態・採否の事実を分けて保持する。
-                      </li>
-                      <li>
-                        復元可能性は依存素材も含めた確認結果と確認時刻を持つ。
-                      </li>
-                    </ul>
+                    <div class="contract-detail">
+                      登録処理の失敗と、確定後に素材の不足・削除が判明したことを分ける。
+                    </div>
+                    <div class="contract-detail">
+                      <ul class="cell-list">
+                        <li>
+                          ファイルの状態は、作成の確定（途中／確定／失敗・不明）と現在の可用性（存在確認済み／未確認／欠落／明示削除／破損）を分ける。
+                        </li>
+                        <li>
+                          現在の可用性と当時の保存状態・採否の事実を分けて保持する。
+                        </li>
+                        <li>
+                          復元可能性は依存素材も含めた確認結果と確認時刻を持つ。
+                        </li>
+                      </ul>
+                    </div>
                   </td>
                 </tr>
               </tbody>
@@ -832,7 +885,7 @@
           </div>
         </section>
         <section aria-labelledby="分岐組合せ採用" class="spec-section">
-          <h2 id="分岐組合せ採用">分岐、組合せ、採用</h2>
+          <h2 id="分岐組合せ採用">5. 分岐、組合せ、採用</h2>
           <p>
             同じ依頼で比較する代替案は同じ基準状態から分岐する。手修正はその候補の枝に追加し、AIへの追加の修正依頼も指定した候補の保存状態から枝を伸ばす。通常の継続では直前の状態を変更前とし、以前の状態を明示して別の修正を試す場合はその状態から分岐する。
           </p>
@@ -906,6 +959,19 @@
                         修正もその案と修正済み状態を指定する。
                       </li>
                     </ul>
+                    <div class="contract-detail">
+                      <ul class="cell-list">
+                        <li>
+                          候補の修正では指定した保存状態を起点として維持する。
+                        </li>
+                        <li>
+                          実行直前には指定状態の可用性、変更範囲・保護、同時編集の有無を確認し、現在の制作状態へ反映できるかは採用時に改めて照合する。
+                        </li>
+                        <li>
+                          案の基準と作品の現在状態が異なる場合の適用・競合処理は編集案設計へ引き継ぐ。
+                        </li>
+                      </ul>
+                    </div>
                   </td>
                 </tr>
                 <tr>
@@ -923,22 +989,7 @@
                     </ul>
                   </td>
                 </tr>
-                <tr>
-                  <th scope="row">保存状態</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        候補の修正では指定した保存状態を起点として維持する。
-                      </li>
-                      <li>
-                        実行直前には指定状態の可用性、変更範囲・保護、同時編集の有無を確認し、現在の制作状態へ反映できるかは採用時に改めて照合する。
-                      </li>
-                      <li>
-                        案の基準と作品の現在状態が異なる場合の適用・競合処理は編集案設計へ引き継ぐ。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
+
                 <tr>
                   <th scope="row">停止</th>
                   <td>
@@ -987,26 +1038,24 @@
                       <li>変更した判断を追加する。</li>
                       <li>採用されなかった他の案は未選択として残す。</li>
                     </ul>
+                    <div class="contract-detail">
+                      <ul class="cell-list">
+                        <li>
+                          植物配置と照明調整のような独立した変更は別々に採否を判断できる。
+                        </li>
+                        <li>
+                          複数の案を組み合わせたときは、実際の変更前後の保存状態と採用に寄与した案・保存状態・判断を記録する。
+                        </li>
+                        <li>内容の出典を示す参照にする。</li>
+                        <li>
+                          元の案全体を採用したか、一部を取り込んだかも区別する。
+                        </li>
+                        <li>組合せ結果を確定して現在状態を更新する。</li>
+                      </ul>
+                    </div>
                   </td>
                 </tr>
-                <tr>
-                  <th scope="row">処理内容</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        植物配置と照明調整のような独立した変更は別々に採否を判断できる。
-                      </li>
-                      <li>
-                        複数の案を組み合わせたときは、実際の変更前後の保存状態と採用に寄与した案・保存状態・判断を記録する。
-                      </li>
-                      <li>内容の出典を示す参照にする。</li>
-                      <li>
-                        元の案全体を採用したか、一部を取り込んだかも区別する。
-                      </li>
-                      <li>組合せ結果を確定して現在状態を更新する。</li>
-                    </ul>
-                  </td>
-                </tr>
+
                 <tr>
                   <th scope="row">採用判断</th>
                   <td>
@@ -1021,13 +1070,13 @@
           </div>
         </section>
         <section aria-labelledby="復元と派生" class="spec-section">
-          <h2 id="復元と派生">復元</h2>
+          <h2 id="復元と派生">6. 復元</h2>
           <p>
             復元では、戻す直前の作業状態を記録したうえで、新しい保存状態を作る。変更記録は変更前と復元元を別々に参照する。新しい状態の内容は復元元に対応するが、後から行った復元という事実は残る。
           </p>
         </section>
         <section aria-labelledby="派生作品のデータ" class="spec-section">
-          <h2 id="派生作品のデータ">派生作品</h2>
+          <h2 id="派生作品のデータ">7. 派生作品</h2>
           <div
             aria-label="派生作品"
             class="table-scroll"
@@ -1077,7 +1126,7 @@
           </div>
         </section>
         <section aria-labelledby="会話共有情報原文と要約" class="spec-section">
-          <h2 id="会話共有情報原文と要約">会話の共有情報</h2>
+          <h2 id="会話共有情報原文と要約">8. 会話の共有情報</h2>
           <div
             aria-label="会話の共有情報"
             class="table-scroll"
@@ -1127,47 +1176,48 @@
               </tbody>
             </table>
           </div>
-        </section>
-        <section aria-labelledby="会話の要約記録" class="spec-section">
-          <h2 id="会話の要約記録">会話の要約記録</h2>
-          <div
-            aria-label="会話の要約記録"
-            class="table-scroll"
-            role="region"
-            tabindex="0"
-          >
-            <table class="spec-table">
-              <thead>
-                <tr>
-                  <th scope="col">観点</th>
-                  <th scope="col">仕様</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row">対象範囲</th>
-                  <td>
-                    会話の要約は要約対象のメッセージ
-                    ID／範囲と作成者・時刻を持ち、原文と独立して残す。
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">訂正</th>
-                  <td>訂正時は新しい文章 ID を持つ。</td>
-                </tr>
-                <tr>
-                  <th scope="row">Codexとの対応</th>
-                  <td>
-                    一依頼が複数 turn に対応する場合も、同一 turn
-                    内で複数回制作をやり直す場合も記録できる対応関係にする。
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+
+          <section aria-labelledby="会話の要約記録" class="spec-subsection">
+            <h3 id="会話の要約記録">8-1. 会話の要約記録</h3>
+            <div
+              aria-label="会話の要約記録"
+              class="table-scroll"
+              role="region"
+              tabindex="0"
+            >
+              <table class="spec-table">
+                <thead>
+                  <tr>
+                    <th scope="col">観点</th>
+                    <th scope="col">仕様</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row">対象範囲</th>
+                    <td>
+                      会話の要約は要約対象のメッセージ
+                      ID／範囲と作成者・時刻を持ち、原文と独立して残す。
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">訂正</th>
+                    <td>訂正時は新しい文章 ID を持つ。</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Codexとの対応</th>
+                    <td>
+                      一依頼が複数 turn に対応する場合も、同一 turn
+                      内で複数回制作をやり直す場合も記録できる対応関係にする。
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
         </section>
         <section aria-labelledby="振り返りのデータ" class="spec-section">
-          <h2 id="振り返りのデータ">振り返りの記録</h2>
+          <h2 id="振り返りのデータ">9. 振り返りの記録</h2>
           <div
             aria-label="振り返りの記録"
             class="table-scroll"
@@ -1228,97 +1278,96 @@
           aria-labelledby="実行windows-の記録エージェント改訂履歴"
           class="spec-section"
         >
-          <h2 id="実行windows-の記録エージェント改訂履歴">実行記録</h2>
-          <div
-            aria-label="実行記録"
-            class="table-scroll"
-            role="region"
-            tabindex="0"
-          >
-            <table class="spec-table">
-              <thead>
-                <tr>
-                  <th scope="col">項目</th>
-                  <th scope="col">仕様</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row">モデル</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        実行時の記録には、使用した定義・作風の Git
-                        参照、工程、モデル、推論強度・速度、指示・ツール・手順への参照、入力状態を保持する。
-                      </li>
-                      <li>
-                        手修正・取り込み等で AI
-                        定義を使用していない場合は「適用なし」、過去の取り込み元で分からない場合は「不明」と区別する。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">再実行</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        依頼ごとの自動再実行は最大2回という既存契約を維持する。
-                      </li>
-                      <li>
-                        再起動・turn変更・原因変更後も累積回数を維持する。
-                      </li>
-                      <li>
-                        人間による停止や利用上限到達後は、人間の再開指示を待つ。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">停止</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        AI 実行から Windows 実行への親子関係を残し、Windows
-                        側の開始・停止・完成記録は実際の Windows 実行 ID
-                        と要求の世代で照合する。
-                      </li>
-                      <li>同じIDの通知は、対応する制作操作へ照合する。</li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">整合性</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        <a href="blender-integration.html">Blender連携設計</a
-                        >で要求する入力／出力ハッシュ、Blender
-                        版、エンジン・デバイス、カメラ・フレーム・解像度・seed・サンプル数、色管理・ICC、パスの意味・変換、ID
-                        色対応、深度範囲、Shadows
-                        設定、依存素材、操作スクリプトの実体またはハッシュと保持先を、制作実行・生成物のメタデータとして保持する。
-                      </li>
-                      <li>
-                        完成出力とチェックポイント、欠落・停止・失敗を区別する。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+          <h2 id="実行windows-の記録エージェント改訂履歴">10. 実行記録</h2>
+          <div class="contract-cards">
+            <article class="contract-card" aria-label="モデル">
+              <p class="contract-card-title">モデル</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>
+                      実行時の記録には、使用した定義・作風の Git
+                      参照、工程、モデル、推論強度・速度、指示・ツール・手順への参照、入力状態を保持する。
+                    </li>
+                    <li>
+                      手修正・取り込み等で AI
+                      定義を使用していない場合は「適用なし」、過去の取り込み元で分からない場合は「不明」と区別する。
+                    </li>
+                  </ul>
+                </dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="再実行">
+              <p class="contract-card-title">再実行</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>
+                      依頼ごとの自動再実行は最大2回という既存契約を維持する。
+                    </li>
+                    <li>再起動・turn変更・原因変更後も累積回数を維持する。</li>
+                    <li>
+                      人間による停止や利用上限到達後は、人間の再開指示を待つ。
+                    </li>
+                  </ul>
+                </dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="停止">
+              <p class="contract-card-title">停止</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>
+                      AI 実行から Windows 実行への親子関係を残し、Windows
+                      側の開始・停止・完成記録は実際の Windows 実行 ID
+                      と要求の世代で照合する。
+                    </li>
+                    <li>同じIDの通知は、対応する制作操作へ照合する。</li>
+                  </ul>
+                </dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="整合性">
+              <p class="contract-card-title">整合性</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>
+                      <a href="blender-integration.html">Blender連携設計</a
+                      >で要求する入力／出力ハッシュ、Blender
+                      版、エンジン・デバイス、カメラ・フレーム・解像度・seed・サンプル数、色管理・ICC、パスの意味・変換、ID
+                      色対応、深度範囲、Shadows
+                      設定、依存素材、操作スクリプトの実体またはハッシュと保持先を、制作実行・生成物のメタデータとして保持する。
+                    </li>
+                    <li>
+                      完成出力とチェックポイント、欠落・停止・失敗を区別する。
+                    </li>
+                  </ul>
+                </dd>
+              </dl>
+            </article>
           </div>
-        </section>
-        <section aria-labelledby="エージェント改訂履歴" class="spec-section">
-          <h2 id="エージェント改訂履歴">エージェント改訂履歴</h2>
-          <p>
-            エージェント改訂履歴は定義等の変更コミットと理由を正として参照し、それを使った実行へ結び付ける。モデル設定だけの変更も、実行ごとの実効設定と設定変更の記録・理由から追跡できるようにする。場当たり的に生成した操作スクリプトの修正も定義そのものの改訂と区別する。
-          </p>
+
+          <section
+            aria-labelledby="エージェント改訂履歴"
+            class="spec-subsection"
+          >
+            <h3 id="エージェント改訂履歴">10-1. エージェント改訂履歴</h3>
+            <p>
+              エージェント改訂履歴は定義等の変更コミットと理由を正として参照し、それを使った実行へ結び付ける。モデル設定だけの変更も、実行ごとの実効設定と設定変更の記録・理由から追跡できるようにする。場当たり的に生成した操作スクリプトの修正も定義そのものの改訂と区別する。
+            </p>
+          </section>
         </section>
         <section
           aria-labelledby="記録が成立する単位と不変条件"
           class="spec-section"
         >
-          <h2 id="記録が成立する単位と不変条件">記録の成立条件</h2>
+          <h2 id="記録が成立する単位と不変条件">11. 記録の成立条件</h2>
           <div
             aria-label="記録が成立する単位と不変条件"
             class="table-scroll"
@@ -1433,7 +1482,7 @@
           class="spec-section"
         >
           <h2 id="ブランチグラフによる制作履歴の表示">
-            ブランチグラフによる制作履歴の表示
+            12. ブランチグラフによる制作履歴の表示
           </h2>
           <p>
             以下は保存状態の具体例を節点として並べた制作履歴であり、概念間の関係図とは別に、同じ概念に属する複数の状態を表示する。節点は保存状態、枝は変更記録、採用の表示は採否記録に対応する。手修正は種別が「手修正」の変更記録として表す。
@@ -1455,14 +1504,22 @@
                   上から下へ変更が進む。保存状態Sから案Aと案Bに分岐。案Aから人間の手修正H、追加AI修正A2へ進み、A2を修正して採用して次の制作へ進む。採用前の現在状態はSのまま。案Bの記録も残る。
                 </desc>
                 <defs>
-                  <marker id="h-arrow" markerheight="8" markerwidth="8"
-                    orient="auto" refx="7" refy="4">
+                  <marker
+                    id="h-arrow"
+                    markerheight="8"
+                    markerwidth="8"
+                    orient="auto"
+                    refx="7"
+                    refy="4"
+                  >
                     <path d="M0 0L8 4L0 8Z" fill="#48716b"></path>
                   </marker>
                 </defs>
                 <g class="history-lines">
-                  <path d="M280 76V106H150V136"></path>
-                  <path d="M280 106H410V136"></path>
+                  <path
+                    d="M280 76L280 96Q280 106 270 106L160 106Q150 106 150 116L150 136"
+                  ></path>
+                  <path d="M280 106L400 106Q410 106 410 116L410 136"></path>
                   <path d="M150 192V252"></path>
                   <path d="M150 308V368"></path>
                   <path d="M150 424V504"></path>
@@ -1484,8 +1541,12 @@
                   <text x="150" y="537">次の制作へ</text>
                 </g>
                 <text class="edge-label" x="224" y="468">修正して採用</text>
-                <text class="sub note" x="280" y="600">採用前の現在状態は S のまま</text>
-                <text class="sub note" x="280" y="626">別案・理由・指示原文も残す</text>
+                <text class="sub note" x="280" y="600">
+                  採用前の現在状態は S のまま
+                </text>
+                <text class="sub note" x="280" y="626">
+                  別案・理由・指示原文も残す
+                </text>
               </svg>
             </div>
             <figcaption>
@@ -1518,158 +1579,158 @@
                         であることを区別する。
                       </li>
                     </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">採用判断</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        節点・枝から、変更要約、実行または手修正の変更記録による由来、変更理由、採否と採用理由を
-                        ID で取得できるようにする。
-                      </li>
-                      <li>判断した時点ごとに取得する。</li>
-                      <li>理由が未入力なら未入力と分かる。</li>
-                      <li>
-                        ホバーの見せ方、長い履歴の省略、復元線・派生線の描き分けは<a
-                          href="https://github.com/Kurarowa305/scene-craft/issues/12"
-                          rel="noopener noreferrer"
-                          target="_blank"
-                          >画面設計</a
-                        >で決める。
-                      </li>
-                    </ul>
+                    <div class="contract-detail">
+                      <ul class="cell-list">
+                        <li>
+                          節点・枝から、変更要約、実行または手修正の変更記録による由来、変更理由、採否と採用理由を
+                          ID で取得できるようにする。
+                        </li>
+                        <li>判断した時点ごとに取得する。</li>
+                        <li>理由が未入力なら未入力と分かる。</li>
+                        <li>
+                          ホバーの見せ方、長い履歴の省略、復元線・派生線の描き分けは<a
+                            href="https://github.com/Kurarowa305/scene-craft/issues/12"
+                            rel="noopener noreferrer"
+                            target="_blank"
+                            >画面設計</a
+                          >で決める。
+                        </li>
+                      </ul>
+                    </div>
                   </td>
                 </tr>
               </tbody>
             </table>
           </div>
-        </section>
-        <section aria-labelledby="具体例による確認" class="spec-section">
-          <h2 id="具体例による確認">具体例による確認</h2>
-          <div
-            aria-label="具体例による確認"
-            class="table-scroll"
-            role="region"
-            tabindex="0"
-          >
-            <table class="spec-table">
-              <thead>
-                <tr>
-                  <th scope="col">場面</th>
-                  <th scope="col">記録の例</th>
-                  <th scope="col">確認できること</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row">既存作品の取り込み</th>
-                  <td>
-                    作品Wに <code>.blend</code> と PSD
-                    とプレビューを登録して状態Sを確定。PSDの元レンダーが不明なら不明と記録
-                  </td>
-                  <td>理由は後日補足できる</td>
-                </tr>
-                <tr>
-                  <th scope="row">AI案と手修正</th>
-                  <td>
-                    Sから案A・案B。案Aの状態A0から人間がA1、A2を記録し、A2を「修正して採用」
-                  </td>
-                  <td>
-                    <ul class="cell-list">
-                      <li>AI原案A0</li>
-                      <li>二回の修正理由</li>
-                      <li>A2を採用した理由を別々に表示できる</li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">AI修正と手修正の交互の継続</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>未採用A・A0からQ1でA1・S1</li>
-                      <li>手修正でS2</li>
-                      <li>Q2でA2・S3を作り</li>
-                      <li>A2・S3を修正して採用</li>
-                    </ul>
-                  </td>
-                  <td>指示原文・実行・修正元の案・前後の状態がつながる</td>
-                </tr>
-                <tr>
-                  <th scope="row">修正依頼の待機と失敗</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>Aの状態を指定して修正依頼が待機中に別案Bを採用。</li>
-                      <li>指定したAの状態は維持して整合性を確認。</li>
-                      <li>修正依頼が失敗したら同じ依頼として再実行 。</li>
-                    </ul>
-                  </td>
-                  <td>
-                    指定したAの保存状態を起点に維持する。追加の制作指示と失敗の再実行を区別する
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">独立した変更</th>
-                  <td>
-                    植物の案Pを採用し、照明の案Lを明示的に不採用。両方採用する場合は組合せ結果Mと寄与元P・Lを記録
-                  </td>
-                  <td>
-                    代替案の選択と独立した変更の採否を区別し、組合せ結果を検証する
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">Photoshop作業</th>
-                  <td>
-                    レンダーRから作ったPSDを人間が修正。前回PSDと今回PSD・プレビュー・任意の理由を記録し、blend参照は引き継ぐ
-                  </td>
-                  <td>
-                    同じ作品内でBlenderとPhotoshopの記録をたどれ、PSDの元レンダーも特定できる
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">過去への復元</th>
-                  <td>
-                    現在TからSへ戻し、新しい状態Uを確定。変更前Tと復元元Sを保持
-                  </td>
-                  <td>復元前に未登録の変更があれば先に記録</td>
-                </tr>
-                <tr>
-                  <th scope="row">派生作品</th>
-                  <td>
-                    昼の作品Wの保存状態Sから、夜の作品Vを開始。V側の初期状態V0にW・Sを派生元として記録
-                  </td>
-                  <td>
-                    独立した制作実体へ編集を加え、元の会話・判断を出典として参照する
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">振り返りと補記</th>
-                  <td>
-                    W・Vの状態、採否、手修正、文章IDを固定して分析。後から人間が理由を補記
-                  </td>
-                  <td>
-                    過去の分析は当時未入力だった根拠を維持し、次の分析では補記された理由を利用できる
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">停止・削除</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>実行途中で停止。</li>
-                      <li>完成したチェックポイントだけ登録。</li>
-                      <li>その後、人間が案Bの大きい実体を削除 。</li>
-                    </ul>
-                  </td>
-                  <td>
-                    停止した実行、完成した状態、未完成出力を区別する。Bの理由と分岐は残り、復元不可を表示
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+
+          <section aria-labelledby="具体例による確認" class="spec-subsection">
+            <h3 id="具体例による確認">12-1. 具体例による確認</h3>
+            <div
+              aria-label="具体例による確認"
+              class="table-scroll"
+              role="region"
+              tabindex="0"
+            >
+              <table class="spec-table">
+                <thead>
+                  <tr>
+                    <th scope="col">場面</th>
+                    <th scope="col">記録の例</th>
+                    <th scope="col">確認できること</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row">既存作品の取り込み</th>
+                    <td>
+                      作品Wに <code>.blend</code> と PSD
+                      とプレビューを登録して状態Sを確定。PSDの元レンダーが不明なら不明と記録
+                    </td>
+                    <td>理由は後日補足できる</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">AI案と手修正</th>
+                    <td>
+                      Sから案A・案B。案Aの状態A0から人間がA1、A2を記録し、A2を「修正して採用」
+                    </td>
+                    <td>
+                      <ul class="cell-list">
+                        <li>AI原案A0</li>
+                        <li>二回の修正理由</li>
+                        <li>A2を採用した理由を別々に表示できる</li>
+                      </ul>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">AI修正と手修正の交互の継続</th>
+                    <td>
+                      <ul class="cell-list">
+                        <li>未採用A・A0からQ1でA1・S1</li>
+                        <li>手修正でS2</li>
+                        <li>Q2でA2・S3を作り</li>
+                        <li>A2・S3を修正して採用</li>
+                      </ul>
+                    </td>
+                    <td>指示原文・実行・修正元の案・前後の状態がつながる</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">修正依頼の待機と失敗</th>
+                    <td>
+                      <ul class="cell-list">
+                        <li>
+                          Aの状態を指定して修正依頼が待機中に別案Bを採用。
+                        </li>
+                        <li>指定したAの状態は維持して整合性を確認。</li>
+                        <li>修正依頼が失敗したら同じ依頼として再実行 。</li>
+                      </ul>
+                    </td>
+                    <td>
+                      指定したAの保存状態を起点に維持する。追加の制作指示と失敗の再実行を区別する
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">独立した変更</th>
+                    <td>
+                      植物の案Pを採用し、照明の案Lを明示的に不採用。両方採用する場合は組合せ結果Mと寄与元P・Lを記録
+                    </td>
+                    <td>
+                      代替案の選択と独立した変更の採否を区別し、組合せ結果を検証する
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Photoshop作業</th>
+                    <td>
+                      レンダーRから作ったPSDを人間が修正。前回PSDと今回PSD・プレビュー・任意の理由を記録し、blend参照は引き継ぐ
+                    </td>
+                    <td>
+                      同じ作品内でBlenderとPhotoshopの記録をたどれ、PSDの元レンダーも特定できる
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">過去への復元</th>
+                    <td>
+                      現在TからSへ戻し、新しい状態Uを確定。変更前Tと復元元Sを保持
+                    </td>
+                    <td>復元前に未登録の変更があれば先に記録</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">派生作品</th>
+                    <td>
+                      昼の作品Wの保存状態Sから、夜の作品Vを開始。V側の初期状態V0にW・Sを派生元として記録
+                    </td>
+                    <td>
+                      独立した制作実体へ編集を加え、元の会話・判断を出典として参照する
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">振り返りと補記</th>
+                    <td>
+                      W・Vの状態、採否、手修正、文章IDを固定して分析。後から人間が理由を補記
+                    </td>
+                    <td>
+                      過去の分析は当時未入力だった根拠を維持し、次の分析では補記された理由を利用できる
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">停止・削除</th>
+                    <td>
+                      <ul class="cell-list">
+                        <li>実行途中で停止。</li>
+                        <li>完成したチェックポイントだけ登録。</li>
+                        <li>その後、人間が案Bの大きい実体を削除 。</li>
+                      </ul>
+                    </td>
+                    <td>
+                      停止した実行、完成した状態、未完成出力を区別する。Bの理由と分岐は残り、復元不可を表示
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
         </section>
         <section class="sources">
-          <h2>詳細資料</h2>
+          <h2 id="sources">13. 詳細資料</h2>
           <p>
             <a
               href="https://github.com/Kurarowa305/scene-craft/issues/5"

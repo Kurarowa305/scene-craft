@@ -43,41 +43,72 @@
       <main id="main" tabindex="-1">
         <p class="eyebrow">DESIGN / 02</p>
         <h1>画面と制作の導線</h1>
-        <nav aria-label="このページの目次" class="page-toc">
-          <h2>このページの内容</h2>
+        <nav aria-label="目次" class="page-toc">
+          <h2>目次</h2>
           <ol>
-            <li><a href="#責務と画面構成">画面構成</a></li>
-            <li><a href="#作品と会話の開始">制作の開始</a></li>
-            <li><a href="#メインチャットと成果物">メインチャット</a></li>
-            <li><a href="#採否と追加修正">編集案の操作</a></li>
-            <li><a href="#手作業の記録">手作業の記録</a></li>
+            <li><a href="#責務と画面構成">1. 画面構成</a></li>
+            <li><a href="#作品と会話の開始">2. 制作の開始</a></li>
             <li>
-              <a href="#blendの記録用プレビュー">.blend の記録用プレビュー</a>
+              <a href="#メインチャットと成果物">3. メインチャット</a>
+              <ol>
+                <li><a href="#採否と追加修正">3-1. 編集案の操作</a></li>
+              </ol>
             </li>
-            <li><a href="#サイドチャットと手作業の相談">サイドチャット</a></li>
-            <li><a href="#制作履歴復元派生">制作履歴・復元・派生</a></li>
-            <li><a href="#保護指定">保護指定</a></li>
-            <li><a href="#実行状況停止再開">実行状況・停止・再開</a></li>
             <li>
-              <a href="#操作対象はチャットで今行っている作業"
-                >操作対象はチャットで今行っている作業</a
-              >
+              <a href="#手作業の記録">4. 手作業の記録</a>
+              <ol>
+                <li>
+                  <a href="#blendの記録用プレビュー"
+                    >4-1. .blend の記録用プレビュー</a
+                  >
+                </li>
+              </ol>
             </li>
-            <li><a href="#作風制作方針と版選択">作風・制作方針と版選択</a></li>
-            <li><a href="#振り返り">振り返り</a></li>
-            <li><a href="#設定と保存データ管理">設定</a></li>
-            <li><a href="#命名保存用要約モデル">命名・保存用要約モデル</a></li>
             <li>
-              <a href="#バックアップ復元形式移行"
-                >バックアップ・復元・形式移行</a
-              >
+              <a href="#サイドチャットと手作業の相談">5. サイドチャット</a>
             </li>
-            <li><a href="#大容量実体の明示削除">大容量実体の明示削除</a></li>
-            <li><a href="#主要な制作シナリオと操作の入口">制作シナリオ</a></li>
+            <li><a href="#制作履歴復元派生">6. 制作履歴・復元・派生</a></li>
+            <li><a href="#保護指定">7. 保護指定</a></li>
+            <li>
+              <a href="#実行状況停止再開">8. 実行状況・停止・再開</a>
+              <ol>
+                <li>
+                  <a href="#操作対象はチャットで今行っている作業"
+                    >8-1. 操作対象はチャットで今行っている作業</a
+                  >
+                </li>
+              </ol>
+            </li>
+            <li>
+              <a href="#作風制作方針と版選択">9. 作風・制作方針と版選択</a>
+            </li>
+            <li><a href="#振り返り">10. 振り返り</a></li>
+            <li>
+              <a href="#設定と保存データ管理">11. 設定</a>
+              <ol>
+                <li>
+                  <a href="#命名保存用要約モデル"
+                    >11-1. 命名・保存用要約モデル</a
+                  >
+                </li>
+                <li>
+                  <a href="#バックアップ復元形式移行"
+                    >11-2. バックアップ・復元・形式移行</a
+                  >
+                </li>
+                <li>
+                  <a href="#大容量実体の明示削除">11-3. 大容量実体の明示削除</a>
+                </li>
+              </ol>
+            </li>
+            <li>
+              <a href="#主要な制作シナリオと操作の入口">12. 制作シナリオ</a>
+            </li>
+            <li><a href="#sources">13. 詳細資料</a></li>
           </ol>
         </nav>
         <section aria-labelledby="責務と画面構成" class="spec-section">
-          <h2 id="責務と画面構成">画面構成</h2>
+          <h2 id="責務と画面構成">1. 画面構成</h2>
           <p>
             画面は作品と操作対象を明示し、会話による制作依頼・採否・手作業の記録と、成果物・履歴の閲覧をつなぐ。採用・保存・停止の成否は、<a
               href="edit-candidates.html"
@@ -154,19 +185,17 @@
                       </li>
                       <li>ChatGPTデスクトップアプリを操作の参考とする。</li>
                     </ul>
+                    <div class="contract-detail">
+                      <ul class="cell-list">
+                        <li>
+                          別の成果物へのリンクは新しいタブを開き、同じ成果物なら既存のタブを選択する。
+                        </li>
+                        <li>サイドチャットは保存して開き直せる。</li>
+                      </ul>
+                    </div>
                   </td>
                 </tr>
-                <tr>
-                  <th scope="row">処理内容</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        別の成果物へのリンクは新しいタブを開き、同じ成果物なら既存のタブを選択する。
-                      </li>
-                      <li>サイドチャットは保存して開き直せる。</li>
-                    </ul>
-                  </td>
-                </tr>
+
                 <tr>
                   <th scope="row">保護指定</th>
                   <td>
@@ -183,7 +212,7 @@
           </div>
         </section>
         <section aria-labelledby="作品と会話の開始" class="spec-section">
-          <h2 id="作品と会話の開始">制作の開始</h2>
+          <h2 id="作品と会話の開始">2. 制作の開始</h2>
           <div
             aria-label="作品と会話の開始"
             class="table-scroll"
@@ -210,6 +239,45 @@
                         空の状態から始めるか、既存の制作ファイルを取り込む。
                       </li>
                     </ul>
+                    <div class="contract-detail">
+                      <ul class="cell-list">
+                        <li>
+                          新しい作品では作風の版を選ぶか「作風なし」を指定する。
+                        </li>
+                        <li>
+                          作風の版のプルダウンでは最新版に「最新」と表示し、過去版と区別する。
+                        </li>
+                        <li>派生作品でも派生先の選択として扱う。</li>
+                      </ul>
+                    </div>
+                    <div class="contract-detail">
+                      <ul class="cell-list">
+                        <li>
+                          各作品名・振り返りプロジェクト名の右に「新しいチャット」の入口を置く。
+                        </li>
+                        <li>タイトルは最初のリクエスト後にLLMが命名する。</li>
+                        <li>
+                          LLM利用不可時も会話原文と記録を保存し、仮の会話名を表示する。
+                        </li>
+                      </ul>
+                    </div>
+                    <div class="contract-detail">
+                      <ul class="cell-list">
+                        <li>
+                          入力欄のエージェント選択の先頭に「なし」を置き、新規チャットは「なし」で始める。
+                        </li>
+                        <li>
+                          実際の送信時に選んだエージェントをその依頼の工程として記録する。
+                        </li>
+                      </ul>
+                    </div>
+                    <div class="contract-detail">
+                      <ul class="cell-list">
+                        <li>会話ごとに変更できる。</li>
+                        <li>変更は次の依頼から適用する。</li>
+                        <li>使用不能ならその旨を示す。</li>
+                      </ul>
+                    </div>
                   </td>
                 </tr>
                 <tr>
@@ -221,47 +289,7 @@
                     >に従って管理下へコピーし、取り込み時点を最初の記録にする。
                   </td>
                 </tr>
-                <tr>
-                  <th scope="row">処理内容</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        新しい作品では作風の版を選ぶか「作風なし」を指定する。
-                      </li>
-                      <li>
-                        作風の版のプルダウンでは最新版に「最新」と表示し、過去版と区別する。
-                      </li>
-                      <li>派生作品でも派生先の選択として扱う。</li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">処理内容</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        各作品名・振り返りプロジェクト名の右に「新しいチャット」の入口を置く。
-                      </li>
-                      <li>タイトルは最初のリクエスト後にLLMが命名する。</li>
-                      <li>
-                        LLM利用不可時も会話原文と記録を保存し、仮の会話名を表示する。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">処理内容</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        入力欄のエージェント選択の先頭に「なし」を置き、新規チャットは「なし」で始める。
-                      </li>
-                      <li>
-                        実際の送信時に選んだエージェントをその依頼の工程として記録する。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
+
                 <tr>
                   <th scope="row">モデル</th>
                   <td>
@@ -276,22 +304,12 @@
                     </ul>
                   </td>
                 </tr>
-                <tr>
-                  <th scope="row">処理内容</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>会話ごとに変更できる。</li>
-                      <li>変更は次の依頼から適用する。</li>
-                      <li>使用不能ならその旨を示す。</li>
-                    </ul>
-                  </td>
-                </tr>
               </tbody>
             </table>
           </div>
         </section>
         <section aria-labelledby="メインチャットと成果物" class="spec-section">
-          <h2 id="メインチャットと成果物">メインチャット</h2>
+          <h2 id="メインチャットと成果物">3. メインチャット</h2>
           <div
             aria-label="メインチャットと成果物"
             class="table-scroll"
@@ -339,84 +357,77 @@
               </tbody>
             </table>
           </div>
-        </section>
-        <section aria-labelledby="採否と追加修正" class="spec-section">
-          <h2 id="採否と追加修正">編集案の操作</h2>
-          <div
-            aria-label="採否と追加修正"
-            class="table-scroll"
-            role="region"
-            tabindex="0"
-          >
-            <table class="spec-table">
-              <thead>
-                <tr>
-                  <th scope="col">項目</th>
-                  <th scope="col">仕様</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row">採用判断</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        採用・修正して採用・不採用はメインチャットからのみ指示する。
-                      </li>
-                      <li>対象や範囲が曖昧なら具体化する。</li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">採用判断</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        部分採用は独立して確認・検証できる変更単位を対象にする。
-                      </li>
-                      <li>依存がある部分は一組で確認する。</li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">採用判断</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        基準が古い案や複数案を取り込む場合は、現在状態に組み合わせた実際の結果をリンクで提示し、会話で確認してから採用する。
-                      </li>
-                      <li>元の案・寄与元・保持する手修正を説明する。</li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">採用判断</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        未採用の案にも手修正を記録し、指定した状態からAIに追加修正を依頼できる。
-                      </li>
-                      <li>指示した人間と変更したAIを区別する。</li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">処理内容</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>理由は任意とし、入力された内容を保存する。</li>
-                      <li>
-                        採用の指示、適用中、適用済み、失敗、結果不明を区別する。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+
+          <section aria-labelledby="採否と追加修正" class="spec-subsection">
+            <h3 id="採否と追加修正">3-1. 編集案の操作</h3>
+            <div
+              aria-label="採否と追加修正"
+              class="table-scroll"
+              role="region"
+              tabindex="0"
+            >
+              <table class="spec-table">
+                <thead>
+                  <tr>
+                    <th scope="col">項目</th>
+                    <th scope="col">仕様</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row">採用判断</th>
+                    <td>
+                      <ul class="cell-list">
+                        <li>
+                          採用・修正して採用・不採用はメインチャットからのみ指示する。
+                        </li>
+                        <li>対象や範囲が曖昧なら具体化する。</li>
+                      </ul>
+                      <div class="contract-detail">
+                        <ul class="cell-list">
+                          <li>
+                            部分採用は独立して確認・検証できる変更単位を対象にする。
+                          </li>
+                          <li>依存がある部分は一組で確認する。</li>
+                        </ul>
+                      </div>
+                      <div class="contract-detail">
+                        <ul class="cell-list">
+                          <li>
+                            基準が古い案や複数案を取り込む場合は、現在状態に組み合わせた実際の結果をリンクで提示し、会話で確認してから採用する。
+                          </li>
+                          <li>元の案・寄与元・保持する手修正を説明する。</li>
+                        </ul>
+                      </div>
+                      <div class="contract-detail">
+                        <ul class="cell-list">
+                          <li>
+                            未採用の案にも手修正を記録し、指定した状態からAIに追加修正を依頼できる。
+                          </li>
+                          <li>指示した人間と変更したAIを区別する。</li>
+                        </ul>
+                      </div>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <th scope="row">処理内容</th>
+                    <td>
+                      <ul class="cell-list">
+                        <li>理由は任意とし、入力された内容を保存する。</li>
+                        <li>
+                          採用の指示、適用中、適用済み、失敗、結果不明を区別する。
+                        </li>
+                      </ul>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
         </section>
         <section aria-labelledby="手作業の記録" class="spec-section">
-          <h2 id="手作業の記録">手作業の記録</h2>
+          <h2 id="手作業の記録">4. 手作業の記録</h2>
           <div
             aria-label="手作業の記録"
             class="table-scroll"
@@ -450,6 +461,27 @@
                         同じプルダウンの最下部からコンピューター上のファイル・画像を添付できる。
                       </li>
                     </ul>
+                    <div class="contract-detail">
+                      <ul class="cell-list">
+                        <li>
+                          記録は前回の状態または指定した候補に結び付け、作業内容・変更前後・理由を保持する。
+                        </li>
+                        <li>
+                          理由の後日入力・訂正、変更要約の訂正もメインチャットで対象を指定して行い、以前の文章・記入者・時刻を残す。
+                        </li>
+                      </ul>
+                    </div>
+                    <div class="contract-detail">
+                      <ul class="cell-list">
+                        <li>
+                          LLMが使えない間も、同じ会話欄の「記録として送信」から対象・本文・添付をそのまま登録できる。
+                        </li>
+                        <li>通常の相談メッセージとは送信時に区別する。</li>
+                      </ul>
+                    </div>
+                    <div class="contract-detail">
+                      Photoshopでの作業は人間が保存したPSD/PSBとプレビューを登録し、前回の記録・元レンダーとの関係を保持する。
+                    </div>
                   </td>
                 </tr>
                 <tr>
@@ -465,116 +497,88 @@
                     </ul>
                   </td>
                 </tr>
-                <tr>
-                  <th scope="row">記録</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        記録は前回の状態または指定した候補に結び付け、作業内容・変更前後・理由を保持する。
-                      </li>
-                      <li>
-                        理由の後日入力・訂正、変更要約の訂正もメインチャットで対象を指定して行い、以前の文章・記入者・時刻を残す。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">記録</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        LLMが使えない間も、同じ会話欄の「記録として送信」から対象・本文・添付をそのまま登録できる。
-                      </li>
-                      <li>通常の相談メッセージとは送信時に区別する。</li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">記録</th>
-                  <td>
-                    Photoshopでの作業は人間が保存したPSD/PSBとプレビューを登録し、前回の記録・元レンダーとの関係を保持する。
-                  </td>
-                </tr>
               </tbody>
             </table>
           </div>
-        </section>
-        <section aria-labelledby="blendの記録用プレビュー" class="spec-section">
-          <h2 id="blendの記録用プレビュー">
-            <code>.blend</code>の記録用プレビュー
-          </h2>
-          <div
-            aria-label=".blend の記録用プレビュー"
-            class="table-scroll"
-            role="region"
-            tabindex="0"
+
+          <section
+            aria-labelledby="blendの記録用プレビュー"
+            class="spec-subsection"
           >
-            <table class="spec-table">
-              <thead>
-                <tr>
-                  <th scope="col">項目</th>
-                  <th scope="col">仕様</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row">処理内容</th>
-                  <td>
-                    指定した保存済み
-                    <code>.blend</code>
-                    の内容と取得条件に対応する既存の画像があれば再利用する。
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">処理内容</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        対応画像がなければWindows
-                        Blenderと通常のPythonスクリプトで生成する。
-                      </li>
-                      <li>LLMなしで利用できる処理とする。</li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">記録</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        使用するカメラ・フレーム・記録用解像度を表示する。
-                      </li>
-                      <li>
-                        記録用プレビューと正式な13レイヤーのPSD/PSB出力を区別する。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">適用条件</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        カメラ・依存素材等が不足する場合や生成に失敗した場合は原因を示す。
-                      </li>
-                      <li>
-                        本文と制作ファイルの記録は可能とし、プレビューを後から補える。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <p>
-            固定入力からの画像生成が可能であることと、製品としての取得処理が検証済みであることは区別する。取得条件・再利用判定・停止・記録との確定順は後続のエージェント契約と実装仕様へ引き継ぐ。
-          </p>
+            <h3 id="blendの記録用プレビュー">
+              4-1. <code>.blend</code>の記録用プレビュー
+            </h3>
+            <div
+              aria-label=".blend の記録用プレビュー"
+              class="table-scroll"
+              role="region"
+              tabindex="0"
+            >
+              <table class="spec-table">
+                <thead>
+                  <tr>
+                    <th scope="col">項目</th>
+                    <th scope="col">仕様</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row">処理内容</th>
+                    <td>
+                      指定した保存済み
+                      <code>.blend</code>
+                      の内容と取得条件に対応する既存の画像があれば再利用する。
+                      <div class="contract-detail">
+                        <ul class="cell-list">
+                          <li>
+                            対応画像がなければWindows
+                            Blenderと通常のPythonスクリプトで生成する。
+                          </li>
+                          <li>LLMなしで利用できる処理とする。</li>
+                        </ul>
+                      </div>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <th scope="row">記録</th>
+                    <td>
+                      <ul class="cell-list">
+                        <li>
+                          使用するカメラ・フレーム・記録用解像度を表示する。
+                        </li>
+                        <li>
+                          記録用プレビューと正式な13レイヤーのPSD/PSB出力を区別する。
+                        </li>
+                      </ul>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">適用条件</th>
+                    <td>
+                      <ul class="cell-list">
+                        <li>
+                          カメラ・依存素材等が不足する場合や生成に失敗した場合は原因を示す。
+                        </li>
+                        <li>
+                          本文と制作ファイルの記録は可能とし、プレビューを後から補える。
+                        </li>
+                      </ul>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p>
+              固定入力からの画像生成が可能であることと、製品としての取得処理が検証済みであることは区別する。取得条件・再利用判定・停止・記録との確定順は後続のエージェント契約と実装仕様へ引き継ぐ。
+            </p>
+          </section>
         </section>
         <section
           aria-labelledby="サイドチャットと手作業の相談"
           class="spec-section"
         >
-          <h2 id="サイドチャットと手作業の相談">サイドチャット</h2>
+          <h2 id="サイドチャットと手作業の相談">5. サイドチャット</h2>
           <p>右側のタブでメインの制作と並行して相談する。</p>
           <div
             aria-label="サイドチャットと手作業の相談"
@@ -622,7 +626,7 @@
           </div>
         </section>
         <section aria-labelledby="制作履歴復元派生" class="spec-section">
-          <h2 id="制作履歴復元派生">制作履歴・復元・派生</h2>
+          <h2 id="制作履歴復元派生">6. 制作履歴・復元・派生</h2>
           <p>
             制作履歴は普段は閉じ、右側の「制作履歴」タブで、左から右へ制作が進むブランチグラフとして広く開く。節点は保存状態、枝は変更記録、採用の表示は採否記録に対応し、定義・作風を管理するGitコミットとは区別する。
           </p>
@@ -649,40 +653,36 @@
                       </li>
                       <li>指示者と変更者を区別する。</li>
                     </ul>
+                    <div class="contract-detail">
+                      <ul class="cell-list">
+                        <li>
+                          ホバーで修正理由・採用理由を確認でき、未入力なら未入力と示す。
+                        </li>
+                        <li>
+                          クリックで対象を固定し、成果物リンクからプレビュータブを開く。
+                        </li>
+                      </ul>
+                    </div>
                   </td>
                 </tr>
-                <tr>
-                  <th scope="row">採用判断</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        ホバーで修正理由・採用理由を確認でき、未入力なら未入力と示す。
-                      </li>
-                      <li>
-                        クリックで対象を固定し、成果物リンクからプレビュータブを開く。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
+
                 <tr>
                   <th scope="row">復元</th>
                   <td>
                     選んだ節点をメインチャットに参照として添え、追加修正・手修正の記録・復元・派生を指示する。
+                    <div class="contract-detail">
+                      <ul class="cell-list">
+                        <li>
+                          「ここに戻して」では復元元と戻す直前の状態を説明し、未登録の手修正があれば先に記録する。
+                        </li>
+                        <li>
+                          後続の履歴は残し、復元元を参照する新しい記録を作る。
+                        </li>
+                      </ul>
+                    </div>
                   </td>
                 </tr>
-                <tr>
-                  <th scope="row">復元</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        「ここに戻して」では復元元と戻す直前の状態を説明し、未登録の手修正があれば先に記録する。
-                      </li>
-                      <li>
-                        後続の履歴は残し、復元元を参照する新しい記録を作る。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
+
                 <tr>
                   <th scope="row">派生</th>
                   <td>
@@ -708,7 +708,7 @@
           </p>
         </section>
         <section aria-labelledby="保護指定" class="spec-section">
-          <h2 id="保護指定">保護指定</h2>
+          <h2 id="保護指定">7. 保護指定</h2>
           <div
             aria-label="保護指定"
             class="table-scroll"
@@ -735,6 +735,16 @@
                       </li>
                       <li>保護の追加はメインチャットからも指示できる。</li>
                     </ul>
+                    <div class="contract-detail">
+                      <ul class="cell-list">
+                        <li>
+                          保護違反・検証不能な候補は、原因と必要な対処をチャットで説明する。
+                        </li>
+                        <li>
+                          許可済みでも最新の保護・実際の変更・許可範囲を採用時に照合する。
+                        </li>
+                      </ul>
+                    </div>
                   </td>
                 </tr>
                 <tr>
@@ -754,25 +764,12 @@
                     </ul>
                   </td>
                 </tr>
-                <tr>
-                  <th scope="row">保護指定</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        保護違反・検証不能な候補は、原因と必要な対処をチャットで説明する。
-                      </li>
-                      <li>
-                        許可済みでも最新の保護・実際の変更・許可範囲を採用時に照合する。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
               </tbody>
             </table>
           </div>
         </section>
         <section aria-labelledby="実行状況停止再開" class="spec-section">
-          <h2 id="実行状況停止再開">実行状況・停止・再開</h2>
+          <h2 id="実行状況停止再開">8. 実行状況・停止・再開</h2>
           <p>
             左側のチャット名の右に状態アイコンを置く。以下へ集約する。具体的なアイコンの形はChatGPTアプリを参考に実装時に照合する。
           </p>
@@ -844,90 +841,88 @@
               </tbody>
             </table>
           </div>
-        </section>
-        <section
-          aria-labelledby="操作対象はチャットで今行っている作業"
-          class="spec-section"
-        >
-          <h2 id="操作対象はチャットで今行っている作業">
-            操作対象はチャットで今行っている作業
-          </h2>
-          <div
-            aria-label="操作対象はチャットで今行っている作業"
-            class="table-scroll"
-            role="region"
-            tabindex="0"
+
+          <section
+            aria-labelledby="操作対象はチャットで今行っている作業"
+            class="spec-subsection"
           >
-            <table class="spec-table">
-              <thead>
-                <tr>
-                  <th scope="col">項目</th>
-                  <th scope="col">仕様</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row">停止</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>作業中は送信欄の右下に停止ボタンを置く。</li>
-                      <li>利用者はそのチャットで今行っている作業を止める。</li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">停止</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        内部では停止対象を該当する依頼・操作へ対応付け、停止要求受付と実際の停止完了を区別する。
-                      </li>
-                      <li>停止処理中を表示す。</li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">処理内容</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>「続けて」等の明示メッセージで再開する。</li>
-                      <li>
-                        対象が曖昧な場合は確認し、元の依頼と累積回数を維持する。
-                      </li>
-                      <li>
-                        新しい制作指示による追加修正は別の依頼として扱う。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">処理内容</th>
-                  <td>結果不明なら先に照合する。</td>
-                </tr>
-                <tr>
-                  <th scope="row">依頼</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        依頼全体が失敗・中断しても独立して検証済みの途中成果にはリンクを示し、未完成部分と区別する。
-                      </li>
-                      <li>全体の完了と案の採用も区別する。</li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">処理内容</th>
-                  <td>
-                    ブラウザを閉じてもローカル実行が継続する契約を保ち、再表示では保存された進捗・結果を取得する。
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <p>同じ作品内の制作操作・採用・復元等は既存の順序・排他に従う。</p>
+            <h3 id="操作対象はチャットで今行っている作業">
+              8-1. 操作対象はチャットで今行っている作業
+            </h3>
+            <div
+              aria-label="操作対象はチャットで今行っている作業"
+              class="table-scroll"
+              role="region"
+              tabindex="0"
+            >
+              <table class="spec-table">
+                <thead>
+                  <tr>
+                    <th scope="col">項目</th>
+                    <th scope="col">仕様</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row">停止</th>
+                    <td>
+                      <ul class="cell-list">
+                        <li>作業中は送信欄の右下に停止ボタンを置く。</li>
+                        <li>
+                          利用者はそのチャットで今行っている作業を止める。
+                        </li>
+                      </ul>
+                      <div class="contract-detail">
+                        <ul class="cell-list">
+                          <li>
+                            内部では停止対象を該当する依頼・操作へ対応付け、停止要求受付と実際の停止完了を区別する。
+                          </li>
+                          <li>停止処理中を表示す。</li>
+                        </ul>
+                      </div>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <th scope="row">処理内容</th>
+                    <td>
+                      <ul class="cell-list">
+                        <li>「続けて」等の明示メッセージで再開する。</li>
+                        <li>
+                          対象が曖昧な場合は確認し、元の依頼と累積回数を維持する。
+                        </li>
+                        <li>
+                          新しい制作指示による追加修正は別の依頼として扱う。
+                        </li>
+                      </ul>
+                      <div class="contract-detail">
+                        結果不明なら先に照合する。
+                      </div>
+                      <div class="contract-detail">
+                        ブラウザを閉じてもローカル実行が継続する契約を保ち、再表示では保存された進捗・結果を取得する。
+                      </div>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <th scope="row">依頼</th>
+                    <td>
+                      <ul class="cell-list">
+                        <li>
+                          依頼全体が失敗・中断しても独立して検証済みの途中成果にはリンクを示し、未完成部分と区別する。
+                        </li>
+                        <li>全体の完了と案の採用も区別する。</li>
+                      </ul>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p>同じ作品内の制作操作・採用・復元等は既存の順序・排他に従う。</p>
+          </section>
         </section>
         <section aria-labelledby="作風制作方針と版選択" class="spec-section">
-          <h2 id="作風制作方針と版選択">作風・制作方針と版選択</h2>
+          <h2 id="作風制作方針と版選択">9. 作風・制作方針と版選択</h2>
           <div
             aria-label="作風・制作方針と版選択"
             class="table-scroll"
@@ -1022,19 +1017,16 @@
                       </li>
                       <li>未pushでもローカルの条件が揃えば制作できる。</li>
                     </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">Git参照</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        設定から保存先と対象の保持用タグを確認して明示的にGitHubへ保存できる。
-                      </li>
-                      <li>
-                        ローカルコミット・作品への適用・リモート公開は別操作とする。
-                      </li>
-                    </ul>
+                    <div class="contract-detail">
+                      <ul class="cell-list">
+                        <li>
+                          設定から保存先と対象の保持用タグを確認して明示的にGitHubへ保存できる。
+                        </li>
+                        <li>
+                          ローカルコミット・作品への適用・リモート公開は別操作とする。
+                        </li>
+                      </ul>
+                    </div>
                   </td>
                 </tr>
               </tbody>
@@ -1042,7 +1034,7 @@
           </div>
         </section>
         <section aria-labelledby="振り返り" class="spec-section">
-          <h2 id="振り返り">振り返り</h2>
+          <h2 id="振り返り">10. 振り返り</h2>
           <div
             aria-label="振り返り"
             class="table-scroll"
@@ -1074,19 +1066,17 @@
                         >に従う。
                       </li>
                     </ul>
+                    <div class="contract-detail">
+                      <ul class="cell-list">
+                        <li>
+                          根拠となる作品・採否・手修正へのリンク、不足、理由未入力、仮説と事実の違いをチャットで返す。
+                        </li>
+                        <li>根拠の後日訂正があれば更新を示す。</li>
+                      </ul>
+                    </div>
                   </td>
                 </tr>
-                <tr>
-                  <th scope="row">処理内容</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        根拠となる作品・採否・手修正へのリンク、不足、理由未入力、仮説と事実の違いをチャットで返す。
-                      </li>
-                      <li>根拠の後日訂正があれば更新を示す。</li>
-                    </ul>
-                  </td>
-                </tr>
+
                 <tr>
                   <th scope="row">採用判断</th>
                   <td>
@@ -1105,7 +1095,7 @@
           </div>
         </section>
         <section aria-labelledby="設定と保存データ管理" class="spec-section">
-          <h2 id="設定と保存データ管理">設定</h2>
+          <h2 id="設定と保存データ管理">11. 設定</h2>
           <div
             aria-label="設定"
             class="table-scroll"
@@ -1143,179 +1133,186 @@
               </tbody>
             </table>
           </div>
-        </section>
-        <section aria-labelledby="命名保存用要約モデル" class="spec-section">
-          <h2 id="命名保存用要約モデル">命名・保存用要約モデル</h2>
-          <div
-            aria-label="命名・保存用要約モデル"
-            class="table-scroll"
-            role="region"
-            tabindex="0"
+
+          <section
+            aria-labelledby="命名保存用要約モデル"
+            class="spec-subsection"
           >
-            <table class="spec-table">
-              <thead>
-                <tr>
-                  <th scope="col">項目</th>
-                  <th scope="col">仕様</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row">モデル</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        <a
-                          href="https://github.com/Kurarowa305/scene-craft/blob/main/docs/design/agent-contracts.md#提案数と補助モデル合意済み"
-                          rel="noopener noreferrer"
-                          target="_blank"
-                          >エージェント契約の設計</a
-                        >で、設定から命名・保存用要約のモデルを変更できるよう指定された。
-                      </li>
-                      <li>
-                        「命名・保存用要約モデル」を設定項目として設け、初期構築時はGPT-6
-                        Luna（<code>gpt-6-luna</code>）を初期値にする。
-                      </li>
-                      <li>
-                        制作会話のモデル選択・新規会話への引き継ぎとは別に扱う。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">設定</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>設定変更は以後の補助処理へ適用する。</li>
-                      <li>
-                        指定モデルが利用不可なら原因と設定変更の入口を示す。
-                      </li>
-                      <li>
-                        未命名・未要約でも会話と制作結果を閲覧でき、LLMなしの記録も継続できる。
-                      </li>
-                      <li>具体的な設定画面の配置は実装仕様で定める。</li>
-                    </ul>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
-        <section
-          aria-labelledby="バックアップ復元形式移行"
-          class="spec-section"
-        >
-          <h2 id="バックアップ復元形式移行">バックアップ・復元・形式移行</h2>
-          <div
-            aria-label="バックアップ・復元・形式移行"
-            class="table-scroll"
-            role="region"
-            tabindex="0"
+            <h3 id="命名保存用要約モデル">11-1. 命名・保存用要約モデル</h3>
+            <div
+              aria-label="命名・保存用要約モデル"
+              class="table-scroll"
+              role="region"
+              tabindex="0"
+            >
+              <table class="spec-table">
+                <thead>
+                  <tr>
+                    <th scope="col">項目</th>
+                    <th scope="col">仕様</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row">モデル</th>
+                    <td>
+                      <ul class="cell-list">
+                        <li>
+                          <a
+                            href="https://github.com/Kurarowa305/scene-craft/blob/main/docs/design/agent-contracts.md#提案数と補助モデル合意済み"
+                            rel="noopener noreferrer"
+                            target="_blank"
+                            >エージェント契約の設計</a
+                          >で、設定から命名・保存用要約のモデルを変更できるよう指定された。
+                        </li>
+                        <li>
+                          「命名・保存用要約モデル」を設定項目として設け、初期構築時はGPT-6
+                          Luna（<code>gpt-6-luna</code>）を初期値にする。
+                        </li>
+                        <li>
+                          制作会話のモデル選択・新規会話への引き継ぎとは別に扱う。
+                        </li>
+                      </ul>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">設定</th>
+                    <td>
+                      <ul class="cell-list">
+                        <li>設定変更は以後の補助処理へ適用する。</li>
+                        <li>
+                          指定モデルが利用不可なら原因と設定変更の入口を示す。
+                        </li>
+                        <li>
+                          未命名・未要約でも会話と制作結果を閲覧でき、LLMなしの記録も継続できる。
+                        </li>
+                        <li>具体的な設定画面の配置は実装仕様で定める。</li>
+                      </ul>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+          <section
+            aria-labelledby="バックアップ復元形式移行"
+            class="spec-subsection"
           >
-            <table class="spec-table">
-              <thead>
-                <tr>
-                  <th scope="col">項目</th>
-                  <th scope="col">仕様</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row">バックアップ</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        全体バックアップでは保存先・必要容量・既知の不足を示す。
-                      </li>
-                      <li>
-                        安全な停止と照合、作業用ファイルの保存を経て書き出す。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">記録</th>
-                  <td>作業中は新しい制作操作・記録更新を止める。</td>
-                </tr>
-                <tr>
-                  <th scope="row">バックアップ</th>
-                  <td>
-                    不足を持つ正常なバックアップと破損したバックアップを区別する。
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">認証</th>
-                  <td>GitHubからの取得・別途認証・明示再開を案内する。</td>
-                </tr>
-                <tr>
-                  <th scope="row">処理内容</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        ローカル保存形式の移行が必要なら対象・変更内容・必要容量・退避先・退避状態を示し、確認後に行う。
-                      </li>
-                      <li>移行失敗時は退避した構成への復旧を案内する。</li>
-                    </ul>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
-        <section aria-labelledby="大容量実体の明示削除" class="spec-section">
-          <h2 id="大容量実体の明示削除">大容量実体の明示削除</h2>
-          <div
-            aria-label="大容量実体の明示削除"
-            class="table-scroll"
-            role="region"
-            tabindex="0"
+            <h3 id="バックアップ復元形式移行">
+              11-2. バックアップ・復元・形式移行
+            </h3>
+            <div
+              aria-label="バックアップ・復元・形式移行"
+              class="table-scroll"
+              role="region"
+              tabindex="0"
+            >
+              <table class="spec-table">
+                <thead>
+                  <tr>
+                    <th scope="col">項目</th>
+                    <th scope="col">仕様</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row">バックアップ</th>
+                    <td>
+                      <ul class="cell-list">
+                        <li>
+                          全体バックアップでは保存先・必要容量・既知の不足を示す。
+                        </li>
+                        <li>
+                          安全な停止と照合、作業用ファイルの保存を経て書き出す。
+                        </li>
+                      </ul>
+                      <div class="contract-detail">
+                        不足を持つ正常なバックアップと破損したバックアップを区別する。
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">記録</th>
+                    <td>作業中は新しい制作操作・記録更新を止める。</td>
+                  </tr>
+
+                  <tr>
+                    <th scope="row">認証</th>
+                    <td>GitHubからの取得・別途認証・明示再開を案内する。</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">処理内容</th>
+                    <td>
+                      <ul class="cell-list">
+                        <li>
+                          ローカル保存形式の移行が必要なら対象・変更内容・必要容量・退避先・退避状態を示し、確認後に行う。
+                        </li>
+                        <li>移行失敗時は退避した構成への復旧を案内する。</li>
+                      </ul>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+          <section
+            aria-labelledby="大容量実体の明示削除"
+            class="spec-subsection"
           >
-            <table class="spec-table">
-              <thead>
-                <tr>
-                  <th scope="col">項目</th>
-                  <th scope="col">仕様</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row">復元</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        設定の「保存データ管理」で対象・容量・影響する保存状態と復元できなくなる内容を示し、人間が明示的に削除する。
-                      </li>
-                      <li>
-                        現在採用中・実行中、別の保存状態・作品で必要な実体は保護する。
-                      </li>
-                      <li>
-                        参照・共有素材の検査と削除は保存設計の契約に従う。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">参照</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        会話・理由・採否・分岐・ファイルの当時の参照は残し、削除済み・欠落・破損・未確認を区別する。
-                      </li>
-                      <li>
-                        履歴と実体の可用性を表示し、必要な実体が揃った状態で復元・派生・制作を受け付ける。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+            <h3 id="大容量実体の明示削除">11-3. 大容量実体の明示削除</h3>
+            <div
+              aria-label="大容量実体の明示削除"
+              class="table-scroll"
+              role="region"
+              tabindex="0"
+            >
+              <table class="spec-table">
+                <thead>
+                  <tr>
+                    <th scope="col">項目</th>
+                    <th scope="col">仕様</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row">復元</th>
+                    <td>
+                      <ul class="cell-list">
+                        <li>
+                          設定の「保存データ管理」で対象・容量・影響する保存状態と復元できなくなる内容を示し、人間が明示的に削除する。
+                        </li>
+                        <li>
+                          現在採用中・実行中、別の保存状態・作品で必要な実体は保護する。
+                        </li>
+                        <li>
+                          参照・共有素材の検査と削除は保存設計の契約に従う。
+                        </li>
+                      </ul>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">参照</th>
+                    <td>
+                      <ul class="cell-list">
+                        <li>
+                          会話・理由・採否・分岐・ファイルの当時の参照は残し、削除済み・欠落・破損・未確認を区別する。
+                        </li>
+                        <li>
+                          履歴と実体の可用性を表示し、必要な実体が揃った状態で復元・派生・制作を受け付ける。
+                        </li>
+                      </ul>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
         </section>
         <section
           aria-labelledby="主要な制作シナリオと操作の入口"
           class="spec-section"
         >
-          <h2 id="主要な制作シナリオと操作の入口">制作シナリオ</h2>
+          <h2 id="主要な制作シナリオと操作の入口">12. 制作シナリオ</h2>
           <div
             aria-label="主要な制作シナリオと操作の入口"
             class="table-scroll"
@@ -1434,7 +1431,7 @@
           </div>
         </section>
         <section class="sources">
-          <h2>詳細資料</h2>
+          <h2 id="sources">13. 詳細資料</h2>
           <p>
             <a
               href="https://github.com/Kurarowa305/scene-craft/issues/12"

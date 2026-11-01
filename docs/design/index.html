@@ -47,8 +47,7 @@
           人間が工程を選び、AIの編集案を確かめ、採用する。scene-craftは制作データと会話、手修正と理由をつないで残す。
         </p>
         <section id="overview">
-          <p class="eyebrow">01 / SYSTEM</p>
-          <h2>どこで、何を動かすか</h2>
+          <h2>1. どこで、何を動かすか</h2>
           <p>
             制作アプリとファイルはWindows、会話と制作の管理はWSL。専用MCPを通る制作要求も、バックエンドで権限・保護・実行順序を照合する。
           </p>
@@ -137,7 +136,10 @@
                 </g>
                 <path class="edge" d="M816 253V317"></path>
                 <text class="edge-label" x="843" y="289">stdio</text>
-                <path class="edge" d="M727 350H695V140"></path>
+                <path
+                  class="edge"
+                  d="M727 350L705 350Q695 350 695 340L695 140"
+                ></path>
                 <text class="edge-label" x="595" y="340">認可付き</text>
                 <text class="edge-label" x="595" y="362">Unix socket RPC</text>
                 <g class="node">
@@ -147,7 +149,10 @@
                     実行ごとの記録・プロセス所有権
                   </text>
                 </g>
-                <path class="edge" d="M490 126H465V222H390"></path>
+                <path
+                  class="edge"
+                  d="M490 126L475 126Q465 126 465 136L465 212Q465 222 455 222L390 222"
+                ></path>
                 <text class="edge-label" x="430" y="277">開始・照合・停止</text>
                 <g class="node">
                   <rect height="60" rx="9" width="350" x="40" y="310"></rect>
@@ -190,8 +195,7 @@
           </p>
         </section>
         <section>
-          <p class="eyebrow">02 / CREATIVE CYCLE</p>
-          <h2>人間の判断を挟んで進む</h2>
+          <h2>2. 人間の判断を挟んで進む</h2>
           <figure>
             <ol class="flow">
               <li>調べる・計画する</li>
@@ -223,8 +227,7 @@
           </div>
         </section>
         <section id="areas">
-          <p class="eyebrow">03 / DESIGN AREAS</p>
-          <h2>設計一覧</h2>
+          <h2>3. 設計一覧</h2>
           <p>各設計で作る機能と仕様を確認できます。</p>
           <div class="cards">
             <a class="area-card" href="application-architecture.html"

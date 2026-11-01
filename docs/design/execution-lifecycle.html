@@ -44,28 +44,45 @@
       <main id="main" tabindex="-1">
         <p class="eyebrow">DESIGN / 06</p>
         <h1>実行・停止・復旧</h1>
-        <nav aria-label="このページの目次" class="page-toc">
-          <h2>このページの内容</h2>
+        <nav aria-label="目次" class="page-toc">
+          <h2>目次</h2>
           <ol>
-            <li><a href="#責務と前提">責務</a></li>
-            <li><a href="#順序と排他">順序と排他</a></li>
-            <li><a href="#再実行予算">再実行予算</a></li>
-            <li><a href="#アプリ再起動">アプリ再起動</a></li>
-            <li><a href="#停止後の再開と予算">再開時の予算</a></li>
-            <li><a href="#個別停止と後続">依頼の個別停止</a></li>
-            <li><a href="#依頼失敗時の編集案">依頼失敗時の編集案</a></li>
-            <li><a href="#状態と遷移">依頼状態</a></li>
-            <li><a href="#状態遷移の全経路">状態遷移の全経路</a></li>
-            <li><a href="#停止と完了の競合">停止と完了の競合</a></li>
-            <li><a href="#二重受付予算と保存タイミング">受付の永続化</a></li>
-            <li><a href="#世代所有権連絡期限">世代・所有権・連絡期限</a></li>
-            <li><a href="#遷移時の共通条件">遷移時の共通条件</a></li>
-            <li><a href="#主要な異常系と受け入れ観点">異常時の動作</a></li>
-            <li><a href="#会話基盤との実行境界">会話基盤との実行境界</a></li>
+            <li><a href="#責務と前提">1. 責務</a></li>
+            <li><a href="#順序と排他">2. 順序と排他</a></li>
+            <li>
+              <a href="#再実行予算">3. 再実行予算</a>
+              <ol>
+                <li><a href="#停止後の再開と予算">3-1. 再開時の予算</a></li>
+              </ol>
+            </li>
+            <li><a href="#アプリ再起動">4. アプリ再起動</a></li>
+            <li>
+              <a href="#個別停止と後続">5. 依頼の個別停止</a>
+              <ol>
+                <li>
+                  <a href="#依頼失敗時の編集案">5-1. 依頼失敗時の編集案</a>
+                </li>
+              </ol>
+            </li>
+            <li>
+              <a href="#状態と遷移">6. 依頼状態</a>
+              <ol>
+                <li><a href="#状態遷移の全経路">6-1. 状態遷移の全経路</a></li>
+                <li><a href="#停止と完了の競合">6-2. 停止と完了の競合</a></li>
+                <li><a href="#遷移時の共通条件">6-3. 遷移時の共通条件</a></li>
+              </ol>
+            </li>
+            <li><a href="#二重受付予算と保存タイミング">7. 受付の永続化</a></li>
+            <li><a href="#世代所有権連絡期限">8. 世代・所有権・連絡期限</a></li>
+            <li><a href="#主要な異常系と受け入れ観点">9. 異常時の動作</a></li>
+            <li>
+              <a href="#会話基盤との実行境界">10. 会話基盤との実行境界</a>
+            </li>
+            <li><a href="#sources">11. 詳細資料</a></li>
           </ol>
         </nav>
         <section aria-labelledby="責務と前提" class="spec-section">
-          <h2 id="責務と前提">責務</h2>
+          <h2 id="責務と前提">1. 責務</h2>
           <div
             aria-label="責務と前提"
             class="table-scroll"
@@ -123,7 +140,7 @@
             class="anchor-alias"
             id="順序再実行起動の契約"
           ></span>
-          <h2 id="順序と排他">順序と排他</h2>
+          <h2 id="順序と排他">2. 順序と排他</h2>
           <div
             aria-label="順序と排他"
             class="table-scroll"
@@ -199,7 +216,7 @@
           </div>
         </section>
         <section aria-labelledby="再実行予算" class="spec-section">
-          <h2 id="再実行予算">再実行予算</h2>
+          <h2 id="再実行予算">3. 再実行予算</h2>
           <div
             aria-label="再実行予算"
             class="table-scroll"
@@ -268,9 +285,67 @@
               </tbody>
             </table>
           </div>
+
+          <section aria-labelledby="停止後の再開と予算" class="spec-subsection">
+            <span
+              aria-hidden="true"
+              class="anchor-alias"
+              id="停止後の継続と途中成果"
+            ></span>
+            <h3 id="停止後の再開と予算">3-1. 再開時の予算</h3>
+            <div
+              aria-label="停止後の再開と予算"
+              class="table-scroll"
+              role="region"
+              tabindex="0"
+            >
+              <table class="spec-table">
+                <thead>
+                  <tr>
+                    <th scope="col">項目</th>
+                    <th scope="col">仕様</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row">停止</th>
+                    <td>
+                      停止した操作をやり直す場合は1回消費する。
+                      <div class="contract-detail">
+                        <ul class="cell-list">
+                          <li>
+                            例として植物配置が完了し照明調整を停止した場合、植物配置は整合性を再確認して再利用できる。
+                          </li>
+                          <li>照明調整をやり直すときに回数を消費する。</li>
+                        </ul>
+                      </div>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <th scope="row">処理内容</th>
+                    <td>結果不明の操作は先に照合する。</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">再実行</th>
+                    <td>
+                      <ul class="cell-list">
+                        <li>
+                          再実行上限到達時は、原因・途中状態・対処を示して人間の判断を待つ。
+                        </li>
+                        <li>
+                          検証済みの結果を使う未着手部分の継続は、依存関係・変更範囲等を満たせば可能。
+                        </li>
+                      </ul>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
         </section>
         <section aria-labelledby="アプリ再起動" class="spec-section">
-          <h2 id="アプリ再起動">アプリ再起動</h2>
+          <h2 id="アプリ再起動">4. アプリ再起動</h2>
           <div
             aria-label="アプリ再起動"
             class="table-scroll"
@@ -298,65 +373,8 @@
             </table>
           </div>
         </section>
-        <section aria-labelledby="停止後の再開と予算" class="spec-section">
-          <span
-            aria-hidden="true"
-            class="anchor-alias"
-            id="停止後の継続と途中成果"
-          ></span>
-          <h2 id="停止後の再開と予算">再開時の予算</h2>
-          <div
-            aria-label="停止後の再開と予算"
-            class="table-scroll"
-            role="region"
-            tabindex="0"
-          >
-            <table class="spec-table">
-              <thead>
-                <tr>
-                  <th scope="col">項目</th>
-                  <th scope="col">仕様</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row">停止</th>
-                  <td>停止した操作をやり直す場合は1回消費する。</td>
-                </tr>
-                <tr>
-                  <th scope="row">停止</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        例として植物配置が完了し照明調整を停止した場合、植物配置は整合性を再確認して再利用できる。
-                      </li>
-                      <li>照明調整をやり直すときに回数を消費する。</li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">処理内容</th>
-                  <td>結果不明の操作は先に照合する。</td>
-                </tr>
-                <tr>
-                  <th scope="row">再実行</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        再実行上限到達時は、原因・途中状態・対処を示して人間の判断を待つ。
-                      </li>
-                      <li>
-                        検証済みの結果を使う未着手部分の継続は、依存関係・変更範囲等を満たせば可能。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
         <section aria-labelledby="個別停止と後続" class="spec-section">
-          <h2 id="個別停止と後続">依頼の個別停止</h2>
+          <h2 id="個別停止と後続">5. 依頼の個別停止</h2>
           <div
             aria-label="個別停止と後続"
             class="table-scroll"
@@ -386,56 +404,56 @@
               </tbody>
             </table>
           </div>
-        </section>
-        <section aria-labelledby="依頼失敗時の編集案" class="spec-section">
-          <h2 id="依頼失敗時の編集案">依頼失敗時の編集案</h2>
-          <div
-            aria-label="依頼失敗時の編集案"
-            class="table-scroll"
-            role="region"
-            tabindex="0"
-          >
-            <table class="spec-table">
-              <thead>
-                <tr>
-                  <th scope="col">項目</th>
-                  <th scope="col">仕様</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row">採用判断</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        依頼全体が失敗しても、独立して検証できた編集案は残し、人間が採用・修正できる。
-                      </li>
-                      <li>
-                        依頼の失敗と、完成した案の利用可否を別に記録する。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">依頼</th>
-                  <td>
-                    例として植物配置と照明調整の依頼で、植物配置だけが独立して検証済みなら、その案を利用できる。
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">出力</th>
-                  <td>Blender連携の出力契約を維持する。</td>
-                </tr>
-                <tr>
-                  <th scope="row">採用判断</th>
-                  <td>検証済みの案でも採用は別の人間の指示で行う。</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+
+          <section aria-labelledby="依頼失敗時の編集案" class="spec-subsection">
+            <h3 id="依頼失敗時の編集案">5-1. 依頼失敗時の編集案</h3>
+            <div
+              aria-label="依頼失敗時の編集案"
+              class="table-scroll"
+              role="region"
+              tabindex="0"
+            >
+              <table class="spec-table">
+                <thead>
+                  <tr>
+                    <th scope="col">項目</th>
+                    <th scope="col">仕様</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row">採用判断</th>
+                    <td>
+                      <ul class="cell-list">
+                        <li>
+                          依頼全体が失敗しても、独立して検証できた編集案は残し、人間が採用・修正できる。
+                        </li>
+                        <li>
+                          依頼の失敗と、完成した案の利用可否を別に記録する。
+                        </li>
+                      </ul>
+                      <div class="contract-detail">
+                        検証済みの案でも採用は別の人間の指示で行う。
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">依頼</th>
+                    <td>
+                      例として植物配置と照明調整の依頼で、植物配置だけが独立して検証済みなら、その案を利用できる。
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">出力</th>
+                    <td>Blender連携の出力契約を維持する。</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
         </section>
         <section aria-labelledby="状態と遷移" class="spec-section">
-          <h2 id="状態と遷移">依頼状態</h2>
+          <h2 id="状態と遷移">6. 依頼状態</h2>
           <p>
             依頼の状態と、実行中の操作・停止理由を分けて記録する。編集案が完成したことと人間が採用したことを別に扱う。
           </p>
@@ -508,255 +526,353 @@
               </tbody>
             </table>
           </div>
-        </section>
-        <section aria-labelledby="状態遷移の全経路" class="spec-section">
-          <h2 id="状態遷移の全経路">状態遷移の全経路</h2>
-          <div
-            aria-label="状態遷移の全経路"
-            class="table-scroll"
-            role="region"
-            tabindex="0"
-          >
-            <table class="spec-table">
-              <thead>
-                <tr>
-                  <th scope="col">遷移前</th>
-                  <th scope="col">条件・操作</th>
-                  <th scope="col">遷移後</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row">開始</th>
-                  <td>受付</td>
-                  <td>待機</td>
-                </tr>
-                <tr>
-                  <th scope="row">待機</th>
-                  <td>順番・前提・入力を確認</td>
-                  <td>実行中</td>
-                </tr>
-                <tr>
-                  <th scope="row">待機</th>
-                  <td>前提の変更</td>
-                  <td>確認待ち</td>
-                </tr>
-                <tr>
-                  <th scope="row">待機</th>
-                  <td>アプリ終了・再起動</td>
-                  <td>保留</td>
-                </tr>
-                <tr>
-                  <th scope="row">待機</th>
-                  <td>個別停止・外部操作なし</td>
-                  <td>中断</td>
-                </tr>
-                <tr>
-                  <th scope="row">保留</th>
-                  <td>個別停止・外部操作なし</td>
-                  <td>中断</td>
-                </tr>
-                <tr>
-                  <th scope="row">確認待ち</th>
-                  <td>個別停止・外部操作なし</td>
-                  <td>中断</td>
-                </tr>
-                <tr>
-                  <th scope="row">保留</th>
-                  <td>人間が再開</td>
-                  <td>待機</td>
-                </tr>
-                <tr>
-                  <th scope="row">実行中</th>
-                  <td>操作停止を確認し判断を求める</td>
-                  <td>確認待ち</td>
-                </tr>
-                <tr>
-                  <th scope="row">確認待ち</th>
-                  <td>人間の回答・再受付</td>
-                  <td>待機</td>
-                </tr>
-                <tr>
-                  <th scope="row">実行中</th>
-                  <td>停止要求・上限・認証切れ</td>
-                  <td>停止待ち</td>
-                </tr>
-                <tr>
-                  <th scope="row">停止待ち</th>
-                  <td>操作の停止を確認</td>
-                  <td>中断</td>
-                </tr>
-                <tr>
-                  <th scope="row">停止待ち</th>
-                  <td>判断待ちのため安全な停止を確認</td>
-                  <td>確認待ち</td>
-                </tr>
-                <tr>
-                  <th scope="row">停止待ち</th>
-                  <td>障害で停止後に失敗を確認</td>
-                  <td>失敗</td>
-                </tr>
-                <tr>
-                  <th scope="row">停止待ち</th>
-                  <td>依頼全体の完了を確認</td>
-                  <td>完了</td>
-                </tr>
-                <tr>
-                  <th scope="row">実行中</th>
-                  <td>終端・結果・保存を確認</td>
-                  <td>完了</td>
-                </tr>
-                <tr>
-                  <th scope="row">実行中</th>
-                  <td>失敗確定</td>
-                  <td>失敗</td>
-                </tr>
-                <tr>
-                  <th scope="row">実行中</th>
-                  <td>受付・終端・所有権が不明</td>
-                  <td>状態確認が必要</td>
-                </tr>
-                <tr>
-                  <th scope="row">停止待ち</th>
-                  <td>停止結果が不明</td>
-                  <td>状態確認が必要</td>
-                </tr>
-                <tr>
-                  <th scope="row">状態確認が必要</th>
-                  <td>照合して停止を確認</td>
-                  <td>中断</td>
-                </tr>
-                <tr>
-                  <th scope="row">状態確認が必要</th>
-                  <td>照合して完了を確認</td>
-                  <td>完了</td>
-                </tr>
-                <tr>
-                  <th scope="row">状態確認が必要</th>
-                  <td>照合して失敗を確認</td>
-                  <td>失敗</td>
-                </tr>
-                <tr>
-                  <th scope="row">失敗</th>
-                  <td>許可条件と残り予算を確認</td>
-                  <td>待機</td>
-                </tr>
-                <tr>
-                  <th scope="row">中断</th>
-                  <td>人間が再開・入力を再確認</td>
-                  <td>待機</td>
-                </tr>
-                <tr>
-                  <th scope="row">状態確認が必要</th>
-                  <td>照合で稼働を確認・停止を待つ</td>
-                  <td>停止待ち</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <p>
-            状態遷移と停止要求・実行枠・予算の更新は DB
-            内で一体として記録する。開始前の記録と外部の実行記録を照合する。具体的な受付キー・世代・期限は以下に定める。
-          </p>
-        </section>
-        <section aria-labelledby="停止と完了の競合" class="spec-section">
-          <span
-            aria-hidden="true"
-            class="anchor-alias"
-            id="受付停止復旧の契約"
-          ></span>
-          <h2 id="停止と完了の競合">停止と完了の競合</h2>
-          <div
-            aria-label="停止と完了の競合"
-            class="table-scroll"
-            role="region"
-            tabindex="0"
-          >
-            <table class="spec-table">
-              <thead>
-                <tr>
-                  <th scope="col">項目</th>
-                  <th scope="col">仕様</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row">停止</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        停止要求をDBへ保存すると同時に、その依頼の新規操作の開始許可を閉じる。
-                      </li>
-                      <li>
-                        待機・確認待ち・保留の依頼も個別停止でき、外部操作がないことを確認できれば中断にする。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">停止</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        操作の開始許可と停止要求は同じ依頼の下で直列に判定する。
-                      </li>
-                      <li>
-                        開始許可が先に確定した操作は停止対象の実行中操作として追跡する。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">停止</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>Windows側も開始・停止を直列に受け付ける。</li>
-                      <li>
-                        停止応答は単なる要求受付と実際の停止確認を分ける。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">停止</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        停止要求時点ですでに開始を許可した操作は、通信の遅れで直ちに止められない場合がある。
-                      </li>
-                      <li>
-                        編集・保存は安全な境目で止め、専用レンダーは所有権を確認して終了する。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">停止</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        停止と前後して全処理が終わった場合、操作の終端・必要な結果・保存の検証が揃えば依頼は完了とする。
-                      </li>
-                      <li>停止要求も履歴に残す。</li>
-                      <li>一部だけ完了ならその結果を残して中断とする。</li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">依頼</th>
-                  <td>
-                    外部操作の終了と開始許可の解決後に、次の依頼へ実行枠を渡す。
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+
+          <section aria-labelledby="状態遷移の全経路" class="spec-subsection">
+            <h3 id="状態遷移の全経路">6-1. 状態遷移の全経路</h3>
+            <div
+              aria-label="状態遷移の全経路"
+              class="table-scroll"
+              role="region"
+              tabindex="0"
+            >
+              <table class="spec-table">
+                <thead>
+                  <tr>
+                    <th scope="col">遷移前</th>
+                    <th scope="col">条件・操作</th>
+                    <th scope="col">遷移後</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row">開始</th>
+                    <td>受付</td>
+                    <td>待機</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">待機</th>
+                    <td>順番・前提・入力を確認</td>
+                    <td>実行中</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">待機</th>
+                    <td>前提の変更</td>
+                    <td>確認待ち</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">待機</th>
+                    <td>アプリ終了・再起動</td>
+                    <td>保留</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">待機</th>
+                    <td>個別停止・外部操作なし</td>
+                    <td>中断</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">保留</th>
+                    <td>個別停止・外部操作なし</td>
+                    <td>中断</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">確認待ち</th>
+                    <td>個別停止・外部操作なし</td>
+                    <td>中断</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">保留</th>
+                    <td>人間が再開</td>
+                    <td>待機</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">実行中</th>
+                    <td>操作停止を確認し判断を求める</td>
+                    <td>確認待ち</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">確認待ち</th>
+                    <td>人間の回答・再受付</td>
+                    <td>待機</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">実行中</th>
+                    <td>停止要求・上限・認証切れ</td>
+                    <td>停止待ち</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">停止待ち</th>
+                    <td>操作の停止を確認</td>
+                    <td>中断</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">停止待ち</th>
+                    <td>判断待ちのため安全な停止を確認</td>
+                    <td>確認待ち</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">停止待ち</th>
+                    <td>障害で停止後に失敗を確認</td>
+                    <td>失敗</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">停止待ち</th>
+                    <td>依頼全体の完了を確認</td>
+                    <td>完了</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">実行中</th>
+                    <td>終端・結果・保存を確認</td>
+                    <td>完了</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">実行中</th>
+                    <td>失敗確定</td>
+                    <td>失敗</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">実行中</th>
+                    <td>受付・終端・所有権が不明</td>
+                    <td>状態確認が必要</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">停止待ち</th>
+                    <td>停止結果が不明</td>
+                    <td>状態確認が必要</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">状態確認が必要</th>
+                    <td>照合して停止を確認</td>
+                    <td>中断</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">状態確認が必要</th>
+                    <td>照合して完了を確認</td>
+                    <td>完了</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">状態確認が必要</th>
+                    <td>照合して失敗を確認</td>
+                    <td>失敗</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">失敗</th>
+                    <td>許可条件と残り予算を確認</td>
+                    <td>待機</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">中断</th>
+                    <td>人間が再開・入力を再確認</td>
+                    <td>待機</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">状態確認が必要</th>
+                    <td>照合で稼働を確認・停止を待つ</td>
+                    <td>停止待ち</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p>
+              状態遷移と停止要求・実行枠・予算の更新は DB
+              内で一体として記録する。開始前の記録と外部の実行記録を照合する。具体的な受付キー・世代・期限は以下に定める。
+            </p>
+          </section>
+          <section aria-labelledby="停止と完了の競合" class="spec-subsection">
+            <span
+              aria-hidden="true"
+              class="anchor-alias"
+              id="受付停止復旧の契約"
+            ></span>
+            <h3 id="停止と完了の競合">6-2. 停止と完了の競合</h3>
+            <div
+              aria-label="停止と完了の競合"
+              class="table-scroll"
+              role="region"
+              tabindex="0"
+            >
+              <table class="spec-table">
+                <thead>
+                  <tr>
+                    <th scope="col">項目</th>
+                    <th scope="col">仕様</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row">停止</th>
+                    <td>
+                      <ul class="cell-list">
+                        <li>
+                          停止要求をDBへ保存すると同時に、その依頼の新規操作の開始許可を閉じる。
+                        </li>
+                        <li>
+                          待機・確認待ち・保留の依頼も個別停止でき、外部操作がないことを確認できれば中断にする。
+                        </li>
+                      </ul>
+                      <div class="contract-detail">
+                        <ul class="cell-list">
+                          <li>
+                            操作の開始許可と停止要求は同じ依頼の下で直列に判定する。
+                          </li>
+                          <li>
+                            開始許可が先に確定した操作は停止対象の実行中操作として追跡する。
+                          </li>
+                        </ul>
+                      </div>
+                      <div class="contract-detail">
+                        <ul class="cell-list">
+                          <li>Windows側も開始・停止を直列に受け付ける。</li>
+                          <li>
+                            停止応答は単なる要求受付と実際の停止確認を分ける。
+                          </li>
+                        </ul>
+                      </div>
+                      <div class="contract-detail">
+                        <ul class="cell-list">
+                          <li>
+                            停止要求時点ですでに開始を許可した操作は、通信の遅れで直ちに止められない場合がある。
+                          </li>
+                          <li>
+                            編集・保存は安全な境目で止め、専用レンダーは所有権を確認して終了する。
+                          </li>
+                        </ul>
+                      </div>
+                      <div class="contract-detail">
+                        <ul class="cell-list">
+                          <li>
+                            停止と前後して全処理が終わった場合、操作の終端・必要な結果・保存の検証が揃えば依頼は完了とする。
+                          </li>
+                          <li>停止要求も履歴に残す。</li>
+                          <li>一部だけ完了ならその結果を残して中断とする。</li>
+                        </ul>
+                      </div>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <th scope="row">依頼</th>
+                    <td>
+                      外部操作の終了と開始許可の解決後に、次の依頼へ実行枠を渡す。
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+          <section aria-labelledby="遷移時の共通条件" class="spec-subsection">
+            <h3 id="遷移時の共通条件">6-3. 遷移時の共通条件</h3>
+            <div
+              aria-label="遷移時の共通条件"
+              class="table-scroll"
+              role="region"
+              tabindex="0"
+            >
+              <table class="spec-table">
+                <thead>
+                  <tr>
+                    <th scope="col">項目</th>
+                    <th scope="col">仕様</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row">停止</th>
+                    <td>
+                      <ul class="cell-list">
+                        <li>
+                          確認が必要になっても外部操作が動いていれば停止待ちを経由する。
+                        </li>
+                        <li>
+                          停止待ちは、要求理由と停止確認後の遷移先を保持する。
+                        </li>
+                        <li>
+                          確認待ち・中断・失敗へ移して実行枠を解放する前に、動作中の操作と未解決の開始許可がないことを確認する。
+                        </li>
+                      </ul>
+                      <div class="contract-detail">
+                        <ul class="cell-list">
+                          <li>
+                            アプリ終了時は待機依頼を保留し、実行中の依頼は停止待ちへ移す。
+                          </li>
+                          <li>
+                            予期せぬ終了後は未着手依頼を保留し、実行中・停止待ちの依頼を照合する。
+                          </li>
+                          <li>
+                            未回答内容、失敗・中断の理由、消費回数を保存する。
+                          </li>
+                          <li>再起動後は人間の再開指示を待つ。</li>
+                        </ul>
+                      </div>
+                      <div class="contract-detail">
+                        <ul class="cell-list">
+                          <li>
+                            安全な停止を待ち、終端・結果・保存の照合により完了・失敗・中断へ確定する。
+                          </li>
+                          <li>
+                            確認できない間は状態確認が必要のまま保持する。
+                          </li>
+                          <li>
+                            再認証・利用枠回復後は、人間の指示を受けて再開を許可する。
+                          </li>
+                        </ul>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">保護指定</th>
+                    <td>
+                      <ul class="cell-list">
+                        <li>
+                          待機から実行中への遷移では、作品の実行枠、依存関係、入力の存在・整合性、最新の保護指定・変更範囲、停止要求と実行許可を確認する。
+                        </li>
+                        <li>依頼で指定した候補の起点を維持する。</li>
+                      </ul>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">依頼</th>
+                    <td>
+                      <ul class="cell-list">
+                        <li>
+                          確認待ちの回答と手動再開は、同じ依頼ID・累積回数を維持して待機列の末尾へ戻す。
+                        </li>
+                        <li>
+                          回答の対象と前提を記録し、後続の変更で回答が適用できなくなったら再確認する。
+                        </li>
+                      </ul>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">再実行</th>
+                    <td>
+                      <ul class="cell-list">
+                        <li>
+                          失敗後の自動再実行は、失敗確定・残り予算・デザイン維持・重複防止・再開許可の確認後に行う。
+                        </li>
+                        <li>それ以外では原因・途中状態・対処案を残す。</li>
+                        <li>
+                          再実行予算は実際のやり直しの開始予定記録時に消費する。
+                        </li>
+                      </ul>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <th scope="row">保存状態</th>
+                    <td>
+                      完成した案への新しい修正指示は新しい依頼として受け付け、元の案・保存状態と関係付ける。
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
         </section>
         <section
           aria-labelledby="二重受付予算と保存タイミング"
           class="spec-section"
         >
-          <h2 id="二重受付予算と保存タイミング">受付の永続化</h2>
+          <h2 id="二重受付予算と保存タイミング">7. 受付の永続化</h2>
           <div
             aria-label="二重受付・予算と保存タイミング"
             class="table-scroll"
@@ -782,6 +898,26 @@
                         同じキー・同じ内容の再送には既存の依頼IDを返し、内容が違えば拒否する。
                       </li>
                     </ul>
+                    <div class="contract-detail">
+                      <ul class="cell-list">
+                        <li>
+                          外部へ送る前に落ちても、保存済みの試行IDと予算を維持する。
+                        </li>
+                        <li>
+                          同じ試行の未着手を両側の記録から証明できれば、その試行を人間の再開指示後に実行できる。
+                        </li>
+                        <li>証明できない場合は結果不明として扱う。</li>
+                      </ul>
+                    </div>
+                    <div class="contract-detail">
+                      <ul class="cell-list">
+                        <li>ファイル完成とDB更新は別々に確認する。</li>
+                        <li>
+                          完成記録とハッシュ・必須出力を照合し、同じ試行の終端通知を何度受けても結果を一度だけ登録する。
+                        </li>
+                        <li>記録が食い違う場合は状態確認が必要とする。</li>
+                      </ul>
+                    </div>
                   </td>
                 </tr>
                 <tr>
@@ -826,20 +962,7 @@
                     </ul>
                   </td>
                 </tr>
-                <tr>
-                  <th scope="row">処理内容</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        外部へ送る前に落ちても、保存済みの試行IDと予算を維持する。
-                      </li>
-                      <li>
-                        同じ試行の未着手を両側の記録から証明できれば、その試行を人間の再開指示後に実行できる。
-                      </li>
-                      <li>証明できない場合は結果不明として扱う。</li>
-                    </ul>
-                  </td>
-                </tr>
+
                 <tr>
                   <th scope="row">起動</th>
                   <td>
@@ -866,24 +989,12 @@
                     </ul>
                   </td>
                 </tr>
-                <tr>
-                  <th scope="row">処理内容</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>ファイル完成とDB更新は別々に確認する。</li>
-                      <li>
-                        完成記録とハッシュ・必須出力を照合し、同じ試行の終端通知を何度受けても結果を一度だけ登録する。
-                      </li>
-                      <li>記録が食い違う場合は状態確認が必要とする。</li>
-                    </ul>
-                  </td>
-                </tr>
               </tbody>
             </table>
           </div>
         </section>
         <section aria-labelledby="世代所有権連絡期限" class="spec-section">
-          <h2 id="世代所有権連絡期限">世代・所有権・連絡期限</h2>
+          <h2 id="世代所有権連絡期限">8. 世代・所有権・連絡期限</h2>
           <div
             aria-label="世代・所有権・連絡期限"
             class="table-scroll"
@@ -915,37 +1026,43 @@
                         世代は制作データやGitの版番号とは別の制御情報とする。
                       </li>
                     </ul>
+                    <div class="contract-detail">
+                      <ul class="cell-list">
+                        <li>
+                          Windows側でも同じ実行領域を管理する補助プロセスを一つに限定し、現在の世代と試行IDを照合する。
+                        </li>
+                        <li>古い世代からの開始要求を拒否する。</li>
+                        <li>古い結果通知は照合資料として保持する。</li>
+                      </ul>
+                    </div>
+                    <div class="contract-detail">
+                      <ul class="cell-list">
+                        <li>
+                          双方向に5秒ごとの連絡確認、各受信側の単調時計で最後の有効な連絡から30秒を期限とする。
+                        </li>
+                        <li>
+                          現在の世代・連絡番号に対応する新しい連絡で期限を更新する。
+                        </li>
+                      </ul>
+                    </div>
+                    <div class="contract-detail">
+                      <ul class="cell-list">
+                        <li>
+                          照合後、人間の再開指示で新しい実行許可を発行する。
+                        </li>
+                        <li>
+                          PCスリープからの復帰も期限切れなら同じ扱いとする。
+                        </li>
+                      </ul>
+                    </div>
                   </td>
                 </tr>
-                <tr>
-                  <th scope="row">処理内容</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        Windows側でも同じ実行領域を管理する補助プロセスを一つに限定し、現在の世代と試行IDを照合する。
-                      </li>
-                      <li>古い世代からの開始要求を拒否する。</li>
-                      <li>古い結果通知は照合資料として保持する。</li>
-                    </ul>
-                  </td>
-                </tr>
+
                 <tr>
                   <th scope="row">所有権</th>
                   <td>旧プロセスの所有権、停止・終了と出力を照合する。</td>
                 </tr>
-                <tr>
-                  <th scope="row">処理内容</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        双方向に5秒ごとの連絡確認、各受信側の単調時計で最後の有効な連絡から30秒を期限とする。
-                      </li>
-                      <li>
-                        現在の世代・連絡番号に対応する新しい連絡で期限を更新する。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
+
                 <tr>
                   <th scope="row">記録</th>
                   <td>
@@ -958,19 +1075,7 @@
                     </ul>
                   </td>
                 </tr>
-                <tr>
-                  <th scope="row">処理内容</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        照合後、人間の再開指示で新しい実行許可を発行する。
-                      </li>
-                      <li>
-                        PCスリープからの復帰も期限切れなら同じ扱いとする。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
+
                 <tr>
                   <th scope="row">停止</th>
                   <td>
@@ -986,122 +1091,11 @@
             </table>
           </div>
         </section>
-        <section aria-labelledby="遷移時の共通条件" class="spec-section">
-          <h2 id="遷移時の共通条件">遷移時の共通条件</h2>
-          <div
-            aria-label="遷移時の共通条件"
-            class="table-scroll"
-            role="region"
-            tabindex="0"
-          >
-            <table class="spec-table">
-              <thead>
-                <tr>
-                  <th scope="col">項目</th>
-                  <th scope="col">仕様</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row">停止</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        確認が必要になっても外部操作が動いていれば停止待ちを経由する。
-                      </li>
-                      <li>
-                        停止待ちは、要求理由と停止確認後の遷移先を保持する。
-                      </li>
-                      <li>
-                        確認待ち・中断・失敗へ移して実行枠を解放する前に、動作中の操作と未解決の開始許可がないことを確認する。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">保護指定</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        待機から実行中への遷移では、作品の実行枠、依存関係、入力の存在・整合性、最新の保護指定・変更範囲、停止要求と実行許可を確認する。
-                      </li>
-                      <li>依頼で指定した候補の起点を維持する。</li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">依頼</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        確認待ちの回答と手動再開は、同じ依頼ID・累積回数を維持して待機列の末尾へ戻す。
-                      </li>
-                      <li>
-                        回答の対象と前提を記録し、後続の変更で回答が適用できなくなったら再確認する。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">再実行</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        失敗後の自動再実行は、失敗確定・残り予算・デザイン維持・重複防止・再開許可の確認後に行う。
-                      </li>
-                      <li>それ以外では原因・途中状態・対処案を残す。</li>
-                      <li>
-                        再実行予算は実際のやり直しの開始予定記録時に消費する。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">停止</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        アプリ終了時は待機依頼を保留し、実行中の依頼は停止待ちへ移す。
-                      </li>
-                      <li>
-                        予期せぬ終了後は未着手依頼を保留し、実行中・停止待ちの依頼を照合する。
-                      </li>
-                      <li>
-                        未回答内容、失敗・中断の理由、消費回数を保存する。
-                      </li>
-                      <li>再起動後は人間の再開指示を待つ。</li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">停止</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        安全な停止を待ち、終端・結果・保存の照合により完了・失敗・中断へ確定する。
-                      </li>
-                      <li>確認できない間は状態確認が必要のまま保持する。</li>
-                      <li>
-                        再認証・利用枠回復後は、人間の指示を受けて再開を許可する。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">保存状態</th>
-                  <td>
-                    完成した案への新しい修正指示は新しい依頼として受け付け、元の案・保存状態と関係付ける。
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
         <section
           aria-labelledby="主要な異常系と受け入れ観点"
           class="spec-section"
         >
-          <h2 id="主要な異常系と受け入れ観点">異常時の動作</h2>
+          <h2 id="主要な異常系と受け入れ観点">9. 異常時の動作</h2>
           <div
             aria-label="主要な異常系と受け入れ観点"
             class="table-scroll"
@@ -1233,13 +1227,13 @@
           </div>
         </section>
         <section aria-labelledby="会話基盤との実行境界" class="spec-section">
-          <h2 id="会話基盤との実行境界">会話基盤との実行境界</h2>
+          <h2 id="会話基盤との実行境界">10. 会話基盤との実行境界</h2>
           <p>
             並行実行では別の接続単位を使い、各threadのturnを順番に進める。制作操作や採用等の書き込みへ進む場合は作品の実行枠を取得する。
           </p>
         </section>
         <section class="sources">
-          <h2>詳細資料</h2>
+          <h2 id="sources">11. 詳細資料</h2>
           <p>
             <a
               href="https://github.com/Kurarowa305/scene-craft/issues/7"
