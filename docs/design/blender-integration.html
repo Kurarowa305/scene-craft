@@ -63,11 +63,7 @@
           <h2>このページの内容</h2>
           <ol>
             <li><a href="#制作時の使い方">制作時の使い方</a></li>
-            <li>
-              <a href="#採用する操作経路と確認範囲"
-                >採用する操作経路と確認範囲</a
-              >
-            </li>
+            <li><a href="#採用する操作経路と確認範囲">Blenderの操作経路</a></li>
             <li>
               <a href="#標準レンダー機能の利用">標準レンダー機能の利用</a>
             </li>
@@ -75,57 +71,140 @@
             <li><a href="#psd-への引き渡し">PSD への引き渡し</a></li>
             <li><a href="#shadows-の採用方式">Shadows の採用方式</a></li>
             <li><a href="#入力編集可能性の契約">入力・編集可能性の契約</a></li>
-            <li>
-              <a href="#出力の契約">出力の契約</a>
-              <ul>
-                <li><a href="#メタデータ">メタデータ</a></li>
-              </ul>
-            </li>
+            <li><a href="#出力の契約">出力の契約</a></li>
+            <li><a href="#メタデータ">メタデータ</a></li>
             <li>
               <a href="#blender操作moduleのinterface"
                 >Blender操作ModuleのInterface</a
               >
-              <ul>
-                <li><a href="#接続と状態">接続と状態</a></li>
-                <li><a href="#停止失敗再開">停止・失敗・再開</a></li>
-              </ul>
             </li>
-            <li><a href="#容量とメモリの判定">容量とメモリの判定</a></li>
+            <li><a href="#接続と状態">実行の管理</a></li>
+            <li><a href="#停止失敗再開">停止・失敗・再開</a></li>
+            <li><a href="#容量とメモリの判定">出力容量の判定</a></li>
           </ol>
         </nav>
         <section aria-labelledby="制作時の使い方" class="spec-section">
           <h2 id="制作時の使い方">制作時の使い方</h2>
-          <ul>
-            <li>
-              保存した制作データを入力として、元の制作データと分けた編集案を作る。人間は結果を
-              Blender で開いて確認する。
-            </li>
-            <li>
-              初期構築のレンダー出力は、シーン全体に対する後述の13種類のレイヤーに限定する。形式は16
-              bit
-              RGBのPSD（上限超過時はPSB）、色空間はsRGBとする。各パスの意味は後述の表に従う。表示用の変換規約は後述の出力契約に従う。
-            </li>
-            <li>
-              植物などの配置は密度・範囲などをまとめて調整でき、必要な個体を取り出して手修正できる方針とする。取り出した個体は元の分布から除外する。具体的なノード構成は実装仕様で検証する。
-            </li>
-            <li>
-              Material ID と Object ID
-              は、それぞれ材質・物体ごとに異なる色で塗り分けた画像とする。成分出力は
-              Photoshop での色調整・描き足しの使いやすさを優先する。
-            </li>
-            <li>
-              Blender
-              標準のマルチパス機能で目的を満たせるなら、その機能に合わせる。分離・書き出しは通常プログラムが担当する。標準機能で満たす具体的な出力の組み合わせは、下記の制約を踏まえて確認する。
-            </li>
-            <li>
-              長いレンダーの停止では現在のレンダーも中断する。レンダー前に保存した制作データと完成済みの出力は残し、中断した画像は人間の再開指示後に作り直す。小さな検証では保存後の所有プロセスを強制終了できた。製品の停止・完成判定の契約は後述する。応答時間と異常系の実機確認は実行状態・受け入れ設計へ引き継ぐ。
-            </li>
-            <li>
-              Diffuse Lighting は影による暗さを含む陰影付きの出力とし、Shadows
-              は影部分の選択・補助調整に使う。ShadowsはCycles標準のShadow
-              Catcherを使い、人間が指定した地面・壁などの受け面を対象とする。
-            </li>
-          </ul>
+          <div
+            aria-label="制作時の使い方"
+            class="table-scroll"
+            role="region"
+            tabindex="0"
+          >
+            <table class="spec-table">
+              <thead>
+                <tr>
+                  <th scope="col">項目</th>
+                  <th scope="col">仕様</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">編集案</th>
+                  <td>
+                    <ul class="cell-list">
+                      <li>
+                        保存した制作データを入力として、元の制作データと分けた編集案を作る。
+                      </li>
+                      <li>人間は結果を Blender で開いて確認する。</li>
+                    </ul>
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">レンダー形式</th>
+                  <td>
+                    <ul class="cell-list">
+                      <li>
+                        初期構築のレンダー出力は、シーン全体に対する後述の13種類のレイヤーに限定する。
+                      </li>
+                      <li>
+                        形式は16 bit
+                        RGBのPSD（上限超過時はPSB）、色空間はsRGBとする。
+                      </li>
+                      <li>各パスの意味は後述の表に従う。</li>
+                      <li>表示用の変換規約は後述の出力契約に従う。</li>
+                    </ul>
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">植物配置</th>
+                  <td>
+                    <ul class="cell-list">
+                      <li>
+                        植物などの配置は密度・範囲などをまとめて調整でき、必要な個体を取り出して手修正できる方針とする。
+                      </li>
+                      <li>取り出した個体は元の分布から除外する。</li>
+                      <li>具体的なノード構成は実装仕様で検証する。</li>
+                    </ul>
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">ID画像</th>
+                  <td>
+                    <ul class="cell-list">
+                      <li>
+                        Material ID と Object ID
+                        は、それぞれ材質・物体ごとに異なる色で塗り分けた画像とする。
+                      </li>
+                      <li>
+                        成分出力は Photoshop
+                        での色調整・描き足しの使いやすさを優先する。
+                      </li>
+                    </ul>
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">パス処理</th>
+                  <td>
+                    <ul class="cell-list">
+                      <li>
+                        Blender
+                        標準のマルチパス機能で目的を満たせるなら、その機能に合わせる。
+                      </li>
+                      <li>分離・書き出しは通常プログラムが担当する。</li>
+                      <li>
+                        標準機能で満たす具体的な出力の組み合わせは、下記の制約を踏まえて確認する。
+                      </li>
+                    </ul>
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">レンダー停止</th>
+                  <td>
+                    <ul class="cell-list">
+                      <li>長いレンダーの停止では現在のレンダーも中断する。</li>
+                      <li>
+                        レンダー前に保存した制作データと完成済みの出力は残し、中断した画像は人間の再開指示後に作り直す。
+                      </li>
+                      <li>
+                        小さな検証では保存後の所有プロセスを強制終了できた。
+                      </li>
+                      <li>製品の停止・完成判定の契約は後述する。</li>
+                      <li>
+                        応答時間と異常系の実機確認は実行状態・受け入れ設計へ引き継ぐ。
+                      </li>
+                    </ul>
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">影の用途</th>
+                  <td>
+                    <ul class="cell-list">
+                      <li>
+                        Diffuse Lighting
+                        は影による暗さを含む陰影付きの出力とし、Shadows
+                        は影部分の選択・補助調整に使う。
+                      </li>
+                      <li>
+                        ShadowsはCycles標準のShadow
+                        Catcherを使い、人間が指定した地面・壁などの受け面を対象とする。
+                      </li>
+                    </ul>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
           <p>
             人間とAIは制作データを交互に編集する。編集案の採否と、Photoshopへの読み込み・レイヤー整理・レタッチ・保存は人間が行う。
           </p>
@@ -134,53 +213,176 @@
           aria-labelledby="採用する操作経路と確認範囲"
           class="spec-section"
         >
-          <h2 id="採用する操作経路と確認範囲">採用する操作経路と確認範囲</h2>
-          <p>
-            Windows Blender をバックグラウンドで起動し、保存済み入力から Python
-            スクリプトで編集案とレンダーを作る経路を採用する。保存済みの入力をWindows
-            Blenderのbackground処理へ渡す。
-          </p>
-          <p>
-            Blender 5.2.2
-            LTSを既存の導入版とし、実行時に使用する版・機能・依存を検査する。実行ファイルの所在は環境設定で解決する。
-          </p>
-          <p>
-            プロセス終了と成果物の完成は別に判定する。アプリが所有するBlenderプロセスを対象に終了する。
-          </p>
+          <h2 id="採用する操作経路と確認範囲">Blenderの操作経路</h2>
+          <div
+            aria-label="採用する操作経路と確認範囲"
+            class="table-scroll"
+            role="region"
+            tabindex="0"
+          >
+            <table class="spec-table">
+              <thead>
+                <tr>
+                  <th scope="col">項目</th>
+                  <th scope="col">仕様</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">採用判断</th>
+                  <td>
+                    <ul class="cell-list">
+                      <li>
+                        Windows Blender
+                        をバックグラウンドで起動し、保存済み入力から Python
+                        スクリプトで編集案とレンダーを作る経路を採用する。
+                      </li>
+                      <li>
+                        保存済みの入力をWindows Blenderのbackground処理へ渡す。
+                      </li>
+                    </ul>
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">処理内容</th>
+                  <td>
+                    <ul class="cell-list">
+                      <li>
+                        Blender 5.2.2
+                        LTSを既存の導入版とし、実行時に使用する版・機能・依存を検査する。
+                      </li>
+                      <li>実行ファイルの所在は環境設定で解決する。</li>
+                    </ul>
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">処理内容</th>
+                  <td>
+                    <ul class="cell-list">
+                      <li>プロセス終了と成果物の完成は別に判定する。</li>
+                      <li>アプリが所有するBlenderプロセスを対象に終了する。</li>
+                    </ul>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </section>
         <section aria-labelledby="標準レンダー機能の利用" class="spec-section">
           <h2 id="標準レンダー機能の利用">標準レンダー機能の利用</h2>
-          <p>
-            CyclesのRender Passesを使い、Shadowsは指定受け面の標準Shadow
-            Catcherとする。Material color、光・反射、空を除くGlobal Alpha
-            Maskは、以下のレイヤー定義と変換規約に従う。
-          </p>
-          <ul>
-            <li>
-              出力の単位はシーン全体とする。ID
-              の色分けは見えている物体・材質を識別するために使う。
-            </li>
-            <li>
-              成分の分離には Render Passes を使う。Cycles では
-              Diffuse／Glossy／Transmission の
-              Color・Direct・Indirect、Volume、Emission
-              などがある。使う成分だけを指定する。
-            </li>
-            <li>
-              Cycles の Shadow Catcher
-              は指定した受け側で影を扱うための機能であり、物体の陰影全体を別レイヤーへ移す機能とは区別する。EEVEE
-              の Shadow パスとも仕様が異なる。
-            </li>
-            <li>
-              File Output ノードでパスを個別ファイル、または Multi-Layer OpenEXR
-              として保存できる。初期要件に従い、Photoshop
-              への読み込みとレイヤー整理は人間が行う。
-            </li>
-            <li>
-              通常のプログラムが指定済みの対象・パス・出力設定から Blender
-              の設定と書き出しを実行する。標準機能で表せない分離要求は未対応または追加設計として示す。
-            </li>
-          </ul>
+          <div
+            aria-label="標準レンダー機能の利用"
+            class="table-scroll"
+            role="region"
+            tabindex="0"
+          >
+            <table class="spec-table">
+              <thead>
+                <tr>
+                  <th scope="col">観点</th>
+                  <th scope="col">仕様</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">レンダー機能</th>
+                  <td>
+                    CyclesのRender Passesを使い、Shadowsは指定受け面の標準Shadow
+                    Catcherとする。
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">レイヤー変換</th>
+                  <td>
+                    Material color、光・反射、空を除くGlobal Alpha
+                    Maskは、以下のレイヤー定義と変換規約に従う。
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div
+            aria-label="標準レンダー機能の利用"
+            class="table-scroll"
+            role="region"
+            tabindex="0"
+          >
+            <table class="spec-table">
+              <thead>
+                <tr>
+                  <th scope="col">項目</th>
+                  <th scope="col">仕様</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">出力単位</th>
+                  <td>
+                    <ul class="cell-list">
+                      <li>出力の単位はシーン全体とする。</li>
+                      <li>
+                        ID の色分けは見えている物体・材質を識別するために使う。
+                      </li>
+                    </ul>
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">Render Passes</th>
+                  <td>
+                    <ul class="cell-list">
+                      <li>成分の分離には Render Passes を使う。</li>
+                      <li>
+                        Cycles では Diffuse／Glossy／Transmission の
+                        Color・Direct・Indirect、Volume、Emission などがある。
+                      </li>
+                      <li>使う成分だけを指定する。</li>
+                    </ul>
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">Shadow Catcher</th>
+                  <td>
+                    <ul class="cell-list">
+                      <li>
+                        Cycles の Shadow Catcher
+                        は指定した受け側で影を扱うための機能であり、物体の陰影全体を別レイヤーへ移す機能とは区別する。
+                      </li>
+                      <li>EEVEE の Shadow パスとも仕様が異なる。</li>
+                    </ul>
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">EXR出力</th>
+                  <td>
+                    <ul class="cell-list">
+                      <li>
+                        File Output ノードでパスを個別ファイル、または
+                        Multi-Layer OpenEXR として保存できる。
+                      </li>
+                      <li>
+                        初期要件に従い、Photoshop
+                        への読み込みとレイヤー整理は人間が行う。
+                      </li>
+                    </ul>
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">設定の反映</th>
+                  <td>
+                    <ul class="cell-list">
+                      <li>
+                        通常のプログラムが指定済みの対象・パス・出力設定から
+                        Blender の設定と書き出しを実行する。
+                      </li>
+                      <li>
+                        標準機能で表せない分離要求は未対応または追加設計として示す。
+                      </li>
+                    </ul>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </section>
         <section aria-labelledby="レタッチ用レイヤー" class="spec-section">
           <h2 id="レタッチ用レイヤー">レタッチ用レイヤー</h2>
@@ -232,17 +434,26 @@
                 <tr>
                   <th scope="row">Specular Lighting</th>
                   <td>
-                    直接の鏡面反射。具体化式は
-                    <code>Glossy Direct × Glossy Color</code
-                    >。空や発光面の直接鏡面寄与がこちらへ入る場合がある
+                    <ul class="cell-list">
+                      <li>直接の鏡面反射。</li>
+                      <li>
+                        具体化式は <code>Glossy Direct × Glossy Color</code>。
+                      </li>
+                      <li>
+                        空や発光面の直接鏡面寄与がこちらへ入る場合がある 。
+                      </li>
+                    </ul>
                   </td>
                 </tr>
                 <tr>
                   <th scope="row">Diffuse Lighting</th>
                   <td>
-                    Diffuse Direct
-                    を採用。材質色を含まない直接拡散光。影を含む陰影を残す。Diffuse
-                    Directをそのまま使う
+                    <ul class="cell-list">
+                      <li>Diffuse Direct を採用。</li>
+                      <li>材質色を含まない直接拡散光。</li>
+                      <li>影を含む陰影を残す。</li>
+                      <li>Diffuse Directをそのまま使う 。</li>
+                    </ul>
                   </td>
                 </tr>
                 <tr>
@@ -261,9 +472,15 @@
                 <tr>
                   <th scope="row">Shadows</th>
                   <td>
-                    影部分の選択・補助調整用と合意済み。Diffuse Lighting
-                    から影を取り除く完全分離は不要。Cycles標準のShadow
-                    Catcherを使い、人間が指定した地面・壁などを対象にすると合意済み。影あり／影なしからの近似マスク方式は不採用
+                    <ul class="cell-list">
+                      <li>影部分の選択・補助調整用と合意済み。</li>
+                      <li>Diffuse Lighting から影を取り除く完全分離は不要。</li>
+                      <li>
+                        Cycles標準のShadow
+                        Catcherを使い、人間が指定した地面・壁などを対象にすると合意済み。
+                      </li>
+                      <li>影あり／影なしからの近似マスク方式は不採用 。</li>
+                    </ul>
                   </td>
                 </tr>
                 <tr>
@@ -296,54 +513,184 @@
               </tbody>
             </table>
           </div>
-          <p>出力はシーン全体の13種類に限定する。</p>
-          <p>
-            パス取得・ID可視化・数式合成・深度変換・書き出しは通常プログラムが担当する。
-          </p>
+          <div
+            aria-label="レタッチ用レイヤー"
+            class="table-scroll"
+            role="region"
+            tabindex="0"
+          >
+            <table class="spec-table">
+              <thead>
+                <tr>
+                  <th scope="col">項目</th>
+                  <th scope="col">仕様</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">出力</th>
+                  <td>出力はシーン全体の13種類に限定する。</td>
+                </tr>
+                <tr>
+                  <th scope="row">処理内容</th>
+                  <td>
+                    パス取得・ID可視化・数式合成・深度変換・書き出しは通常プログラムが担当する。
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </section>
         <section aria-labelledby="psd-への引き渡し" class="spec-section">
           <h2 id="psd-への引き渡し">PSD への引き渡し</h2>
-          <p>
-            利用者は13種類を名前付きの画像レイヤーとして一つの16 bit RGB
-            PSDにまとめる方式を承認した。初期表示は統合レイヤーだけを表示し、残り12種類は非表示とする。方式の採用と実機検証の完了は区別する。
-          </p>
-          <p>
-            Blender でパスを出力した後、通常のプログラムで PSD
-            を新規生成する。人間が成果物を開いてレタッチする流れとする。PSD
-            内に出力画像を配置する処理と、Photoshop
-            で人間が行うその後の編集を区別する。
-          </p>
-          <ul>
-            <li>
-              13種類の名前付き画像レイヤーを格納する。初期表示は統合レイヤーだけを表示し、残りは補助素材として非表示にする。
-            </li>
-            <li>
-              16 bit
-              RGB、sRGBを採用する。sRGBのICCプロファイルを埋め込む。色の画像にはシーンリニアからの変換を行い、ID色・マスク・Z
-              Depthには用途に合う値を符号化する。レイヤーの用途に合う表示変換・数値符号化を適用する。
-            </li>
-            <li>
-              2026-10-31の<a
-                href="https://github.com/Kurarowa305/scene-craft/blob/main/docs/research/psd16-conversion-validation.md"
-                rel="noopener noreferrer"
-                target="_blank"
-                >実EXR変換検証</a
-              >に基づき、PhotoshopAPI 0.9.1でレイヤーを書き、psd-tools
-              1.24.0で期待する名称を設定し直し、変換済みCombinedをmerged
-              imageへ直接格納する方式を採用する。psd-toolsの内部APIを使うため版を固定し、更新時は再検証する。一時ファイルを再読込して全レイヤー・merged
-              image・ICCを検証してから完成として公開する。小さなCycles実出力からの13種類の変換とPSD/PSBでの16bit値保持は確認済み。Photoshop実機の表示・編集、大容量の実動作は未確認。
-            </li>
-            <li>
-              PSDの容量・寸法上限を超える場合は同じ13レイヤー・16
-              bit・sRGBを維持してPSBへ自動切り替えし、出力形式を画面に表示する。指定した解像度とbit
-              depthを維持する。PSB自体の上限や保存容量不足は失敗として示す。
-            </li>
-            <li>
-              実機確認ではレイヤー数・名称・表示状態、16 bit、色とアルファ、ID
-              色と深度の保持、Photoshop
-              での開き直しを確認する。ライブラリの合成プレビューの制約も確認する。
-            </li>
-          </ul>
+          <div
+            aria-label="PSD への引き渡し"
+            class="table-scroll"
+            role="region"
+            tabindex="0"
+          >
+            <table class="spec-table">
+              <thead>
+                <tr>
+                  <th scope="col">項目</th>
+                  <th scope="col">仕様</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">処理内容</th>
+                  <td>
+                    <ul class="cell-list">
+                      <li>
+                        利用者は13種類を名前付きの画像レイヤーとして一つの16 bit
+                        RGB PSDにまとめる方式を承認した。
+                      </li>
+                      <li>
+                        初期表示は統合レイヤーだけを表示し、残り12種類は非表示とする。
+                      </li>
+                      <li>方式の採用と実機検証の完了は区別する。</li>
+                    </ul>
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">出力</th>
+                  <td>
+                    <ul class="cell-list">
+                      <li>
+                        Blender でパスを出力した後、通常のプログラムで PSD
+                        を新規生成する。
+                      </li>
+                      <li>人間が成果物を開いてレタッチする流れとする。</li>
+                      <li>
+                        PSD 内に出力画像を配置する処理と、Photoshop
+                        で人間が行うその後の編集を区別する。
+                      </li>
+                    </ul>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div
+            aria-label="PSD への引き渡し"
+            class="table-scroll"
+            role="region"
+            tabindex="0"
+          >
+            <table class="spec-table">
+              <thead>
+                <tr>
+                  <th scope="col">項目</th>
+                  <th scope="col">仕様</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">レイヤー構成</th>
+                  <td>
+                    <ul class="cell-list">
+                      <li>13種類の名前付き画像レイヤーを格納する。</li>
+                      <li>
+                        初期表示は統合レイヤーだけを表示し、残りは補助素材として非表示にする。
+                      </li>
+                    </ul>
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">画像形式</th>
+                  <td>
+                    <ul class="cell-list">
+                      <li>16 bit RGB、sRGBを採用する。</li>
+                      <li>sRGBのICCプロファイルを埋め込む。</li>
+                      <li>
+                        色の画像にはシーンリニアからの変換を行い、ID色・マスク・Z
+                        Depthには用途に合う値を符号化する。
+                      </li>
+                      <li>
+                        レイヤーの用途に合う表示変換・数値符号化を適用する。
+                      </li>
+                    </ul>
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">変換処理</th>
+                  <td>
+                    <ul class="cell-list">
+                      <li>
+                        2026-10-31の<a
+                          href="https://github.com/Kurarowa305/scene-craft/blob/main/docs/research/psd16-conversion-validation.md"
+                          rel="noopener noreferrer"
+                          target="_blank"
+                          >実EXR変換検証</a
+                        >に基づき、PhotoshopAPI 0.9.1でレイヤーを書き、psd-tools
+                        1.24.0で期待する名称を設定し直し、変換済みCombinedをmerged
+                        imageへ直接格納する方式を採用する。
+                      </li>
+                      <li>
+                        psd-toolsの内部APIを使うため版を固定し、更新時は再検証する。
+                      </li>
+                      <li>
+                        一時ファイルを再読込して全レイヤー・merged
+                        image・ICCを検証してから完成として公開する。
+                      </li>
+                      <li>
+                        小さなCycles実出力からの13種類の変換とPSD/PSBでの16bit値保持は確認済み。
+                      </li>
+                      <li>
+                        Photoshop実機の表示・編集、大容量の実動作は未確認。
+                      </li>
+                    </ul>
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">PSB切替</th>
+                  <td>
+                    <ul class="cell-list">
+                      <li>
+                        PSDの容量・寸法上限を超える場合は同じ13レイヤー・16
+                        bit・sRGBを維持してPSBへ自動切り替えし、出力形式を画面に表示する。
+                      </li>
+                      <li>指定した解像度とbit depthを維持する。</li>
+                      <li>PSB自体の上限や保存容量不足は失敗として示す。</li>
+                    </ul>
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">確認項目</th>
+                  <td>
+                    <ul class="cell-list">
+                      <li>
+                        実機確認ではレイヤー数・名称・表示状態、16
+                        bit、色とアルファ、ID 色と深度の保持、Photoshop
+                        での開き直しを確認する。
+                      </li>
+                      <li>ライブラリの合成プレビューの制約も確認する。</li>
+                    </ul>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
           <p>
             根拠:
             <a
@@ -366,99 +713,398 @@
         </section>
         <section aria-labelledby="shadows-の採用方式" class="spec-section">
           <h2 id="shadows-の採用方式">Shadows の採用方式</h2>
-          <p>
-            利用者はCycles標準のShadow
-            Catcherを選択した。Shadowsは指定した地面・壁などの受け面の出力に限定する。影あり／影なしレンダーの比率から近似マスクを作る案は不採用。調査結果は比較の根拠として
-            <a
-              href="https://github.com/Kurarowa305/scene-craft/blob/main/docs/research/blender-shadow-ratio-validation.md"
-              rel="noopener noreferrer"
-              target="_blank"
-              >調査資料</a
-            >
-            に残す。
-          </p>
-          <p>
-            <a
-              href="https://github.com/Kurarowa305/scene-craft/blob/main/docs/research/blender-shadow-validation.md"
-              rel="noopener noreferrer"
-              target="_blank"
-              >実機確認</a
-            >では、指定した地面からShadow
-            Catcherパスを生成できた。標準仕様に含まれる間接光との相互作用も踏まえ、PSD向け変換は後述の契約に従う。壁・複数受け面・実作品の確認は未完了。
-          </p>
-          <p>
-            受け面をShadow
-            Catcherにすると同じレンダーのCombinedの見た目も変わるため、通常の統合画像を生成した制作データと、影用の作業コピーを分ける。受け面の指定・追加・削除と未指定時の扱いは、下記の出力契約に従う。
-          </p>
+          <div
+            aria-label="Shadows の採用方式"
+            class="table-scroll"
+            role="region"
+            tabindex="0"
+          >
+            <table class="spec-table">
+              <thead>
+                <tr>
+                  <th scope="col">項目</th>
+                  <th scope="col">仕様</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">処理内容</th>
+                  <td>
+                    <ul class="cell-list">
+                      <li>利用者はCycles標準のShadow Catcherを選択した。</li>
+                      <li>
+                        Shadowsは指定した地面・壁などの受け面の出力に限定する。
+                      </li>
+                      <li>
+                        影あり／影なしレンダーの比率から近似マスクを作る案は不採用。
+                      </li>
+                      <li>
+                        調査結果は比較の根拠として
+                        <a
+                          href="https://github.com/Kurarowa305/scene-craft/blob/main/docs/research/blender-shadow-ratio-validation.md"
+                          rel="noopener noreferrer"
+                          target="_blank"
+                          >調査資料</a
+                        >
+                        に残す。
+                      </li>
+                    </ul>
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">処理内容</th>
+                  <td>
+                    <ul class="cell-list">
+                      <li>
+                        <a
+                          href="https://github.com/Kurarowa305/scene-craft/blob/main/docs/research/blender-shadow-validation.md"
+                          rel="noopener noreferrer"
+                          target="_blank"
+                          >実機確認</a
+                        >では、指定した地面からShadow Catcherパスを生成できた。
+                      </li>
+                      <li>
+                        標準仕様に含まれる間接光との相互作用も踏まえ、PSD向け変換は後述の契約に従う。
+                      </li>
+                      <li>壁・複数受け面・実作品の確認は未完了。</li>
+                    </ul>
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">処理内容</th>
+                  <td>
+                    <ul class="cell-list">
+                      <li>
+                        受け面をShadow
+                        Catcherにすると同じレンダーのCombinedの見た目も変わるため、通常の統合画像を生成した制作データと、影用の作業コピーを分ける。
+                      </li>
+                      <li>
+                        受け面の指定・追加・削除と未指定時の扱いは、下記の出力契約に従う。
+                      </li>
+                    </ul>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </section>
         <section aria-labelledby="入力編集可能性の契約" class="spec-section">
           <h2 id="入力編集可能性の契約">入力・編集可能性の契約</h2>
-          <ul>
-            <li>
-              人間はBlenderで手修正を保存してから依頼する。実行時に保存済み
-              <code>.blend</code>
-              と必要な依存素材をコピーし、入力の内容を固定する。画面に「保存済みデータが対象」と示す。元ファイルを保持する。
-            </li>
-            <li>
-              操作前にBlenderの版、入力・外部素材の存在、カメラ・フレーム・解像度・出力先容量、使用するレンダー機能を検査する。
-            </li>
-            <li>
-              仮形状は部品単位で選択・編集できるオブジェクトとして残す。UV、画像テクスチャへの接続、材質ノードを残す。空・海・照明・3D雲は、利用したオブジェクト・材質・ノード・主要パラメーターを
-              <code>.blend</code>
-              に残す。利用するアドオン等の依存は一覧に含める。
-            </li>
-            <li>
-              植物・小物は素材、分布範囲・除外範囲・密度・大きさのばらつき・seedを保存する。選んだ個体を独立して手修正する場合は、元の分布から除外して二重生成を防ぐ。具体的なGeometry
-              Nodes等の構成は実装仕様で検証する。
-            </li>
-            <li>
-              工程の変更範囲と保護指定を操作要求に含める。編集案は実際の変更を検査し、変更範囲と保護指定に適合した結果を公開する。検査の項目・実現方法は「編集案の採用と保護指定の適用方法を決める」と接続する。
-            </li>
-          </ul>
+          <div
+            aria-label="入力・編集可能性の契約"
+            class="table-scroll"
+            role="region"
+            tabindex="0"
+          >
+            <table class="spec-table">
+              <thead>
+                <tr>
+                  <th scope="col">項目</th>
+                  <th scope="col">仕様</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">入力固定</th>
+                  <td>
+                    <ul class="cell-list">
+                      <li>人間はBlenderで手修正を保存してから依頼する。</li>
+                      <li>
+                        実行時に保存済み
+                        <code>.blend</code>
+                        と必要な依存素材をコピーし、入力の内容を固定する。
+                      </li>
+                      <li>画面に「保存済みデータが対象」と示す。</li>
+                      <li>元ファイルを保持する。</li>
+                    </ul>
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">事前検査</th>
+                  <td>
+                    操作前にBlenderの版、入力・外部素材の存在、カメラ・フレーム・解像度・出力先容量、使用するレンダー機能を検査する。
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">編集可能性</th>
+                  <td>
+                    <ul class="cell-list">
+                      <li>
+                        仮形状は部品単位で選択・編集できるオブジェクトとして残す。
+                      </li>
+                      <li>UV、画像テクスチャへの接続、材質ノードを残す。</li>
+                      <li>
+                        空・海・照明・3D雲は、利用したオブジェクト・材質・ノード・主要パラメーターを
+                        <code>.blend</code>
+                        に残す。
+                      </li>
+                      <li>利用するアドオン等の依存は一覧に含める。</li>
+                    </ul>
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">配置条件</th>
+                  <td>
+                    <ul class="cell-list">
+                      <li>
+                        植物・小物は素材、分布範囲・除外範囲・密度・大きさのばらつき・seedを保存する。
+                      </li>
+                      <li>
+                        選んだ個体を独立して手修正する場合は、元の分布から除外して二重生成を防ぐ。
+                      </li>
+                      <li>
+                        具体的なGeometry Nodes等の構成は実装仕様で検証する。
+                      </li>
+                    </ul>
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">保護検査</th>
+                  <td>
+                    <ul class="cell-list">
+                      <li>工程の変更範囲と保護指定を操作要求に含める。</li>
+                      <li>
+                        編集案は実際の変更を検査し、変更範囲と保護指定に適合した結果を公開する。
+                      </li>
+                      <li>
+                        検査の項目・実現方法は「編集案の採用と保護指定の適用方法を決める」と接続する。
+                      </li>
+                    </ul>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </section>
         <section aria-labelledby="出力の契約" class="spec-section">
           <h2 id="出力の契約">出力の契約</h2>
-          <ul>
-            <li>
-              全レイヤーを同じカメラ・フレーム・解像度に揃える。指定した解像度・サンプル数・露出を維持する。13種類は常に名前付きで格納する。寄与ゼロ・取得失敗・未対応を区別して記録する。必須パスの取得結果を検査し、不足時は出力全体を失敗とする。寄与ゼロを確認した成分は正常な空成分として扱う。
-            </li>
-            <li>
-              対応する数式はシーンリニアの値へ適用する。統合、光、反射、屈折の見た目用画像は、作品に記録した表示変換・露出を用いてsRGBへ変換する。新規作品の表示変換はAgX、露出0を既定値とし、取り込んだ作品の見た目は変更前に確認する。
-            </li>
-            <li>
-              Material
-              colorは材質色としてsRGBへ符号化する。対象ごとに一意のID色を割り当て、作品内の同じ対象に同じ色を使う。ID色・マスク・深度・AOは定義されたデータ値で符号化する。データレイヤーの数値規約をメタデータへ残す。
-            </li>
-            <li>
-              色との対応に永続的な対象IDを使い、複製・削除再作成・再生成した個体を同一対象とする規則はデータモデル設計へ引き継ぐ。ID色は選択補助とする。Indexパスのアンチエイリアスの制約を受け入れる。
-            </li>
-            <li>
-              Z
-              Depthは近い側が白、遠い側が黒。初回に有限な距離から範囲を提案し、人間が調整できるようにする。採用した近距離・遠距離を保存する。背景・無限遠は黒、範囲外は端へクランプする。元の距離情報は中間EXRに保持する。
-            </li>
-            <li>
-              Global Alpha
-              Maskは背景として扱う空を除いて生成する。World背景を除くだけでなく、空として使うドーム・背景板・雲等は背景対象を明示する。3D雲等が背景か制作物かは作品設定へ残す。Alpha用の作業コピーで背景のカメラ可視性を変える方式を候補とする。レンダーAlpha値を黒0・白1の画像にする。ガラス越し・透過・ボリュームの境界は実機検証対象。
-            </li>
-            <li>
-              Shadowsの受け面は作品の設定として保存し、再レンダーで再利用する。未指定・削除で対象がなくなった場合は実行前に指定を求める。人間が「影の出力対象なし」を明示した場合だけ、変化なしを示す白いShadowsレイヤーを格納し、メタデータに対象なしと記録する。
-            </li>
-            <li>
-              Shadowsは影用の作業コピーで生成した標準Shadow
-              Catcherを利用し、Combinedは通常の制作データから作る。Shadow
-              Catcherの倍率としての値を保持する中間EXRと、sRGB・16bitのレタッチ用画像を区別する。RGB各値を0〜1へクランプし、0を黒・1を白の16bit補助画像として格納する。白を中立値とする0〜1のデータ画像として保存する。1を超える明るい寄与はPSDでは白へ制限されるが、中間EXRには元の値を残す。実装時に見本で確認する。
-            </li>
-            <li>
-              PSD/PSBの13画像はフルキャンバスで位置を揃え、統合のみ表示・通常合成・不透明度100%を初期値にする。補助レイヤーは人間が必要に応じて表示・選択・合成する。半透明を含むカラー画像は書き出し先のalpha規約へ変換し、縁の色を確認する。
-            </li>
-            <li>
-              中間EXRと実行メタデータはアプリが管理する制作データとして保持する。大きな中間データの削除・保持は保存設計に従う。
-            </li>
-          </ul>
-          <h3 id="メタデータ">メタデータ</h3>
-          <p>
-            出力ごとに作品・依頼・実行・入力の保存状態、入力と出力のハッシュ、Blenderの版、エンジン・デバイス、カメラ・フレーム・解像度・seed・サンプル数、カラーマネジメント設定、ICC識別子、パスの意味と数式・変換方法、ID色の対応、深度範囲、Shadows受け面・背景対象、依存素材、使った定義のGitコミット、完成・欠落・停止・失敗を記録する。モデルが生成した操作スクリプトも、その実行で使った実体またはハッシュと保持先を記録する。具体的な保存構造はデータモデル・保存設計へ引き継ぐ。
-          </p>
+          <div
+            aria-label="出力の契約"
+            class="table-scroll"
+            role="region"
+            tabindex="0"
+          >
+            <table class="spec-table">
+              <thead>
+                <tr>
+                  <th scope="col">項目</th>
+                  <th scope="col">仕様</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">共通設定</th>
+                  <td>
+                    <ul class="cell-list">
+                      <li>
+                        全レイヤーを同じカメラ・フレーム・解像度に揃える。
+                      </li>
+                      <li>指定した解像度・サンプル数・露出を維持する。</li>
+                      <li>13種類は常に名前付きで格納する。</li>
+                      <li>寄与ゼロ・取得失敗・未対応を区別して記録する。</li>
+                      <li>
+                        必須パスの取得結果を検査し、不足時は出力全体を失敗とする。
+                      </li>
+                      <li>寄与ゼロを確認した成分は正常な空成分として扱う。</li>
+                    </ul>
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">表示変換</th>
+                  <td>
+                    <ul class="cell-list">
+                      <li>対応する数式はシーンリニアの値へ適用する。</li>
+                      <li>
+                        統合、光、反射、屈折の見た目用画像は、作品に記録した表示変換・露出を用いてsRGBへ変換する。
+                      </li>
+                      <li>
+                        新規作品の表示変換はAgX、露出0を既定値とし、取り込んだ作品の見た目は変更前に確認する。
+                      </li>
+                    </ul>
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">ID符号化</th>
+                  <td>
+                    <ul class="cell-list">
+                      <li>Material colorは材質色としてsRGBへ符号化する。</li>
+                      <li>
+                        対象ごとに一意のID色を割り当て、作品内の同じ対象に同じ色を使う。
+                      </li>
+                      <li>
+                        ID色・マスク・深度・AOは定義されたデータ値で符号化する。
+                      </li>
+                      <li>データレイヤーの数値規約をメタデータへ残す。</li>
+                    </ul>
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">対象の識別</th>
+                  <td>
+                    <ul class="cell-list">
+                      <li>
+                        色との対応に永続的な対象IDを使い、複製・削除再作成・再生成した個体を同一対象とする規則はデータモデル設計へ引き継ぐ。
+                      </li>
+                      <li>ID色は選択補助とする。</li>
+                      <li>Indexパスのアンチエイリアスの制約を受け入れる。</li>
+                    </ul>
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">深度</th>
+                  <td>
+                    <ul class="cell-list">
+                      <li>Z Depthは近い側が白、遠い側が黒。</li>
+                      <li>
+                        初回に有限な距離から範囲を提案し、人間が調整できるようにする。
+                      </li>
+                      <li>採用した近距離・遠距離を保存する。</li>
+                      <li>背景・無限遠は黒、範囲外は端へクランプする。</li>
+                      <li>元の距離情報は中間EXRに保持する。</li>
+                    </ul>
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">Alpha</th>
+                  <td>
+                    <ul class="cell-list">
+                      <li>
+                        Global Alpha Maskは背景として扱う空を除いて生成する。
+                      </li>
+                      <li>
+                        World背景を除くだけでなく、空として使うドーム・背景板・雲等は背景対象を明示する。
+                      </li>
+                      <li>3D雲等が背景か制作物かは作品設定へ残す。</li>
+                      <li>
+                        Alpha用の作業コピーで背景のカメラ可視性を変える方式を候補とする。
+                      </li>
+                      <li>レンダーAlpha値を黒0・白1の画像にする。</li>
+                      <li>
+                        ガラス越し・透過・ボリュームの境界は実機検証対象。
+                      </li>
+                    </ul>
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">影の受け面</th>
+                  <td>
+                    <ul class="cell-list">
+                      <li>
+                        Shadowsの受け面は作品の設定として保存し、再レンダーで再利用する。
+                      </li>
+                      <li>
+                        未指定・削除で対象がなくなった場合は実行前に指定を求める。
+                      </li>
+                      <li>
+                        人間が「影の出力対象なし」を明示した場合だけ、変化なしを示す白いShadowsレイヤーを格納し、メタデータに対象なしと記録する。
+                      </li>
+                    </ul>
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">影の符号化</th>
+                  <td>
+                    <ul class="cell-list">
+                      <li>
+                        Shadowsは影用の作業コピーで生成した標準Shadow
+                        Catcherを利用し、Combinedは通常の制作データから作る。
+                      </li>
+                      <li>
+                        Shadow
+                        Catcherの倍率としての値を保持する中間EXRと、sRGB・16bitのレタッチ用画像を区別する。
+                      </li>
+                      <li>
+                        RGB各値を0〜1へクランプし、0を黒・1を白の16bit補助画像として格納する。
+                      </li>
+                      <li>白を中立値とする0〜1のデータ画像として保存する。</li>
+                      <li>
+                        1を超える明るい寄与はPSDでは白へ制限されるが、中間EXRには元の値を残す。
+                      </li>
+                      <li>実装時に見本で確認する。</li>
+                    </ul>
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">レイヤー初期状態</th>
+                  <td>
+                    <ul class="cell-list">
+                      <li>
+                        PSD/PSBの13画像はフルキャンバスで位置を揃え、統合のみ表示・通常合成・不透明度100%を初期値にする。
+                      </li>
+                      <li>
+                        補助レイヤーは人間が必要に応じて表示・選択・合成する。
+                      </li>
+                      <li>
+                        半透明を含むカラー画像は書き出し先のalpha規約へ変換し、縁の色を確認する。
+                      </li>
+                    </ul>
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">保持データ</th>
+                  <td>
+                    <ul class="cell-list">
+                      <li>
+                        中間EXRと実行メタデータはアプリが管理する制作データとして保持する。
+                      </li>
+                      <li>大きな中間データの削除・保持は保存設計に従う。</li>
+                    </ul>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+        <section aria-labelledby="メタデータ" class="spec-section">
+          <h2 id="メタデータ">メタデータ</h2>
+          <div
+            aria-label="メタデータ"
+            class="table-scroll"
+            role="region"
+            tabindex="0"
+          >
+            <table class="spec-table">
+              <thead>
+                <tr>
+                  <th scope="col">観点</th>
+                  <th scope="col">仕様</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">出力の記録</th>
+                  <td>
+                    <ul class="cell-list">
+                      <li>出力ごとに作品・依頼・実行・入力の保存状態</li>
+                      <li>入力と出力のハッシュ</li>
+                      <li>Blenderの版</li>
+                      <li>エンジン・デバイス</li>
+                      <li>カメラ・フレーム・解像度・seed・サンプル数</li>
+                      <li>カラーマネジメント設定</li>
+                      <li>ICC識別子</li>
+                      <li>パスの意味と数式・変換方法</li>
+                      <li>ID色の対応</li>
+                      <li>深度範囲</li>
+                      <li>Shadows受け面・背景対象</li>
+                      <li>依存素材</li>
+                      <li>使った定義のGitコミット</li>
+                      <li>完成・欠落・停止・失敗を記録する。</li>
+                    </ul>
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">操作スクリプト</th>
+                  <td>
+                    モデルが生成した操作スクリプトも、その実行で使った実体またはハッシュと保持先を記録する。
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">保存構造</th>
+                  <td>具体的な保存構造はデータモデル・保存設計へ引き継ぐ。</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </section>
         <section
           aria-labelledby="blender操作moduleのinterface"
@@ -467,10 +1113,41 @@
           <h2 id="blender操作moduleのinterface">
             Blender操作ModuleのInterface
           </h2>
-          <p>
-            Blender操作アダプターがPython・Windowsプロセス・OSパス・PSDライブラリを扱う。Windows
-            Blenderを操作するAdapterがその違いを引き受ける。工程の採否・依頼の順序・自動再実行予算は外側の制作管理・実行管理に残す。
-          </p>
+          <div
+            aria-label="Blender操作ModuleのInterface"
+            class="table-scroll"
+            role="region"
+            tabindex="0"
+          >
+            <table class="spec-table">
+              <thead>
+                <tr>
+                  <th scope="col">観点</th>
+                  <th scope="col">仕様</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">アダプター</th>
+                  <td>
+                    Blender操作アダプターがPython・Windowsプロセス・OSパス・PSDライブラリを扱う。
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">Windows実行</th>
+                  <td>
+                    Windows Blenderを操作するAdapterがその違いを引き受ける。
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">制作管理</th>
+                  <td>
+                    工程の採否・依頼の順序・自動再実行予算は外側の制作管理・実行管理に残す。
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
           <div
             aria-label="Blender操作ModuleのInterface"
             class="table-scroll"
@@ -496,24 +1173,43 @@
                 <tr>
                   <th scope="row">実行開始</th>
                   <td>
-                    実行ID、固定入力、操作要求、変更範囲・保護指定、出力設定
+                    <ul class="cell-list">
+                      <li>実行ID</li>
+                      <li>固定入力</li>
+                      <li>操作要求</li>
+                      <li>変更範囲・保護指定</li>
+                      <li>出力設定</li>
+                    </ul>
                   </td>
                   <td>
-                    実行の参照。受付と制作完了を区別する。同じ実行IDの要求には既存の実行結果を返す
+                    <ul class="cell-list">
+                      <li>実行の参照。</li>
+                      <li>受付と制作完了を区別する。</li>
+                      <li>同じ実行IDの要求には既存の実行結果を返す 。</li>
+                    </ul>
                   </td>
                 </tr>
                 <tr>
                   <th scope="row">状態照合</th>
                   <td>実行の参照</td>
                   <td>
-                    フェーズ、完了した保存状態・出力、プロセス生存、失敗・不明の情報
+                    <ul class="cell-list">
+                      <li>フェーズ</li>
+                      <li>完了した保存状態・出力</li>
+                      <li>プロセス生存</li>
+                      <li>失敗・不明の情報</li>
+                    </ul>
                   </td>
                 </tr>
                 <tr>
                   <th scope="row">停止要求</th>
                   <td>実行の参照</td>
                   <td>
-                    停止要求の受付。同じ要求には既存の操作の状態を返す。停止完了は別途照合する
+                    <ul class="cell-list">
+                      <li>停止要求の受付。</li>
+                      <li>同じ要求には既存の操作の状態を返す。</li>
+                      <li>停止完了は別途照合する 。</li>
+                    </ul>
                   </td>
                 </tr>
               </tbody>
@@ -522,52 +1218,190 @@
           <p>
             固定ツールが入力の検査・コピー・チェックポイント保存・パス設定・PSD生成・検証を担当する。生成スクリプトが必要な制作操作も同じ実行単位の下で行う。新しい制作操作のやり直しは最大2回の予算に含める。
           </p>
-          <h3 id="接続と状態">接続と状態</h3>
-          <ul>
-            <li>
-              WSLからWindows側の補助プロセスを起動し、Windows
-              Blenderをbackgroundで動かす。読み取り／編集／レンダーの入力をファイルで渡し、ログ・進捗・完了記録を取得する。
-            </li>
-            <li>
-              Windows側で実行ID・PID・起動時刻・実行ファイル・実行用ディレクトリを対応付ける。実行ID・PID・起動時刻・実行ファイル・実行用ディレクトリで所有権を照合して終了対象を決める。補助プロセスの具体的な実装とWindows側の生存管理は全体設計・実行状態設計で検証する。
-            </li>
-            <li>
-              内部フェーズは準備、編集、保存、レンダー、PSD生成、検証に分け、完成したチェックポイントと出力だけを確定する。実行中・停止待ち・成功・失敗・停止・状態不明を区別する。全体の状態機械とDB更新は実行状態設計へ統合する。
-            </li>
-            <li>
-              読み取りの完了には固定入力の読み取りと要約の検証を、編集の完了には出力
-              <code>.blend</code>
-              の保存完了と再読み取り確認を、レンダー出力の完了には必要なパスとPSD/PSBの仕様検証を必要とする。終了コードと成果物の検証結果を照合して成功を判定する。非0、必須ファイル欠落、破損・ハッシュ不一致、想定外のレイヤーやbit
-              depthは失敗とする。
-            </li>
-            <li>
-              書き込み中は完成先と区別した領域へ出力する。ファイル検証後に完成記録を確定し、公開する。再起動時に整合性を照合する。
-            </li>
-          </ul>
-          <h3 id="停止失敗再開">停止・失敗・再開</h3>
-          <ul>
-            <li>
-              人間の停止要求を保存する。編集と保存は安全に止められる境目で止め、完了済みの保存状態を残す。保存処理は安全な境目まで進めて停止する。
-            </li>
-            <li>
-              レンダーは直前の
-              <code>.blend</code>
-              が保存済みの専用プロセスで行う。停止要求時は所有するレンダープロセスを終了して、未完成の画像を不採用とする。OS側の終了を確認して停止済みとする。アプリが所有するプロセスを対象に終了する。
-            </li>
-            <li>最後の操作を失う強制終了は人間が明示した場合に限定する。</li>
-            <li>
-              検証済みの途中成果を記録し、13種類が揃ったPSDを完成として渡す。PSD生成だけの失敗なら検証済み中間出力を利用できる。
-            </li>
-            <li>
-              人間が止めた依頼は、明示的な再開指示を待つ。手動再開時に入力・チェックポイント・完成出力を再照合する。デザインを変える復旧は既存要件どおり人間に確認する。
-            </li>
-            <li>
-              WSLや補助プロセスが落ちた場合、Windows側プロセスの生存と完了記録を照合する。
-            </li>
-          </ul>
+        </section>
+        <section aria-labelledby="接続と状態" class="spec-section">
+          <h2 id="接続と状態">実行の管理</h2>
+          <div
+            aria-label="接続と状態"
+            class="table-scroll"
+            role="region"
+            tabindex="0"
+          >
+            <table class="spec-table">
+              <thead>
+                <tr>
+                  <th scope="col">項目</th>
+                  <th scope="col">仕様</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">接続</th>
+                  <td>
+                    <ul class="cell-list">
+                      <li>
+                        WSLからWindows側の補助プロセスを起動し、Windows
+                        Blenderをbackgroundで動かす。
+                      </li>
+                      <li>
+                        読み取り／編集／レンダーの入力をファイルで渡し、ログ・進捗・完了記録を取得する。
+                      </li>
+                    </ul>
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">所有権</th>
+                  <td>
+                    <ul class="cell-list">
+                      <li>
+                        Windows側で実行ID・PID・起動時刻・実行ファイル・実行用ディレクトリを対応付ける。
+                      </li>
+                      <li>
+                        実行ID・PID・起動時刻・実行ファイル・実行用ディレクトリで所有権を照合して終了対象を決める。
+                      </li>
+                      <li>
+                        補助プロセスの具体的な実装とWindows側の生存管理は全体設計・実行状態設計で検証する。
+                      </li>
+                    </ul>
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">内部フェーズ</th>
+                  <td>
+                    <ul class="cell-list">
+                      <li>
+                        内部フェーズは準備、編集、保存、レンダー、PSD生成、検証に分け、完成したチェックポイントと出力だけを確定する。
+                      </li>
+                      <li>
+                        実行中・停止待ち・成功・失敗・停止・状態不明を区別する。
+                      </li>
+                      <li>全体の状態機械とDB更新は実行状態設計へ統合する。</li>
+                    </ul>
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">完了条件</th>
+                  <td>
+                    <ul class="cell-list">
+                      <li>
+                        読み取りの完了には固定入力の読み取りと要約の検証を、編集の完了には出力
+                        <code>.blend</code>
+                        の保存完了と再読み取り確認を、レンダー出力の完了には必要なパスとPSD/PSBの仕様検証を必要とする。
+                      </li>
+                      <li>
+                        終了コードと成果物の検証結果を照合して成功を判定する。
+                      </li>
+                      <li>
+                        非0、必須ファイル欠落、破損・ハッシュ不一致、想定外のレイヤーやbit
+                        depthは失敗とする。
+                      </li>
+                    </ul>
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">出力確定</th>
+                  <td>
+                    <ul class="cell-list">
+                      <li>書き込み中は完成先と区別した領域へ出力する。</li>
+                      <li>ファイル検証後に完成記録を確定し、公開する。</li>
+                      <li>再起動時に整合性を照合する。</li>
+                    </ul>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+        <section aria-labelledby="停止失敗再開" class="spec-section">
+          <h2 id="停止失敗再開">停止・失敗・再開</h2>
+          <div
+            aria-label="停止・失敗・再開"
+            class="table-scroll"
+            role="region"
+            tabindex="0"
+          >
+            <table class="spec-table">
+              <thead>
+                <tr>
+                  <th scope="col">項目</th>
+                  <th scope="col">仕様</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">編集の停止</th>
+                  <td>
+                    <ul class="cell-list">
+                      <li>人間の停止要求を保存する。</li>
+                      <li>
+                        編集と保存は安全に止められる境目で止め、完了済みの保存状態を残す。
+                      </li>
+                      <li>保存処理は安全な境目まで進めて停止する。</li>
+                    </ul>
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">レンダーの停止</th>
+                  <td>
+                    <ul class="cell-list">
+                      <li>
+                        レンダーは直前の
+                        <code>.blend</code>
+                        が保存済みの専用プロセスで行う。
+                      </li>
+                      <li>
+                        停止要求時は所有するレンダープロセスを終了して、未完成の画像を不採用とする。
+                      </li>
+                      <li>OS側の終了を確認して停止済みとする。</li>
+                      <li>アプリが所有するプロセスを対象に終了する。</li>
+                    </ul>
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">強制終了</th>
+                  <td>
+                    最後の操作を失う強制終了は人間が明示した場合に限定する。
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">途中成果</th>
+                  <td>
+                    <ul class="cell-list">
+                      <li>
+                        検証済みの途中成果を記録し、13種類が揃ったPSDを完成として渡す。
+                      </li>
+                      <li>
+                        PSD生成だけの失敗なら検証済み中間出力を利用できる。
+                      </li>
+                    </ul>
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">手動再開</th>
+                  <td>
+                    <ul class="cell-list">
+                      <li>人間が止めた依頼は、明示的な再開指示を待つ。</li>
+                      <li>
+                        手動再開時に入力・チェックポイント・完成出力を再照合する。
+                      </li>
+                      <li>
+                        デザインを変える復旧は既存要件どおり人間に確認する。
+                      </li>
+                    </ul>
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">障害時の照合</th>
+                  <td>
+                    WSLや補助プロセスが落ちた場合、Windows側プロセスの生存と完了記録を照合する。
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </section>
         <section aria-labelledby="容量とメモリの判定" class="spec-section">
-          <h2 id="容量とメモリの判定">容量とメモリの判定</h2>
+          <h2 id="容量とメモリの判定">出力容量の判定</h2>
           <p>
             PSD/PSBの選択は、寸法・圧縮後サイズ上界・各長さフィールドから事前判定し、実サイズも検証する。失敗を記録して検証済み中間出力を残す。
           </p>

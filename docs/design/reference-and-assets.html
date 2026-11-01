@@ -61,40 +61,25 @@
         <nav aria-label="このページの目次" class="page-toc">
           <h2>このページの内容</h2>
           <ol>
-            <li><a href="#対象と選定理由">対象と選定理由</a></li>
+            <li><a href="#対象と選定理由">検索対象</a></li>
+            <li><a href="#検索候補人間の選択">検索・候補・人間の選択</a></li>
             <li>
-              <a href="#検索候補人間の選択">検索・候補・人間の選択</a>
-              <ul>
-                <li>
-                  <a href="#候補と実際の取り込みに残す情報">
-                    候補と実際の取り込みに残す情報
-                  </a>
-                </li>
-              </ul>
-            </li>
-            <li>
-              <a href="#プレビューと参考画像の保存"
-                >プレビューと参考画像の保存</a
+              <a href="#候補と実際の取り込みに残す情報"
+                >候補と実際の取り込みに残す情報</a
               >
             </li>
-            <li>
-              <a href="#取得blenderへの取り込み">取得・Blenderへの取り込み</a>
-              <ul>
-                <li><a href="#対応形式と品質">対応形式と品質</a></li>
-                <li><a href="#手順と完成の境界">手順と完成の境界</a></li>
-              </ul>
-            </li>
+            <li><a href="#プレビューと参考画像の保存">参考画像の保存</a></li>
+            <li><a href="#対応形式と品質">取得条件</a></li>
+            <li><a href="#手順と完成の境界">素材の取り込み手順</a></li>
             <li><a href="#失敗不足停止">失敗・不足・停止</a></li>
             <li>
-              <a href="#サービスの提供条件と確認範囲"
-                >サービスの提供条件と確認範囲</a
-              >
+              <a href="#サービスの提供条件と確認範囲">サービスの提供条件</a>
             </li>
             <li><a href="#検索と制作操作の境界">検索と制作操作の境界</a></li>
           </ol>
         </nav>
         <section aria-labelledby="対象と選定理由" class="spec-section">
-          <h2 id="対象と選定理由">対象と選定理由</h2>
+          <h2 id="対象と選定理由">検索対象</h2>
           <p>
             参考資料は表現・構造等を検討する根拠、素材は制作データへ取り込んで使うデータとする。同じ画像が両方の役割を持つ場合も、参考として選ぶ判断と制作データへの取り込みを区別する。
           </p>
@@ -145,29 +130,54 @@
         </section>
         <section aria-labelledby="検索候補人間の選択" class="spec-section">
           <h2 id="検索候補人間の選択">検索・候補・人間の選択</h2>
-          <ol>
-            <li>
-              依頼の目的と作品の制作意図を基に参考資料・素材を探す。手元の検索対象は指定したフォルダーに限定する。依存素材の収集で指定範囲外の参照が見つかった場合は、保存設計に従って実際の参照先と取り込み可否を確認する。
-            </li>
-            <li>
-              メインチャットで候補と情報を提示する。プレビューは<a
-                href="user-interface.html"
-                >画面設計</a
-              >の成果物リンク・右側タブの導線を使う。
-            </li>
-            <li>
-              人間が参考資料または素材を会話で選ぶ。対象や使い方が曖昧なら具体化する。
-            </li>
-            <li>
-              選んだ参考資料は、その出典・参考要素・制作意図との関係とともに次の工程へ渡す。参考資料から確定できない構造等は仮説として提示する。
-            </li>
-            <li>
-              選んだ素材は、下記の取得・取り込み手順へ進める。候補の検索結果と会話を保持し、人間が選んだ制作条件を次工程へ渡す。
-            </li>
-          </ol>
-          <h3 id="候補と実際の取り込みに残す情報">
+          <figure class="process-diagram">
+            <ol aria-label="検索・候補・人間の選択" class="process-flow">
+              <li>
+                <strong>検索</strong>
+                <div class="process-detail">
+                  依頼の目的と作品の制作意図を基に参考資料・素材を探す。手元の検索対象は指定したフォルダーに限定する。依存素材の収集で指定範囲外の参照が見つかった場合は、保存設計に従って実際の参照先と取り込み可否を確認する。
+                </div>
+              </li>
+              <li>
+                <strong>候補を提示</strong>
+                <div class="process-detail">
+                  メインチャットで候補と情報を提示する。プレビューは<a
+                    href="user-interface.html"
+                    >画面設計</a
+                  >の成果物リンク・右側タブの導線を使う。
+                </div>
+              </li>
+              <li>
+                <strong>人間が選択</strong>
+                <div class="process-detail">
+                  人間が参考資料または素材を会話で選ぶ。対象や使い方が曖昧なら具体化する。
+                </div>
+              </li>
+              <li>
+                <strong>参考資料を引継ぎ</strong>
+                <div class="process-detail">
+                  選んだ参考資料は、その出典・参考要素・制作意図との関係とともに次の工程へ渡す。参考資料から確定できない構造等は仮説として提示する。
+                </div>
+              </li>
+              <li>
+                <strong>素材取得へ</strong>
+                <div class="process-detail">
+                  選んだ素材は、下記の取得・取り込み手順へ進める。候補の検索結果と会話を保持し、人間が選んだ制作条件を次工程へ渡す。
+                </div>
+              </li>
+            </ol>
+            <figcaption>
+              矢印は手順の順序を表す。各段階の条件に従って処理を進める。
+            </figcaption>
+          </figure>
+        </section>
+        <section
+          aria-labelledby="候補と実際の取り込みに残す情報"
+          class="spec-section"
+        >
+          <h2 id="候補と実際の取り込みに残す情報">
             候補と実際の取り込みに残す情報
-          </h3>
+          </h2>
           <div
             aria-label="候補と実際の取り込みに残す情報"
             class="table-scroll"
@@ -185,64 +195,171 @@
                 <tr>
                   <th scope="row">検索</th>
                   <td>
-                    作品・会話・依頼・実行への参照、検索語・対象サービスまたは指定フォルダー、検索時刻、結果と取得失敗の区別
+                    <ul class="cell-list">
+                      <li>作品・会話・依頼・実行への参照</li>
+                      <li>検索語・対象サービスまたは指定フォルダー</li>
+                      <li>検索時刻</li>
+                      <li>結果と取得失敗の区別</li>
+                    </ul>
                   </td>
                 </tr>
                 <tr>
                   <th scope="row">候補共通</th>
                   <td>
-                    候補を識別する参照、名前、出典URLまたは元の所在、サービスの素材ID（ある場合）、作者、プレビューまたは欠けている理由、利用条件・根拠のURLまたは文書参照・確認日、参考にする要素と制作意図との関係
+                    <ul class="cell-list">
+                      <li>候補を識別する参照</li>
+                      <li>名前</li>
+                      <li>出典URLまたは元の所在</li>
+                      <li>サービスの素材ID（ある場合）</li>
+                      <li>作者</li>
+                      <li>プレビューまたは欠けている理由</li>
+                      <li>利用条件・根拠のURLまたは文書参照・確認日</li>
+                      <li>参考にする要素と制作意図との関係</li>
+                    </ul>
                   </td>
                 </tr>
                 <tr>
                   <th scope="row">素材候補</th>
                   <td>
-                    提供される形式・解像度・容量、品質やモデルの違い、既知の依存素材・必要なアドオン等。未取得の詳細は未確認とする
+                    提供される形式・解像度・容量、品質やモデルの違い、
+                    既知の依存素材・必要なアドオン等。未取得の詳細は未確認とする
                   </td>
                 </tr>
                 <tr>
                   <th scope="row">人間の選択</th>
                   <td>
-                    対象候補、参考としての選択／素材取り込みの指示の区別、指示原文・人間・時刻への参照、理由（入力された場合）
+                    <ul class="cell-list">
+                      <li>対象候補</li>
+                      <li>参考としての選択／素材取り込みの指示の区別</li>
+                      <li>指示原文・人間・時刻への参照</li>
+                      <li>理由（入力された場合）</li>
+                    </ul>
                   </td>
                 </tr>
                 <tr>
                   <th scope="row">取得・取り込み</th>
                   <td>
-                    実際の取得元・時刻・形式・解像度・品質、利用条件の確認根拠、人間の補足、元ファイルと管理下ファイルの対応、サイズ・ハッシュ・依存一覧、検証結果、編集案・保存状態・実行への参照
+                    <ul class="cell-list">
+                      <li>実際の取得元・時刻・形式・解像度・品質</li>
+                      <li>利用条件の確認根拠</li>
+                      <li>人間の補足</li>
+                      <li>元ファイルと管理下ファイルの対応</li>
+                      <li>サイズ・ハッシュ・依存一覧</li>
+                      <li>検証結果</li>
+                      <li>編集案・保存状態・実行への参照</li>
+                    </ul>
                   </td>
                 </tr>
               </tbody>
             </table>
           </div>
-          <p>
-            作者・容量等が分からない場合は不明と記録する。利用条件が不明な場合は、他の項目が揃っていても取り込みを保留する。取得した実体と依存素材をハッシュで固定する。
-          </p>
-          <p>
-            検索・参考資料の選択は会話・出典の記録として保存する。具体的なテーブル分割は実装仕様へ引き継ぐ。
-          </p>
+          <div
+            aria-label="候補と実際の取り込みに残す情報"
+            class="table-scroll"
+            role="region"
+            tabindex="0"
+          >
+            <table class="spec-table">
+              <thead>
+                <tr>
+                  <th scope="col">項目</th>
+                  <th scope="col">仕様</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">記録</th>
+                  <td>
+                    <ul class="cell-list">
+                      <li>作者・容量等が分からない場合は不明と記録する。</li>
+                      <li>
+                        利用条件が不明な場合は、他の項目が揃っていても取り込みを保留する。
+                      </li>
+                      <li>取得した実体と依存素材をハッシュで固定する。</li>
+                    </ul>
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">記録</th>
+                  <td>
+                    <ul class="cell-list">
+                      <li>
+                        検索・参考資料の選択は会話・出典の記録として保存する。
+                      </li>
+                      <li>具体的なテーブル分割は実装仕様へ引き継ぐ。</li>
+                    </ul>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </section>
         <section
           aria-labelledby="プレビューと参考画像の保存"
           class="spec-section"
         >
-          <h2 id="プレビューと参考画像の保存">プレビューと参考画像の保存</h2>
-          <ul>
-            <li>
-              プレビューの出典と、制作へ取り込むファイルの出典・利用条件を区別する。
-            </li>
-            <li>
-              一般Webの参考画像は、保存できる条件を確認できたものを管理下へコピーする。保存可否が不明なら出典URL・参考要素・制作意図との関係と、画像の可用性を記録する。
-            </li>
-            <li>
-              リンク切れや画像の欠落が起きても文章と当時の選択の記録は残す。当時の参考資料と出典を保持する。
-            </li>
-            <li>役割を変えて取り込む際は素材としての利用条件を確認する。</li>
-          </ul>
+          <h2 id="プレビューと参考画像の保存">参考画像の保存</h2>
+          <div
+            aria-label="プレビューと参考画像の保存"
+            class="table-scroll"
+            role="region"
+            tabindex="0"
+          >
+            <table class="spec-table">
+              <thead>
+                <tr>
+                  <th scope="col">項目</th>
+                  <th scope="col">仕様</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">出典</th>
+                  <td>
+                    プレビューの出典と、制作へ取り込むファイルの出典・利用条件を区別する。
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">保存条件</th>
+                  <td>
+                    <ul class="cell-list">
+                      <li>
+                        一般Webの参考画像は、保存できる条件を確認できたものを管理下へコピーする。
+                      </li>
+                      <li>
+                        保存可否が不明なら出典URL・参考要素・制作意図との関係と、画像の可用性を記録する。
+                      </li>
+                    </ul>
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">記録保持</th>
+                  <td>
+                    <ul class="cell-list">
+                      <li>
+                        リンク切れや画像の欠落が起きても文章と当時の選択の記録は残す。
+                      </li>
+                      <li>当時の参考資料と出典を保持する。</li>
+                    </ul>
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">素材への用途変更</th>
+                  <td>
+                    役割を変えて取り込む際は素材としての利用条件を確認する。
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </section>
-        <section aria-labelledby="取得blenderへの取り込み" class="spec-section">
-          <h2 id="取得blenderへの取り込み">取得・Blenderへの取り込み</h2>
-          <h3 id="対応形式と品質">対応形式と品質</h3>
+        <section aria-labelledby="対応形式と品質" class="spec-section">
+          <span
+            aria-hidden="true"
+            class="anchor-alias"
+            id="取得blenderへの取り込み"
+          ></span>
+          <h2 id="対応形式と品質">取得条件</h2>
           <div
             aria-label="対応形式と品質"
             class="table-scroll"
@@ -260,8 +377,11 @@
                 <tr>
                   <th scope="row">3D</th>
                   <td>
-                    <code>.blend</code
-                    >、glTF/GLB、FBX、OBJ。必要な外部ファイル・テクスチャも収集する。モデルの品質違いを明示す
+                    <ul class="cell-list">
+                      <li><code>.blend</code>、glTF/GLB、FBX、OBJ。</li>
+                      <li>必要な外部ファイル・テクスチャも収集する。</li>
+                      <li>モデルの品質違いを明示す 。</li>
+                    </ul>
                   </td>
                 </tr>
                 <tr>
@@ -273,7 +393,13 @@
                 <tr>
                   <th scope="row">取得品質</th>
                   <td>
-                    テクスチャは2K、HDRIは4Kを既定とする。取得前に形式・解像度・容量を提示し、会話で変更できる。実際に選んだ品質を保存する
+                    <ul class="cell-list">
+                      <li>テクスチャは2K、HDRIは4Kを既定とする。</li>
+                      <li>
+                        取得前に形式・解像度・容量を提示し、会話で変更できる。
+                      </li>
+                      <li>実際に選んだ品質を保存する 。</li>
+                    </ul>
                   </td>
                 </tr>
               </tbody>
@@ -283,31 +409,56 @@
             既定の品質が提供されていない場合も、選べるものを示す。拡張子が対象でも、追加アドオンが必要な素材や読めない内容は保留し、原因を示す。対応形式の設計上の採用と、現在のWindows
             Blenderでの検証済みを区別する。
           </p>
-          <h3 id="手順と完成の境界">手順と完成の境界</h3>
-          <ol>
-            <li>
-              人間が選んだ素材、利用条件、形式・品質、制作への使い方と変更範囲を固定する。配置・UV・材質変更等の必要条件が未指定なら具体化する。
-            </li>
-            <li>
-              選んだ素材を取得する。手元の場合は元のファイルを読み取り、外部の場合は選んだサービスのファイルを取得する。
-            </li>
-            <li>
-              <a href="artifact-storage.html#依存素材の取り込み">保存設計</a
-              >へ、元の所在、利用条件の記録、取得した実体、依存一覧と既知の不足を渡す。保存側は依存先を再帰的に収集し、循環・実参照先・コピー中の変更を確認する。管理下へコピーしてサイズ・ハッシュ・参照先を検証する。
-            </li>
-            <li>
-              <a href="blender-integration.html">Blender連携設計</a
-              >に従い、固定した起点の作業用コピーへ取り込み、管理下の依存素材を参照する編集可能な結果を作る。利用した素材とBlender内の対象との対応、単位・大きさ・向きや材質等の適用内容を実行結果に残す。
-            </li>
-            <li>
-              保存・再読み取り・必須依存の確認を終えた結果を編集案と新しい保存状態として提示する。素材の取得完了と、Blenderの編集案完成を区別する。
-            </li>
-            <li>
-              人間が実際の結果を採用したときに<a href="edit-candidates.html"
-                >編集案の採用契約</a
-              >で現在状態へ反映する。
-            </li>
-          </ol>
+        </section>
+        <section aria-labelledby="手順と完成の境界" class="spec-section">
+          <h2 id="手順と完成の境界">素材の取り込み手順</h2>
+          <figure class="process-diagram">
+            <ol aria-label="手順と完成の境界" class="process-flow">
+              <li>
+                <strong>条件を固定</strong>
+                <div class="process-detail">
+                  人間が選んだ素材、利用条件、形式・品質、制作への使い方と変更範囲を固定する。配置・UV・材質変更等の必要条件が未指定なら具体化する。
+                </div>
+              </li>
+              <li>
+                <strong>取得</strong>
+                <div class="process-detail">
+                  選んだ素材を取得する。手元の場合は元のファイルを読み取り、外部の場合は選んだサービスのファイルを取得する。
+                </div>
+              </li>
+              <li>
+                <strong>管理下へ保存</strong>
+                <div class="process-detail">
+                  <a href="artifact-storage.html#依存素材の取り込み">保存設計</a
+                  >へ、元の所在、利用条件の記録、取得した実体、依存一覧と既知の不足を渡す。保存側は依存先を再帰的に収集し、循環・実参照先・コピー中の変更を確認する。管理下へコピーしてサイズ・ハッシュ・参照先を検証する。
+                </div>
+              </li>
+              <li>
+                <strong>Blenderへ取込</strong>
+                <div class="process-detail">
+                  <a href="blender-integration.html">Blender連携設計</a
+                  >に従い、固定した起点の作業用コピーへ取り込み、管理下の依存素材を参照する編集可能な結果を作る。利用した素材とBlender内の対象との対応、単位・大きさ・向きや材質等の適用内容を実行結果に残す。
+                </div>
+              </li>
+              <li>
+                <strong>編集案を検証</strong>
+                <div class="process-detail">
+                  保存・再読み取り・必須依存の確認を終えた結果を編集案と新しい保存状態として提示する。素材の取得完了と、Blenderの編集案完成を区別する。
+                </div>
+              </li>
+              <li>
+                <strong>採用して反映</strong>
+                <div class="process-detail">
+                  人間が実際の結果を採用したときに<a href="edit-candidates.html"
+                    >編集案の採用契約</a
+                  >で現在状態へ反映する。
+                </div>
+              </li>
+            </ol>
+            <figcaption>
+              矢印は手順の順序を表す。各段階の条件に従って処理を進める。
+            </figcaption>
+          </figure>
           <p>
             取得後の素材・条件の記録は、その実行が何を使ったかを示す根拠として残す。再取得で内容が異なり、人間が選んだ前提・品質・デザインが変わる場合は確認し直す。
           </p>
@@ -331,7 +482,13 @@
                 <tr>
                   <th scope="row">検索サービスが利用不可・応答失敗</th>
                   <td>
-                    検索失敗と検索結果なしを区別し、取得済みの候補と出典を残す。手元の候補は確認できる。人間が選んだサービス・素材を取得する
+                    <ul class="cell-list">
+                      <li>
+                        検索失敗と検索結果なしを区別し、取得済みの候補と出典を残す。
+                      </li>
+                      <li>手元の候補は確認できる。</li>
+                      <li>人間が選んだサービス・素材を取得する 。</li>
+                    </ul>
                   </td>
                 </tr>
                 <tr>
@@ -378,9 +535,7 @@
           aria-labelledby="サービスの提供条件と確認範囲"
           class="spec-section"
         >
-          <h2 id="サービスの提供条件と確認範囲">
-            サービスの提供条件と確認範囲
-          </h2>
+          <h2 id="サービスの提供条件と確認範囲">サービスの提供条件</h2>
           <p>
             APIの利用条件と素材の利用条件は分けて記録する。提供条件は2026-10-31の公式資料を根拠とする。
           </p>
@@ -402,8 +557,15 @@
                 <tr>
                   <th scope="row">Poly Haven</th>
                   <td>
-                    APIは商用を含め無料。素材はCC0。live
-                    API利用時はサービス名が分かる出典表示と、ソフト名に対応するRefererまたはUser-Agentが必要
+                    <ul class="cell-list">
+                      <li>APIは商用を含め無料。</li>
+                      <li>素材はCC0。</li>
+                      <li>
+                        live
+                        API利用時はサービス名が分かる出典表示と、ソフト名に対応するRefererまたはUser-Agentが必要
+                        。
+                      </li>
+                    </ul>
                   </td>
                   <td>
                     <a
@@ -427,8 +589,11 @@
                 <tr>
                   <th scope="row">ambientCG</th>
                   <td>
-                    コードからの検索・取得とv3のassets
-                    APIを文書化。素材ファイルと素材プレビューはCC0。運営側がAPIの信頼性・安定性の限界を明記
+                    <ul class="cell-list">
+                      <li>コードからの検索・取得とv3のassets APIを文書化。</li>
+                      <li>素材ファイルと素材プレビューはCC0。</li>
+                      <li>運営側がAPIの信頼性・安定性の限界を明記 。</li>
+                    </ul>
                   </td>
                   <td>
                     <a
@@ -464,9 +629,35 @@
         </section>
         <section aria-labelledby="検索と制作操作の境界" class="spec-section">
           <h2 id="検索と制作操作の境界">検索と制作操作の境界</h2>
-          <p>
-            一般Web検索・画像参照・ツール呼び出しと、scene-craftによる出典・利用条件の記録・サービス別取得・管理下コピー・Blender取り込みを区別する。具体的なAPIページング・キャッシュ・アクセス間隔・ファイル選択規則は、採用した条件と利用者の選択を維持する形で定める。
-          </p>
+          <div
+            aria-label="検索と制作操作の境界"
+            class="table-scroll"
+            role="region"
+            tabindex="0"
+          >
+            <table class="spec-table">
+              <thead>
+                <tr>
+                  <th scope="col">観点</th>
+                  <th scope="col">仕様</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">処理の担当</th>
+                  <td>
+                    一般Web検索・画像参照・ツール呼び出しと、scene-craftによる出典・利用条件の記録・サービス別取得・管理下コピー・Blender取り込みを区別する。
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">取得APIの運用</th>
+                  <td>
+                    具体的なAPIページング・キャッシュ・アクセス間隔・ファイル選択規則は、採用した条件と利用者の選択を維持する形で定める。
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </section>
         <section class="sources">
           <h2>詳細資料</h2>
