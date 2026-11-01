@@ -7,7 +7,7 @@
       name="description"
       content="scene-craftで作る機能・構成・制作の流れをまとめた設計資料。"
     />
-    <title>作品と制作履歴 | scene-craft 設計</title>
+    <title>データモデル | scene-craft 設計</title>
     <link rel="stylesheet" href="portal.css" />
   </head>
   <body>
@@ -25,9 +25,7 @@
           <p class="nav-label">全体を知る</p>
           <a href="application-architecture.html">全体構成とOSの責務</a
           ><a href="user-interface.html">画面と制作の導線</a
-          ><a href="domain-data-model.html" aria-current="page"
-            >作品と制作履歴</a
-          >
+          ><a href="domain-data-model.html" aria-current="page">データモデル</a>
           <p class="nav-label">制作を進める</p>
           <a href="llm-connection.html">LLM接続と費用</a
           ><a href="agent-contracts.html">工程別エージェントとツール</a
@@ -43,74 +41,196 @@
       </aside>
       <main id="main" tabindex="-1">
         <p class="eyebrow">DESIGN / 03</p>
-        <h1>作品と制作履歴</h1>
+        <h1>データモデル</h1>
         <p class="lead">保存状態をつなぎ、判断の理由を残す</p>
         <p class="intro">
           作品は完成した一枚を目指す単位。AI案・手修正・採否の分岐をつなぎ、何を見て判断し、どこから次の制作を始めたかを追跡する。
         </p>
 
-        <figure>
-          <div
-            class="diagram-scroll"
-            tabindex="0"
-            role="region"
-            aria-label="制作履歴の分岐例"
-          >
-            <svg
-              viewBox="0 0 820 245"
-              role="img"
-              aria-labelledby="hist-title hist-desc"
+        <section aria-labelledby="entities">
+          <h2 id="entities">エンティティの所属関係</h2>
+          <p>
+            作品を中心に、会話・依頼・制作の記録を管理する。各エンティティは独自の永続IDを持ち、表示名や保存場所が変わっても同一性を保つ。
+          </p>
+          <figure>
+            <div
+              class="diagram-scroll"
+              tabindex="0"
+              role="region"
+              aria-label="エンティティの所属関係"
             >
-              <title id="hist-title">未採用の案を修正して採用する例</title>
-              <desc id="hist-desc">
-                保存状態Sから案Aと案Bに分岐。案Aから人間の手修正H、追加AI修正A2へ進み、A2を修正して採用して次の制作へ進む。採用前の現在状態はSのまま。案Bの記録も残る。
-              </desc>
-              <defs>
-                <marker
-                  id="h-arrow"
-                  markerWidth="8"
-                  markerHeight="8"
-                  refX="7"
-                  refY="4"
-                  orient="auto"
-                >
-                  <path d="M0 0L8 4L0 8Z" fill="#48716b"></path>
-                </marker>
-              </defs>
-              <g class="history-lines">
+              <svg
+                viewBox="0 0 850 735"
+                role="img"
+                aria-labelledby="entity-title entity-desc"
+              >
+                <title id="entity-title">エンティティの所属関係</title>
+                <desc id="entity-desc">
+                  矢印は記録から所属先へ向かう。会話→作品は制作会話のみ。文章記録と振り返りの参照記録は所属を規定せず、接続しない。生成元・判断対象などの参照や物理テーブルの分割は示さない。
+                </desc>
+                <defs>
+                  <marker
+                    id="entity-arrow"
+                    markerWidth="8"
+                    markerHeight="8"
+                    refX="7"
+                    refY="4"
+                    orient="auto"
+                  >
+                    <path d="M0 0L8 4L0 8Z" fill="#48716b" />
+                  </marker>
+                </defs>
                 <path
-                  d="M112 88H180M112 88V187H180M282 88H330M432 88H480M582 88H650"
-                ></path>
-              </g>
-              <g class="node">
-                <rect x="10" y="60" width="102" height="56" rx="8"></rect>
-                <text x="61" y="93">基準 S</text>
-                <rect x="180" y="60" width="102" height="56" rx="8"></rect>
-                <text x="231" y="93">AI案 A</text>
-                <rect x="180" y="158" width="102" height="56" rx="8"></rect>
-                <text x="231" y="191">別案 B</text>
-                <rect x="330" y="60" width="102" height="56" rx="8"></rect>
-                <text x="381" y="93">手修正 H</text>
-                <rect x="480" y="60" width="102" height="56" rx="8"></rect>
-                <text x="531" y="93">AI修正 A2</text>
-              </g>
-              <g class="node primary">
-                <rect x="650" y="60" width="155" height="56" rx="8"></rect>
-                <text x="727" y="93">次の制作へ</text>
-              </g>
-              <text class="edge-label" x="614" y="43">修正して採用</text>
-              <text class="sub note" x="420" y="192">
-                採用前の現在状態は S のまま
-              </text>
-              <text class="sub note" x="420" y="217">
-                別案・理由・指示原文も残す
-              </text>
-            </svg>
-          </div>
-          <figcaption>
-            矢印は変更の順序。所属関係図や自動マージの図ではない。採否は確認したA2の保存状態を参照する。
-          </figcaption>
-        </figure>
+                  d="M525 59H620V310H680"
+                  fill="none"
+                  stroke="#48716b"
+                  stroke-width="1.5"
+                  marker-end="url(#entity-arrow)"
+                />
+                <path
+                  d="M525 189H620V310H680"
+                  fill="none"
+                  stroke="#48716b"
+                  stroke-width="1.5"
+                  marker-end="url(#entity-arrow)"
+                />
+                <path
+                  d="M525 265H620V310H680"
+                  fill="none"
+                  stroke="#48716b"
+                  stroke-width="1.5"
+                  marker-end="url(#entity-arrow)"
+                />
+                <path
+                  d="M525 341H620V310H680"
+                  fill="none"
+                  stroke="#48716b"
+                  stroke-width="1.5"
+                  marker-end="url(#entity-arrow)"
+                />
+                <path
+                  d="M525 417H620V310H680"
+                  fill="none"
+                  stroke="#48716b"
+                  stroke-width="1.5"
+                  marker-end="url(#entity-arrow)"
+                />
+                <path
+                  d="M525 493H620V310H680"
+                  fill="none"
+                  stroke="#48716b"
+                  stroke-width="1.5"
+                  marker-end="url(#entity-arrow)"
+                />
+                <path
+                  d="M525 569H620V310H680"
+                  fill="none"
+                  stroke="#48716b"
+                  stroke-width="1.5"
+                  marker-end="url(#entity-arrow)"
+                />
+                <path
+                  d="M525 645H620V310H680"
+                  fill="none"
+                  stroke="#48716b"
+                  stroke-width="1.5"
+                  marker-end="url(#entity-arrow)"
+                />
+                <path
+                  d="M265 39H335"
+                  fill="none"
+                  stroke="#48716b"
+                  stroke-width="1.5"
+                  marker-end="url(#entity-arrow)"
+                />
+                <path
+                  d="M265 119H300V59H335"
+                  fill="none"
+                  stroke="#48716b"
+                  stroke-width="1.5"
+                  marker-end="url(#entity-arrow)"
+                />
+                <path
+                  d="M110 209V148"
+                  fill="none"
+                  stroke="#48716b"
+                  stroke-width="1.5"
+                  marker-end="url(#entity-arrow)"
+                />
+                <path
+                  d="M205 318H290V119H265"
+                  fill="none"
+                  stroke="#48716b"
+                  stroke-width="1.5"
+                  marker-end="url(#entity-arrow)"
+                />
+                <g class="node">
+                  <rect x="680" y="281" width="130" height="58" rx="8" />
+                  <text x="745.0" y="316">作品</text>
+                </g>
+                <g class="node">
+                  <rect x="335" y="30" width="190" height="58" rx="8" />
+                  <text x="430.0" y="65">会話</text>
+                </g>
+                <g class="node">
+                  <rect x="335" y="160" width="190" height="58" rx="8" />
+                  <text x="430.0" y="195">編集案</text>
+                </g>
+                <g class="node">
+                  <rect x="335" y="236" width="190" height="58" rx="8" />
+                  <text x="430.0" y="271">保存状態</text>
+                </g>
+                <g class="node">
+                  <rect x="335" y="312" width="190" height="58" rx="8" />
+                  <text x="430.0" y="347">変更記録</text>
+                </g>
+                <g class="node">
+                  <rect x="335" y="388" width="190" height="58" rx="8" />
+                  <text x="430.0" y="423">採否記録</text>
+                </g>
+                <g class="node">
+                  <rect x="335" y="464" width="190" height="58" rx="8" />
+                  <text x="430.0" y="499">現在状態の更新記録</text>
+                </g>
+                <g class="node">
+                  <rect x="335" y="540" width="190" height="58" rx="8" />
+                  <text x="430.0" y="575">生成物</text>
+                </g>
+                <g class="node">
+                  <rect x="335" y="616" width="190" height="58" rx="8" />
+                  <text x="430.0" y="651">ファイル参照</text>
+                </g>
+                <g class="node">
+                  <rect x="15" y="10" width="250" height="58" rx="8" />
+                  <text x="140.0" y="45">原文メッセージ</text>
+                </g>
+                <g class="node">
+                  <rect x="15" y="90" width="250" height="58" rx="8" />
+                  <text x="140.0" y="125">依頼</text>
+                </g>
+                <g class="node">
+                  <rect x="15" y="209" width="190" height="58" rx="8" />
+                  <text x="110.0" y="244">実行</text>
+                </g>
+                <g class="node">
+                  <rect x="15" y="289" width="190" height="58" rx="8" />
+                  <text x="110.0" y="324">再実行の記録</text>
+                </g>
+                <g class="node">
+                  <rect x="15" y="525" width="250" height="58" rx="8" />
+                  <text x="140.0" y="560">文章記録</text>
+                </g>
+                <g class="node">
+                  <rect x="15" y="605" width="250" height="58" rx="8" />
+                  <text x="140.0" y="640">振り返りの参照記録</text>
+                </g>
+              </svg>
+            </div>
+            <figcaption>
+              矢印は記録から所属先へ向かう。会話→作品は制作会話のみ。文章記録と振り返りの参照記録は所属を規定せず、接続しない。生成元・判断対象などの参照や物理テーブルの分割は示さない。
+            </figcaption>
+          </figure>
+        </section>
         <section aria-labelledby="contracts">
           <h2 id="contracts">主要な契約</h2>
           <div
@@ -122,52 +242,142 @@
             <table>
               <thead>
                 <tr>
-                  <th scope="col">項目</th>
-                  <th scope="col">決めたこと・受け渡すもの</th>
+                  <th scope="col">エンティティ</th>
+                  <th scope="col">保持する情報の要点</th>
+                  <th scope="col">責務・契約</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
-                  <th scope="row">作品・会話・原文</th>
+                  <th scope="row">作品</th>
                   <td>
-                    作品の共有情報と複数会話を管理。原文メッセージは順序・発言者・添付・途中や欠落を保持する。
+                    作品ID・名前・開始方法・制作意図・作風のGit参照・現在状態
+                  </td>
+                  <td>完成した一枚を目指す単位。会話間の共有情報の所属先</td>
+                </tr>
+                <tr>
+                  <th scope="row">会話</th>
+                  <td>会話ID・用途・所属作品／対象作品集合・モデル選択</td>
+                  <td>
+                    原文の所属と依頼の入口。Codex thread ID
+                    は別の接続対応記録で保持し、会話の ID にしない
                   </td>
                 </tr>
                 <tr>
-                  <th scope="row">依頼・実行・再実行の記録</th>
+                  <th scope="row">原文メッセージ</th>
                   <td>
-                    目的と予算の単位、AIとWindowsの親子実行、そのやり直しを分ける。Codex
-                    thread/turnの対応は接続記録。
+                    メッセージID・会話・発言者・順序・本文／添付・受信状態
+                  </td>
+                  <td>
+                    原文を保持する。訂正や要約で置換しない。AI
+                    の内部推論を必須の制作記録とはしない
                   </td>
                 </tr>
                 <tr>
-                  <th scope="row">ファイル参照・生成物</th>
+                  <th scope="row">依頼</th>
                   <td>
-                    固定実体とAI等の成果物を区別。人間が取り込んだファイルをAIの生成物と呼ばない。
+                    依頼ID・会話・指示原文・起点・変更範囲・保護と依頼限定許可
+                  </td>
+                  <td>
+                    一つの目的と停止・再実行予算の単位。自動再実行で新しい依頼
+                    ID にしない
                   </td>
                 </tr>
                 <tr>
-                  <th scope="row">保存状態・変更記録</th>
+                  <th scope="row">実行</th>
                   <td>
-                    固定した構成と依存素材、変更前後と由来。手修正・復元・派生も変更記録でつなぐ。
+                    実行ID・依頼・親実行・状態／失敗・入力／出力・実効設定
+                  </td>
+                  <td>
+                    AI 処理と Windows 側制作操作を識別する。Windows
+                    側操作にも固有の実行 ID を与え、親の AI 実行と関連付ける
                   </td>
                 </tr>
                 <tr>
-                  <th scope="row">編集案・採否記録</th>
+                  <th scope="row">再実行の記録</th>
+                  <td>記録ID・依頼・原因・対象実行・累積回数・開始根拠</td>
                   <td>
-                    基準と候補、代替・依存・修正元を保持。判断は実際に確認した状態と範囲を参照する。
+                    同一 turn
+                    内の制作操作のやり直しも対応付ける。通常の子処理開始や通信再送と区別する。何を一回として消費するかは実行状態設計で具体化
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">ファイル参照</th>
+                  <td>
+                    ファイルID・作品・役割／形式・由来・相対パス・ハッシュ・可用性
+                  </td>
+                  <td>
+                    保存済みの特定の実体を識別する。作業中の上書き可能なパスだけを保存状態の根拠にしない
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">生成物</th>
+                  <td>生成物ID・作品・作成実行・内容・種類・完成判定</td>
+                  <td>
+                    AI
+                    の成果物。成功・完成と、人間による採用を区別する。通常プログラムによるレンダー・変換も作成した制作実行へ結び付ける
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">保存状態</th>
+                  <td>
+                    保存状態ID・作品・構成ファイル・依存素材・成立／復元可能性・変更記録
+                  </td>
+                  <td>
+                    ある時点の制作データを固定する。初回を除き親となる状態を変更記録からたどれる
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">変更記録</th>
+                  <td>
+                    変更ID・作品・種別・変更前後・由来・要約／理由。手修正は操作者・作業内容等も保持
+                  </td>
+                  <td>
+                    制作データの変更前後と由来を一まとまりとして記録する。手修正もこの概念に含め、人間が指定した意味のあるまとまりを単位とし、Blender／Photoshopの操作一つずつは網羅しない。取り込み・派生・復元の特別な参照は下記に従う
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">編集案</th>
+                  <td>
+                    編集案ID・作品・依頼・基準／AI結果の状態・作成実行・変更範囲・代替／依存・修正元
+                  </td>
+                  <td>
+                    何と何を比較するかを表す。手修正後も AI
+                    の結果への参照を維持し、AIによる追加修正は新しい編集案から修正元へつなぐ
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">採否記録</th>
+                  <td>
+                    判断ID・作品・編集案・確認した状態・判断者／時刻・任意の理由・範囲・適用状態
+                  </td>
+                  <td>
+                    最新の枝先ではなく、実際に見て判断した編集案と保存状態を指す。AI修正・手修正を経た結果も「修正して採用」として記録でき、変更者は各変更記録から判別する。判断前・未選択は明示的な不採用と区別
                   </td>
                 </tr>
                 <tr>
                   <th scope="row">現在状態の更新記録</th>
                   <td>
-                    次の制作の出発点をいつ、どの採否・変更で切り替えたかを記録する。
+                    更新ID・作品・更新前後の状態・根拠の採否／変更・確定時刻
+                  </td>
+                  <td>
+                    どの状態を次の制作の出発点にしたかを保持する。案の生成や候補上の手修正だけでは更新しない
                   </td>
                 </tr>
                 <tr>
-                  <th scope="row">文章記録・振り返りの参照記録</th>
+                  <th scope="row">文章記録</th>
+                  <td>文章ID・対象・用途・本文・記入者／時刻・訂正元・根拠</td>
                   <td>
-                    理由・要約・制作意図は訂正履歴付き。分析が当時使った文章・採否・実体を固定する。
+                    変更理由と採用理由を別の対象へ結び付ける。未入力は本文なしとして扱い、後から追加できる
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">振り返りの参照記録</th>
+                  <td>
+                    参照記録ID・依頼／実行・対象作品／状態・採否／変更／文章・分析結果
+                  </td>
+                  <td>
+                    当時何を根拠に振り返ったかを固定する。後日の理由訂正で過去の分析根拠を書き換えない
                   </td>
                 </tr>
               </tbody>
@@ -175,10 +385,78 @@
           </div>
         </section>
         <section>
+          <h2>保存状態でたどる制作履歴</h2>
+          <p>
+            所属関係とは別に、保存状態を節点、変更記録を枝として制作の経緯をたどる。採否記録は実際に確認した状態を参照する。
+          </p>
+          <figure>
+            <div
+              class="diagram-scroll"
+              tabindex="0"
+              role="region"
+              aria-label="制作履歴の分岐例"
+            >
+              <svg
+                viewBox="0 0 820 245"
+                role="img"
+                aria-labelledby="hist-title hist-desc"
+              >
+                <title id="hist-title">未採用の案を修正して採用する例</title>
+                <desc id="hist-desc">
+                  保存状態Sから案Aと案Bに分岐。案Aから人間の手修正H、追加AI修正A2へ進み、A2を修正して採用して次の制作へ進む。採用前の現在状態はSのまま。案Bの記録も残る。
+                </desc>
+                <defs>
+                  <marker
+                    id="h-arrow"
+                    markerWidth="8"
+                    markerHeight="8"
+                    refX="7"
+                    refY="4"
+                    orient="auto"
+                  >
+                    <path d="M0 0L8 4L0 8Z" fill="#48716b"></path>
+                  </marker>
+                </defs>
+                <g class="history-lines">
+                  <path
+                    d="M112 88H180M112 88V187H180M282 88H330M432 88H480M582 88H650"
+                  ></path>
+                </g>
+                <g class="node">
+                  <rect x="10" y="60" width="102" height="56" rx="8"></rect>
+                  <text x="61" y="93">基準 S</text>
+                  <rect x="180" y="60" width="102" height="56" rx="8"></rect>
+                  <text x="231" y="93">AI案 A</text>
+                  <rect x="180" y="158" width="102" height="56" rx="8"></rect>
+                  <text x="231" y="191">別案 B</text>
+                  <rect x="330" y="60" width="102" height="56" rx="8"></rect>
+                  <text x="381" y="93">手修正 H</text>
+                  <rect x="480" y="60" width="102" height="56" rx="8"></rect>
+                  <text x="531" y="93">AI修正 A2</text>
+                </g>
+                <g class="node primary">
+                  <rect x="650" y="60" width="155" height="56" rx="8"></rect>
+                  <text x="727" y="93">次の制作へ</text>
+                </g>
+                <text class="edge-label" x="614" y="43">修正して採用</text>
+                <text class="sub note" x="420" y="192">
+                  採用前の現在状態は S のまま
+                </text>
+                <text class="sub note" x="420" y="217">
+                  別案・理由・指示原文も残す
+                </text>
+              </svg>
+            </div>
+            <figcaption>
+              矢印は変更の順序。所属関係図や自動マージの図ではない。採否は確認したA2の保存状態を参照する。
+            </figcaption>
+          </figure>
+        </section>
+        <section>
           <h2>制約と失敗時の扱い</h2>
           <ul class="rules">
             <li>
-              15概念を上の7群に整理している。物理的なテーブル分割を表すものではない。
+              確定済みの保存状態を上書きせず、理由・要約の訂正も新しい文章記録として残す。
             </li>
             <li>
               案の完成・候補上の修正だけで現在状態を更新しない。未選択と不採用は別。
@@ -195,7 +473,7 @@
               href="https://github.com/Kurarowa305/scene-craft/issues/5"
               target="_blank"
               rel="noopener noreferrer"
-              >設計Issue：作品と制作履歴</a
+              >設計Issue：データモデル</a
             >
           </p>
           <p>
