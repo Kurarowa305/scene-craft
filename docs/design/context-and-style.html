@@ -1,20 +1,21 @@
 <!doctype html>
+
 <html lang="ja">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta content="width=device-width,initial-scale=1" name="viewport" />
     <meta
-      name="description"
       content="scene-craftで作る機能・構成・制作の流れをまとめた設計資料。"
+      name="description"
     />
     <title>文脈・作風・制作方針 | scene-craft 設計</title>
-    <link rel="stylesheet" href="portal.css" />
+    <link href="portal.css" rel="stylesheet" />
   </head>
   <body>
     <a class="skip" href="#main">本文へ移動</a>
     <header class="top">
       <a class="brand" href="index.html"
-        ><span class="mark" aria-hidden="true">sc</span> scene-craft
+        ><span aria-hidden="true" class="mark">sc</span> scene-craft
         <span class="brand-sub">/ DESIGN NOTES</span></a
       >
     </header>
@@ -35,7 +36,7 @@
           <p class="nav-label">残して活かす</p>
           <a href="artifact-storage.html">保存・復元・バックアップ</a
           ><a href="reference-and-assets.html">参考資料と素材</a
-          ><a href="context-and-style.html" aria-current="page"
+          ><a aria-current="page" href="context-and-style.html"
             >文脈・作風・制作方針</a
           ><a href="git-versioning.html">Gitの版固定と更新</a>
         </nav>
@@ -47,7 +48,6 @@
         <p class="intro">
           作品の制作意図を最優先に、採用状態・保護・作風を共有する。Codexの文脈圧縮と、scene-craftが残す根拠付き要約を分ける。
         </p>
-
         <figure>
           <ol class="flow">
             <li>対象作品の全履歴</li>
@@ -57,113 +57,245 @@
           </ol>
           <figcaption>主要な流れの要約。人間が工程と採否を選ぶ。</figcaption>
         </figure>
-        <section aria-labelledby="contracts">
-          <h2 id="contracts">主要な契約</h2>
+        <nav aria-label="このページの目次" class="page-toc">
+          <h2>このページの内容</h2>
+          <ol>
+            <li><a href="#責務">責務</a></li>
+            <li><a href="#共有情報と制作意図">共有情報と制作意図</a></li>
+            <li><a href="#実行に渡す文脈">実行に渡す文脈</a></li>
+            <li><a href="#要約の更新と原文">要約の更新と原文</a></li>
+            <li><a href="#振り返りと根拠">振り返りと根拠</a></li>
+            <li>
+              <a href="#作風の傾向から制作方針へ">作風の傾向から制作方針へ</a>
+            </li>
+            <li><a href="#会話履歴の取得">会話履歴の取得</a></li>
+          </ol>
+        </nav>
+        <section aria-labelledby="責務" class="spec-section">
+          <h2 id="責務">責務</h2>
+          <p>
+            Codex app-server
+            は同一threadの継続・再開と、モデルが扱う会話履歴の圧縮を担当する。<a
+              href="llm-connection.html"
+              >接続設計</a
+            >に従い、scene-craftで独自の圧縮ループを実装しない。
+          </p>
+          <p>
+            scene-craft
+            は原文・要約・制作履歴を保存し、作品の共有情報と依頼に関係する記録を実行へ渡す。別会話への引き継ぎ、振り返りの根拠、バックアップからの再開は、Codex内部の圧縮内容だけに依存させない。
+          </p>
           <div
+            aria-label="責務"
             class="table-scroll"
-            tabindex="0"
             role="region"
-            aria-label="主要な契約"
+            tabindex="0"
           >
-            <table>
+            <table class="spec-table">
               <thead>
                 <tr>
-                  <th scope="col">項目</th>
-                  <th scope="col">決めたこと・受け渡すもの</th>
+                  <th scope="col">処理</th>
+                  <th scope="col">担当と境界</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
-                  <th scope="row">会話の継続</th>
+                  <th scope="row">同じ会話の続行</th>
                   <td>
-                    同じthreadをCodexで継続し、圧縮もCodexに任せる。scene-craftは原文と根拠付き要約を独立保存。
+                    Codexの既存threadを継続・再開する。scene-craftの要約だけで毎回新規threadを作る方式にはしない
                   </td>
                 </tr>
                 <tr>
-                  <th scope="row">作品の共有情報</th>
+                  <th scope="row">モデル文脈の圧縮</th>
                   <td>
-                    制作意図・採用状態・保護・固定作風を作品単位で管理。人間の明示更新を原文へ結び付け、古い要約で巻き戻さない。
+                    Codexに任せる。scene-craftの依頼の完了・停止時に必ず圧縮が走るという前提は置かない
                   </td>
                 </tr>
                 <tr>
-                  <th scope="row">実行へ渡す文脈</th>
+                  <th scope="row">作品共有情報の取得</th>
                   <td>
-                    依頼・起点・意図・範囲・保護・許可・作風を固定。他会話の関連要約と必要な原文・画像を追加取得し、実参照を残す。
+                    scene-craftが最新の確定情報を取得し、実行に使った参照を固定する
                   </td>
                 </tr>
                 <tr>
-                  <th scope="row">要約の区切り</th>
+                  <th scope="row">保存用・他会話参照用の要約</th>
                   <td>
-                    完了・停止・確認待ちを区切りに追加発言を対象化。ただし停止後等は新たなLLM処理を起動せず未要約で保持。
+                    scene-craft側の処理。対象原文の参照を持ち、Codexの内部圧縮とは独立して保存する
                   </td>
                 </tr>
                 <tr>
-                  <th scope="row">振り返り</th>
+                  <th scope="row">根拠の追加取得</th>
                   <td>
-                    人間が一作品または作品集合を選ぶ。対象は各作品の全履歴。未取得・削除・欠落と、実際に観察した範囲を説明する。
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">制作方針への採用</th>
-                  <td>
-                    作風の傾向は仮説。人間が項目別に採用・編集・保留し、採用変更をGitへコミット。作品へ使う版の適用は別途選ぶ。
+                    許可された作品・対象範囲の要約・原文・履歴を必要に応じて取得し、参照を残す
                   </td>
                 </tr>
               </tbody>
             </table>
           </div>
+          <p>
+            app-serverの<code>thread/resume</code>と<code>thread/compact/start</code>は<a
+              href="https://learn.chatgpt.com/docs/app-server"
+              rel="noopener noreferrer"
+              target="_blank"
+              >公式OpenAI documentation</a
+            >に記載されている。公開される<code>contextCompaction</code>項目を、作品の根拠付き要約本文としてそのまま保存・再利用できる契約とは扱わない。既存の<a
+              href="https://github.com/Kurarowa305/scene-craft/blob/main/docs/research/codex-app-server-connection-validation.md"
+              rel="noopener noreferrer"
+              target="_blank"
+              >実接続検証</a
+            >では圧縮後の継続を確認したが、長期の制作履歴保持や別会話の共有は保証していない。
+          </p>
         </section>
-        <section>
-          <h2>制約と失敗時の扱い</h2>
-          <ul class="rules">
+        <section aria-labelledby="共有情報と制作意図" class="spec-section">
+          <h2 id="共有情報と制作意図">共有情報と制作意図</h2>
+          <ul>
             <li>
-              理由未入力を推測で埋めず、事実・人間の理由・AIの解釈を区別する。
+              制作意図、現在採用状態、採否と手修正、保護指定、固定した作風は作品単位を正とする。会話ごとのコピーやAIの要約で上書きしない。
             </li>
             <li>
-              後日の理由訂正で過去の分析根拠を変更しない。「根拠に更新あり」を示し、再分析は人間が起動する。
+              「夕景もいいかも」は検討中の案。「この作品は夕景に変更して」のような明示的な指示を共有する制作意図の更新根拠にできる。明示した更新に重ねて同じ確認を強制しない。
             </li>
             <li>
-              新規作品の作風は版を選択するか「なし」。前作や最新の版を自動適用しない。
+              更新時は指示原文と新しい文章記録を関連付け、訂正前の意図・記入者・時刻も維持する。単なる提案・仮説を人間が確定した意図へ変換しない。
             </li>
             <li>
-              対象が全履歴であることと、全画像・実体を観察済みであることを区別する。
+              制作方針より作品の制作意図を優先する。過去の傾向だけを理由に新しい依頼を拒まない。
+            </li>
+            <li>
+              「静かな夜景」の作品で「昼のように明るくして」と頼まれ、両立する調整か意図の変更か判断できない場合は確認する。制作意図の優先を、変更範囲や保護指定を越える許可にはしない。
             </li>
           </ul>
+        </section>
+        <section aria-labelledby="実行に渡す文脈" class="spec-section">
+          <h2 id="実行に渡す文脈">実行に渡す文脈</h2>
+          <ol>
+            <li>
+              対象作品、依頼原文、実際の起点となる保存状態、制作意図、保護指定と依頼限定許可、変更範囲、採用済み状態、固定した作風の参照を取得する。未選択・未入力・制作データ未作成は明示し、推測で埋めない。
+            </li>
+            <li>
+              同じ会話の継続はCodexのthreadを利用する。作品の最新情報はscene-craftの確定記録から補い、古い会話の記述を現在値と誤認させない。
+            </li>
+            <li>
+              同じ作品の他会話から依頼に関連する要約を選ぶ。必要な原文・採否・手修正・画像等を追加取得できるようにし、参照元を追跡可能にする。他作品の制作会話を無条件で混ぜない。
+            </li>
+            <li>
+              実行へ渡した文章・保存状態・採否・変更・ファイル・要約と、その要約の対象範囲を記録する。定義と作風はそれぞれのGit参照・使用内容を残す。追加取得も実行に関連付ける。
+            </li>
+          </ol>
+          <p>
+            待機依頼は<a href="execution-lifecycle.html">実行状態設計</a
+            >に従い開始直前に最新の共有情報を確認する。明示した候補の保存状態を最新採用状態へ差し替えない。前提が合わなくなれば確認する。実行の途中で更新された情報を過去の入力へ遡って反映しない。
+          </p>
+          <p>
+            必須情報を省いて実行可能に見せない。長い履歴は関連範囲を分けて取得し、要約に未反映の原文も参照対象にする。必須情報自体を扱えない場合は原因を示して停止し、必要な対処を求める。モデルの自動切替は行わない。
+          </p>
+        </section>
+        <section aria-labelledby="要約の更新と原文" class="spec-section">
+          <h2 id="要約の更新と原文">要約の更新と原文</h2>
+          <ul>
+            <li>
+              依頼の完了・停止・確認待ちを更新の区切りとし、追加された発言を要約する。要約は履歴の補助であり、制作操作の成功・採用・停止を確定する根拠にはしない。
+            </li>
+            <li>
+              要約は対象メッセージID／範囲、作成者・時刻、根拠の参照を持つ。訂正時は新しい文章記録を作り、訂正元を残す。原文を置換・削除しない。
+            </li>
+            <li>
+              次の実行では最新の共有情報、利用可能な要約、要約に未反映の原文を区別する。古い要約の作成後に確定した採否・意図・保護指定を要約で巻き戻さない。
+            </li>
+            <li>
+              要約失敗や中断時も原文・依頼・途中結果を保存する。未要約の範囲と失敗を示す。受信途中・欠落は完全な原文と区別する。
+            </li>
+            <li>
+              要約処理のLLM呼び出しにも既存の認証・利用上限・停止契約を適用する。人間の停止後に新しい要約処理を勝手に起動せず、未要約として残せる。要約の具体的な工程契約はエージェント設計へ渡す。
+            </li>
+          </ul>
+        </section>
+        <section aria-labelledby="振り返りと根拠" class="spec-section">
+          <h2 id="振り返りと根拠">振り返りと根拠</h2>
+          <p>
+            人間が一作品または複数作品を選んで起動する。複数作品の場合は専用会話として対象作品集合を保持する。対象範囲は各対象作品の全履歴とし、採用状態・保存状態で絞らない。開始画面に履歴範囲の選択項目を設けない。全履歴を対象とすることと、実際に分析で取得・観察できた範囲の説明を区別する。
+          </p>
+          <ul>
+            <li>
+              完成・採用された結果に加え、不採用案と手修正の比較も使う。未選択の案を不採用と解釈しない。
+            </li>
+            <li>
+              実際に参照した作品・保存状態・採否・変更・文章・ファイルを<a
+                href="domain-data-model.html"
+                >振り返りの参照記録</a
+              >へ固定する。参照対象と分析できた範囲を示す。
+            </li>
+            <li>
+              結論には具体的な根拠を付ける。記録された事実、人間が明示した理由、AIによる解釈・仮説を区別する。理由未入力を人間の意図として補わない。
+            </li>
+            <li>
+              画像や制作実体が削除・欠落していれば、その実体を観察したと主張しない。残る文章・プレビュー等で分析した範囲と限界を示す。
+            </li>
+            <li>
+              後日理由が補記・訂正されても過去の分析と根拠は上書きしない。根拠の文章記録等に更新があれば「根拠に更新あり」と示し、人間が起動した再分析で新しい記録を参照する。
+            </li>
+          </ul>
+        </section>
+        <section
+          aria-labelledby="作風の傾向から制作方針へ"
+          class="spec-section"
+        >
+          <h2 id="作風の傾向から制作方針へ">作風の傾向から制作方針へ</h2>
+          <p>
+            振り返り結果には作風の傾向を仮説として示す。人間は項目ごとに採用・編集・保留を選べる。「暖色が多い」という観察を「主役を暖色で際立たせる」という方針へ編集できる。観察された頻度を必須ルールへ自動変換しない。
+          </p>
+          <p>
+            元の仮説・根拠、人間が編集・採用した内容と判断を追跡可能にする。保留した仮説と採用済みの制作方針を同じ扱いにしない。理由がなければ未入力とする。
+          </p>
+          <p>
+            採用した変更をGitへコミットし、作品への適用は別に選ぶ。通常制作では選択した版の採用済み制作方針を使い、未確認の作風の傾向は振り返り・方針の検討時に参照する。
+          </p>
+          <p>
+            新しい作品は作風の版を選ぶか、作風なしで始める。前作の版は候補として提示できるが自動適用しない。派生開始時も参照元と派生先の選択を区別する。
+          </p>
+          <p>
+            作品の版更新は<a href="git-versioning.html">Git版管理設計</a
+            >に従い、旧・新参照、選択者・時刻・理由を保持する。定義と作風で異なるコミットを使える。待機中に作風が変わった場合は開始前に旧版継続／新版切替を確認し、自動再実行では版を維持する。コミット失敗・非互換・欠損を、採用・適用完了として扱わない。
+          </p>
+        </section>
+        <section aria-labelledby="会話履歴の取得" class="spec-section">
+          <h2 id="会話履歴の取得">会話履歴の取得</h2>
+          <p>
+            paginated履歴はページングで取得する。Codexの要約itemを完全な原文として保存しない。保存済み原文を正とし、実行・分析で使った参照の固定と、制作意図・方針の明示更新を維持する。
+          </p>
         </section>
         <section class="sources">
           <h2>詳細資料</h2>
           <p>
             <a
               href="https://github.com/Kurarowa305/scene-craft/issues/10"
-              target="_blank"
               rel="noopener noreferrer"
+              target="_blank"
               >設計Issue：文脈・作風・制作方針</a
             >
           </p>
           <p>
             <a
               href="https://github.com/Kurarowa305/scene-craft/blob/main/docs/design/context-and-style.md"
-              target="_blank"
               rel="noopener noreferrer"
+              target="_blank"
               >現在の詳細設計（Markdown） →</a
             >
           </p>
         </section>
-
         <footer>
           <p>scene-craft · 設計ポータル</p>
           <p>
             <a
               href="https://github.com/Kurarowa305/scene-craft/blob/main/docs/requirements/initial-scope.md"
-              target="_blank"
               rel="noopener noreferrer"
+              target="_blank"
               >要件</a
             >
             ·
             <a
               href="https://github.com/Kurarowa305/scene-craft/blob/main/GLOSSARY.md"
-              target="_blank"
               rel="noopener noreferrer"
+              target="_blank"
               >用語集</a
             >
           </p>
