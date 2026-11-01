@@ -1,20 +1,21 @@
 <!doctype html>
+
 <html lang="ja">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta content="width=device-width,initial-scale=1" name="viewport" />
     <meta
-      name="description"
       content="scene-craftで作る機能・構成・制作の流れをまとめた設計資料。"
+      name="description"
     />
     <title>参考資料と素材 | scene-craft 設計</title>
-    <link rel="stylesheet" href="portal.css" />
+    <link href="portal.css" rel="stylesheet" />
   </head>
   <body>
     <a class="skip" href="#main">本文へ移動</a>
     <header class="top">
       <a class="brand" href="index.html"
-        ><span class="mark" aria-hidden="true">sc</span> scene-craft
+        ><span aria-hidden="true" class="mark">sc</span> scene-craft
         <span class="brand-sub">/ DESIGN NOTES</span></a
       >
     </header>
@@ -34,7 +35,7 @@
           ><a href="blender-integration.html">Blender連携とレンダー出力</a>
           <p class="nav-label">残して活かす</p>
           <a href="artifact-storage.html">保存・復元・バックアップ</a
-          ><a href="reference-and-assets.html" aria-current="page"
+          ><a aria-current="page" href="reference-and-assets.html"
             >参考資料と素材</a
           ><a href="context-and-style.html">文脈・作風・制作方針</a
           ><a href="git-versioning.html">Gitの版固定と更新</a>
@@ -48,7 +49,6 @@
           参考資料は表現や構造の根拠、素材は制作へ取り込むデータ。一般Web・指定フォルダー・Poly
           Haven・ambientCGを使い、人間の選択と取得実体を結び付ける。
         </p>
-
         <figure>
           <ol class="flow">
             <li>検索し候補を提示</li>
@@ -58,126 +58,466 @@
           </ol>
           <figcaption>主要な流れの要約。人間が工程と採否を選ぶ。</figcaption>
         </figure>
-        <section aria-labelledby="contracts">
-          <h2 id="contracts">主要な契約</h2>
+        <nav aria-label="このページの目次" class="page-toc">
+          <h2>このページの内容</h2>
+          <ol>
+            <li><a href="#対象と選定理由">対象と選定理由</a></li>
+            <li>
+              <a href="#検索候補人間の選択">検索・候補・人間の選択</a>
+              <ul>
+                <li>
+                  <a href="#候補と実際の取り込みに残す情報">
+                    候補と実際の取り込みに残す情報
+                  </a>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <a href="#プレビューと参考画像の保存"
+                >プレビューと参考画像の保存</a
+              >
+            </li>
+            <li>
+              <a href="#取得blenderへの取り込み">取得・Blenderへの取り込み</a>
+              <ul>
+                <li><a href="#対応形式と品質">対応形式と品質</a></li>
+                <li><a href="#手順と完成の境界">手順と完成の境界</a></li>
+              </ul>
+            </li>
+            <li><a href="#失敗不足停止">失敗・不足・停止</a></li>
+            <li>
+              <a href="#サービスの提供条件と確認範囲"
+                >サービスの提供条件と確認範囲</a
+              >
+            </li>
+            <li><a href="#検索と制作操作の境界">検索と制作操作の境界</a></li>
+          </ol>
+        </nav>
+        <section aria-labelledby="対象と選定理由" class="spec-section">
+          <h2 id="対象と選定理由">対象と選定理由</h2>
+          <p>
+            参考資料は表現・構造等を検討する根拠、素材は制作データへ取り込んで使うデータとする。同じ画像が両方の役割を持つ場合も、参考として選ぶ判断と制作データへの取り込みを区別する。検索したことだけでは採用にしない。
+          </p>
           <div
+            aria-label="対象と選定理由"
             class="table-scroll"
-            tabindex="0"
             role="region"
-            aria-label="主要な契約"
+            tabindex="0"
           >
-            <table>
+            <table class="spec-table">
               <thead>
                 <tr>
-                  <th scope="col">項目</th>
-                  <th scope="col">決めたこと・受け渡すもの</th>
+                  <th scope="col">対象</th>
+                  <th scope="col">初期の扱いと理由</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
-                  <th scope="row">候補に残す情報</th>
+                  <th scope="row">参考調査</th>
                   <td>
-                    名前・作者・出典・素材ID・利用条件の根拠と確認日、プレビュー、参考要素と制作意図との関係。不明は不明と記録。
+                    一般Web検索で写真・建築資料・作品等を調べる。特定の素材サービスに限定せず、出典・参考にする要素・制作意図との関係を残す
                   </td>
                 </tr>
                 <tr>
-                  <th scope="row">検索先</th>
+                  <th scope="row">Poly Haven</th>
                   <td>
-                    一般Webで参考調査。素材はPoly
-                    Haven・ambientCGの無料公開素材と、人間が指定した手元フォルダー。購入手続きは初期対象外。
+                    外部素材の検索・取得先として採用。HDRI・テクスチャ・3Dモデルを扱い、公式APIとCC0の素材を利用できる
                   </td>
                 </tr>
                 <tr>
-                  <th scope="row">3Dの対応形式</th>
+                  <th scope="row">ambientCG</th>
                   <td>
-                    blend、glTF/GLB、FBX、OBJ。必要なテクスチャ・リンクも収集し、追加アドオンや読めない内容は保留する。
+                    外部素材の検索・取得先として採用。材質等の候補を補い、公式APIとCC0の素材を利用できる
                   </td>
                 </tr>
                 <tr>
-                  <th scope="row">画像と品質</th>
+                  <th scope="row">手元の素材ライブラリ</th>
                   <td>
-                    PNG/JPEG、EXR/HDR。テクスチャ2K・HDRI4Kが既定。取得前に形式・解像度・容量を提示し、実際の品質を固定。
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">取得と取り込み</th>
-                  <td>
-                    利用条件・人間の選択・実体ハッシュ・依存一覧を保持。Blenderの入力コピーへ取り込み、保存・再読込検証済みの編集案として提示。
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">提供条件</th>
-                  <td>
-                    Poly
-                    HavenのAPI出典表示と識別ヘッダー、ambientCGの文書化APIを使う。素材のCC0とAPIの条件、一般Webの保存条件を区別する。
+                    人間が指定したフォルダー内を検索する。外部ライブラリの元データは変更せず、選んだ素材と依存素材を管理下へコピーする
                   </td>
                 </tr>
               </tbody>
             </table>
           </div>
+          <p>
+            外部の自動検索・取得は無料で公開されている素材を対象とする。購入済みの有料素材は手元のライブラリから取り込み、その利用条件を残す。有料素材の購入手続き支援、支援者向け限定素材、他の素材サービスへの専用接続は初期範囲に含めない。一般Web上の参考資料に、素材サービスのCC0条件を当てはめない。
+          </p>
         </section>
-        <section>
-          <h2>制約と失敗時の扱い</h2>
-          <ul class="rules">
+        <section aria-labelledby="検索候補人間の選択" class="spec-section">
+          <h2 id="検索候補人間の選択">検索・候補・人間の選択</h2>
+          <ol>
             <li>
-              利用条件不明は取り込み保留。一般Web画像は保存できる根拠を確認できたものだけ保持し、未保持ならURLと記録を残す。
+              依頼の目的と作品の制作意図を基に参考資料・素材を探す。手元の検索対象は指定したフォルダーに限定する。依存素材の収集で指定範囲外の参照が見つかった場合は、保存設計に従って実際の参照先と取り込み可否を確認する。
             </li>
             <li>
-              指定品質がなければ候補を示して確認。別素材・解像度・サービスへ黙って差し替えない。
+              メインチャットで候補と情報を提示する。プレビューは<a
+                href="user-interface.html"
+                >画面設計</a
+              >の成果物リンク・右側タブの導線を使い、専用の採否ボタンや別の採用画面は追加しない。
             </li>
             <li>
-              取得完了・編集案完成・採用は別。人間が案を採用するまで現在状態を切り替えない。
+              人間が参考資料または素材を会話で選ぶ。対象や使い方が曖昧なら具体化し、選択済みの同じ内容を再度確認しない。採用理由は任意であり、AIが人間の理由を補作しない。
             </li>
             <li>
-              検索失敗と結果なし、プレビュー欠落と実体欠落、既知不足と破損を区別する。
+              選んだ参考資料は、その出典・参考要素・制作意図との関係とともに次の工程へ渡す。参考資料から確定できない構造等は仮説として提示し、人間が採用するまで確定した制作条件にしない。
+            </li>
+            <li>
+              選んだ素材は、下記の取得・取り込み手順へ進める。選ばなかった候補も検索結果・会話の記録として残せるが、採用済みの制作条件として次の工程へ渡さない。
+            </li>
+          </ol>
+          <h3 id="候補と実際の取り込みに残す情報">
+            候補と実際の取り込みに残す情報
+          </h3>
+          <div
+            aria-label="候補と実際の取り込みに残す情報"
+            class="table-scroll"
+            role="region"
+            tabindex="0"
+          >
+            <table class="spec-table">
+              <thead>
+                <tr>
+                  <th scope="col">段階</th>
+                  <th scope="col">記録する内容</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">検索</th>
+                  <td>
+                    作品・会話・依頼・実行への参照、検索語・対象サービスまたは指定フォルダー、検索時刻、結果と取得失敗の区別
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">候補共通</th>
+                  <td>
+                    候補を識別する参照、名前、出典URLまたは元の所在、サービスの素材ID（ある場合）、作者、プレビューまたは欠けている理由、利用条件・根拠のURLまたは文書参照・確認日、参考にする要素と制作意図との関係
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">素材候補</th>
+                  <td>
+                    提供される形式・解像度・容量、品質やモデルの違い、既知の依存素材・必要なアドオン等。未取得の詳細は未確認とする
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">人間の選択</th>
+                  <td>
+                    対象候補、参考としての選択／素材取り込みの指示の区別、指示原文・人間・時刻への参照、理由（入力された場合）
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">取得・取り込み</th>
+                  <td>
+                    実際の取得元・時刻・形式・解像度・品質、利用条件の確認根拠、人間の補足、元ファイルと管理下ファイルの対応、サイズ・ハッシュ・依存一覧、検証結果、編集案・保存状態・実行への参照
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>
+            作者・容量等が分からない場合は不明と記録する。利用条件が不明な場合は、他の項目が揃っていても取り込みを保留する。候補の表示名や同じURLだけで内容の同一性を保証せず、取得した実体と依存素材をハッシュで固定する。
+          </p>
+          <p>
+            これらは<a href="domain-data-model.html">データモデル</a
+            >の原文メッセージ・文章記録・ファイル参照・編集案・保存状態等に結び付ける情報であり、外部素材をAIが作成した生成物として扱わない。検索・参考資料の選択だけで制作データの保存状態を増やす必要はない。具体的なテーブル分割は実装仕様へ引き継ぐ。
+          </p>
+        </section>
+        <section
+          aria-labelledby="プレビューと参考画像の保存"
+          class="spec-section"
+        >
+          <h2 id="プレビューと参考画像の保存">プレビューと参考画像の保存</h2>
+          <ul>
+            <li>
+              プレビューの出典と、制作へ取り込むファイルの出典・利用条件を区別する。元のサービスの見本画像を、Blenderへ取り込んだ結果のプレビューとして表示しない。
+            </li>
+            <li>
+              一般Webの参考画像は、保存できる条件を確認できたものを管理下へコピーする。保存可否が不明なら出典URL・参考にする要素・制作意図との関係を残し、画像を保持できていないと表示する。
+            </li>
+            <li>
+              リンク切れや画像の欠落が起きても文章と当時の選択の記録は残す。別の画像を当時の参考資料として自動で差し替えない。
+            </li>
+            <li>
+              参考画像の保存を認められることと、テクスチャ等の制作素材として利用できることを同一視しない。役割を変えて取り込む際は素材としての利用条件を確認する。
             </li>
           </ul>
+        </section>
+        <section aria-labelledby="取得blenderへの取り込み" class="spec-section">
+          <h2 id="取得blenderへの取り込み">取得・Blenderへの取り込み</h2>
+          <h3 id="対応形式と品質">対応形式と品質</h3>
+          <div
+            aria-label="対応形式と品質"
+            class="table-scroll"
+            role="region"
+            tabindex="0"
+          >
+            <table class="spec-table">
+              <thead>
+                <tr>
+                  <th scope="col">種別</th>
+                  <th scope="col">初期の対象と契約</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">3D</th>
+                  <td>
+                    <code>.blend</code
+                    >、glTF/GLB、FBX、OBJ。必要な外部ファイル・テクスチャも収集する。モデルの品質違いを明示し、軽量化や品質変更は黙って行わない
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">画像</th>
+                  <td>
+                    PNG/JPEG、EXR/HDR。用途に応じて材質・照明等へ接続し、対象や変更範囲を記録する
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">取得品質</th>
+                  <td>
+                    テクスチャは2K、HDRIは4Kを既定とする。取得前に形式・解像度・容量を提示し、会話で変更できる。実際に選んだ品質を保存する
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>
+            既定の品質が提供されていない場合も、別の解像度やモデルに自動で切り替えず、選べるものを示す。ZIP等は配布用の包みとして必要な内容を展開・検証するものであり、任意の内部形式を対応済みと扱わない。拡張子が対象でも、追加アドオンが必要な素材や読めない内容は保留し、原因を示す。対応形式の設計上の採用と、現在のWindows
+            Blenderでの検証済みを区別する。
+          </p>
+          <h3 id="手順と完成の境界">手順と完成の境界</h3>
+          <ol>
+            <li>
+              人間が選んだ素材、利用条件、形式・品質、制作への使い方と変更範囲を固定する。配置・UV・材質変更等の必要条件が未指定なら具体化する。素材選択を保護指定の解除許可として扱わない。
+            </li>
+            <li>
+              選んだ素材を取得する。手元の場合は元のファイルを読み取り、外部の場合は選んだサービスのファイルを取得する。取得途中と検証済みの実体を分け、途中のファイルを取り込み完了にしない。
+            </li>
+            <li>
+              <a href="artifact-storage.html#依存素材の取り込み">保存設計</a
+              >へ、元の所在、利用条件の記録、取得した実体、依存一覧と既知の不足を渡す。保存側は依存先を再帰的に収集し、循環・実参照先・コピー中の変更を確認する。管理下へコピーしてサイズ・ハッシュ・参照先を検証し、元データは変更しない。
+            </li>
+            <li>
+              <a href="blender-integration.html">Blender連携設計</a
+              >に従い、固定した起点の作業用コピーへ取り込み、管理下の依存素材を参照する編集可能な結果を作る。利用した素材とBlender内の対象との対応、単位・大きさ・向きや材質等の適用内容を実行結果に残す。操作のために起点の確定実体を上書きしない。
+            </li>
+            <li>
+              保存・再読み取り・必須依存の確認を終えた結果を編集案と新しい保存状態として提示する。素材の取得完了と、Blenderの編集案完成を区別する。
+            </li>
+            <li>
+              人間が実際の結果を採用したときに<a href="edit-candidates.html"
+                >編集案の採用契約</a
+              >で現在状態へ反映する。選択しただけ、取得できただけ、未採用の案を作れただけでは現在状態を切り替えない。
+            </li>
+          </ol>
+          <p>
+            取得後の素材・条件の記録は、その実行が何を使ったかを示す根拠として残す。同じ出典から後日取り直した内容や、人間が補足・訂正した条件は、以前の実行で確認した内容に上書きしない。再取得で内容が異なり、人間が選んだ前提・品質・デザインが変わる場合は確認し直す。
+          </p>
+        </section>
+        <section aria-labelledby="失敗不足停止" class="spec-section">
+          <h2 id="失敗不足停止">失敗・不足・停止</h2>
+          <div
+            aria-label="失敗・不足・停止"
+            class="table-scroll"
+            role="region"
+            tabindex="0"
+          >
+            <table class="spec-table">
+              <thead>
+                <tr>
+                  <th scope="col">状況</th>
+                  <th scope="col">扱い</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">検索サービスが利用不可・応答失敗</th>
+                  <td>
+                    検索失敗と検索結果なしを区別し、取得済みの候補と出典を残す。手元の候補は確認できる。選択済みの素材を別サービスや別素材へ黙って差し替えない
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">ダウンロード失敗・容量不足・破損</th>
+                  <td>
+                    失敗した取得先・形式・品質と原因、検証済みの途中成果を記録する。素材取得・編集案作成を成功として返さない
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">利用条件不明</th>
+                  <td>
+                    候補の記録は残せるが取り込みは保留。手元の購入済み素材も同様とし、人間が購入時の規約や利用許諾を補足した後に進める。AIが推測して許諾済みにしない
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">保存できない素材・不足する依存</th>
+                  <td>
+                    対象・理由・必要な操作を保存側へ渡す。不足一覧を持つ保存状態は残せるが、完全復元可能としない。その依存が必要な取り込み・制作操作は開始しない
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">未対応形式・追加アドオンが必要</th>
+                  <td>
+                    原因を示して保留する。別素材・別品質の採用や新たな実行環境の導入へ自動で進まない
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">プレビューだけ取得できない</th>
+                  <td>
+                    候補に画像がない理由を示す。実体の取得状況とは分け、以前の画像を今回の結果として表示しない
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">停止・アプリ再起動・結果不明</th>
+                  <td>
+                    <a href="execution-lifecycle.html">実行状態設計</a
+                    >に従い、新規操作の開始を止め、検証済み実体・外部実行・保存記録を照合する。手動停止や再起動だけで自動再開しない
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>
+            取得・Blender操作のやり直しに、工程名の変更や別の子処理で再実行予算を迂回する経路を作らない。依頼全体の最大2回、同じ試行の通信再送と制作操作のやり直しの区別は実行状態設計を引き継ぐ。取り込み前の素材・利用条件が揃うまで制作操作を始めず、検証済みの同一素材を再利用できる場合も同一性を照合する。
+          </p>
+        </section>
+        <section
+          aria-labelledby="サービスの提供条件と確認範囲"
+          class="spec-section"
+        >
+          <h2 id="サービスの提供条件と確認範囲">
+            サービスの提供条件と確認範囲
+          </h2>
+          <p>
+            APIの利用条件と素材の利用条件は分けて記録する。提供条件は2026-10-31の公式資料を根拠とする。
+          </p>
+          <div
+            aria-label="サービスの提供条件と確認範囲"
+            class="table-scroll"
+            role="region"
+            tabindex="0"
+          >
+            <table class="spec-table">
+              <thead>
+                <tr>
+                  <th scope="col">サービス</th>
+                  <th scope="col">公式資料で確認したこと・制限</th>
+                  <th scope="col">根拠</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">Poly Haven</th>
+                  <td>
+                    APIは商用を含め無料。素材はCC0。live
+                    API利用時はサービス名が分かる出典表示と、ソフト名に対応するRefererまたはUser-Agentが必要。可用性保証はなく、サービスを劣化させる利用は禁止。数値による呼出上限は今回の資料では確認できない
+                  </td>
+                  <td>
+                    <a
+                      href="https://polyhaven.com/our-api"
+                      rel="noopener noreferrer"
+                      target="_blank"
+                      >API案内</a
+                    >、<a
+                      href="https://github.com/Poly-Haven/Public-API/blob/master/ToS.md"
+                      rel="noopener noreferrer"
+                      target="_blank"
+                      >API利用条件</a
+                    >、<a
+                      href="https://polyhaven.com/license"
+                      rel="noopener noreferrer"
+                      target="_blank"
+                      >素材ライセンス</a
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">ambientCG</th>
+                  <td>
+                    コードからの検索・取得とv3のassets
+                    APIを文書化。素材ファイルと素材プレビューはCC0。支援者特典用のトークンは初期対象外。運営側がAPIの信頼性・安定性の限界を明記。数値による呼出上限は今回の資料では確認できない
+                  </td>
+                  <td>
+                    <a
+                      href="https://docs.ambientcg.com/api/"
+                      rel="noopener noreferrer"
+                      target="_blank"
+                      >API概要</a
+                    >、<a
+                      href="https://docs.ambientcg.com/api/v3/"
+                      rel="noopener noreferrer"
+                      target="_blank"
+                      >v3</a
+                    >、<a
+                      href="https://docs.ambientcg.com/api/v3/assets/"
+                      rel="noopener noreferrer"
+                      target="_blank"
+                      >assets</a
+                    >、<a
+                      href="https://docs.ambientcg.com/license/"
+                      rel="noopener noreferrer"
+                      target="_blank"
+                      >素材ライセンス</a
+                    >
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>
+            Poly
+            Havenの出典表示は候補に添えるサービス名と出典リンクで満たす構成にする。素材自体のCC0にはない条件を、完成作品へのクレジット義務として追加しない。無制限の連続取得や可用性を前提にせず、取得済みの固定実体を保存して再利用する。提供条件が変わり選んだ素材・取得方法を維持できない場合は、原因を示して人間に確認する。
+          </p>
+        </section>
+        <section aria-labelledby="検索と制作操作の境界" class="spec-section">
+          <h2 id="検索と制作操作の境界">検索と制作操作の境界</h2>
+          <p>
+            一般Web検索・画像参照・ツール呼び出しと、scene-craftによる出典・利用条件の記録・サービス別取得・管理下コピー・Blender取り込みを区別する。具体的なAPIページング・キャッシュ・アクセス間隔・ファイル選択規則は、採用した条件と利用者の選択を維持する形で定める。
+          </p>
         </section>
         <section class="sources">
           <h2>詳細資料</h2>
           <p>
             <a
               href="https://github.com/Kurarowa305/scene-craft/issues/13"
-              target="_blank"
               rel="noopener noreferrer"
+              target="_blank"
               >設計Issue：参考資料と素材</a
             >
           </p>
           <p>
             <a
               href="https://github.com/Kurarowa305/scene-craft/blob/main/docs/design/reference-and-assets.md"
-              target="_blank"
               rel="noopener noreferrer"
+              target="_blank"
               >現在の詳細設計（Markdown） →</a
             >
           </p>
-
           <ul>
             <li>
               <a
                 href="https://github.com/Kurarowa305/scene-craft/issues/13"
-                target="_blank"
                 rel="noopener noreferrer"
+                target="_blank"
                 >素材サービスの詳細・合意</a
               >
             </li>
           </ul>
         </section>
-
         <footer>
           <p>scene-craft · 設計ポータル</p>
           <p>
             <a
               href="https://github.com/Kurarowa305/scene-craft/blob/main/docs/requirements/initial-scope.md"
-              target="_blank"
               rel="noopener noreferrer"
+              target="_blank"
               >要件</a
             >
             ·
             <a
               href="https://github.com/Kurarowa305/scene-craft/blob/main/GLOSSARY.md"
-              target="_blank"
               rel="noopener noreferrer"
+              target="_blank"
               >用語集</a
             >
           </p>
