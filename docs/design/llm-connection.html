@@ -25,7 +25,7 @@
           <p class="nav-label">全体を知る</p>
           <a href="application-architecture.html">全体構成とOSの責務</a
           ><a href="user-interface.html">画面と制作の導線</a
-          ><a href="domain-data-model.html">作品と制作履歴</a>
+          ><a href="domain-data-model.html">データモデル</a>
           <p class="nav-label">制作を進める</p>
           <a href="llm-connection.html" aria-current="page">LLM接続と費用</a
           ><a href="agent-contracts.html">工程別エージェントとツール</a
@@ -57,6 +57,205 @@
           </ol>
           <figcaption>主要な流れの要約。人間が工程と採否を選ぶ。</figcaption>
         </figure>
+        <section aria-labelledby="data-mapping">
+          <h2 id="data-mapping">保持するデータとその紐付け</h2>
+          <p>
+            Codexは会話の継続とモデル処理を管理し、scene-craftは独自IDで原文・依頼・制作記録を保持する。接続対応記録で両者のIDを結び、結果を照合する。
+          </p>
+          <figure>
+            <div
+              class="diagram-scroll"
+              tabindex="0"
+              role="region"
+              aria-label="保持するデータと接続対応"
+            >
+              <svg
+                viewBox="0 0 860 685"
+                role="img"
+                aria-labelledby="mapping-title mapping-desc"
+              >
+                <title id="mapping-title">保持するデータと接続対応</title>
+                <desc id="mapping-desc">
+                  実線は各システム内の履歴構造・所属、点線はIDによる照合を表す。会話↔thread、AI実行↔turn、原文↔発言item、外部操作の実行↔ツールitemを対応付ける。共有データや一対一の関係を意味しない。
+                </desc>
+                <defs>
+                  <marker
+                    id="mapping-arrow"
+                    markerWidth="8"
+                    markerHeight="8"
+                    refX="7"
+                    refY="4"
+                    orient="auto"
+                  >
+                    <path d="M0 0L8 4L0 8Z" fill="#48716b" />
+                  </marker>
+                </defs>
+                <rect
+                  class="zone wsl"
+                  x="15"
+                  y="15"
+                  width="335"
+                  height="650"
+                  rx="10"
+                />
+                <rect
+                  class="zone"
+                  x="510"
+                  y="15"
+                  width="335"
+                  height="650"
+                  rx="10"
+                />
+                <text class="zone-title" x="35" y="48">
+                  scene-craft / SQLite
+                </text>
+                <text class="zone-title" x="530" y="48">Codex app-server</text>
+                <path
+                  d="M85 180V148"
+                  fill="none"
+                  stroke="#48716b"
+                  stroke-width="1.5"
+                  marker-end="url(#mapping-arrow)"
+                />
+                <path
+                  d="M175 289H330V160H185V148"
+                  fill="none"
+                  stroke="#48716b"
+                  stroke-width="1.5"
+                  marker-end="url(#mapping-arrow)"
+                />
+                <path
+                  d="M35 409H25V209H35"
+                  fill="none"
+                  stroke="#48716b"
+                  stroke-width="1.5"
+                  marker-end="url(#mapping-arrow)"
+                />
+                <path
+                  d="M315 509H340V209H175"
+                  fill="none"
+                  stroke="#48716b"
+                  stroke-width="1.5"
+                  marker-end="url(#mapping-arrow)"
+                />
+                <path
+                  d="M805 119H825V409H805"
+                  fill="none"
+                  stroke="#48716b"
+                  stroke-width="1.5"
+                  marker-end="url(#mapping-arrow)"
+                />
+                <path
+                  d="M760 380V318"
+                  fill="none"
+                  stroke="#48716b"
+                  stroke-width="1.5"
+                  marker-end="url(#mapping-arrow)"
+                />
+                <path
+                  d="M805 129H835V594H805"
+                  fill="none"
+                  stroke="#48716b"
+                  stroke-width="1.5"
+                  marker-end="url(#mapping-arrow)"
+                />
+                <path
+                  d="M315 119H545"
+                  fill="none"
+                  stroke="#48716b"
+                  stroke-width="1.5"
+                  marker-end="url(#mapping-arrow)"
+                  stroke-dasharray="5 5"
+                />
+                <path
+                  d="M175 289H545"
+                  fill="none"
+                  stroke="#48716b"
+                  stroke-width="1.5"
+                  marker-end="url(#mapping-arrow)"
+                  stroke-dasharray="5 5"
+                />
+                <path
+                  d="M175 409H545"
+                  fill="none"
+                  stroke="#48716b"
+                  stroke-width="1.5"
+                  marker-end="url(#mapping-arrow)"
+                  stroke-dasharray="5 5"
+                />
+                <path
+                  d="M175 419H470V318H545"
+                  fill="none"
+                  stroke="#48716b"
+                  stroke-width="1.5"
+                  marker-end="url(#mapping-arrow)"
+                  stroke-dasharray="5 5"
+                />
+                <g class="node">
+                  <rect x="35" y="90" width="280" height="58" rx="8" />
+                  <text x="175.0" y="115">会話</text>
+                  <text class="sub" x="175.0" y="136">
+                    作品・対象集合・モデル選択
+                  </text>
+                </g>
+                <g class="node">
+                  <rect x="35" y="180" width="140" height="58" rx="8" />
+                  <text x="105.0" y="215">依頼</text>
+                </g>
+                <g class="node">
+                  <rect x="35" y="260" width="140" height="58" rx="8" />
+                  <text x="105.0" y="295">原文メッセージ</text>
+                </g>
+                <g class="node">
+                  <rect x="35" y="380" width="140" height="58" rx="8" />
+                  <text x="105.0" y="415">実行</text>
+                </g>
+                <g class="node">
+                  <rect x="35" y="480" width="280" height="58" rx="8" />
+                  <text x="175.0" y="515">再実行の記録</text>
+                </g>
+                <g class="node">
+                  <rect x="545" y="90" width="260" height="58" rx="8" />
+                  <text x="675.0" y="115">thread</text>
+                  <text class="sub" x="675.0" y="136">会話履歴・継続設定</text>
+                </g>
+                <g class="node">
+                  <rect x="545" y="260" width="260" height="58" rx="8" />
+                  <text x="675.0" y="285">item</text>
+                  <text class="sub" x="675.0" y="306">
+                    発言・ツール要求／結果・圧縮項目
+                  </text>
+                </g>
+                <g class="node">
+                  <rect x="545" y="380" width="260" height="58" rx="8" />
+                  <text x="675.0" y="405">turn</text>
+                  <text class="sub" x="675.0" y="426">
+                    モデル処理とその状態
+                  </text>
+                </g>
+                <g class="node">
+                  <rect x="545" y="565" width="260" height="58" rx="8" />
+                  <text x="675.0" y="590">モデル用の文脈</text>
+                  <text class="sub" x="675.0" y="611">圧縮後の継続情報</text>
+                </g>
+              </svg>
+            </div>
+            <figcaption>
+              実線は各システム内の履歴構造・所属、点線はIDによる照合を表す。会話↔thread、AI実行↔turn、原文↔発言item、外部操作の実行↔ツールitemを対応付ける。共有データや一対一の関係を意味しない。
+            </figcaption>
+          </figure>
+          <ul class="rules">
+            <li>
+              一つの依頼が複数turnにまたがる場合も、同じturnで複数の外部操作を行う場合も、実行と再実行を個別に記録する。turnの変更で再実行回数をリセットしない。
+            </li>
+            <li>
+              発言itemを原文として保存する。ツール項目や内部推論をすべて原文に変換する前提は置かない。
+            </li>
+            <li>
+              LLMなしの記録送信や外部取り込みの原文、通常プログラムの実行は、対応するitemがなくても保持する。Codexの内部継続データを移行しなくても会話IDと保存済み原文は残す。
+            </li>
+          </ul>
+        </section>
         <section aria-labelledby="contracts">
           <h2 id="contracts">主要な契約</h2>
           <div
@@ -149,6 +348,14 @@
           </p>
 
           <ul>
+            <li>
+              <a
+                href="https://github.com/Kurarowa305/scene-craft/blob/main/docs/research/codex-app-server-ui-capabilities.md"
+                target="_blank"
+                rel="noopener noreferrer"
+                >機能別の実装分担とデータ対応図</a
+              >
+            </li>
             <li>
               <a
                 href="https://github.com/Kurarowa305/scene-craft/blob/main/docs/adr/0004-codex-app-server-runtime.md"
