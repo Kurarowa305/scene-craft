@@ -8,6 +8,7 @@ import type {
 } from "../shared/files.js";
 import { join } from "node:path";
 import type { Work, Conversation, BodyRecord } from "../shared/contracts.js";
+import type { GitReference, VersionPlan } from "../shared/versions.js";
 
 export class OperationError extends Error {
   constructor(
@@ -69,6 +70,46 @@ export function openStore(directory: string) {
     if (!row) throw new OperationError(404, "STATE_NOT_FOUND");
     return JSON.parse(row.data);
   }
+  if (
+    !db
+      .prepare("SELECT name FROM sqlite_master WHERE name = 'git_settings'")
+      .get()
+  ) {
+    const backup = join(directory, "records.before-git-versions.sqlite");
+    if (!existsSync(backup)) db.prepare("VACUUM INTO ?").run(backup);
+    db.exec(`BEGIN IMMEDIATE;
+      CREATE TABLE git_settings (sequence INTEGER PRIMARY KEY AUTOINCREMENT, data TEXT NOT NULL, created_at TEXT NOT NULL);
+      CREATE TABLE work_git (work_id TEXT PRIMARY KEY REFERENCES works(id), data TEXT NOT NULL);
+      CREATE TABLE version_plans (id TEXT PRIMARY KEY, work_id TEXT NOT NULL REFERENCES works(id), data TEXT NOT NULL);
+      COMMIT;`);
+  }
+  function defaultDefinition(): GitReference | null {
+    const row = db
+      .prepare("SELECT data FROM git_settings ORDER BY sequence DESC LIMIT 1")
+      .get() as { data: string } | undefined;
+    return row ? JSON.parse(row.data) : null;
+  }
+  function workVersions(workId: string): {
+    definition: GitReference | null;
+    style: GitReference | null;
+  } {
+    requireEntity("works", workId);
+    const row = db
+      .prepare("SELECT data FROM work_git WHERE work_id = ?")
+      .get(workId) as { data: string } | undefined;
+    return row ? JSON.parse(row.data) : { definition: null, style: null };
+  }
+  function decorateWork(work: Work): Work {
+    const refs = workVersions(work.id);
+    return { ...work, style: refs.style, plannedDefinition: refs.definition };
+  }
+  function versionPlan(id: string): VersionPlan {
+    const row = db
+      .prepare("SELECT data FROM version_plans WHERE id = ?")
+      .get(id) as { data: string } | undefined;
+    if (!row) throw new OperationError(404, "NOT_FOUND");
+    return JSON.parse(row.data);
+  }
   function operation(id: string): ImportOperation {
     const row = db
       .prepare("SELECT data FROM import_operations WHERE id = ?")
@@ -123,6 +164,47 @@ export function openStore(directory: string) {
     "id, sequence, conversation_id AS conversationId, body, 'record' AS kind, 'human' AS author, created_at AS createdAt";
   return {
     close: () => db.close(),
+    defaultDefinition,
+    workVersions,
+    versionPlan,
+    versionPlans: (workId: string): VersionPlan[] => {
+      requireEntity("works", workId);
+      return db
+        .prepare(
+          "SELECT data FROM version_plans WHERE work_id = ? ORDER BY rowid",
+        )
+        .all(workId)
+        .map((row) => JSON.parse(row.data as string));
+    },
+    planVersions: (
+      key: string,
+      workId: string,
+      select: () => { definition: GitReference; style: GitReference | null },
+    ) =>
+      once(key, ["version-plan", workId], () => {
+        requireEntity("works", workId);
+        const refs = select();
+        const plan: VersionPlan = {
+          id: randomUUID(),
+          workId,
+          ...refs,
+          createdAt: new Date().toISOString(),
+        };
+        db.prepare("INSERT INTO version_plans VALUES (?, ?, ?)").run(
+          plan.id,
+          workId,
+          JSON.stringify(plan),
+        );
+        return plan;
+      }),
+    selectDefault: (key: string, commit: string, select: () => GitReference) =>
+      once(key, ["default-definition", commit], () => {
+        const definition = select();
+        db.prepare(
+          "INSERT INTO git_settings (data, created_at) VALUES (?, ?)",
+        ).run(JSON.stringify(definition), new Date().toISOString());
+        return { definition };
+      }),
     state: readState,
     operation,
     operations: (workId: string) => {
@@ -301,19 +383,41 @@ export function openStore(directory: string) {
       }
     },
     works: () =>
-      db
-        .prepare(`SELECT ${workColumns} FROM works ORDER BY sequence`)
-        .all() as unknown as Work[],
-    createWork: (key: string, name: string, intent: string | null) =>
-      once(key, ["work", name, intent], () => {
-        const id = randomUUID();
-        db.prepare(
-          "INSERT INTO works (id, name, intent, created_at) VALUES (?, ?, ?, ?)",
-        ).run(id, name, intent, new Date().toISOString());
-        return db
-          .prepare(`SELECT ${workColumns} FROM works WHERE id = ?`)
-          .get(id) as unknown as Work;
-      }),
+      (
+        db
+          .prepare(`SELECT ${workColumns} FROM works ORDER BY sequence`)
+          .all() as unknown as Work[]
+      ).map(decorateWork),
+    createWork: (
+      key: string,
+      name: string,
+      intent: string | null,
+      styleCommit: string | null = null,
+      select?: () => {
+        definition: GitReference | null;
+        style: GitReference | null;
+      },
+    ) =>
+      once(
+        key,
+        ["work", name, intent, ...(styleCommit ? [styleCommit] : [])],
+        () => {
+          const refs = select?.() ?? { definition: null, style: null };
+          const id = randomUUID();
+          db.prepare(
+            "INSERT INTO works (id, name, intent, created_at) VALUES (?, ?, ?, ?)",
+          ).run(id, name, intent, new Date().toISOString());
+          db.prepare("INSERT INTO work_git VALUES (?, ?)").run(
+            id,
+            JSON.stringify(refs),
+          );
+          return decorateWork(
+            db
+              .prepare(`SELECT ${workColumns} FROM works WHERE id = ?`)
+              .get(id) as unknown as Work,
+          );
+        },
+      ),
     conversations: (workId: string) => {
       requireEntity("works", workId);
       return db

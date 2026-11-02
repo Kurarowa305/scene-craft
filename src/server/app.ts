@@ -10,9 +10,11 @@ import {
 } from "./files.js";
 import { mkdir, open } from "node:fs/promises";
 import { openStore, OperationError } from "./store.js";
+import { gitVersions } from "./versions.js";
 
 interface AppOptions {
   directory: string;
+  gitRepository?: string;
   fileRoots?: FileRoots;
   dependencyInspector?: DependencyInspector;
   publishFiles?: typeof import("node:fs/promises").rename;
@@ -48,6 +50,11 @@ export async function createApp(options: AppOptions) {
   if (options.fileRoots) validateFileRoots(options.fileRoots);
   await mkdir(options.directory, { recursive: true, mode: 0o700 });
   const store = openStore(options.directory);
+  function versions() {
+    if (!options.gitRepository)
+      throw new OperationError(409, "GIT_NOT_CONFIGURED");
+    return gitVersions(options.gitRepository, options.directory);
+  }
   const app = Fastify({
     logger: false,
     bodyLimit: 1024 * 1024,
@@ -130,7 +137,113 @@ export async function createApp(options: AppOptions) {
       };
     });
   app.get("/api/works", async () => store.works());
-  app.post<{ Body: { requestKey: string; name: string; intent?: string } }>(
+  const commitSchema = {
+    type: "string",
+    pattern: "^([a-f0-9]{40}|[a-f0-9]{64})$",
+  };
+  app.get("/api/versions", async () => {
+    const definition = store.defaultDefinition();
+    try {
+      return {
+        configured: Boolean(options.gitRepository),
+        ...versions().status(definition, null),
+      };
+    } catch {
+      return {
+        configured: Boolean(options.gitRepository),
+        definition,
+        style: null,
+        availability: { available: false, reason: "GIT_CONTENT_UNAVAILABLE" },
+        remote: "unverified",
+      };
+    }
+  });
+  app.post<{ Body: { requestKey: string; commit: string } }>(
+    "/api/versions/default",
+    {
+      schema: { body: bodySchema({ commit: commitSchema }, ["commit"]) },
+    },
+    async (request) =>
+      store.selectDefault(request.body.requestKey, request.body.commit, () => {
+        const service = versions();
+        const reference = service.select(request.body.commit, "definition");
+        service.materialize(reference, "definition");
+        return reference;
+      }),
+  );
+  app.get<{ Params: { id: string } }>(
+    "/api/works/:id/versions",
+    { schema: { params: idParams } },
+    async (request) => {
+      const refs = store.workVersions(request.params.id);
+      // This is the preview for a NEW request: current explicit default + fixed work style.
+      const definition = store.defaultDefinition();
+      try {
+        return versions().status(definition, refs.style);
+      } catch {
+        return {
+          definition,
+          style: refs.style,
+          availability: { available: false, reason: "GIT_CONTENT_UNAVAILABLE" },
+          remote: "unverified",
+        };
+      }
+    },
+  );
+  app.get<{ Params: { id: string } }>(
+    "/api/works/:id/version-plans",
+    { schema: { params: idParams } },
+    async (request) => store.versionPlans(request.params.id),
+  );
+  app.post<{ Params: { id: string }; Body: { requestKey: string } }>(
+    "/api/works/:id/version-plans",
+    { schema: { params: idParams, body: bodySchema({}, []) } },
+    async (request) =>
+      store.planVersions(request.body.requestKey, request.params.id, () => {
+        const service = versions();
+        const definition = store.defaultDefinition();
+        const { style } = store.workVersions(request.params.id);
+        return service.prepare(definition, style);
+      }),
+  );
+  app.get<{
+    Params: { id: string };
+    Querystring: { kind: "definition" | "style"; path: string };
+  }>(
+    "/api/version-plans/:id/content",
+    {
+      schema: {
+        params: idParams,
+        querystring: {
+          type: "object",
+          additionalProperties: false,
+          required: ["kind", "path"],
+          properties: {
+            kind: { enum: ["definition", "style"] },
+            path: { ...text, maxLength: 2000 },
+          },
+        },
+      },
+    },
+    async (request) => {
+      const plan = store.versionPlan(request.params.id);
+      const reference = plan[request.query.kind];
+      if (!reference) throw new OperationError(409, "GIT_STYLE_NOT_SELECTED");
+      return versions().content(
+        reference,
+        request.query.kind,
+        request.query.path,
+      );
+    },
+  );
+  app.post<{
+    Body: {
+      requestKey: string;
+      name: string;
+      intent?: string;
+      styleCommit?: string | null;
+    };
+  }>(
     "/api/works",
     {
       schema: {
@@ -138,6 +251,7 @@ export async function createApp(options: AppOptions) {
           {
             name: { ...text, maxLength: 200, pattern: "\\S" },
             intent: { type: "string", maxLength: 20000 },
+            styleCommit: { anyOf: [{ type: "null" }, commitSchema] },
           },
           ["name"],
         ),
@@ -148,6 +262,17 @@ export async function createApp(options: AppOptions) {
         request.body.requestKey,
         request.body.name,
         request.body.intent ?? null,
+        request.body.styleCommit ?? null,
+        () => {
+          const definition = store.defaultDefinition();
+          if (!definition && !request.body.styleCommit)
+            return { definition: null, style: null };
+          const service = versions();
+          const style = request.body.styleCommit
+            ? service.select(request.body.styleCommit, "style")
+            : null;
+          return service.prepare(definition, style);
+        },
       ),
   );
   app.get<{ Params: { id: string } }>(
