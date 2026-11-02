@@ -87,3 +87,28 @@ Linuxでの自動試験合格と、Windows/WSLの実機合格・main必須ステ
 この結果はデスクトップショートカットのクリック、ブラウザ／起動端末終了後の継続、二重起動、別アプリのポート占有の手動確認を代替しない。結果JSONの手動4項目は `not_run` のままとする。空白を含むパスでの追加起動確認と試験用アプリの終了をまとめたコマンドは自動承認レビューで拒否され、詳細な理由は返されなかったため、この追加確認は未実施。`Test-Local.ps1` が起動した試験用アプリは継続中なので、確認を終えたら画面の「アプリ終了」で終了する。
 
 既存のデスクトップショートカットは `%LOCALAPPDATA%\scene-craft\Launcher.ps1` のインストール済みコピーを使う。修正版を使うには、更新後の `scripts/windows` をWindows側のインストール作業フォルダーへ再コピーし、同じ設定で `Install-Shortcut.ps1` を再実行する。リポジトリの更新だけではインストール済みコピーは変わらない。
+## SQLiteの確認用コンソール
+
+WSLのリポジトリルートで次を実行する。Python 3の標準ライブラリだけを使い、DBは読み取り専用で開く。存在しないDBを新規作成しない。
+
+```sh
+python3 scripts/db-console.py
+```
+
+通常の保存先は `~/.local/share/scene-craft/records.sqlite`。別の保存先を使う場合は、DBファイルのパスを引数に渡す。
+
+```sh
+python3 scripts/db-console.py /path/to/data/records.sqlite
+```
+
+コンソールでは `.tables` でテーブル一覧、`.schema` で定義、`.help` で操作説明を表示し、`.quit` またはCtrl+Dで終了する。SQLは末尾にセミコロンを付ける。結果は1行につき1件のJSONで表示するため、本文の改行は `\n` と表示される。SQLエラー後も入力を続けられるが、終了コードは1になる。
+
+```sql
+SELECT id, name, intent FROM works;
+SELECT id, work_id FROM conversations;
+SELECT conversation_id, body, created_at FROM records ORDER BY sequence;
+```
+
+Windows PowerShellから利用する場合は `wsl -d Ubuntu` でWSLへ入り、`cd ~/scene-craft` でリポジトリへ移動してから上記コマンドを実行する。
+
+詳しい接続・SQL入力・終了・エラー時の手順は [SQLite接続手順](db-console.md) を参照。
