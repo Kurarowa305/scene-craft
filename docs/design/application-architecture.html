@@ -54,14 +54,17 @@
             <li>
               <a href="#通信とモジュールの責務">5. 通信とモジュールの責務</a>
             </li>
-            <li><a href="#保存領域とパス">6. 保存領域とパス</a></li>
+            <li><a href="#保存処理">6. 保存処理</a></li>
             <li>
               <a href="#起動終了再接続">7. 起動・終了・再接続</a>
               <ol>
                 <li><a href="#生存管理">7-1. 生存管理</a></li>
               </ol>
             </li>
-            <li><a href="#sources">8. 詳細資料</a></li>
+            <li><a href="#認証">8. 認証</a></li>
+            <li><a href="#設定">9. 設定</a></li>
+            <li><a href="#復元">10. 復元</a></li>
+            <li><a href="#sources">11. 詳細資料</a></li>
           </ol>
         </nav>
         <section aria-labelledby="配置と利用方法" class="spec-section">
@@ -552,20 +555,67 @@
             制作管理・実行管理が必要とするインターフェースを定義し、Codex・Blender・保存のアダプターを接続する。Host・Origin・変更要求の正当性を照合し、同じoriginの正当な操作を受け付ける。具体的なローカルセッション方式は実装仕様で定義する。
           </p>
         </section>
-        <section aria-labelledby="保存領域とパス" class="spec-section">
-          <h2 id="保存領域とパス">6. 保存領域とパス</h2>
+        <section aria-labelledby="保存処理" class="spec-section">
+          <h2 id="保存処理">6. 保存処理</h2>
+          <span
+            aria-hidden="true"
+            class="anchor-alias"
+            id="保存領域とパス"
+          ></span
+          ><span
+            aria-hidden="true"
+            class="anchor-alias"
+            id="保存と実装構成"
+          ></span>
           <div class="contract-cards">
-            <article class="contract-card" aria-label="処理内容">
-              <p class="contract-card-title">処理内容</p>
+            <article
+              class="contract-card"
+              aria-label="制作データと管理データの配置"
+            >
+              <p class="contract-card-title">制作データと管理データの配置</p>
               <dl>
                 <dt>仕様</dt>
                 <dd>
                   <ul class="cell-list">
                     <li>Windows の制作ルートと WSL の管理データを分ける。</li>
                     <li>
+                      管理 DB と Codex 用保存領域は WSL の Linux
+                      ファイルシステム上の別ディレクトリとする。
+                    </li>
+                  </ul>
+                </dd>
+              </dl>
+            </article>
+            <article
+              class="contract-card"
+              aria-label="制作ファイルの参照とパス変換"
+            >
+              <p class="contract-card-title">制作ファイルの参照とパス変換</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>
                       制作ファイルは保存ルート ID と相対パスで参照し、実際の
                       Windows パスと WSL パスへの変換を保存モジュールに集める。
                     </li>
+                    <li>移行時はルートの対応を差し替える。</li>
+                    <li>
+                      パス変換、リンク先・ルート逸脱の検査は保存モジュールが担う。
+                    </li>
+                  </ul>
+                </dd>
+              </dl>
+            </article>
+            <article
+              class="contract-card"
+              aria-label="ブラウザからの表示・取得"
+            >
+              <p class="contract-card-title">ブラウザからの表示・取得</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  <ul class="cell-list">
                     <li>
                       ブラウザには作品・生成物の ID
                       を渡し、ローカルファイルの表示・取得はバックエンドを通す。
@@ -574,132 +624,37 @@
                 </dd>
               </dl>
             </article>
-            <article class="contract-card" aria-label="復元">
-              <p class="contract-card-title">復元</p>
+            <article class="contract-card" aria-label="記録と実体の照合">
+              <p class="contract-card-title">記録と実体の照合</p>
               <dl>
                 <dt>仕様</dt>
                 <dd>
                   <ul class="cell-list">
                     <li>
-                      整合性・復元・バックアップの契約は保存設計へ引き継ぐ。
+                      記録 DB、Codex の内部状態、Windows
+                      の実行記録と生成物を別の役割として扱う。
                     </li>
-                    <li>ルートからの逸脱やリンク先も確認する。</li>
+                    <li>
+                      検証済みファイルと完成記録を照合して作品へ反映する。
+                    </li>
                   </ul>
                 </dd>
               </dl>
             </article>
-            <article class="contract-card" aria-label="認証">
-              <p class="contract-card-title">認証</p>
+            <article class="contract-card" aria-label="制作データの書き出し">
+              <p class="contract-card-title">制作データの書き出し</p>
               <dl>
                 <dt>仕様</dt>
                 <dd>
                   <ul class="cell-list">
                     <li>
-                      Codex 用には WSL に scene-craft
-                      専用の保存領域を用意し、普段の開発用 Codex
-                      の設定・会話・認証ファイルと分ける。
-                    </li>
-                    <li>
-                      初回はその領域で同じ ChatGPT アカウントへログインする。
-                    </li>
-                    <li>
-                      Codex
-                      標準のファイル保管を採用し、所有ユーザーにアクセスを限定する。
-                    </li>
-                    <li>
-                      Codex
-                      の会話継続用データをどこまで移行対象にするかは、制作記録との区別を保って保存設計で決める。
+                      scene-craft
+                      の制作データ書き出しは含める項目を選ぶ方式とする。
                     </li>
                   </ul>
                 </dd>
               </dl>
             </article>
-            <article class="contract-card" aria-label="設定">
-              <p class="contract-card-title">設定</p>
-              <dl>
-                <dt>仕様</dt>
-                <dd>
-                  Codex
-                  のプロジェクト設定など別の設定層もあるため、許可するツールと実行設定を接続時に確認する。
-                </dd>
-              </dl>
-            </article>
-          </div>
-          <span
-            aria-hidden="true"
-            class="anchor-alias"
-            id="保存と実装構成"
-          ></span>
-
-          <div
-            aria-label="保存と実装構成"
-            class="table-scroll"
-            role="region"
-            tabindex="0"
-          >
-            <table class="spec-table">
-              <thead>
-                <tr>
-                  <th scope="col">項目</th>
-                  <th scope="col">仕様</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row">管理領域</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        管理 DB と Codex 用保存領域は WSL の Linux
-                        ファイルシステム上の別ディレクトリとする。
-                      </li>
-                      <li>
-                        Codex は標準の file
-                        保管を使い、ディレクトリを所有者のみアクセス可能にする。
-                      </li>
-                      <li>認証ファイルの作成・更新は Codex が行う。</li>
-                      <li>
-                        scene-craft
-                        の制作データ書き出しは含める項目を選ぶ方式とする。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">制作ルート</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        Windows の制作ルートは設定で登録し、初期の対象はこの PC
-                        のローカルディスクとする。
-                      </li>
-                      <li>
-                        ルート ID
-                        と相対パスで参照し、移行時はルートの対応を差し替える。
-                      </li>
-                      <li>
-                        パス変換、リンク先・ルート逸脱の検査は保存モジュールが担う。
-                      </li>
-                      <li>具体的なドライブ名は利用開始時に設定する。</li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">記録の照合</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        記録 DB、Codex の内部状態、Windows
-                        の実行記録と生成物を別の役割として扱う。
-                      </li>
-                      <li>
-                        検証済みファイルと完成記録を照合して作品へ反映する。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
           </div>
         </section>
         <section aria-labelledby="起動終了再接続" class="spec-section">
@@ -970,8 +925,128 @@
           </section>
         </section>
 
+        <section aria-labelledby="認証" class="spec-section">
+          <h2 id="認証">8. 認証</h2>
+          <div class="contract-cards">
+            <article class="contract-card" aria-label="Codex専用領域とログイン">
+              <p class="contract-card-title">Codex専用領域とログイン</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>
+                      Codex 用には WSL に scene-craft
+                      専用の保存領域を用意し、普段の開発用 Codex
+                      の設定・会話・認証ファイルと分ける。
+                    </li>
+                    <li>
+                      初回はその領域で同じ ChatGPT アカウントへログインする。
+                    </li>
+                  </ul>
+                </dd>
+              </dl>
+            </article>
+            <article aria-label="認証情報の保管と更新" class="contract-card">
+              <p class="contract-card-title">認証情報の保管と更新</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>
+                      Codex標準のファイル保管を採用し、保存ディレクトリと認証ファイルへのアクセスを所有ユーザーに限定する。
+                    </li>
+
+                    <li>認証ファイルの作成・更新は Codex が行う。</li>
+                  </ul>
+                  <p>
+                    <a href="llm-connection.html#認証方式">認証方式の詳細 →</a>
+                  </p>
+                </dd>
+              </dl>
+            </article>
+          </div>
+        </section>
+        <section aria-labelledby="設定" class="spec-section">
+          <h2 id="設定">9. 設定</h2>
+          <div class="contract-cards">
+            <article class="contract-card" aria-label="制作ルートの登録">
+              <p class="contract-card-title">制作ルートの登録</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>
+                      Windows の制作ルートは設定で登録し、初期の対象はこの PC
+                      のローカルディスクとする。
+                    </li>
+                    <li>具体的なドライブ名は利用開始時に設定する。</li>
+                  </ul>
+                </dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="接続時の設定確認">
+              <p class="contract-card-title">接続時の設定確認</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  Codex
+                  のプロジェクト設定など別の設定層もあるため、許可するツールと実行設定を接続時に確認する。
+                  <p>
+                    <a href="user-interface.html#設定と保存データ管理"
+                      >設定画面の詳細 →</a
+                    >
+                  </p>
+                </dd>
+              </dl>
+            </article>
+          </div>
+        </section>
+        <section aria-labelledby="復元" class="spec-section">
+          <h2 id="復元">10. 復元</h2>
+          <div class="contract-cards">
+            <article
+              class="contract-card"
+              aria-label="整合性・復元・バックアップ"
+            >
+              <p class="contract-card-title">整合性・復元・バックアップ</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>
+                      整合性・復元・バックアップの契約は保存設計へ引き継ぐ。
+                    </li>
+                    <li>ルートからの逸脱やリンク先も確認する。</li>
+                  </ul>
+                  <p>
+                    <a href="artifact-storage.html"
+                      >保存・復元・バックアップの詳細 →</a
+                    >
+                  </p>
+                </dd>
+              </dl>
+            </article>
+            <article
+              class="contract-card"
+              aria-label="Codexデータと制作記録の移行"
+            >
+              <p class="contract-card-title">Codexデータと制作記録の移行</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>
+                      Codex
+                      の会話継続用データをどこまで移行対象にするかは、制作記録との区別を保って保存設計で決める。
+                    </li>
+                  </ul>
+                </dd>
+              </dl>
+            </article>
+          </div>
+        </section>
         <section class="sources">
-          <h2 id="sources">8. 詳細資料</h2>
+          <h2 id="sources">11. 詳細資料</h2>
           <p>
             <a
               href="https://github.com/Kurarowa305/scene-craft/issues/3"
