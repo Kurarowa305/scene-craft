@@ -83,55 +83,48 @@
         </nav>
         <section aria-labelledby="責務と前提" class="spec-section">
           <h2 id="責務と前提">1. 責務</h2>
-          <div
-            aria-label="責務と前提"
-            class="table-scroll"
-            role="region"
-            tabindex="0"
-          >
-            <table class="spec-table">
-              <thead>
-                <tr>
-                  <th scope="col">項目</th>
-                  <th scope="col">仕様</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row">再実行</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        実行管理は依頼の受付・順序・停止・制作操作の照合・再実行予算を担当する。
-                      </li>
-                      <li>
-                        制作管理は編集案・採否・保護指定、保存モジュールはファイル実体の確定と検証を担当する。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">モデル</th>
-                  <td>
-                    根拠は<a
-                      href="https://github.com/Kurarowa305/scene-craft/blob/main/docs/requirements/initial-scope.md#execution"
-                      rel="noopener noreferrer"
-                      target="_blank"
-                      >初期要件</a
-                    >、<a href="application-architecture.html">全体設計</a>、<a
-                      href="llm-connection.html"
-                      >LLM 接続設計</a
-                    >、<a href="blender-integration.html">Blender 連携設計</a
-                    >、<a href="domain-data-model.html">データモデル</a>、<a
-                      href="https://github.com/Kurarowa305/scene-craft/blob/main/GLOSSARY.md"
-                      rel="noopener noreferrer"
-                      target="_blank"
-                      >用語集</a
-                    >。
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+          <div class="contract-cards">
+            <article class="contract-card" aria-label="再実行">
+              <p class="contract-card-title">再実行</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>
+                      実行管理は依頼の受付・順序・停止・制作操作の照合・再実行予算を担当する。
+                    </li>
+                    <li>
+                      制作管理は編集案・採否・保護指定、保存モジュールはファイル実体の確定と検証を担当する。
+                    </li>
+                  </ul>
+                </dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="モデル">
+              <p class="contract-card-title">モデル</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  根拠は<a
+                    href="https://github.com/Kurarowa305/scene-craft/blob/main/docs/requirements/initial-scope.md#execution"
+                    rel="noopener noreferrer"
+                    target="_blank"
+                    >初期要件</a
+                  >、<a href="application-architecture.html">全体設計</a>、<a
+                    href="llm-connection.html"
+                    >LLM 接続設計</a
+                  >、<a href="blender-integration.html">Blender 連携設計</a>、<a
+                    href="domain-data-model.html"
+                    >データモデル</a
+                  >、<a
+                    href="https://github.com/Kurarowa305/scene-craft/blob/main/GLOSSARY.md"
+                    rel="noopener noreferrer"
+                    target="_blank"
+                    >用語集</a
+                  >。
+                </dd>
+              </dl>
+            </article>
           </div>
         </section>
         <section aria-labelledby="順序と排他" class="spec-section">
@@ -141,149 +134,150 @@
             id="順序再実行起動の契約"
           ></span>
           <h2 id="順序と排他">2. 順序と排他</h2>
-          <div
-            aria-label="順序と排他"
-            class="table-scroll"
-            role="region"
-            tabindex="0"
-          >
-            <table class="spec-table">
-              <thead>
-                <tr>
-                  <th scope="col">項目</th>
-                  <th scope="col">仕様</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row">作品内の順序</th>
-                  <td>
-                    同じ作品の編集・レンダー・採用・復元は順番に実行する。
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">参照処理</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        固定済みの保存状態を読む参考調査・振り返りは並行して進められる。
-                      </li>
-                      <li>その参照を実行記録へ残す。</li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">確認待ち</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        確認待ちの依頼は、動作中の処理が安全に停止したことを確認できれば作品の実行枠を解放する。
-                      </li>
-                      <li>
-                        後続は開始直前に最新の状態・保護指定・変更範囲を確認する。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">後続の依存</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>確認待ちの案に依存する後続は待機する。</li>
-                      <li>依存がない後続は進められる。</li>
-                      <li>
-                        確認への回答を受けた依頼は再び順番待ちへ戻り、開始時に前提を再確認する。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">入力固定</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        現在状態を起点にする依頼は着手直前に入力を固定する。
-                      </li>
-                      <li>
-                        候補の保存状態を明示した修正依頼はその起点を維持する。
-                      </li>
-                      <li>候補の起点を維持する。</li>
-                    </ul>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+          <div class="contract-cards">
+            <article class="contract-card" aria-label="作品内の順序">
+              <p class="contract-card-title">作品内の順序</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>同じ作品の編集・レンダー・採用・復元は順番に実行する。</dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="参照処理">
+              <p class="contract-card-title">参照処理</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>
+                      固定済みの保存状態を読む参考調査・振り返りは並行して進められる。
+                    </li>
+                    <li>その参照を実行記録へ残す。</li>
+                  </ul>
+                </dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="確認待ち">
+              <p class="contract-card-title">確認待ち</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>
+                      確認待ちの依頼は、動作中の処理が安全に停止したことを確認できれば作品の実行枠を解放する。
+                    </li>
+                    <li>
+                      後続は開始直前に最新の状態・保護指定・変更範囲を確認する。
+                    </li>
+                  </ul>
+                </dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="後続の依存">
+              <p class="contract-card-title">後続の依存</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>確認待ちの案に依存する後続は待機する。</li>
+                    <li>依存がない後続は進められる。</li>
+                    <li>
+                      確認への回答を受けた依頼は再び順番待ちへ戻り、開始時に前提を再確認する。
+                    </li>
+                  </ul>
+                </dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="入力固定">
+              <p class="contract-card-title">入力固定</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>
+                      現在状態を起点にする依頼は着手直前に入力を固定する。
+                    </li>
+                    <li>
+                      候補の保存状態を明示した修正依頼はその起点を維持する。
+                    </li>
+                    <li>候補の起点を維持する。</li>
+                  </ul>
+                </dd>
+              </dl>
+            </article>
           </div>
         </section>
         <section aria-labelledby="再実行予算" class="spec-section">
           <h2 id="再実行予算">3. 再実行予算</h2>
-          <div
-            aria-label="再実行予算"
-            class="table-scroll"
-            role="region"
-            tabindex="0"
-          >
-            <table class="spec-table">
-              <thead>
-                <tr>
-                  <th scope="col">項目</th>
-                  <th scope="col">仕様</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row">上限</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>一つの依頼全体で最大2回の再実行を共有する。</li>
-                      <li>
-                        例えば植物配置のやり直しに1回使った後、照明調整のやり直しに使えるのは残り1回とする。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">同じturnのやり直し</th>
-                  <td>
-                    同じ turn 内での失敗した制作操作の修正・やり直しも数える。
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">結果の再利用</th>
-                  <td>
-                    正常に完了した操作は、検証済みの結果と入力・変更範囲の整合性を確認して再利用する。
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">手動再実行</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        人間が失敗した処理の再実行を指示しても、元の依頼と累積回数を引き継ぐ。
-                      </li>
-                      <li>新しい制作指示による追加の修正は別の依頼とする。</li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">通知の受信</th>
-                  <td>同じturnの進捗と終端を待つ。</td>
-                </tr>
-                <tr>
-                  <th scope="row">自動再実行の条件</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        デザインを維持することと重複操作を防げることを確認できる失敗だけを自動再実行する。
-                      </li>
-                      <li>
-                        デザイン変更・判断不能・結果不明では人間に確認する。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+          <div class="contract-cards">
+            <article class="contract-card" aria-label="上限">
+              <p class="contract-card-title">上限</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>一つの依頼全体で最大2回の再実行を共有する。</li>
+                    <li>
+                      例えば植物配置のやり直しに1回使った後、照明調整のやり直しに使えるのは残り1回とする。
+                    </li>
+                  </ul>
+                </dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="同じturnのやり直し">
+              <p class="contract-card-title">同じturnのやり直し</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  同じ turn 内での失敗した制作操作の修正・やり直しも数える。
+                </dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="結果の再利用">
+              <p class="contract-card-title">結果の再利用</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  正常に完了した操作は、検証済みの結果と入力・変更範囲の整合性を確認して再利用する。
+                </dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="手動再実行">
+              <p class="contract-card-title">手動再実行</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>
+                      人間が失敗した処理の再実行を指示しても、元の依頼と累積回数を引き継ぐ。
+                    </li>
+                    <li>新しい制作指示による追加の修正は別の依頼とする。</li>
+                  </ul>
+                </dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="通知の受信">
+              <p class="contract-card-title">通知の受信</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>同じturnの進捗と終端を待つ。</dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="自動再実行の条件">
+              <p class="contract-card-title">自動再実行の条件</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>
+                      デザインを維持することと重複操作を防げることを確認できる失敗だけを自動再実行する。
+                    </li>
+                    <li>
+                      デザイン変更・判断不能・結果不明では人間に確認する。
+                    </li>
+                  </ul>
+                </dd>
+              </dl>
+            </article>
           </div>
 
           <section aria-labelledby="停止後の再開と予算" class="spec-subsection">
@@ -293,162 +287,131 @@
               id="停止後の継続と途中成果"
             ></span>
             <h3 id="停止後の再開と予算">3-1. 再開時の予算</h3>
-            <div
-              aria-label="停止後の再開と予算"
-              class="table-scroll"
-              role="region"
-              tabindex="0"
-            >
-              <table class="spec-table">
-                <thead>
-                  <tr>
-                    <th scope="col">項目</th>
-                    <th scope="col">仕様</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <th scope="row">停止</th>
-                    <td>
-                      停止した操作をやり直す場合は1回消費する。
-                      <div class="contract-detail">
-                        <ul class="cell-list">
-                          <li>
-                            例として植物配置が完了し照明調整を停止した場合、植物配置は整合性を再確認して再利用できる。
-                          </li>
-                          <li>照明調整をやり直すときに回数を消費する。</li>
-                        </ul>
-                      </div>
-                    </td>
-                  </tr>
-
-                  <tr>
-                    <th scope="row">処理内容</th>
-                    <td>結果不明の操作は先に照合する。</td>
-                  </tr>
-                  <tr>
-                    <th scope="row">再実行</th>
-                    <td>
+            <div class="contract-cards">
+              <article class="contract-card" aria-label="停止">
+                <p class="contract-card-title">停止</p>
+                <dl>
+                  <dt>仕様</dt>
+                  <dd>
+                    停止した操作をやり直す場合は1回消費する。
+                    <div class="contract-detail">
                       <ul class="cell-list">
                         <li>
-                          再実行上限到達時は、原因・途中状態・対処を示して人間の判断を待つ。
+                          例として植物配置が完了し照明調整を停止した場合、植物配置は整合性を再確認して再利用できる。
                         </li>
-                        <li>
-                          検証済みの結果を使う未着手部分の継続は、依存関係・変更範囲等を満たせば可能。
-                        </li>
+                        <li>照明調整をやり直すときに回数を消費する。</li>
                       </ul>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+                    </div>
+                  </dd>
+                </dl>
+              </article>
+              <article class="contract-card" aria-label="処理内容">
+                <p class="contract-card-title">処理内容</p>
+                <dl>
+                  <dt>仕様</dt>
+                  <dd>結果不明の操作は先に照合する。</dd>
+                </dl>
+              </article>
+              <article class="contract-card" aria-label="再実行">
+                <p class="contract-card-title">再実行</p>
+                <dl>
+                  <dt>仕様</dt>
+                  <dd>
+                    <ul class="cell-list">
+                      <li>
+                        再実行上限到達時は、原因・途中状態・対処を示して人間の判断を待つ。
+                      </li>
+                      <li>
+                        検証済みの結果を使う未着手部分の継続は、依存関係・変更範囲等を満たせば可能。
+                      </li>
+                    </ul>
+                  </dd>
+                </dl>
+              </article>
             </div>
           </section>
         </section>
         <section aria-labelledby="アプリ再起動" class="spec-section">
           <h2 id="アプリ再起動">4. アプリ再起動</h2>
-          <div
-            aria-label="アプリ再起動"
-            class="table-scroll"
-            role="region"
-            tabindex="0"
-          >
-            <table class="spec-table">
-              <thead>
-                <tr>
-                  <th scope="col">項目</th>
-                  <th scope="col">仕様</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row">起動</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>未着手の待機依頼も保存し、再起動後は保留する。</li>
-                      <li>人間が個別またはまとめて再開を指示する。</li>
-                    </ul>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+          <div class="contract-cards">
+            <article class="contract-card" aria-label="起動">
+              <p class="contract-card-title">起動</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>未着手の待機依頼も保存し、再起動後は保留する。</li>
+                    <li>人間が個別またはまとめて再開を指示する。</li>
+                  </ul>
+                </dd>
+              </dl>
+            </article>
           </div>
         </section>
         <section aria-labelledby="個別停止と後続" class="spec-section">
           <h2 id="個別停止と後続">5. 依頼の個別停止</h2>
-          <div
-            aria-label="個別停止と後続"
-            class="table-scroll"
-            role="region"
-            tabindex="0"
-          >
-            <table class="spec-table">
-              <thead>
-                <tr>
-                  <th scope="col">項目</th>
-                  <th scope="col">仕様</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row">停止</th>
-                  <td>停止は依頼ごとに行う。</td>
-                </tr>
-                <tr>
-                  <th scope="row">処理内容</th>
-                  <td>依存する後続は待機する。</td>
-                </tr>
-                <tr>
-                  <th scope="row">起動</th>
-                  <td>既存合意のアプリ終了・再起動時の保留とは区別する。</td>
-                </tr>
-              </tbody>
-            </table>
+          <div class="contract-cards">
+            <article class="contract-card" aria-label="停止">
+              <p class="contract-card-title">停止</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>停止は依頼ごとに行う。</dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="処理内容">
+              <p class="contract-card-title">処理内容</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>依存する後続は待機する。</dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="起動">
+              <p class="contract-card-title">起動</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>既存合意のアプリ終了・再起動時の保留とは区別する。</dd>
+              </dl>
+            </article>
           </div>
 
           <section aria-labelledby="依頼失敗時の編集案" class="spec-subsection">
             <h3 id="依頼失敗時の編集案">5-1. 依頼失敗時の編集案</h3>
-            <div
-              aria-label="依頼失敗時の編集案"
-              class="table-scroll"
-              role="region"
-              tabindex="0"
-            >
-              <table class="spec-table">
-                <thead>
-                  <tr>
-                    <th scope="col">項目</th>
-                    <th scope="col">仕様</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <th scope="row">採用判断</th>
-                    <td>
-                      <ul class="cell-list">
-                        <li>
-                          依頼全体が失敗しても、独立して検証できた編集案は残し、人間が採用・修正できる。
-                        </li>
-                        <li>
-                          依頼の失敗と、完成した案の利用可否を別に記録する。
-                        </li>
-                      </ul>
-                      <div class="contract-detail">
-                        検証済みの案でも採用は別の人間の指示で行う。
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <th scope="row">依頼</th>
-                    <td>
-                      例として植物配置と照明調整の依頼で、植物配置だけが独立して検証済みなら、その案を利用できる。
-                    </td>
-                  </tr>
-                  <tr>
-                    <th scope="row">出力</th>
-                    <td>Blender連携の出力契約を維持する。</td>
-                  </tr>
-                </tbody>
-              </table>
+            <div class="contract-cards">
+              <article class="contract-card" aria-label="採用判断">
+                <p class="contract-card-title">採用判断</p>
+                <dl>
+                  <dt>仕様</dt>
+                  <dd>
+                    <ul class="cell-list">
+                      <li>
+                        依頼全体が失敗しても、独立して検証できた編集案は残し、人間が採用・修正できる。
+                      </li>
+                      <li>
+                        依頼の失敗と、完成した案の利用可否を別に記録する。
+                      </li>
+                    </ul>
+                    <div class="contract-detail">
+                      検証済みの案でも採用は別の人間の指示で行う。
+                    </div>
+                  </dd>
+                </dl>
+              </article>
+              <article class="contract-card" aria-label="依頼">
+                <p class="contract-card-title">依頼</p>
+                <dl>
+                  <dt>仕様</dt>
+                  <dd>
+                    例として植物配置と照明調整の依頼で、植物配置だけが独立して検証済みなら、その案を利用できる。
+                  </dd>
+                </dl>
+              </article>
+              <article class="contract-card" aria-label="出力">
+                <p class="contract-card-title">出力</p>
+                <dl>
+                  <dt>仕様</dt>
+                  <dd>Blender連携の出力契約を維持する。</dd>
+                </dl>
+              </article>
             </div>
           </section>
         </section>
@@ -684,187 +647,174 @@
               id="受付停止復旧の契約"
             ></span>
             <h3 id="停止と完了の競合">6-2. 停止と完了の競合</h3>
-            <div
-              aria-label="停止と完了の競合"
-              class="table-scroll"
-              role="region"
-              tabindex="0"
-            >
-              <table class="spec-table">
-                <thead>
-                  <tr>
-                    <th scope="col">項目</th>
-                    <th scope="col">仕様</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <th scope="row">停止</th>
-                    <td>
+            <div class="contract-cards">
+              <article class="contract-card" aria-label="停止">
+                <p class="contract-card-title">停止</p>
+                <dl>
+                  <dt>仕様</dt>
+                  <dd>
+                    <ul class="cell-list">
+                      <li>
+                        停止要求をDBへ保存すると同時に、その依頼の新規操作の開始許可を閉じる。
+                      </li>
+                      <li>
+                        待機・確認待ち・保留の依頼も個別停止でき、外部操作がないことを確認できれば中断にする。
+                      </li>
+                    </ul>
+                    <div class="contract-detail">
                       <ul class="cell-list">
                         <li>
-                          停止要求をDBへ保存すると同時に、その依頼の新規操作の開始許可を閉じる。
+                          操作の開始許可と停止要求は同じ依頼の下で直列に判定する。
                         </li>
                         <li>
-                          待機・確認待ち・保留の依頼も個別停止でき、外部操作がないことを確認できれば中断にする。
+                          開始許可が先に確定した操作は停止対象の実行中操作として追跡する。
                         </li>
                       </ul>
-                      <div class="contract-detail">
-                        <ul class="cell-list">
-                          <li>
-                            操作の開始許可と停止要求は同じ依頼の下で直列に判定する。
-                          </li>
-                          <li>
-                            開始許可が先に確定した操作は停止対象の実行中操作として追跡する。
-                          </li>
-                        </ul>
-                      </div>
-                      <div class="contract-detail">
-                        <ul class="cell-list">
-                          <li>Windows側も開始・停止を直列に受け付ける。</li>
-                          <li>
-                            停止応答は単なる要求受付と実際の停止確認を分ける。
-                          </li>
-                        </ul>
-                      </div>
-                      <div class="contract-detail">
-                        <ul class="cell-list">
-                          <li>
-                            停止要求時点ですでに開始を許可した操作は、通信の遅れで直ちに止められない場合がある。
-                          </li>
-                          <li>
-                            編集・保存は安全な境目で止め、専用レンダーは所有権を確認して終了する。
-                          </li>
-                        </ul>
-                      </div>
-                      <div class="contract-detail">
-                        <ul class="cell-list">
-                          <li>
-                            停止と前後して全処理が終わった場合、操作の終端・必要な結果・保存の検証が揃えば依頼は完了とする。
-                          </li>
-                          <li>停止要求も履歴に残す。</li>
-                          <li>一部だけ完了ならその結果を残して中断とする。</li>
-                        </ul>
-                      </div>
-                    </td>
-                  </tr>
-
-                  <tr>
-                    <th scope="row">依頼</th>
-                    <td>
-                      外部操作の終了と開始許可の解決後に、次の依頼へ実行枠を渡す。
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+                    </div>
+                    <div class="contract-detail">
+                      <ul class="cell-list">
+                        <li>Windows側も開始・停止を直列に受け付ける。</li>
+                        <li>
+                          停止応答は単なる要求受付と実際の停止確認を分ける。
+                        </li>
+                      </ul>
+                    </div>
+                    <div class="contract-detail">
+                      <ul class="cell-list">
+                        <li>
+                          停止要求時点ですでに開始を許可した操作は、通信の遅れで直ちに止められない場合がある。
+                        </li>
+                        <li>
+                          編集・保存は安全な境目で止め、専用レンダーは所有権を確認して終了する。
+                        </li>
+                      </ul>
+                    </div>
+                    <div class="contract-detail">
+                      <ul class="cell-list">
+                        <li>
+                          停止と前後して全処理が終わった場合、操作の終端・必要な結果・保存の検証が揃えば依頼は完了とする。
+                        </li>
+                        <li>停止要求も履歴に残す。</li>
+                        <li>一部だけ完了ならその結果を残して中断とする。</li>
+                      </ul>
+                    </div>
+                  </dd>
+                </dl>
+              </article>
+              <article class="contract-card" aria-label="依頼">
+                <p class="contract-card-title">依頼</p>
+                <dl>
+                  <dt>仕様</dt>
+                  <dd>
+                    外部操作の終了と開始許可の解決後に、次の依頼へ実行枠を渡す。
+                  </dd>
+                </dl>
+              </article>
             </div>
           </section>
           <section aria-labelledby="遷移時の共通条件" class="spec-subsection">
             <h3 id="遷移時の共通条件">6-3. 遷移時の共通条件</h3>
-            <div
-              aria-label="遷移時の共通条件"
-              class="table-scroll"
-              role="region"
-              tabindex="0"
-            >
-              <table class="spec-table">
-                <thead>
-                  <tr>
-                    <th scope="col">項目</th>
-                    <th scope="col">仕様</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <th scope="row">停止</th>
-                    <td>
+            <div class="contract-cards">
+              <article class="contract-card" aria-label="停止">
+                <p class="contract-card-title">停止</p>
+                <dl>
+                  <dt>仕様</dt>
+                  <dd>
+                    <ul class="cell-list">
+                      <li>
+                        確認が必要になっても外部操作が動いていれば停止待ちを経由する。
+                      </li>
+                      <li>
+                        停止待ちは、要求理由と停止確認後の遷移先を保持する。
+                      </li>
+                      <li>
+                        確認待ち・中断・失敗へ移して実行枠を解放する前に、動作中の操作と未解決の開始許可がないことを確認する。
+                      </li>
+                    </ul>
+                    <div class="contract-detail">
                       <ul class="cell-list">
                         <li>
-                          確認が必要になっても外部操作が動いていれば停止待ちを経由する。
+                          アプリ終了時は待機依頼を保留し、実行中の依頼は停止待ちへ移す。
                         </li>
                         <li>
-                          停止待ちは、要求理由と停止確認後の遷移先を保持する。
+                          予期せぬ終了後は未着手依頼を保留し、実行中・停止待ちの依頼を照合する。
                         </li>
                         <li>
-                          確認待ち・中断・失敗へ移して実行枠を解放する前に、動作中の操作と未解決の開始許可がないことを確認する。
+                          未回答内容、失敗・中断の理由、消費回数を保存する。
                         </li>
+                        <li>再起動後は人間の再開指示を待つ。</li>
                       </ul>
-                      <div class="contract-detail">
-                        <ul class="cell-list">
-                          <li>
-                            アプリ終了時は待機依頼を保留し、実行中の依頼は停止待ちへ移す。
-                          </li>
-                          <li>
-                            予期せぬ終了後は未着手依頼を保留し、実行中・停止待ちの依頼を照合する。
-                          </li>
-                          <li>
-                            未回答内容、失敗・中断の理由、消費回数を保存する。
-                          </li>
-                          <li>再起動後は人間の再開指示を待つ。</li>
-                        </ul>
-                      </div>
-                      <div class="contract-detail">
-                        <ul class="cell-list">
-                          <li>
-                            安全な停止を待ち、終端・結果・保存の照合により完了・失敗・中断へ確定する。
-                          </li>
-                          <li>
-                            確認できない間は状態確認が必要のまま保持する。
-                          </li>
-                          <li>
-                            再認証・利用枠回復後は、人間の指示を受けて再開を許可する。
-                          </li>
-                        </ul>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <th scope="row">保護指定</th>
-                    <td>
+                    </div>
+                    <div class="contract-detail">
                       <ul class="cell-list">
                         <li>
-                          待機から実行中への遷移では、作品の実行枠、依存関係、入力の存在・整合性、最新の保護指定・変更範囲、停止要求と実行許可を確認する。
+                          安全な停止を待ち、終端・結果・保存の照合により完了・失敗・中断へ確定する。
                         </li>
-                        <li>依頼で指定した候補の起点を維持する。</li>
-                      </ul>
-                    </td>
-                  </tr>
-                  <tr>
-                    <th scope="row">依頼</th>
-                    <td>
-                      <ul class="cell-list">
+                        <li>確認できない間は状態確認が必要のまま保持する。</li>
                         <li>
-                          確認待ちの回答と手動再開は、同じ依頼ID・累積回数を維持して待機列の末尾へ戻す。
-                        </li>
-                        <li>
-                          回答の対象と前提を記録し、後続の変更で回答が適用できなくなったら再確認する。
+                          再認証・利用枠回復後は、人間の指示を受けて再開を許可する。
                         </li>
                       </ul>
-                    </td>
-                  </tr>
-                  <tr>
-                    <th scope="row">再実行</th>
-                    <td>
-                      <ul class="cell-list">
-                        <li>
-                          失敗後の自動再実行は、失敗確定・残り予算・デザイン維持・重複防止・再開許可の確認後に行う。
-                        </li>
-                        <li>それ以外では原因・途中状態・対処案を残す。</li>
-                        <li>
-                          再実行予算は実際のやり直しの開始予定記録時に消費する。
-                        </li>
-                      </ul>
-                    </td>
-                  </tr>
-
-                  <tr>
-                    <th scope="row">保存状態</th>
-                    <td>
-                      完成した案への新しい修正指示は新しい依頼として受け付け、元の案・保存状態と関係付ける。
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+                    </div>
+                  </dd>
+                </dl>
+              </article>
+              <article class="contract-card" aria-label="保護指定">
+                <p class="contract-card-title">保護指定</p>
+                <dl>
+                  <dt>仕様</dt>
+                  <dd>
+                    <ul class="cell-list">
+                      <li>
+                        待機から実行中への遷移では、作品の実行枠、依存関係、入力の存在・整合性、最新の保護指定・変更範囲、停止要求と実行許可を確認する。
+                      </li>
+                      <li>依頼で指定した候補の起点を維持する。</li>
+                    </ul>
+                  </dd>
+                </dl>
+              </article>
+              <article class="contract-card" aria-label="依頼">
+                <p class="contract-card-title">依頼</p>
+                <dl>
+                  <dt>仕様</dt>
+                  <dd>
+                    <ul class="cell-list">
+                      <li>
+                        確認待ちの回答と手動再開は、同じ依頼ID・累積回数を維持して待機列の末尾へ戻す。
+                      </li>
+                      <li>
+                        回答の対象と前提を記録し、後続の変更で回答が適用できなくなったら再確認する。
+                      </li>
+                    </ul>
+                  </dd>
+                </dl>
+              </article>
+              <article class="contract-card" aria-label="再実行">
+                <p class="contract-card-title">再実行</p>
+                <dl>
+                  <dt>仕様</dt>
+                  <dd>
+                    <ul class="cell-list">
+                      <li>
+                        失敗後の自動再実行は、失敗確定・残り予算・デザイン維持・重複防止・再開許可の確認後に行う。
+                      </li>
+                      <li>それ以外では原因・途中状態・対処案を残す。</li>
+                      <li>
+                        再実行予算は実際のやり直しの開始予定記録時に消費する。
+                      </li>
+                    </ul>
+                  </dd>
+                </dl>
+              </article>
+              <article class="contract-card" aria-label="保存状態">
+                <p class="contract-card-title">保存状態</p>
+                <dl>
+                  <dt>仕様</dt>
+                  <dd>
+                    完成した案への新しい修正指示は新しい依頼として受け付け、元の案・保存状態と関係付ける。
+                  </dd>
+                </dl>
+              </article>
             </div>
           </section>
         </section>
@@ -873,222 +823,214 @@
           class="spec-section"
         >
           <h2 id="二重受付予算と保存タイミング">7. 受付の永続化</h2>
-          <div
-            aria-label="二重受付・予算と保存タイミング"
-            class="table-scroll"
-            role="region"
-            tabindex="0"
-          >
-            <table class="spec-table">
-              <thead>
-                <tr>
-                  <th scope="col">項目</th>
-                  <th scope="col">仕様</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row">処理内容</th>
-                  <td>
+          <div class="contract-cards">
+            <article class="contract-card" aria-label="処理内容">
+              <p class="contract-card-title">処理内容</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>
+                      ブラウザが送信操作ごとに受付キーを作り、受付キーと内容をDBへ保存する。
+                    </li>
+                    <li>
+                      同じキー・同じ内容の再送には既存の依頼IDを返し、内容が違えば拒否する。
+                    </li>
+                  </ul>
+                  <div class="contract-detail">
                     <ul class="cell-list">
                       <li>
-                        ブラウザが送信操作ごとに受付キーを作り、受付キーと内容をDBへ保存する。
+                        外部へ送る前に落ちても、保存済みの試行IDと予算を維持する。
                       </li>
                       <li>
-                        同じキー・同じ内容の再送には既存の依頼IDを返し、内容が違えば拒否する。
+                        同じ試行の未着手を両側の記録から証明できれば、その試行を人間の再開指示後に実行できる。
                       </li>
+                      <li>証明できない場合は結果不明として扱う。</li>
                     </ul>
-                    <div class="contract-detail">
-                      <ul class="cell-list">
-                        <li>
-                          外部へ送る前に落ちても、保存済みの試行IDと予算を維持する。
-                        </li>
-                        <li>
-                          同じ試行の未着手を両側の記録から証明できれば、その試行を人間の再開指示後に実行できる。
-                        </li>
-                        <li>証明できない場合は結果不明として扱う。</li>
-                      </ul>
-                    </div>
-                    <div class="contract-detail">
-                      <ul class="cell-list">
-                        <li>ファイル完成とDB更新は別々に確認する。</li>
-                        <li>
-                          完成記録とハッシュ・必須出力を照合し、同じ試行の終端通知を何度受けても結果を一度だけ登録する。
-                        </li>
-                        <li>記録が食い違う場合は状態確認が必要とする。</li>
-                      </ul>
-                    </div>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">依頼</th>
-                  <td>
+                  </div>
+                  <div class="contract-detail">
                     <ul class="cell-list">
+                      <li>ファイル完成とDB更新は別々に確認する。</li>
                       <li>
-                        依頼ID、制作実行ID、論理的な操作IDとその試行IDを分ける。
+                        完成記録とハッシュ・必須出力を照合し、同じ試行の終端通知を何度受けても結果を一度だけ登録する。
                       </li>
-                      <li>同じ試行IDの通信再送は照合に使う。</li>
-                      <li>内容の異なる再送は拒否する。</li>
-                      <li>
-                        停止した操作のやり直しには新しい試行IDを発行し、元の操作・依頼を参照する。
-                      </li>
+                      <li>記録が食い違う場合は状態確認が必要とする。</li>
                     </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">再実行</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        再実行は、失敗・停止したどの操作をやり直すか実行管理が対応付ける。
-                      </li>
-                      <li>
-                        生成スクリプトや工程名が変わっても同じやり直しとして扱う。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">停止</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        やり直す操作の試行ID発行・予算1回の消費・開始予定記録を、依頼状態・停止条件・作品の実行枠と一緒にDBで確定してから外部へ送る。
-                      </li>
-                      <li>
-                        一つのやり直しがturn再開と制作操作の両方にまたがっても同じ試行として一度だけ数える。
-                      </li>
-                      <li>別の失敗操作のやり直しはもう1回とする。</li>
-                    </ul>
-                  </td>
-                </tr>
-
-                <tr>
-                  <th scope="row">起動</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        外部側は試行IDと入力内容、受付・開始予定を永続化してからプロセスを起動する。
-                      </li>
-                      <li>
-                        記録と起動の間で落ちた場合も、所有権とプロセスを照合する。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">保護指定</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        作品ごとの実行枠・順番・固定入力・保護指定と変更範囲の参照、確認回答、停止理由、結果参照・終端を保存する。
-                      </li>
-                      <li>
-                        再開や回答後は待機列の末尾へ戻し、実行可能な依頼の受付順で進める。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+                  </div>
+                </dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="依頼">
+              <p class="contract-card-title">依頼</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>
+                      依頼ID、制作実行ID、論理的な操作IDとその試行IDを分ける。
+                    </li>
+                    <li>同じ試行IDの通信再送は照合に使う。</li>
+                    <li>内容の異なる再送は拒否する。</li>
+                    <li>
+                      停止した操作のやり直しには新しい試行IDを発行し、元の操作・依頼を参照する。
+                    </li>
+                  </ul>
+                </dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="再実行">
+              <p class="contract-card-title">再実行</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>
+                      再実行は、失敗・停止したどの操作をやり直すか実行管理が対応付ける。
+                    </li>
+                    <li>
+                      生成スクリプトや工程名が変わっても同じやり直しとして扱う。
+                    </li>
+                  </ul>
+                </dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="停止">
+              <p class="contract-card-title">停止</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>
+                      やり直す操作の試行ID発行・予算1回の消費・開始予定記録を、依頼状態・停止条件・作品の実行枠と一緒にDBで確定してから外部へ送る。
+                    </li>
+                    <li>
+                      一つのやり直しがturn再開と制作操作の両方にまたがっても同じ試行として一度だけ数える。
+                    </li>
+                    <li>別の失敗操作のやり直しはもう1回とする。</li>
+                  </ul>
+                </dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="起動">
+              <p class="contract-card-title">起動</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>
+                      外部側は試行IDと入力内容、受付・開始予定を永続化してからプロセスを起動する。
+                    </li>
+                    <li>
+                      記録と起動の間で落ちた場合も、所有権とプロセスを照合する。
+                    </li>
+                  </ul>
+                </dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="保護指定">
+              <p class="contract-card-title">保護指定</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>
+                      作品ごとの実行枠・順番・固定入力・保護指定と変更範囲の参照、確認回答、停止理由、結果参照・終端を保存する。
+                    </li>
+                    <li>
+                      再開や回答後は待機列の末尾へ戻し、実行可能な依頼の受付順で進める。
+                    </li>
+                  </ul>
+                </dd>
+              </dl>
+            </article>
           </div>
         </section>
         <section aria-labelledby="世代所有権連絡期限" class="spec-section">
           <h2 id="世代所有権連絡期限">8. 世代・所有権・連絡期限</h2>
-          <div
-            aria-label="世代・所有権・連絡期限"
-            class="table-scroll"
-            role="region"
-            tabindex="0"
-          >
-            <table class="spec-table">
-              <thead>
-                <tr>
-                  <th scope="col">項目</th>
-                  <th scope="col">仕様</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row">処理内容</th>
-                  <td>
+          <div class="contract-cards">
+            <article class="contract-card" aria-label="処理内容">
+              <p class="contract-card-title">処理内容</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>
+                      同じ管理DBへの書き込みバックエンドは一つに限定する。
+                    </li>
+                    <li>バックエンド起動ごとに新しい世代識別子を払い出す。</li>
+                    <li>
+                      作品の実行枠には所有する依頼・実行・世代を対応付ける。
+                    </li>
+                    <li>
+                      世代は制作データやGitの版番号とは別の制御情報とする。
+                    </li>
+                  </ul>
+                  <div class="contract-detail">
                     <ul class="cell-list">
                       <li>
-                        同じ管理DBへの書き込みバックエンドは一つに限定する。
+                        Windows側でも同じ実行領域を管理する補助プロセスを一つに限定し、現在の世代と試行IDを照合する。
                       </li>
-                      <li>
-                        バックエンド起動ごとに新しい世代識別子を払い出す。
-                      </li>
-                      <li>
-                        作品の実行枠には所有する依頼・実行・世代を対応付ける。
-                      </li>
-                      <li>
-                        世代は制作データやGitの版番号とは別の制御情報とする。
-                      </li>
+                      <li>古い世代からの開始要求を拒否する。</li>
+                      <li>古い結果通知は照合資料として保持する。</li>
                     </ul>
-                    <div class="contract-detail">
-                      <ul class="cell-list">
-                        <li>
-                          Windows側でも同じ実行領域を管理する補助プロセスを一つに限定し、現在の世代と試行IDを照合する。
-                        </li>
-                        <li>古い世代からの開始要求を拒否する。</li>
-                        <li>古い結果通知は照合資料として保持する。</li>
-                      </ul>
-                    </div>
-                    <div class="contract-detail">
-                      <ul class="cell-list">
-                        <li>
-                          双方向に5秒ごとの連絡確認、各受信側の単調時計で最後の有効な連絡から30秒を期限とする。
-                        </li>
-                        <li>
-                          現在の世代・連絡番号に対応する新しい連絡で期限を更新する。
-                        </li>
-                      </ul>
-                    </div>
-                    <div class="contract-detail">
-                      <ul class="cell-list">
-                        <li>
-                          照合後、人間の再開指示で新しい実行許可を発行する。
-                        </li>
-                        <li>
-                          PCスリープからの復帰も期限切れなら同じ扱いとする。
-                        </li>
-                      </ul>
-                    </div>
-                  </td>
-                </tr>
-
-                <tr>
-                  <th scope="row">所有権</th>
-                  <td>旧プロセスの所有権、停止・終了と出力を照合する。</td>
-                </tr>
-
-                <tr>
-                  <th scope="row">記録</th>
-                  <td>
+                  </div>
+                  <div class="contract-detail">
                     <ul class="cell-list">
-                      <li>30秒の期限切れは、連絡喪失として記録する。</li>
-                      <li>期限切れを記録し新規操作を止める。</li>
                       <li>
-                        Windows側は編集・保存を安全な境目で止め、保存済み入力の専用レンダーを終了する。
+                        双方向に5秒ごとの連絡確認、各受信側の単調時計で最後の有効な連絡から30秒を期限とする。
+                      </li>
+                      <li>
+                        現在の世代・連絡番号に対応する新しい連絡で期限を更新する。
                       </li>
                     </ul>
-                  </td>
-                </tr>
-
-                <tr>
-                  <th scope="row">停止</th>
-                  <td>
+                  </div>
+                  <div class="contract-detail">
                     <ul class="cell-list">
-                      <li>編集・保存は安全な境目で停止する。</li>
                       <li>
-                        安全な境目へ進めなければ停止待ちのまま対象を示す。
+                        照合後、人間の再開指示で新しい実行許可を発行する。
+                      </li>
+                      <li>
+                        PCスリープからの復帰も期限切れなら同じ扱いとする。
                       </li>
                     </ul>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+                  </div>
+                </dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="所有権">
+              <p class="contract-card-title">所有権</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>旧プロセスの所有権、停止・終了と出力を照合する。</dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="記録">
+              <p class="contract-card-title">記録</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>30秒の期限切れは、連絡喪失として記録する。</li>
+                    <li>期限切れを記録し新規操作を止める。</li>
+                    <li>
+                      Windows側は編集・保存を安全な境目で止め、保存済み入力の専用レンダーを終了する。
+                    </li>
+                  </ul>
+                </dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="停止">
+              <p class="contract-card-title">停止</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>編集・保存は安全な境目で停止する。</li>
+                    <li>安全な境目へ進めなければ停止待ちのまま対象を示す。</li>
+                  </ul>
+                </dd>
+              </dl>
+            </article>
           </div>
         </section>
         <section

@@ -78,41 +78,35 @@
         </nav>
         <section aria-labelledby="責務と保存単位" class="spec-section">
           <h2 id="責務と保存単位">1. 保存単位</h2>
-          <div
-            aria-label="保存単位"
-            class="table-scroll"
-            role="region"
-            tabindex="0"
-          >
-            <table class="spec-table">
-              <thead>
-                <tr>
-                  <th scope="col">観点</th>
-                  <th scope="col">仕様</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row">保存場所</th>
-                  <td>
-                    <a href="application-architecture.html">全体設計</a
-                    >に従い、制作履歴・会話・依頼等のDBはWSLのLinuxファイルシステム上のSQLite、制作ファイルとWindows側の実行記録はWindowsへ保存する。
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">パス変換</th>
-                  <td>
-                    保存モジュールが保存ルートID・相対パスと各OSの実パスの対応を管理する。
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">移行先</th>
-                  <td>
-                    移行先ではルートを設定し直し、永続IDや制作の参照関係を維持する。
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+          <div class="contract-cards">
+            <article class="contract-card" aria-label="保存場所">
+              <p class="contract-card-title">保存場所</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  <a href="application-architecture.html">全体設計</a
+                  >に従い、制作履歴・会話・依頼等のDBはWSLのLinuxファイルシステム上のSQLite、制作ファイルとWindows側の実行記録はWindowsへ保存する。
+                </dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="パス変換">
+              <p class="contract-card-title">パス変換</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  保存モジュールが保存ルートID・相対パスと各OSの実パスの対応を管理する。
+                </dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="移行先">
+              <p class="contract-card-title">移行先</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  移行先ではルートを設定し直し、永続IDや制作の参照関係を維持する。
+                </dd>
+              </dl>
+            </article>
           </div>
           <div
             aria-label="責務と保存単位"
@@ -182,146 +176,111 @@
               </tbody>
             </table>
           </div>
-          <div
-            aria-label="責務と保存単位"
-            class="table-scroll"
-            role="region"
-            tabindex="0"
-          >
-            <table class="spec-table">
-              <thead>
-                <tr>
-                  <th scope="col">項目</th>
-                  <th scope="col">仕様</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row">保存状態</th>
-                  <td>
+          <div class="contract-cards">
+            <article class="contract-card" aria-label="保存状態">
+              <p class="contract-card-title">保存状態</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>
+                      作業用のコピーと、記録した保存状態の固定実体を分ける。
+                    </li>
+                    <li>
+                      人間もAIも作業用コピーを編集し、その結果を新しい保存状態として登録する。
+                    </li>
+                    <li>
+                      確定実体を編集用ファイルへのハードリンク等で共有する。
+                    </li>
+                    <li>採用しても固定内容と削除保護の契約を維持する。</li>
+                  </ul>
+                  <div class="contract-detail">
                     <ul class="cell-list">
                       <li>
-                        作業用のコピーと、記録した保存状態の固定実体を分ける。
+                        PSD/PSBが参照したレンダーと、その入力保存状態を記録する。
                       </li>
-                      <li>
-                        人間もAIも作業用コピーを編集し、その結果を新しい保存状態として登録する。
-                      </li>
-                      <li>
-                        確定実体を編集用ファイルへのハードリンク等で共有する。
-                      </li>
-                      <li>採用しても固定内容と削除保護の契約を維持する。</li>
+                      <li>新しい保存状態として確定する。</li>
                     </ul>
-                    <div class="contract-detail">
-                      <ul class="cell-list">
-                        <li>
-                          PSD/PSBが参照したレンダーと、その入力保存状態を記録する。
-                        </li>
-                        <li>新しい保存状態として確定する。</li>
-                      </ul>
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+                  </div>
+                </dd>
+              </dl>
+            </article>
           </div>
 
           <section aria-labelledby="依存素材の取り込み" class="spec-subsection">
             <h3 id="依存素材の取り込み">1-1. 依存素材の取り込み</h3>
-            <div
-              aria-label="依存素材の取り込み"
-              class="table-scroll"
-              role="region"
-              tabindex="0"
-            >
-              <table class="spec-table">
-                <thead>
-                  <tr>
-                    <th scope="col">項目</th>
-                    <th scope="col">仕様</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <th scope="row">処理内容</th>
-                    <td>
-                      <ul class="cell-list">
-                        <li>
-                          元ファイルと依存関係を確認し、依存先も再帰的に収集する。
-                        </li>
-                        <li>循環や未解決の参照を検知する。</li>
-                      </ul>
-                    </td>
-                  </tr>
-                  <tr>
-                    <th scope="row">参照</th>
-                    <td>
-                      <ul class="cell-list">
-                        <li>
-                          素材を管理下へコピーし、作業用コピーの参照先を管理下の素材へ変更する。
-                        </li>
-                        <li>
-                          ルートからの逸脱、リンクの実際の参照先も確認する。
-                        </li>
-                      </ul>
-                      <div class="contract-detail">
-                        コピーした内容と参照先を検証する。
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <th scope="row">整合性</th>
-                    <td>
-                      <ul class="cell-list">
-                        <li>
-                          元の所在と取り込み後のファイル参照、ハッシュ、出典・利用条件等の記録への対応を残す。
-                        </li>
-                        <li>
-                          依存素材の必須メタデータとサービス別の取り込みは<a
-                            href="reference-and-assets.html"
-                            >参考調査・素材の設計</a
-                          >を参照する。
-                        </li>
-                      </ul>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            <div
-              aria-label="依存素材の取り込み"
-              class="table-scroll"
-              role="region"
-              tabindex="0"
-            >
-              <table class="spec-table">
-                <thead>
-                  <tr>
-                    <th scope="col">項目</th>
-                    <th scope="col">仕様</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <th scope="row">記録</th>
-                    <td>
-                      <ul class="cell-list">
-                        <li>
-                          取り込み不可・所在不明の素材は、不足の対象・理由・必要な操作を記録する。
-                        </li>
-                        <li>
-                          アドオン・実行環境など制作ファイルだけで保存できない依存も必要条件として記録する。
-                        </li>
-                      </ul>
-                    </td>
-                  </tr>
-                  <tr>
-                    <th scope="row">処理内容</th>
-                    <td>
+            <div class="contract-cards">
+              <article aria-label="処理内容" class="contract-card">
+                <p class="contract-card-title">処理内容</p>
+                <dl>
+                  <dt>仕様</dt>
+                  <dd>
+                    <ul class="cell-list">
+                      <li>
+                        元ファイルと依存関係を確認し、依存先も再帰的に収集する。
+                      </li>
+                      <li>循環や未解決の参照を検知する。</li>
+                    </ul>
+                    <div class="contract-detail">
                       必須の制作ファイルのコピー失敗と、外部依存の不足を区別する。
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+                    </div>
+                  </dd>
+                </dl>
+              </article>
+              <article aria-label="参照" class="contract-card">
+                <p class="contract-card-title">参照</p>
+                <dl>
+                  <dt>仕様</dt>
+                  <dd>
+                    <ul class="cell-list">
+                      <li>
+                        素材を管理下へコピーし、作業用コピーの参照先を管理下の素材へ変更する。
+                      </li>
+                      <li>
+                        ルートからの逸脱、リンクの実際の参照先も確認する。
+                      </li>
+                    </ul>
+                    <div class="contract-detail">
+                      コピーした内容と参照先を検証する。
+                    </div>
+                  </dd>
+                </dl>
+              </article>
+              <article aria-label="整合性" class="contract-card">
+                <p class="contract-card-title">整合性</p>
+                <dl>
+                  <dt>仕様</dt>
+                  <dd>
+                    <ul class="cell-list">
+                      <li>
+                        元の所在と取り込み後のファイル参照、ハッシュ、出典・利用条件等の記録への対応を残す。
+                      </li>
+                      <li>
+                        依存素材の必須メタデータとサービス別の取り込みは<a
+                          href="reference-and-assets.html"
+                          >参考調査・素材の設計</a
+                        >を参照する。
+                      </li>
+                    </ul>
+                  </dd>
+                </dl>
+              </article>
+              <article aria-label="記録" class="contract-card">
+                <p class="contract-card-title">記録</p>
+                <dl>
+                  <dt>仕様</dt>
+                  <dd>
+                    <ul class="cell-list">
+                      <li>
+                        取り込み不可・所在不明の素材は、不足の対象・理由・必要な操作を記録する。
+                      </li>
+                      <li>
+                        アドオン・実行環境など制作ファイルだけで保存できない依存も必要条件として記録する。
+                      </li>
+                    </ul>
+                  </dd>
+                </dl>
+              </article>
             </div>
           </section>
           <section aria-labelledby="保存の確定と照合" class="spec-subsection">
@@ -358,45 +317,36 @@
                 矢印は手順の順序を表す。各段階の条件に従って処理を進める。
               </figcaption>
             </figure>
-            <div
-              aria-label="保存の確定と照合"
-              class="table-scroll"
-              role="region"
-              tabindex="0"
-            >
-              <table class="spec-table">
-                <thead>
-                  <tr>
-                    <th scope="col">項目</th>
-                    <th scope="col">仕様</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <th scope="row">適用条件</th>
-                    <td>
-                      <ul class="cell-list">
-                        <li>
-                          ファイル確定後にDB保存が失敗した場合も、その実体を照合対象として保持する。
-                        </li>
-                        <li>履歴・根拠を保持して照合する。</li>
-                        <li>
-                          実行の試行ID・世代・所有権と結果の一度だけの登録は<a
-                            href="execution-lifecycle.html"
-                            >実行状態設計</a
-                          >に従う。
-                        </li>
-                      </ul>
-                    </td>
-                  </tr>
-                  <tr>
-                    <th scope="row">処理内容</th>
-                    <td>
-                      具体的なテーブル・キー生成・保持方法は実装仕様で決める。
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+            <div class="contract-cards">
+              <article class="contract-card" aria-label="適用条件">
+                <p class="contract-card-title">適用条件</p>
+                <dl>
+                  <dt>仕様</dt>
+                  <dd>
+                    <ul class="cell-list">
+                      <li>
+                        ファイル確定後にDB保存が失敗した場合も、その実体を照合対象として保持する。
+                      </li>
+                      <li>履歴・根拠を保持して照合する。</li>
+                      <li>
+                        実行の試行ID・世代・所有権と結果の一度だけの登録は<a
+                          href="execution-lifecycle.html"
+                          >実行状態設計</a
+                        >に従う。
+                      </li>
+                    </ul>
+                  </dd>
+                </dl>
+              </article>
+              <article class="contract-card" aria-label="処理内容">
+                <p class="contract-card-title">処理内容</p>
+                <dl>
+                  <dt>仕様</dt>
+                  <dd>
+                    具体的なテーブル・キー生成・保持方法は実装仕様で決める。
+                  </dd>
+                </dl>
+              </article>
             </div>
           </section>
         </section>
@@ -407,99 +357,81 @@
             id="保存状態への復元と派生"
           ></span>
           <h2 id="過去の保存状態へ戻す">2. 過去の保存状態へ戻す</h2>
-          <div
-            aria-label="過去の保存状態へ戻す"
-            class="table-scroll"
-            role="region"
-            tabindex="0"
-          >
-            <table class="spec-table">
-              <thead>
-                <tr>
-                  <th scope="col">項目</th>
-                  <th scope="col">仕様</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row">記録</th>
-                  <td>
+          <div class="contract-cards">
+            <article class="contract-card" aria-label="記録">
+              <p class="contract-card-title">記録</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>
+                      人間がBlender／Photoshopの内容を保存し、未登録の手修正を記録する。
+                    </li>
+                    <li>
+                      保存済みデータが対象であることを示して保存を確認する。
+                    </li>
+                  </ul>
+                </dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="復元">
+              <p class="contract-card-title">復元</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>復元元の制作ファイル・依存素材を確認する。</li>
+                    <li>不足・破損があれば、その状態への復元を止める。</li>
+                  </ul>
+                  <div class="contract-detail">
+                    別の作業領域に復元用のコピーを準備し、依存参照を含めて検証する。
+                  </div>
+                  <div class="contract-detail">
                     <ul class="cell-list">
                       <li>
-                        人間がBlender／Photoshopの内容を保存し、未登録の手修正を記録する。
+                        復元元の内容に対応する新しい保存状態と変更記録を確定し、変更前・復元元を別々に参照する。
                       </li>
-                      <li>
-                        保存済みデータが対象であることを示して保存を確認する。
-                      </li>
+                      <li>成功後に現在状態を切り替える。</li>
+                      <li>失敗時は直前の状態を保つ。</li>
                     </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">復元</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>復元元の制作ファイル・依存素材を確認する。</li>
-                      <li>不足・破損があれば、その状態への復元を止める。</li>
-                    </ul>
-                    <div class="contract-detail">
-                      別の作業領域に復元用のコピーを準備し、依存参照を含めて検証する。
-                    </div>
-                    <div class="contract-detail">
-                      <ul class="cell-list">
-                        <li>
-                          復元元の内容に対応する新しい保存状態と変更記録を確定し、変更前・復元元を別々に参照する。
-                        </li>
-                        <li>成功後に現在状態を切り替える。</li>
-                        <li>失敗時は直前の状態を保つ。</li>
-                      </ul>
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+                  </div>
+                </dd>
+              </dl>
+            </article>
           </div>
           <p>復元元より後の履歴と理由を保持する。</p>
         </section>
         <section aria-labelledby="派生作品" class="spec-section">
           <h2 id="派生作品">3. 派生作品</h2>
-          <div
-            aria-label="派生作品"
-            class="table-scroll"
-            role="region"
-            tabindex="0"
-          >
-            <table class="spec-table">
-              <thead>
-                <tr>
-                  <th scope="col">項目</th>
-                  <th scope="col">仕様</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row">保存状態</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        元作品ID・起点の保存状態IDを記録し、新しい作品IDと最初の保存状態を作る。
-                      </li>
-                      <li>
-                        必要な素材も含めて独立した編集用コピーを準備・検証する。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">参照</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>元作品の会話・採否・理由は出典として参照する。</li>
-                      <li>以後の現在状態・会話・採否は派生作品に属する。</li>
-                    </ul>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+          <div class="contract-cards">
+            <article class="contract-card" aria-label="保存状態">
+              <p class="contract-card-title">保存状態</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>
+                      元作品ID・起点の保存状態IDを記録し、新しい作品IDと最初の保存状態を作る。
+                    </li>
+                    <li>
+                      必要な素材も含めて独立した編集用コピーを準備・検証する。
+                    </li>
+                  </ul>
+                </dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="参照">
+              <p class="contract-card-title">参照</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>元作品の会話・採否・理由は出典として参照する。</li>
+                    <li>以後の現在状態・会話・採否は派生作品に属する。</li>
+                  </ul>
+                </dd>
+              </dl>
+            </article>
           </div>
         </section>
         <section aria-labelledby="可用性と明示削除" class="spec-section">
@@ -541,52 +473,43 @@
               </tbody>
             </table>
           </div>
-          <div
-            aria-label="可用性と明示削除"
-            class="table-scroll"
-            role="region"
-            tabindex="0"
-          >
-            <table class="spec-table">
-              <thead>
-                <tr>
-                  <th scope="col">項目</th>
-                  <th scope="col">仕様</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row">処理内容</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        人間は、使われていない候補や過去状態の大容量実体を明示的に削除できる。
-                      </li>
-                      <li>
-                        ただし、現在採用中・実行中の対象、または削除対象以外の保存状態・作品が必要とする実体は保護する。
-                      </li>
-                      <li>依存素材の共有も参照先まで調べる。</li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">復元</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        削除前に対象・影響する保存状態・復元できなくなる内容を示す。
-                      </li>
-                      <li>
-                        削除開始前に参照・実行状況を再確認し、競合する採用・実行・保存操作と直列に扱う。
-                      </li>
-                      <li>
-                        削除途中の失敗は再照合し、実体が残る場合と既に消えた場合を区別する。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+          <div class="contract-cards">
+            <article class="contract-card" aria-label="処理内容">
+              <p class="contract-card-title">処理内容</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>
+                      人間は、使われていない候補や過去状態の大容量実体を明示的に削除できる。
+                    </li>
+                    <li>
+                      ただし、現在採用中・実行中の対象、または削除対象以外の保存状態・作品が必要とする実体は保護する。
+                    </li>
+                    <li>依存素材の共有も参照先まで調べる。</li>
+                  </ul>
+                </dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="復元">
+              <p class="contract-card-title">復元</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>
+                      削除前に対象・影響する保存状態・復元できなくなる内容を示す。
+                    </li>
+                    <li>
+                      削除開始前に参照・実行状況を再確認し、競合する採用・実行・保存操作と直列に扱う。
+                    </li>
+                    <li>
+                      削除途中の失敗は再照合し、実体が残る場合と既に消えた場合を区別する。
+                    </li>
+                  </ul>
+                </dd>
+              </dl>
+            </article>
           </div>
         </section>
         <section
@@ -594,38 +517,26 @@
           class="spec-section"
         >
           <h2 id="全体バックアップの形式と手順">5. 全体バックアップ</h2>
-          <div
-            aria-label="全体バックアップの形式と手順"
-            class="table-scroll"
-            role="region"
-            tabindex="0"
-          >
-            <table class="spec-table">
-              <thead>
-                <tr>
-                  <th scope="col">項目</th>
-                  <th scope="col">仕様</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row">処理内容</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        初期版は全作品・全会話・制作履歴・保存対象の実体を、一つの通常フォルダーへ非圧縮で書き出す。
-                      </li>
-                      <li>
-                        LLMやCodex接続なしで通常のプログラムとして動作する。
-                      </li>
-                    </ul>
-                    <div class="contract-detail">
-                      以下は論理構成であり、ファイル名・スキーマ・配置の詳細は実装仕様で固定する。
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+          <div class="contract-cards">
+            <article class="contract-card" aria-label="処理内容">
+              <p class="contract-card-title">処理内容</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>
+                      初期版は全作品・全会話・制作履歴・保存対象の実体を、一つの通常フォルダーへ非圧縮で書き出す。
+                    </li>
+                    <li>
+                      LLMやCodex接続なしで通常のプログラムとして動作する。
+                    </li>
+                  </ul>
+                  <div class="contract-detail">
+                    以下は論理構成であり、ファイル名・スキーマ・配置の詳細は実装仕様で固定する。
+                  </div>
+                </dd>
+              </dl>
+            </article>
           </div>
           <pre tabindex="0"><code class="language-text">バックアップフォルダー/
 ├── 構成一覧（形式識別、ID、参照、サイズ、ハッシュ、不足一覧）
@@ -680,41 +591,35 @@
 
           <section aria-labelledby="git情報と除外対象" class="spec-subsection">
             <h3 id="git情報と除外対象">5-1. Git参照</h3>
-            <div
-              aria-label="Git参照"
-              class="table-scroll"
-              role="region"
-              tabindex="0"
-            >
-              <table class="spec-table">
-                <thead>
-                  <tr>
-                    <th scope="col">観点</th>
-                    <th scope="col">仕様</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <th scope="row">参照情報</th>
-                    <td>
-                      <a href="git-versioning.html">Git版管理設計</a
-                      >に従い、リポジトリ識別・資格情報を含まないGitHubの所在・Gitオブジェクト形式と、参照するフルコミットハッシュ・保持用タグを含める。
-                    </td>
-                  </tr>
-                  <tr>
-                    <th scope="row">対象記録</th>
-                    <td>
-                      作品・依頼・成功／失敗の全実行・版切替の参照を対象とする。
-                    </td>
-                  </tr>
-                  <tr>
-                    <th scope="row">可用性</th>
-                    <td>
-                      書き出し時のローカル可用性、リモート保存の最終確認結果・時刻、未push・欠損・確認不能も保持する。
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+            <div class="contract-cards">
+              <article class="contract-card" aria-label="参照情報">
+                <p class="contract-card-title">参照情報</p>
+                <dl>
+                  <dt>仕様</dt>
+                  <dd>
+                    <a href="git-versioning.html">Git版管理設計</a
+                    >に従い、リポジトリ識別・資格情報を含まないGitHubの所在・Gitオブジェクト形式と、参照するフルコミットハッシュ・保持用タグを含める。
+                  </dd>
+                </dl>
+              </article>
+              <article class="contract-card" aria-label="対象記録">
+                <p class="contract-card-title">対象記録</p>
+                <dl>
+                  <dt>仕様</dt>
+                  <dd>
+                    作品・依頼・成功／失敗の全実行・版切替の参照を対象とする。
+                  </dd>
+                </dl>
+              </article>
+              <article class="contract-card" aria-label="可用性">
+                <p class="contract-card-title">可用性</p>
+                <dl>
+                  <dt>仕様</dt>
+                  <dd>
+                    書き出し時のローカル可用性、リモート保存の最終確認結果・時刻、未push・欠損・確認不能も保持する。
+                  </dd>
+                </dl>
+              </article>
             </div>
           </section>
           <section
@@ -788,58 +693,52 @@
         </section>
         <section aria-labelledby="ローカル保存形式の移行" class="spec-section">
           <h2 id="ローカル保存形式の移行">6. ローカル保存形式の移行</h2>
-          <div
-            aria-label="ローカル保存形式の移行"
-            class="table-scroll"
-            role="region"
-            tabindex="0"
-          >
-            <table class="spec-table">
-              <thead>
-                <tr>
-                  <th scope="col">項目</th>
-                  <th scope="col">仕様</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row">Git参照</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>保存形式の識別とGitの内容の版を分ける。</li>
-                      <li>
-                        <a href="git-versioning.html#ローカル保存形式の変更"
-                          >Git版管理設計の移行契約</a
-                        >に従い、変更内容・必要容量・退避先を示し、人間の確認後に書き込みを止める。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">整合性</th>
-                  <td>
-                    変更するDB・ローカル記録・実体を、
-                    元の構成とサイズ・ハッシュを持つ退避領域へコピーし 、
-                    復旧に必要な構成が揃ったことを検証してから変換する。
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">参照</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        変換の段階と退避先を永続化し、変換後のID・参照・形式を検証してから利用する。
-                      </li>
-                      <li>退避した元の構成へ戻せる状態を維持する。</li>
-                      <li>復旧時は退避した形式に揃えて利用する。</li>
-                      <li>
-                        移行後の追加記録を失う旧状態への復元は、影響を示した別の明示操作とする。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+          <div class="contract-cards">
+            <article class="contract-card" aria-label="Git参照">
+              <p class="contract-card-title">Git参照</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>保存形式の識別とGitの内容の版を分ける。</li>
+                    <li>
+                      <a href="git-versioning.html#ローカル保存形式の変更"
+                        >Git版管理設計の移行契約</a
+                      >に従い、変更内容・必要容量・退避先を示し、人間の確認後に書き込みを止める。
+                    </li>
+                  </ul>
+                </dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="整合性">
+              <p class="contract-card-title">整合性</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  変更するDB・ローカル記録・実体を、
+                  元の構成とサイズ・ハッシュを持つ退避領域へコピーし 、
+                  復旧に必要な構成が揃ったことを検証してから変換する。
+                </dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="参照">
+              <p class="contract-card-title">参照</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>
+                      変換の段階と退避先を永続化し、変換後のID・参照・形式を検証してから利用する。
+                    </li>
+                    <li>退避した元の構成へ戻せる状態を維持する。</li>
+                    <li>復旧時は退避した形式に揃えて利用する。</li>
+                    <li>
+                      移行後の追加記録を失う旧状態への復元は、影響を示した別の明示操作とする。
+                    </li>
+                  </ul>
+                </dd>
+              </dl>
+            </article>
           </div>
         </section>
         <section class="sources">

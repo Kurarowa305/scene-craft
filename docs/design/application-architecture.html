@@ -268,62 +268,59 @@
         </section>
         <section aria-labelledby="技術とプロセス" class="spec-section">
           <h2 id="技術とプロセス">3. 採用技術</h2>
-          <div
-            aria-label="採用技術"
-            class="table-scroll"
-            role="region"
-            tabindex="0"
-          >
-            <table class="spec-table">
-              <thead>
-                <tr>
-                  <th scope="col">項目</th>
-                  <th scope="col">仕様</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row">画面</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>画面は React・TypeScript を採用する。</li>
-                      <li>ビルドは Vite を採用する。</li>
-                      <li>
-                        ローカル用途のため初期は静的にビルドした画面を配信する。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">バックエンド</th>
-                  <td>
-                    WSL のバックエンドは Node.js・Fastify を採用し、TypeScript
-                    で記述する。
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">データベース</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        制作履歴・依頼記録は WSL の Linux ファイルシステム上の
-                        SQLite を採用する。
-                      </li>
-                      <li>
-                        データ構造は「作品と制作履歴のデータモデルを決める」、バックアップは「制作データの保存・復元・バックアップ方式を決める」で具体化する。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">通信分離</th>
-                  <td>
-                    HTTP と SSE
-                    は指示と進捗を分け、ブラウザの再接続を依頼の再実行から独立させるために選ぶ。
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+          <div class="contract-cards">
+            <article class="contract-card" aria-label="画面">
+              <p class="contract-card-title">画面</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>画面は React・TypeScript を採用する。</li>
+                    <li>ビルドは Vite を採用する。</li>
+                    <li>
+                      ローカル用途のため初期は静的にビルドした画面を配信する。
+                    </li>
+                  </ul>
+                </dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="バックエンド">
+              <p class="contract-card-title">バックエンド</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  WSL のバックエンドは Node.js・Fastify を採用し、TypeScript
+                  で記述する。
+                </dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="データベース">
+              <p class="contract-card-title">データベース</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>
+                      制作履歴・依頼記録は WSL の Linux ファイルシステム上の
+                      SQLite を採用する。
+                    </li>
+                    <li>
+                      データ構造は「作品と制作履歴のデータモデルを決める」、バックアップは「制作データの保存・復元・バックアップ方式を決める」で具体化する。
+                    </li>
+                  </ul>
+                </dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="通信分離">
+              <p class="contract-card-title">通信分離</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  HTTP と SSE
+                  は指示と進捗を分け、ブラウザの再接続を依頼の再実行から独立させるために選ぶ。
+                </dd>
+              </dl>
+            </article>
           </div>
         </section>
         <section aria-labelledby="プロセス" class="spec-section">
@@ -443,41 +440,33 @@
         </section>
         <section aria-labelledby="通信とモジュールの責務" class="spec-section">
           <h2 id="通信とモジュールの責務">5. 通信とモジュールの責務</h2>
-          <div
-            aria-label="通信とモジュールの責務"
-            class="table-scroll"
-            role="region"
-            tabindex="0"
-          >
-            <table class="spec-table">
-              <thead>
-                <tr>
-                  <th scope="col">観点</th>
-                  <th scope="col">仕様</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row">通信方式</th>
-                  <td>
-                    ブラウザからの指示は HTTP、進捗配信は SSE を採用する。
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">受付範囲</th>
-                  <td>
-                    画面・指示・進捗を同じ origin から提供し、localhost
-                    のみで受け付ける。
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">再接続</th>
-                  <td>
-                    再接続時は保存済み状態を読み、イベントの重複・欠落を照合する。
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+          <div class="contract-cards">
+            <article class="contract-card" aria-label="通信方式">
+              <p class="contract-card-title">通信方式</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>ブラウザからの指示は HTTP、進捗配信は SSE を採用する。</dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="受付範囲">
+              <p class="contract-card-title">受付範囲</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  画面・指示・進捗を同じ origin から提供し、localhost
+                  のみで受け付ける。
+                </dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="再接続">
+              <p class="contract-card-title">再接続</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  再接続時は保存済み状態を読み、イベントの重複・欠落を照合する。
+                </dd>
+              </dl>
+            </article>
           </div>
           <div
             aria-label="通信とモジュールの責務"
