@@ -1,0 +1,19 @@
+digraph G {
+  graph [rankdir=TB, bgcolor="transparent", pad="0.35", nodesep="0.4", ranksep="0.65", splines=spline, outputorder=edgesfirst];
+  node [shape=box, style="rounded,filled", color="#9fb7ae", fillcolor="#edf2eb", fontname="Noto Sans CJK JP", fontsize=16, margin="0.22,0.16"];
+  edge [color="#48716b", fontcolor="#233b37", fontname="Noto Sans CJK JP", fontsize=15, arrowsize=0.8, penwidth=1.4];
+  state0 [label="開始", shape=oval, fillcolor="#ffffff"];
+  state1 [label="待機"];
+  state2 [label="実行中"];
+  state3 [label="確認待ち"];
+  state4 [label="保留"];
+  state5 [label="中断"];
+  state0 -> state1 [id="transition-1", label="受付"];
+  state1 -> state2 [id="transition-2", label="順番・前提・入力を確認"];
+  state1 -> state3 [id="transition-3", label="前提の変更"];
+  state1 -> state4 [id="transition-4", label="アプリ終了・再起動"];
+  state1 -> state5 [id="transition-5", label="個別停止・外部操作なし"];
+  state4 -> state5 [id="transition-6", label="個別停止・外部操作なし"];
+  state3 -> state5 [id="transition-7", label="個別停止・外部操作なし"];
+  state2 -> state3 [id="transition-9", label="操作停止を確認し判断を求める"];
+}
