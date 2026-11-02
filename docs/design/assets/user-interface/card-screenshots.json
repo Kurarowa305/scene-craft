@@ -1,312 +1,312 @@
 [
   {
     "card_index": 0,
-    "title": "チャットタイトルと左右の表示幅の調整",
+    "title": "処理内容",
     "screenshot": "overview.png"
   },
   {
     "card_index": 1,
-    "title": "新しいタブの追加と内容の種類選択",
+    "title": "保護指定",
     "screenshot": "tab-chooser.png"
   },
   {
     "card_index": 2,
-    "title": "作品・作風の選択と新しい制作会話の開始",
+    "title": "処理内容",
     "screenshot": "new-work.png"
   },
   {
     "card_index": 3,
-    "title": "既存ファイルの取り込みと最初の制作記録",
+    "title": "記録",
     "screenshot": "new-work.png"
   },
   {
     "card_index": 4,
-    "title": "送信時のエージェント・モデルと修正元の選択",
+    "title": "モデル",
     "screenshot": "composer.png"
   },
   {
     "card_index": 5,
-    "title": "会話の成果物リンクから開くプレビュー",
+    "title": "依頼",
     "screenshot": "preview.png"
   },
   {
     "card_index": 6,
-    "title": "具体的な保存状態と実体の可用性の表示",
+    "title": "保存状態",
     "screenshot": "deleted-preview.png"
   },
   {
     "card_index": 7,
-    "title": "メインチャットで指示する採否と追加修正",
+    "title": "採用判断",
     "screenshot": "adoption.png"
   },
   {
     "card_index": 8,
-    "title": "任意の判断理由と採用処理の状態表示",
+    "title": "処理内容",
     "screenshot": "adoption.png"
   },
   {
     "card_index": 9,
-    "title": "成果物・添付と本文による手作業の記録",
+    "title": "記録",
     "screenshot": "attachments.png"
   },
   {
     "card_index": 10,
-    "title": "修正の起点と修正後ファイルの区別",
+    "title": "処理内容",
     "screenshot": "attachments.png"
   },
   {
     "card_index": 11,
-    "title": "保存済みblendからのプレビュー再利用・生成",
+    "title": "処理内容",
     "screenshot": "missing-preview.png"
   },
   {
     "card_index": 12,
-    "title": "記録用プレビューのカメラ・フレーム・解像度",
+    "title": "記録",
     "screenshot": "preview.png"
   },
   {
     "card_index": 13,
-    "title": "画像取得失敗後の記録保持と後日の補完",
+    "title": "適用条件",
     "screenshot": "missing-preview.png"
   },
   {
     "card_index": 14,
-    "title": "サイドチャットへ引き継ぐ作品と制作の話題",
+    "title": "採用判断",
     "screenshot": "side-chat.png"
   },
   {
     "card_index": 15,
-    "title": "相談専用として共有する文脈と操作権限",
+    "title": "文脈",
     "screenshot": "side-chat.png"
   },
   {
     "card_index": 16,
-    "title": "相談履歴の再表示と回答の停止",
+    "title": "原文",
     "screenshot": "side-stop.png"
   },
   {
     "card_index": 17,
-    "title": "サイドチャットに公開する参照用ツール",
+    "title": "参照",
     "screenshot": "side-chat.png"
   },
   {
     "card_index": 18,
-    "title": "保存状態の分岐と理由をたどる制作履歴",
+    "title": "採用判断",
     "screenshot": "history.png"
   },
   {
     "card_index": 19,
-    "title": "履歴の節点を起点とする追加修正と復元",
+    "title": "復元",
     "screenshot": "restore.png"
   },
   {
     "card_index": 20,
-    "title": "特定の保存状態から始める独立した派生作品",
+    "title": "派生",
     "screenshot": "derive.png"
   },
   {
     "card_index": 21,
-    "title": "制作実体の不足・破損と復元可否の表示",
+    "title": "処理内容",
     "screenshot": "deleted-preview.png"
   },
   {
     "card_index": 22,
-    "title": "保護一覧での対象確認と継続的な解除",
+    "title": "保護指定",
     "screenshot": "guards.png"
   },
   {
     "card_index": 23,
-    "title": "保護の競合確認と依頼限定の一時許可",
+    "title": "依頼",
     "screenshot": "protection-conflict.png"
   },
   {
     "card_index": 24,
-    "title": "確認が必要な依頼を優先する状態アイコン",
+    "title": "表示の優先順位",
     "screenshot": "unknown.png"
   },
   {
     "card_index": 25,
-    "title": "チャットで伝える実行状況と必要な対処",
+    "title": "チャットの詳細表示",
     "screenshot": "running.png"
   },
   {
     "card_index": 26,
-    "title": "現在の状態表示に含める未解決の依頼",
+    "title": "未解決の対象",
     "screenshot": "unknown.png"
   },
   {
     "card_index": 27,
-    "title": "入力欄から停止するチャットの現在の作業",
+    "title": "停止",
     "screenshot": "running.png"
   },
   {
     "card_index": 28,
-    "title": "元の依頼と累積回数を引き継ぐ明示再開",
+    "title": "処理内容",
     "screenshot": "stopped.png"
   },
   {
     "card_index": 29,
-    "title": "依頼失敗後も確認できる検証済みの途中成果",
+    "title": "依頼",
     "screenshot": "missing-preview.png"
   },
   {
     "card_index": 30,
-    "title": "作品へ適用する作風・制作方針の版選択",
+    "title": "Git参照",
     "screenshot": "style.png"
   },
   {
     "card_index": 31,
-    "title": "設定で管理するエージェント定義の版",
+    "title": "設定",
     "screenshot": "versions.png"
   },
   {
     "card_index": 32,
-    "title": "版変更の旧参照・新参照と変更理由の記録",
+    "title": "参照",
     "screenshot": "style.png"
   },
   {
     "card_index": 33,
-    "title": "待機中・実行中の依頼に対する作風変更の確認",
+    "title": "依頼",
     "screenshot": "style.png"
   },
   {
     "card_index": 34,
-    "title": "版の欠損・非互換時も継続できる閲覧と記録",
+    "title": "処理内容",
     "screenshot": "versions.png"
   },
   {
     "card_index": 35,
-    "title": "対象作品の全履歴を使う振り返り",
+    "title": "処理内容",
     "screenshot": "reflection-picker.png"
   },
   {
     "card_index": 36,
-    "title": "会話で採用する制作方針と作品への別途適用",
+    "title": "採用判断",
     "screenshot": "reflection-result.png"
   },
   {
     "card_index": 37,
-    "title": "設定・保存データの入口と項目の切替",
+    "title": "設定の入口",
     "screenshot": "backup.png"
   },
   {
     "card_index": 38,
-    "title": "LLMを使わないバックアップ・復元・保存管理",
+    "title": "保存データの操作",
     "screenshot": "backup.png"
   },
   {
     "card_index": 39,
-    "title": "設定画面に表示する進捗・不足・失敗",
+    "title": "進捗表示",
     "screenshot": "backup-result.png"
   },
   {
     "card_index": 40,
-    "title": "定義の版・Git保存先と明示的な公開",
+    "title": "Git設定",
     "screenshot": "versions.png"
   },
   {
     "card_index": 41,
-    "title": "命名・保存用要約に使う補助モデルの設定",
+    "title": "モデル",
     "screenshot": "versions.png"
   },
   {
     "card_index": 42,
-    "title": "補助モデル設定の適用時点と利用不可時の記録",
+    "title": "設定",
     "screenshot": "offline.png"
   },
   {
     "card_index": 43,
-    "title": "容量・不足を確認して作成する全体バックアップ",
+    "title": "バックアップ",
     "screenshot": "backup.png"
   },
   {
     "card_index": 44,
-    "title": "バックアップ中の制作操作と記録更新の停止",
+    "title": "記録",
     "screenshot": "backup-busy.png"
   },
   {
     "card_index": 45,
-    "title": "バックアップ復元後のGit取得・認証・明示再開",
+    "title": "認証",
     "screenshot": "backup-restore.png"
   },
   {
     "card_index": 46,
-    "title": "退避と人間の確認を経て進める保存形式の移行",
+    "title": "処理内容",
     "screenshot": "migration.png"
   },
   {
     "card_index": 47,
-    "title": "必要な実体の保護と大容量データの明示削除",
+    "title": "復元",
     "screenshot": "delete-confirm.png"
   },
   {
     "card_index": 48,
-    "title": "削除・欠落・破損を区別する履歴と可用性",
+    "title": "参照",
     "screenshot": "deleted-preview.png"
   },
   {
     "card_index": 49,
-    "title": "作品作成から最初の制作依頼までの操作",
+    "title": "作品開始・既存データ取り込み",
     "screenshot": "new-chat.png"
   },
   {
     "card_index": 50,
-    "title": "案のプレビュー確認から部分採用までの操作",
+    "title": "案の確認・部分採用",
     "screenshot": "adoption.png"
   },
   {
     "card_index": 51,
-    "title": "候補への手修正とAIによる追加修正の操作",
+    "title": "候補のAI修正・手修正の継続",
     "screenshot": "manual-record.png"
   },
   {
     "card_index": 52,
-    "title": "サイドチャットでの作業方法の相談",
+    "title": "作業方法の相談",
     "screenshot": "side-chat.png"
   },
   {
     "card_index": 53,
-    "title": "プレビューがない制作ファイルの記録と補完",
+    "title": "プレビューのない手作業記録",
     "screenshot": "missing-preview.png"
   },
   {
     "card_index": 54,
-    "title": "理由・要約の補記と訂正の操作",
+    "title": "理由・要約の訂正",
     "screenshot": "amend-reason.png"
   },
   {
     "card_index": 55,
-    "title": "保護の競合確認と継続的な解除の操作",
+    "title": "保護の競合・削除",
     "screenshot": "protection-conflict.png"
   },
   {
     "card_index": 56,
-    "title": "作業の停止・結果照合・明示再開の操作",
+    "title": "停止・再開・状態不明",
     "screenshot": "stopped.png"
   },
   {
     "card_index": 57,
-    "title": "過去の保存状態への復元と派生作品の作成",
+    "title": "過去状態への復元・派生",
     "screenshot": "restore.png"
   },
   {
     "card_index": 58,
-    "title": "全履歴の振り返りから制作方針の更新までの操作",
+    "title": "振り返り・制作方針の更新",
     "screenshot": "reflection-result.png"
   },
   {
     "card_index": 59,
-    "title": "Git参照の欠損とリモート未保存時の確認",
+    "title": "版の欠損・リモート未保存",
     "screenshot": "versions.png"
   },
   {
     "card_index": 60,
-    "title": "利用上限・認証待ちの間に続けられる操作",
+    "title": "利用上限・認証待ち",
     "screenshot": "offline.png"
   },
   {
     "card_index": 61,
-    "title": "設定から行う実体削除・バックアップ・形式移行",
+    "title": "実体削除・バックアップ・移行",
     "screenshot": "saved-data.png"
   }
 ]
