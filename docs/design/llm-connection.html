@@ -95,111 +95,111 @@
         </nav>
         <section aria-labelledby="構成と責務" class="spec-section">
           <h2 id="構成と責務">1. 担当範囲</h2>
-          <div
-            aria-label="構成と責務"
-            class="table-scroll"
-            role="region"
-            tabindex="0"
-          >
-            <table class="spec-table">
-              <thead>
-                <tr>
-                  <th scope="col">項目</th>
-                  <th scope="col">仕様</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row">実行基盤</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        初期からローカル Web アプリを用意し、Codex app-server
-                        をエージェント実行基盤として採用する。
-                      </li>
-                      <li>
-                        エージェントの実行処理と文脈管理の自作を減らすことを優先する。
-                      </li>
-                      <li>
-                        <a
-                          href="https://github.com/Kurarowa305/scene-craft/blob/main/docs/adr/0004-codex-app-server-runtime.md"
-                          rel="noopener noreferrer"
-                          target="_blank"
-                          >ADR 0004</a
-                        >
-                        。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">制作管理</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        scene-craft
-                        は作品・保存状態・編集案の採否・保護指定・手修正と制作履歴を管理する。
-                      </li>
-                      <li>Codex の会話と作品の対応を保持する。</li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">工程選択</th>
-                  <td>
-                    工程ごとに人間がエージェントを呼び出す初期範囲を維持する。<a
-                      href="https://github.com/Kurarowa305/scene-craft/blob/main/docs/requirements/initial-scope.md#scope"
-                      rel="noopener noreferrer"
-                      target="_blank"
-                      >初期要件</a
-                    >
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">費用</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>LLM 利用は ChatGPT Pro の契約内とする。</li>
-                      <li>
-                        自動補充無効・既存クレジットなしの確認は利用者が行う。
-                      </li>
-                      <li>
-                        <a
-                          href="https://github.com/Kurarowa305/scene-craft/blob/main/docs/adr/0003-dedicated-chat-with-chatgpt-plan.md"
-                          rel="noopener noreferrer"
-                          target="_blank"
-                          >ADR 0003</a
-                        >
-                        。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">停止</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        利用上限や人間の停止では途中状態を残して止まり、人間が再開する。
-                      </li>
-                      <li>
-                        LLM
-                        を使わない閲覧・手作業の記録・バックアップは継続できる。
-                      </li>
-                      <li>
-                        <a
-                          href="https://github.com/Kurarowa305/scene-craft/blob/main/docs/requirements/initial-scope.md#execution"
-                          rel="noopener noreferrer"
-                          target="_blank"
-                          >初期要件</a
-                        >
-                        。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+          <div class="contract-cards">
+            <article class="contract-card" aria-label="実行基盤">
+              <p class="contract-card-title">実行基盤</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>
+                      初期からローカル Web アプリを用意し、Codex app-server
+                      をエージェント実行基盤として採用する。
+                    </li>
+                    <li>
+                      エージェントの実行処理と文脈管理の自作を減らすことを優先する。
+                    </li>
+                    <li>
+                      <a
+                        href="https://github.com/Kurarowa305/scene-craft/blob/main/docs/adr/0004-codex-app-server-runtime.md"
+                        rel="noopener noreferrer"
+                        target="_blank"
+                        >ADR 0004</a
+                      >
+                      。
+                    </li>
+                  </ul>
+                </dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="制作管理">
+              <p class="contract-card-title">制作管理</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>
+                      scene-craft
+                      は作品・保存状態・編集案の採否・保護指定・手修正と制作履歴を管理する。
+                    </li>
+                    <li>Codex の会話と作品の対応を保持する。</li>
+                  </ul>
+                </dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="工程選択">
+              <p class="contract-card-title">工程選択</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  工程ごとに人間がエージェントを呼び出す初期範囲を維持する。<a
+                    href="https://github.com/Kurarowa305/scene-craft/blob/main/docs/requirements/initial-scope.md#scope"
+                    rel="noopener noreferrer"
+                    target="_blank"
+                    >初期要件</a
+                  >
+                </dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="費用">
+              <p class="contract-card-title">費用</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>LLM 利用は ChatGPT Pro の契約内とする。</li>
+                    <li>
+                      自動補充無効・既存クレジットなしの確認は利用者が行う。
+                    </li>
+                    <li>
+                      <a
+                        href="https://github.com/Kurarowa305/scene-craft/blob/main/docs/adr/0003-dedicated-chat-with-chatgpt-plan.md"
+                        rel="noopener noreferrer"
+                        target="_blank"
+                        >ADR 0003</a
+                      >
+                      。
+                    </li>
+                  </ul>
+                </dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="停止">
+              <p class="contract-card-title">停止</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>
+                      利用上限や人間の停止では途中状態を残して止まり、人間が再開する。
+                    </li>
+                    <li>
+                      LLM
+                      を使わない閲覧・手作業の記録・バックアップは継続できる。
+                    </li>
+                    <li>
+                      <a
+                        href="https://github.com/Kurarowa305/scene-craft/blob/main/docs/requirements/initial-scope.md#execution"
+                        rel="noopener noreferrer"
+                        target="_blank"
+                        >初期要件</a
+                      >
+                      。
+                    </li>
+                  </ul>
+                </dd>
+              </dl>
+            </article>
           </div>
 
           <section
@@ -461,79 +461,73 @@
         </section>
         <section aria-labelledby="認証方式" class="spec-section">
           <h2 id="認証方式">2. 認証方式</h2>
-          <div
-            aria-label="認証方式"
-            class="table-scroll"
-            role="region"
-            tabindex="0"
-          >
-            <table class="spec-table">
-              <thead>
-                <tr>
-                  <th scope="col">項目</th>
-                  <th scope="col">仕様</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row">採用判断</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        Codex 自身の ChatGPT
-                        ログインを採用し、ログイン・認証情報の保存・トークンの自動更新を
-                        Codex に任せる。
-                      </li>
-                      <li>
-                        エージェント実行・文脈管理と同じく、自作と保守の範囲を減らすためである。
-                      </li>
-                      <li>
-                        <a
-                          href="https://github.com/Kurarowa305/scene-craft/blob/main/docs/adr/0004-codex-app-server-runtime.md"
-                          rel="noopener noreferrer"
-                          target="_blank"
-                          >ADR 0004</a
-                        >
-                        。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">処理内容</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        自動補充無効・既存クレジットなしを費用面の運用前提とする。
-                      </li>
-                      <li>
-                        アプリによる自動検証や将来の設定変更を含めた課金防止の保証とは区別する。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">認証</th>
-                  <td>
-                    比較の根拠は
-                    <a
-                      href="https://developers.openai.com/siwc/token-sharing-open-source/codex-app-server"
-                      rel="noopener noreferrer"
-                      target="_blank"
-                      >専用 OAuth を使う app-server 構成</a
-                    >
-                    と
-                    <a
-                      href="https://learn.chatgpt.com/docs/app-server#auth-endpoints"
-                      rel="noopener noreferrer"
-                      target="_blank"
-                      >Codex の認証方式</a
-                    >
-                    を参照する。
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+          <div class="contract-cards">
+            <article class="contract-card" aria-label="採用判断">
+              <p class="contract-card-title">採用判断</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>
+                      Codex 自身の ChatGPT
+                      ログインを採用し、ログイン・認証情報の保存・トークンの自動更新を
+                      Codex に任せる。
+                    </li>
+                    <li>
+                      エージェント実行・文脈管理と同じく、自作と保守の範囲を減らすためである。
+                    </li>
+                    <li>
+                      <a
+                        href="https://github.com/Kurarowa305/scene-craft/blob/main/docs/adr/0004-codex-app-server-runtime.md"
+                        rel="noopener noreferrer"
+                        target="_blank"
+                        >ADR 0004</a
+                      >
+                      。
+                    </li>
+                  </ul>
+                </dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="処理内容">
+              <p class="contract-card-title">処理内容</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>
+                      自動補充無効・既存クレジットなしを費用面の運用前提とする。
+                    </li>
+                    <li>
+                      アプリによる自動検証や将来の設定変更を含めた課金防止の保証とは区別する。
+                    </li>
+                  </ul>
+                </dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="認証">
+              <p class="contract-card-title">認証</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  比較の根拠は
+                  <a
+                    href="https://developers.openai.com/siwc/token-sharing-open-source/codex-app-server"
+                    rel="noopener noreferrer"
+                    target="_blank"
+                    >専用 OAuth を使う app-server 構成</a
+                  >
+                  と
+                  <a
+                    href="https://learn.chatgpt.com/docs/app-server#auth-endpoints"
+                    rel="noopener noreferrer"
+                    target="_blank"
+                    >Codex の認証方式</a
+                  >
+                  を参照する。
+                </dd>
+              </dl>
+            </article>
           </div>
 
           <section
@@ -542,47 +536,36 @@
           >
             <h3 id="codex-管理の認証で分かった費用上の条件">2-1. 費用条件</h3>
             <p>費用条件は利用者が確認する。</p>
-            <div
-              aria-label="Codex 管理の認証で分かった費用上の条件"
-              class="table-scroll"
-              role="region"
-              tabindex="0"
-            >
-              <table class="spec-table">
-                <thead>
-                  <tr>
-                    <th scope="col">項目</th>
-                    <th scope="col">仕様</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <th scope="row">認証</th>
-                    <td>
-                      API キーの課金経路は、ChatGPT
-                      認証の強制、接続先の固定、API キーや別 provider
-                      設定の混入防止で制限する。
-                      <div class="contract-detail">
-                        <ul class="cell-list">
-                          <li>
-                            ChatGPT認証では契約枠を超えると既存クレジットを消費し得る。
-                          </li>
-                          <li>
-                            自動補充が有効なら、残高低下による追加購入が発生する。
-                          </li>
-                        </ul>
-                      </div>
-                    </td>
-                  </tr>
-
-                  <tr>
-                    <th scope="row">採用判断</th>
-                    <td>
-                      利用者による自動補充無効・既存クレジットなしの確認を採用判断の根拠とし、契約枠限定の条件は維持する。
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+            <div class="contract-cards">
+              <article class="contract-card" aria-label="認証">
+                <p class="contract-card-title">認証</p>
+                <dl>
+                  <dt>仕様</dt>
+                  <dd>
+                    API キーの課金経路は、ChatGPT 認証の強制、接続先の固定、API
+                    キーや別 provider 設定の混入防止で制限する。
+                    <div class="contract-detail">
+                      <ul class="cell-list">
+                        <li>
+                          ChatGPT認証では契約枠を超えると既存クレジットを消費し得る。
+                        </li>
+                        <li>
+                          自動補充が有効なら、残高低下による追加購入が発生する。
+                        </li>
+                      </ul>
+                    </div>
+                  </dd>
+                </dl>
+              </article>
+              <article class="contract-card" aria-label="採用判断">
+                <p class="contract-card-title">採用判断</p>
+                <dl>
+                  <dt>仕様</dt>
+                  <dd>
+                    利用者による自動補充無効・既存クレジットなしの確認を採用判断の根拠とし、契約枠限定の条件は維持する。
+                  </dd>
+                </dl>
+              </article>
             </div>
           </section>
           <section
@@ -595,147 +578,153 @@
               id="費用確認と接続復旧"
             ></span>
             <h3 id="費用条件の責務2026-10-12-合意">2-2. 費用条件の確認</h3>
-            <div
-              aria-label="費用条件の責務（2026-10-12 合意）"
-              class="table-scroll"
-              role="region"
-              tabindex="0"
-            >
-              <table class="spec-table">
-                <thead>
-                  <tr>
-                    <th scope="col">項目</th>
-                    <th scope="col">仕様</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <th scope="row">処理内容</th>
-                    <td>
-                      自動補充が無効で既存クレジットがないことは、利用者が確認・管理する。
-                      <div class="contract-detail">
-                        <ul class="cell-list">
-                          <li>
-                            この判断は費用条件の確認を利用者へ委ね、基盤側の確認処理を不要にするためである。
-                          </li>
-                          <li>ChatGPT Pro の契約内で利用する。</li>
-                        </ul>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <th scope="row">適用条件</th>
-                    <td>
-                      利用情報の表示を設ける場合も、取得できなければ不明として表示し、送信可否の条件とは分ける。
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+            <div class="contract-cards">
+              <article class="contract-card" aria-label="処理内容">
+                <p class="contract-card-title">処理内容</p>
+                <dl>
+                  <dt>仕様</dt>
+                  <dd>
+                    自動補充が無効で既存クレジットがないことは、利用者が確認・管理する。
+                    <div class="contract-detail">
+                      <ul class="cell-list">
+                        <li>
+                          この判断は費用条件の確認を利用者へ委ね、基盤側の確認処理を不要にするためである。
+                        </li>
+                        <li>ChatGPT Pro の契約内で利用する。</li>
+                      </ul>
+                    </div>
+                  </dd>
+                </dl>
+              </article>
+              <article class="contract-card" aria-label="適用条件">
+                <p class="contract-card-title">適用条件</p>
+                <dl>
+                  <dt>仕様</dt>
+                  <dd>
+                    利用情報の表示を設ける場合も、取得できなければ不明として表示し、送信可否の条件とは分ける。
+                  </dd>
+                </dl>
+              </article>
             </div>
           </section>
         </section>
         <section aria-labelledby="接続と復旧の契約" class="spec-section">
           <h2 id="接続と復旧の契約">3. 接続契約</h2>
           <p>接続と復旧では、通信の回復と制作操作の再実行を分けて扱う。</p>
-          <div
-            aria-label="接続と復旧の契約"
-            class="table-scroll"
-            role="region"
-            tabindex="0"
-          >
-            <table class="spec-table">
-              <thead>
-                <tr>
-                  <th scope="col">項目</th>
-                  <th scope="col">合意した契約</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row">アプリとの通信</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        scene-craft のローカル実行プロセスから stdio で
-                        app-server を管理する。
-                      </li>
-                      <li>
-                        検証では Windows 側の SQLite 保存先で起動に失敗し、WSL
-                        側へ分けると成功した。
-                      </li>
-                      <li>製品の保存先は OS の責務設計と合わせる。</li>
-                      <li>
-                        ブラウザを閉じても実行プロセスが動いていれば維持する 。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">会話</th>
-                  <td>
-                    scene-craft の会話と Codex thread ID を対応付け、依頼と turn
-                    ID、
-                    ツール要求と操作記録を結び付ける。要約・原文・制作状態を区別する
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">成功判定</th>
-                  <td>終端通知の成功状態を確認して完了を確定する</td>
-                </tr>
-                <tr>
-                  <th scope="row">認証情報</th>
-                  <td>
-                    実行環境の専用保管先に保存する。具体的な保管方式は Codex
-                    の設定と Windows/WSL の責務設計に合わせる
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">費用設定の確認</th>
-                  <td>利用者が行う</td>
-                </tr>
-                <tr>
-                  <th scope="row">トークン更新</th>
-                  <td>
-                    保存・自動更新を Codex に任せる方針を採用する。scene-craft
-                    が扱う再認証の状態と、更新前後の制作操作の重複防止・継続の条件を具体化する
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">再認証と手動再開</th>
-                  <td>
-                    失効・権限不足・一時的な通信障害を区別する。再認証後は途中状態を照合し、人間の指示で制作を再開する
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">再試行と回数制限</th>
-                  <td>
-                    Codex 内部の通信再試行と scene-craft
-                    の依頼再実行を区別して記録する。依頼全体で最大2回の再実行予算を管理する
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">モデルの選択単位</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        制作会話については、直前のチャットで選択していたモデルを新規会話へ引き継ぎ、会話ごとに変更できる。
-                      </li>
-                      <li>
-                        使用可能なモデルから選び、実行に使ったモデルを記録する。
-                      </li>
-                      <li>初期の既定値は下記のモデル選択を参照 。</li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">ツール</th>
-                  <td>
-                    専用stdio
-                    MCPを用い、許可された変更範囲・保護指定を制作操作の実行側でも確認する。具体的なツール契約は後続設計へ引き継ぐ
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+          <div class="contract-cards">
+            <article class="contract-card" aria-label="アプリとの通信">
+              <p class="contract-card-title">アプリとの通信</p>
+              <dl>
+                <dt>合意した契約</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>
+                      scene-craft のローカル実行プロセスから stdio で app-server
+                      を管理する。
+                    </li>
+                    <li>
+                      検証では Windows 側の SQLite 保存先で起動に失敗し、WSL
+                      側へ分けると成功した。
+                    </li>
+                    <li>製品の保存先は OS の責務設計と合わせる。</li>
+                    <li>
+                      ブラウザを閉じても実行プロセスが動いていれば維持する 。
+                    </li>
+                  </ul>
+                </dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="会話">
+              <p class="contract-card-title">会話</p>
+              <dl>
+                <dt>合意した契約</dt>
+                <dd>
+                  scene-craft の会話と Codex thread ID を対応付け、依頼と turn
+                  ID、
+                  ツール要求と操作記録を結び付ける。要約・原文・制作状態を区別する
+                </dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="成功判定">
+              <p class="contract-card-title">成功判定</p>
+              <dl>
+                <dt>合意した契約</dt>
+                <dd>終端通知の成功状態を確認して完了を確定する</dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="認証情報">
+              <p class="contract-card-title">認証情報</p>
+              <dl>
+                <dt>合意した契約</dt>
+                <dd>
+                  実行環境の専用保管先に保存する。具体的な保管方式は Codex
+                  の設定と Windows/WSL の責務設計に合わせる
+                </dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="費用設定の確認">
+              <p class="contract-card-title">費用設定の確認</p>
+              <dl>
+                <dt>合意した契約</dt>
+                <dd>利用者が行う</dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="トークン更新">
+              <p class="contract-card-title">トークン更新</p>
+              <dl>
+                <dt>合意した契約</dt>
+                <dd>
+                  保存・自動更新を Codex に任せる方針を採用する。scene-craft
+                  が扱う再認証の状態と、更新前後の制作操作の重複防止・継続の条件を具体化する
+                </dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="再認証と手動再開">
+              <p class="contract-card-title">再認証と手動再開</p>
+              <dl>
+                <dt>合意した契約</dt>
+                <dd>
+                  失効・権限不足・一時的な通信障害を区別する。再認証後は途中状態を照合し、人間の指示で制作を再開する
+                </dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="再試行と回数制限">
+              <p class="contract-card-title">再試行と回数制限</p>
+              <dl>
+                <dt>合意した契約</dt>
+                <dd>
+                  Codex 内部の通信再試行と scene-craft
+                  の依頼再実行を区別して記録する。依頼全体で最大2回の再実行予算を管理する
+                </dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="モデルの選択単位">
+              <p class="contract-card-title">モデルの選択単位</p>
+              <dl>
+                <dt>合意した契約</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>
+                      制作会話については、直前のチャットで選択していたモデルを新規会話へ引き継ぎ、会話ごとに変更できる。
+                    </li>
+                    <li>
+                      使用可能なモデルから選び、実行に使ったモデルを記録する。
+                    </li>
+                    <li>初期の既定値は下記のモデル選択を参照 。</li>
+                  </ul>
+                </dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="ツール">
+              <p class="contract-card-title">ツール</p>
+              <dl>
+                <dt>合意した契約</dt>
+                <dd>
+                  専用stdio
+                  MCPを用い、許可された変更範囲・保護指定を制作操作の実行側でも確認する。具体的なツール契約は後続設計へ引き継ぐ
+                </dd>
+              </dl>
+            </article>
           </div>
           <p>
             公式の thread/turn 機能、動的ツールの実験扱い、比較した専用 OAuth
@@ -762,63 +751,60 @@
           </section>
           <section aria-labelledby="初期値と変更の適用" class="spec-subsection">
             <h3 id="初期値と変更の適用">3-2. モデル設定</h3>
-            <div
-              aria-label="初期値と変更の適用"
-              class="table-scroll"
-              role="region"
-              tabindex="0"
-            >
-              <table class="spec-table">
-                <thead>
-                  <tr>
-                    <th scope="col">項目</th>
-                    <th scope="col">仕様</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <th scope="row">初回</th>
-                    <td>
-                      過去にモデルの選択がない初回のみ、app-server
-                      が示す利用可能な既定モデルを初期選択として使う。
-                    </td>
-                  </tr>
-                  <tr>
-                    <th scope="row">新規会話</th>
-                    <td>
-                      <ul class="cell-list">
-                        <li>
-                          新しい会話は直前のチャットで選択していたモデルを引き継いで保存する。
-                        </li>
-                        <li>作品作成や振り返り専用会話でも同じ扱いとする。</li>
-                      </ul>
-                    </td>
-                  </tr>
-                  <tr>
-                    <th scope="row">適用時点</th>
-                    <td>
-                      <ul class="cell-list">
-                        <li>会話のモデル変更は次の依頼から適用する。</li>
-                        <li>
-                          停止した依頼を別モデルで再開する場合は利用者が明示して選び、同じ依頼の再実行回数は維持する。
-                        </li>
-                      </ul>
-                    </td>
-                  </tr>
-                  <tr>
-                    <th scope="row">推論設定</th>
-                    <td>
-                      <ul class="cell-list">
-                        <li>
-                          初期の推論強度は選択モデルの既定値、速度は標準とする。
-                        </li>
-                        <li>モデル・推論強度・速度の実行設定を記録する。</li>
-                        <li>設定画面の詳細は画面設計で扱う。</li>
-                      </ul>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+            <div class="contract-cards">
+              <article class="contract-card" aria-label="初回">
+                <p class="contract-card-title">初回</p>
+                <dl>
+                  <dt>仕様</dt>
+                  <dd>
+                    過去にモデルの選択がない初回のみ、app-server
+                    が示す利用可能な既定モデルを初期選択として使う。
+                  </dd>
+                </dl>
+              </article>
+              <article class="contract-card" aria-label="新規会話">
+                <p class="contract-card-title">新規会話</p>
+                <dl>
+                  <dt>仕様</dt>
+                  <dd>
+                    <ul class="cell-list">
+                      <li>
+                        新しい会話は直前のチャットで選択していたモデルを引き継いで保存する。
+                      </li>
+                      <li>作品作成や振り返り専用会話でも同じ扱いとする。</li>
+                    </ul>
+                  </dd>
+                </dl>
+              </article>
+              <article class="contract-card" aria-label="適用時点">
+                <p class="contract-card-title">適用時点</p>
+                <dl>
+                  <dt>仕様</dt>
+                  <dd>
+                    <ul class="cell-list">
+                      <li>会話のモデル変更は次の依頼から適用する。</li>
+                      <li>
+                        停止した依頼を別モデルで再開する場合は利用者が明示して選び、同じ依頼の再実行回数は維持する。
+                      </li>
+                    </ul>
+                  </dd>
+                </dl>
+              </article>
+              <article class="contract-card" aria-label="推論設定">
+                <p class="contract-card-title">推論設定</p>
+                <dl>
+                  <dt>仕様</dt>
+                  <dd>
+                    <ul class="cell-list">
+                      <li>
+                        初期の推論強度は選択モデルの既定値、速度は標準とする。
+                      </li>
+                      <li>モデル・推論強度・速度の実行設定を記録する。</li>
+                      <li>設定画面の詳細は画面設計で扱う。</li>
+                    </ul>
+                  </dd>
+                </dl>
+              </article>
             </div>
           </section>
           <section
@@ -828,113 +814,91 @@
             <h3 id="命名保存用要約の補助モデル">
               3-3. 命名・保存用要約の補助モデル
             </h3>
-            <div
-              aria-label="命名・保存用要約の補助モデル"
-              class="table-scroll"
-              role="region"
-              tabindex="0"
-            >
-              <table class="spec-table">
-                <thead>
-                  <tr>
-                    <th scope="col">項目</th>
-                    <th scope="col">仕様</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <th scope="row">モデル</th>
-                    <td>
+            <div class="contract-cards">
+              <article class="contract-card" aria-label="モデル">
+                <p class="contract-card-title">モデル</p>
+                <dl>
+                  <dt>仕様</dt>
+                  <dd>
+                    <ul class="cell-list">
+                      <li>
+                        <a
+                          href="https://github.com/Kurarowa305/scene-craft/blob/main/docs/design/agent-contracts.md#提案数と補助モデル合意済み"
+                          rel="noopener noreferrer"
+                          target="_blank"
+                          >エージェント契約の設計</a
+                        >で、利用量・コストを抑えるため、命名・保存用要約には制作会話と別のモデルを使うとする。
+                      </li>
+                      <li>
+                        設定に「命名・保存用要約モデル」を設け、初期値はGPT-6
+                        Luna（<code>gpt-6-luna</code>）、利用者が変更できるようにする。
+                      </li>
+                      <li>
+                        制作会話のモデル引き継ぎ・会話別選択は引き続き上記の契約に従う。
+                      </li>
+                    </ul>
+                    <div class="contract-detail">
                       <ul class="cell-list">
                         <li>
-                          <a
-                            href="https://github.com/Kurarowa305/scene-craft/blob/main/docs/design/agent-contracts.md#提案数と補助モデル合意済み"
-                            rel="noopener noreferrer"
-                            target="_blank"
-                            >エージェント契約の設計</a
-                          >で、利用量・コストを抑えるため、命名・保存用要約には制作会話と別のモデルを使うとする。
+                          補助処理ごとに選択モデルと対象を固定・記録する。
                         </li>
-                        <li>
-                          設定に「命名・保存用要約モデル」を設け、初期値はGPT-6
-                          Luna（<code>gpt-6-luna</code>）、利用者が変更できるようにする。
-                        </li>
-                        <li>
-                          制作会話のモデル引き継ぎ・会話別選択は引き続き上記の契約に従う。
-                        </li>
+                        <li>未命名・未要約として原文と制作結果を保存する。</li>
                       </ul>
-                      <div class="contract-detail">
-                        <ul class="cell-list">
-                          <li>
-                            補助処理ごとに選択モデルと対象を固定・記録する。
-                          </li>
-                          <li>
-                            未命名・未要約として原文と制作結果を保存する。
-                          </li>
-                        </ul>
-                      </div>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+                    </div>
+                  </dd>
+                </dl>
+              </article>
             </div>
           </section>
         </section>
         <section aria-labelledby="送信と停止の境界" class="spec-section">
           <h2 id="送信と停止の境界">4. 送信と停止の境界</h2>
           <p>送信時は、費用情報の取得と実際の停止条件を区別する。</p>
-          <div
-            aria-label="送信と停止の境界"
-            class="table-scroll"
-            role="region"
-            tabindex="0"
-          >
-            <table class="spec-table">
-              <thead>
-                <tr>
-                  <th scope="col">項目</th>
-                  <th scope="col">仕様</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row">採用判断</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        Codex 管理の ChatGPT 認証と採用した接続設定を使う。
-                      </li>
-                      <li>認証が必要な場合は再認証を案内する。</li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">停止</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        停止要求、受付結果不明、前の実行の未解決状態を確認する。
-                      </li>
-                      <li>
-                        同じ制作データの実行順と変更範囲は制作操作側でも確認する。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">上限</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        利用情報の取得失敗と、実際の実行で契約枠の上限に達して停止したことを区別する。
-                      </li>
-                      <li>
-                        上限到達時は途中状態を保存し、人間が再開する既存要件を維持する。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+          <div class="contract-cards">
+            <article class="contract-card" aria-label="採用判断">
+              <p class="contract-card-title">採用判断</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>Codex 管理の ChatGPT 認証と採用した接続設定を使う。</li>
+                    <li>認証が必要な場合は再認証を案内する。</li>
+                  </ul>
+                </dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="停止">
+              <p class="contract-card-title">停止</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>
+                      停止要求、受付結果不明、前の実行の未解決状態を確認する。
+                    </li>
+                    <li>
+                      同じ制作データの実行順と変更範囲は制作操作側でも確認する。
+                    </li>
+                  </ul>
+                </dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="上限">
+              <p class="contract-card-title">上限</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>
+                      利用情報の取得失敗と、実際の実行で契約枠の上限に達して停止したことを区別する。
+                    </li>
+                    <li>
+                      上限到達時は途中状態を保存し、人間が再開する既存要件を維持する。
+                    </li>
+                  </ul>
+                </dd>
+              </dl>
+            </article>
           </div>
 
           <section aria-labelledby="停止復旧の判断" class="spec-subsection">

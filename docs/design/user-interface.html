@@ -158,347 +158,302 @@
               </tbody>
             </table>
           </div>
-          <div
-            aria-label="責務と画面構成"
-            class="table-scroll"
-            role="region"
-            tabindex="0"
-          >
-            <table class="spec-table">
-              <thead>
-                <tr>
-                  <th scope="col">項目</th>
-                  <th scope="col">仕様</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row">処理内容</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>中央の上部はチャットタイトルだけを表示す。</li>
-                      <li>
-                        作品の所属は左の一覧、採用結果はチャットや制作履歴で確認する。
-                      </li>
-                      <li>
-                        左右の領域幅を調整でき、履歴等を見るときは右側を広げられる。
-                      </li>
-                      <li>ChatGPTデスクトップアプリを操作の参考とする。</li>
-                    </ul>
-                    <div class="contract-detail">
-                      <ul class="cell-list">
-                        <li>
-                          別の成果物へのリンクは新しいタブを開き、同じ成果物なら既存のタブを選択する。
-                        </li>
-                        <li>サイドチャットは保存して開き直せる。</li>
-                      </ul>
-                    </div>
-                  </td>
-                </tr>
-
-                <tr>
-                  <th scope="row">保護指定</th>
-                  <td>
+          <div class="contract-cards">
+            <article class="contract-card" aria-label="処理内容">
+              <p class="contract-card-title">処理内容</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>中央の上部はチャットタイトルだけを表示す。</li>
+                    <li>
+                      作品の所属は左の一覧、採用結果はチャットや制作履歴で確認する。
+                    </li>
+                    <li>
+                      左右の領域幅を調整でき、履歴等を見るときは右側を広げられる。
+                    </li>
+                    <li>ChatGPTデスクトップアプリを操作の参考とする。</li>
+                  </ul>
+                  <div class="contract-detail">
                     <ul class="cell-list">
                       <li>
-                        タブ上部の＋から新しいタブを開き、そのタブの内容領域に成果物・サイドチャット・制作履歴・保護一覧・作風と制作方針の種類選択を表示する。
+                        別の成果物へのリンクは新しいタブを開き、同じ成果物なら既存のタブを選択する。
                       </li>
-                      <li>種類の選択後はそのタブに選んだ内容を表示する。</li>
+                      <li>サイドチャットは保存して開き直せる。</li>
                     </ul>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+                  </div>
+                </dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="保護指定">
+              <p class="contract-card-title">保護指定</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>
+                      タブ上部の＋から新しいタブを開き、そのタブの内容領域に成果物・サイドチャット・制作履歴・保護一覧・作風と制作方針の種類選択を表示する。
+                    </li>
+                    <li>種類の選択後はそのタブに選んだ内容を表示する。</li>
+                  </ul>
+                </dd>
+              </dl>
+            </article>
           </div>
         </section>
         <section aria-labelledby="作品と会話の開始" class="spec-section">
           <h2 id="作品と会話の開始">2. 制作の開始</h2>
-          <div
-            aria-label="作品と会話の開始"
-            class="table-scroll"
-            role="region"
-            tabindex="0"
-          >
-            <table class="spec-table">
-              <thead>
-                <tr>
-                  <th scope="col">項目</th>
-                  <th scope="col">仕様</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row">処理内容</th>
-                  <td>
+          <div class="contract-cards">
+            <article class="contract-card" aria-label="処理内容">
+              <p class="contract-card-title">処理内容</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>
+                      左側の「作品を作成」から、作品名と制作意図を入力する。
+                    </li>
+                    <li>制作意図は後から会話で補える。</li>
+                    <li>
+                      空の状態から始めるか、既存の制作ファイルを取り込む。
+                    </li>
+                  </ul>
+                  <div class="contract-detail">
                     <ul class="cell-list">
                       <li>
-                        左側の「作品を作成」から、作品名と制作意図を入力する。
+                        新しい作品では作風の版を選ぶか「作風なし」を指定する。
                       </li>
-                      <li>制作意図は後から会話で補える。</li>
                       <li>
-                        空の状態から始めるか、既存の制作ファイルを取り込む。
+                        作風の版のプルダウンでは最新版に「最新」と表示し、過去版と区別する。
                       </li>
+                      <li>派生作品でも派生先の選択として扱う。</li>
                     </ul>
-                    <div class="contract-detail">
-                      <ul class="cell-list">
-                        <li>
-                          新しい作品では作風の版を選ぶか「作風なし」を指定する。
-                        </li>
-                        <li>
-                          作風の版のプルダウンでは最新版に「最新」と表示し、過去版と区別する。
-                        </li>
-                        <li>派生作品でも派生先の選択として扱う。</li>
-                      </ul>
-                    </div>
-                    <div class="contract-detail">
-                      <ul class="cell-list">
-                        <li>
-                          各作品名・振り返りプロジェクト名の右に「新しいチャット」の入口を置く。
-                        </li>
-                        <li>タイトルは最初のリクエスト後にLLMが命名する。</li>
-                        <li>
-                          LLM利用不可時も会話原文と記録を保存し、仮の会話名を表示する。
-                        </li>
-                      </ul>
-                    </div>
-                    <div class="contract-detail">
-                      <ul class="cell-list">
-                        <li>
-                          入力欄のエージェント選択の先頭に「なし」を置き、新規チャットは「なし」で始める。
-                        </li>
-                        <li>
-                          実際の送信時に選んだエージェントをその依頼の工程として記録する。
-                        </li>
-                      </ul>
-                    </div>
-                    <div class="contract-detail">
-                      <ul class="cell-list">
-                        <li>会話ごとに変更できる。</li>
-                        <li>変更は次の依頼から適用する。</li>
-                        <li>使用不能ならその旨を示す。</li>
-                      </ul>
-                    </div>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">記録</th>
-                  <td>
-                    既存の <code>.blend</code>・PSD/PSB等は<a
-                      href="artifact-storage.html"
-                      >保存設計</a
-                    >に従って管理下へコピーし、取り込み時点を最初の記録にする。
-                  </td>
-                </tr>
-
-                <tr>
-                  <th scope="row">モデル</th>
-                  <td>
+                  </div>
+                  <div class="contract-detail">
                     <ul class="cell-list">
                       <li>
-                        入力欄付近にエージェント・モデルを表示して選択できる。
+                        各作品名・振り返りプロジェクト名の右に「新しいチャット」の入口を置く。
+                      </li>
+                      <li>タイトルは最初のリクエスト後にLLMが命名する。</li>
+                      <li>
+                        LLM利用不可時も会話原文と記録を保存し、仮の会話名を表示する。
+                      </li>
+                    </ul>
+                  </div>
+                  <div class="contract-detail">
+                    <ul class="cell-list">
+                      <li>
+                        入力欄のエージェント選択の先頭に「なし」を置き、新規チャットは「なし」で始める。
                       </li>
                       <li>
-                        入力欄左下の＋から成果物を選び、選択内容を入力欄内に表示する。
+                        実際の送信時に選んだエージェントをその依頼の工程として記録する。
                       </li>
-                      <li>未採用案の保存状態を修正元として固定する。</li>
                     </ul>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+                  </div>
+                  <div class="contract-detail">
+                    <ul class="cell-list">
+                      <li>会話ごとに変更できる。</li>
+                      <li>変更は次の依頼から適用する。</li>
+                      <li>使用不能ならその旨を示す。</li>
+                    </ul>
+                  </div>
+                </dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="記録">
+              <p class="contract-card-title">記録</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  既存の <code>.blend</code>・PSD/PSB等は<a
+                    href="artifact-storage.html"
+                    >保存設計</a
+                  >に従って管理下へコピーし、取り込み時点を最初の記録にする。
+                </dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="モデル">
+              <p class="contract-card-title">モデル</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>
+                      入力欄付近にエージェント・モデルを表示して選択できる。
+                    </li>
+                    <li>
+                      入力欄左下の＋から成果物を選び、選択内容を入力欄内に表示する。
+                    </li>
+                    <li>未採用案の保存状態を修正元として固定する。</li>
+                  </ul>
+                </dd>
+              </dl>
+            </article>
           </div>
         </section>
         <section aria-labelledby="メインチャットと成果物" class="spec-section">
           <h2 id="メインチャットと成果物">3. メインチャット</h2>
-          <div
-            aria-label="メインチャットと成果物"
-            class="table-scroll"
-            role="region"
-            tabindex="0"
-          >
-            <table class="spec-table">
-              <thead>
-                <tr>
-                  <th scope="col">項目</th>
-                  <th scope="col">仕様</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row">依頼</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        制作依頼への返答には編集案・成果物へのリンクを含める。
-                      </li>
-                      <li>押すと右側にその案のプレビュータブを開く。</li>
-                      <li>画像は拡大・移動できる。</li>
-                      <li>案は他の成果物と同じタブ領域で確認する。</li>
-                      <li>
-                        変更内容・理由・検査結果・案の独立／依存関係等はチャットで説明する。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">保存状態</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        リンクは確認対象となる具体的な編集案・保存状態・ファイルを指す。
-                      </li>
-                      <li>
-                        成果物リンクは作成時に確認した案・保存状態を参照する。
-                      </li>
-                      <li>実体の削除・欠落を表示する。</li>
-                    </ul>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+          <div class="contract-cards">
+            <article class="contract-card" aria-label="依頼">
+              <p class="contract-card-title">依頼</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>
+                      制作依頼への返答には編集案・成果物へのリンクを含める。
+                    </li>
+                    <li>押すと右側にその案のプレビュータブを開く。</li>
+                    <li>画像は拡大・移動できる。</li>
+                    <li>案は他の成果物と同じタブ領域で確認する。</li>
+                    <li>
+                      変更内容・理由・検査結果・案の独立／依存関係等はチャットで説明する。
+                    </li>
+                  </ul>
+                </dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="保存状態">
+              <p class="contract-card-title">保存状態</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>
+                      リンクは確認対象となる具体的な編集案・保存状態・ファイルを指す。
+                    </li>
+                    <li>
+                      成果物リンクは作成時に確認した案・保存状態を参照する。
+                    </li>
+                    <li>実体の削除・欠落を表示する。</li>
+                  </ul>
+                </dd>
+              </dl>
+            </article>
           </div>
 
           <section aria-labelledby="採否と追加修正" class="spec-subsection">
             <h3 id="採否と追加修正">3-1. 編集案の操作</h3>
-            <div
-              aria-label="採否と追加修正"
-              class="table-scroll"
-              role="region"
-              tabindex="0"
-            >
-              <table class="spec-table">
-                <thead>
-                  <tr>
-                    <th scope="col">項目</th>
-                    <th scope="col">仕様</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <th scope="row">採用判断</th>
-                    <td>
+            <div class="contract-cards">
+              <article class="contract-card" aria-label="採用判断">
+                <p class="contract-card-title">採用判断</p>
+                <dl>
+                  <dt>仕様</dt>
+                  <dd>
+                    <ul class="cell-list">
+                      <li>
+                        採用・修正して採用・不採用はメインチャットからのみ指示する。
+                      </li>
+                      <li>対象や範囲が曖昧なら具体化する。</li>
+                    </ul>
+                    <div class="contract-detail">
                       <ul class="cell-list">
                         <li>
-                          採用・修正して採用・不採用はメインチャットからのみ指示する。
+                          部分採用は独立して確認・検証できる変更単位を対象にする。
                         </li>
-                        <li>対象や範囲が曖昧なら具体化する。</li>
+                        <li>依存がある部分は一組で確認する。</li>
                       </ul>
-                      <div class="contract-detail">
-                        <ul class="cell-list">
-                          <li>
-                            部分採用は独立して確認・検証できる変更単位を対象にする。
-                          </li>
-                          <li>依存がある部分は一組で確認する。</li>
-                        </ul>
-                      </div>
-                      <div class="contract-detail">
-                        <ul class="cell-list">
-                          <li>
-                            基準が古い案や複数案を取り込む場合は、現在状態に組み合わせた実際の結果をリンクで提示し、会話で確認してから採用する。
-                          </li>
-                          <li>元の案・寄与元・保持する手修正を説明する。</li>
-                        </ul>
-                      </div>
-                      <div class="contract-detail">
-                        <ul class="cell-list">
-                          <li>
-                            未採用の案にも手修正を記録し、指定した状態からAIに追加修正を依頼できる。
-                          </li>
-                          <li>指示した人間と変更したAIを区別する。</li>
-                        </ul>
-                      </div>
-                    </td>
-                  </tr>
-
-                  <tr>
-                    <th scope="row">処理内容</th>
-                    <td>
+                    </div>
+                    <div class="contract-detail">
                       <ul class="cell-list">
-                        <li>理由は任意とし、入力された内容を保存する。</li>
                         <li>
-                          採用の指示、適用中、適用済み、失敗、結果不明を区別する。
+                          基準が古い案や複数案を取り込む場合は、現在状態に組み合わせた実際の結果をリンクで提示し、会話で確認してから採用する。
                         </li>
+                        <li>元の案・寄与元・保持する手修正を説明する。</li>
                       </ul>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+                    </div>
+                    <div class="contract-detail">
+                      <ul class="cell-list">
+                        <li>
+                          未採用の案にも手修正を記録し、指定した状態からAIに追加修正を依頼できる。
+                        </li>
+                        <li>指示した人間と変更したAIを区別する。</li>
+                      </ul>
+                    </div>
+                  </dd>
+                </dl>
+              </article>
+              <article class="contract-card" aria-label="処理内容">
+                <p class="contract-card-title">処理内容</p>
+                <dl>
+                  <dt>仕様</dt>
+                  <dd>
+                    <ul class="cell-list">
+                      <li>理由は任意とし、入力された内容を保存する。</li>
+                      <li>
+                        採用の指示、適用中、適用済み、失敗、結果不明を区別する。
+                      </li>
+                    </ul>
+                  </dd>
+                </dl>
+              </article>
             </div>
           </section>
         </section>
         <section aria-labelledby="手作業の記録" class="spec-section">
           <h2 id="手作業の記録">4. 手作業の記録</h2>
-          <div
-            aria-label="手作業の記録"
-            class="table-scroll"
-            role="region"
-            tabindex="0"
-          >
-            <table class="spec-table">
-              <thead>
-                <tr>
-                  <th scope="col">項目</th>
-                  <th scope="col">仕様</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row">記録</th>
-                  <td>
+          <div class="contract-cards">
+            <article class="contract-card" aria-label="記録">
+              <p class="contract-card-title">記録</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>
+                      人間がメインチャットで「ここまでを記録して」等と伝え、作業内容・任意の理由を他のメッセージと同様に送る。
+                    </li>
+                    <li>
+                      入力欄左下の＋で成果物のプルダウンを開き、そのチャットのセッションに対応する
+                      <code>.blend</code>
+                      等を選べる。
+                    </li>
+                    <li>
+                      候補にはファイル名・作成時刻・元の編集案を表示し、どの保存状態かを区別する。
+                    </li>
+                    <li>
+                      同じプルダウンの最下部からコンピューター上のファイル・画像を添付できる。
+                    </li>
+                  </ul>
+                  <div class="contract-detail">
                     <ul class="cell-list">
                       <li>
-                        人間がメインチャットで「ここまでを記録して」等と伝え、作業内容・任意の理由を他のメッセージと同様に送る。
+                        記録は前回の状態または指定した候補に結び付け、作業内容・変更前後・理由を保持する。
                       </li>
                       <li>
-                        入力欄左下の＋で成果物のプルダウンを開き、そのチャットのセッションに対応する
-                        <code>.blend</code>
-                        等を選べる。
-                      </li>
-                      <li>
-                        候補にはファイル名・作成時刻・元の編集案を表示し、どの保存状態かを区別する。
-                      </li>
-                      <li>
-                        同じプルダウンの最下部からコンピューター上のファイル・画像を添付できる。
+                        理由の後日入力・訂正、変更要約の訂正もメインチャットで対象を指定して行い、以前の文章・記入者・時刻を残す。
                       </li>
                     </ul>
-                    <div class="contract-detail">
-                      <ul class="cell-list">
-                        <li>
-                          記録は前回の状態または指定した候補に結び付け、作業内容・変更前後・理由を保持する。
-                        </li>
-                        <li>
-                          理由の後日入力・訂正、変更要約の訂正もメインチャットで対象を指定して行い、以前の文章・記入者・時刻を残す。
-                        </li>
-                      </ul>
-                    </div>
-                    <div class="contract-detail">
-                      <ul class="cell-list">
-                        <li>
-                          LLMが使えない間も、同じ会話欄の「記録として送信」から対象・本文・添付をそのまま登録できる。
-                        </li>
-                        <li>通常の相談メッセージとは送信時に区別する。</li>
-                      </ul>
-                    </div>
-                    <div class="contract-detail">
-                      Photoshopでの作業は人間が保存したPSD/PSBとプレビューを登録し、前回の記録・元レンダーとの関係を保持する。
-                    </div>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">処理内容</th>
-                  <td>
+                  </div>
+                  <div class="contract-detail">
                     <ul class="cell-list">
                       <li>
-                        指定した成果物を手修正の起点とすることと、修正後の制作ファイルを登録することを区別する。
+                        LLMが使えない間も、同じ会話欄の「記録として送信」から対象・本文・添付をそのまま登録できる。
                       </li>
-                      <li>
-                        人間は手修正を保存し、保存済みの作業用ファイルを取り込む。
-                      </li>
+                      <li>通常の相談メッセージとは送信時に区別する。</li>
                     </ul>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+                  </div>
+                  <div class="contract-detail">
+                    Photoshopでの作業は人間が保存したPSD/PSBとプレビューを登録し、前回の記録・元レンダーとの関係を保持する。
+                  </div>
+                </dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="処理内容">
+              <p class="contract-card-title">処理内容</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>
+                      指定した成果物を手修正の起点とすることと、修正後の制作ファイルを登録することを区別する。
+                    </li>
+                    <li>
+                      人間は手修正を保存し、保存済みの作業用ファイルを取り込む。
+                    </li>
+                  </ul>
+                </dd>
+              </dl>
+            </article>
           </div>
 
           <section
@@ -508,66 +463,59 @@
             <h3 id="blendの記録用プレビュー">
               4-1. <code>.blend</code>の記録用プレビュー
             </h3>
-            <div
-              aria-label=".blend の記録用プレビュー"
-              class="table-scroll"
-              role="region"
-              tabindex="0"
-            >
-              <table class="spec-table">
-                <thead>
-                  <tr>
-                    <th scope="col">項目</th>
-                    <th scope="col">仕様</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <th scope="row">処理内容</th>
-                    <td>
-                      指定した保存済み
-                      <code>.blend</code>
-                      の内容と取得条件に対応する既存の画像があれば再利用する。
-                      <div class="contract-detail">
-                        <ul class="cell-list">
-                          <li>
-                            対応画像がなければWindows
-                            Blenderと通常のPythonスクリプトで生成する。
-                          </li>
-                          <li>LLMなしで利用できる処理とする。</li>
-                        </ul>
-                      </div>
-                    </td>
-                  </tr>
-
-                  <tr>
-                    <th scope="row">記録</th>
-                    <td>
+            <div class="contract-cards">
+              <article class="contract-card" aria-label="処理内容">
+                <p class="contract-card-title">処理内容</p>
+                <dl>
+                  <dt>仕様</dt>
+                  <dd>
+                    指定した保存済み
+                    <code>.blend</code>
+                    の内容と取得条件に対応する既存の画像があれば再利用する。
+                    <div class="contract-detail">
                       <ul class="cell-list">
                         <li>
-                          使用するカメラ・フレーム・記録用解像度を表示する。
+                          対応画像がなければWindows
+                          Blenderと通常のPythonスクリプトで生成する。
                         </li>
-                        <li>
-                          記録用プレビューと正式な13レイヤーのPSD/PSB出力を区別する。
-                        </li>
+                        <li>LLMなしで利用できる処理とする。</li>
                       </ul>
-                    </td>
-                  </tr>
-                  <tr>
-                    <th scope="row">適用条件</th>
-                    <td>
-                      <ul class="cell-list">
-                        <li>
-                          カメラ・依存素材等が不足する場合や生成に失敗した場合は原因を示す。
-                        </li>
-                        <li>
-                          本文と制作ファイルの記録は可能とし、プレビューを後から補える。
-                        </li>
-                      </ul>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+                    </div>
+                  </dd>
+                </dl>
+              </article>
+              <article class="contract-card" aria-label="記録">
+                <p class="contract-card-title">記録</p>
+                <dl>
+                  <dt>仕様</dt>
+                  <dd>
+                    <ul class="cell-list">
+                      <li>
+                        使用するカメラ・フレーム・記録用解像度を表示する。
+                      </li>
+                      <li>
+                        記録用プレビューと正式な13レイヤーのPSD/PSB出力を区別する。
+                      </li>
+                    </ul>
+                  </dd>
+                </dl>
+              </article>
+              <article class="contract-card" aria-label="適用条件">
+                <p class="contract-card-title">適用条件</p>
+                <dl>
+                  <dt>仕様</dt>
+                  <dd>
+                    <ul class="cell-list">
+                      <li>
+                        カメラ・依存素材等が不足する場合や生成に失敗した場合は原因を示す。
+                      </li>
+                      <li>
+                        本文と制作ファイルの記録は可能とし、プレビューを後から補える。
+                      </li>
+                    </ul>
+                  </dd>
+                </dl>
+              </article>
             </div>
             <p>
               固定入力からの画像生成が可能であることと、製品としての取得処理が検証済みであることは区別する。取得条件・再利用判定・停止・記録との確定順は後続のエージェント契約と実装仕様へ引き継ぐ。
@@ -580,49 +528,44 @@
         >
           <h2 id="サイドチャットと手作業の相談">5. サイドチャット</h2>
           <p>右側のタブでメインの制作と並行して相談する。</p>
-          <div
-            aria-label="サイドチャットと手作業の相談"
-            class="table-scroll"
-            role="region"
-            tabindex="0"
-          >
-            <table class="spec-table">
-              <thead>
-                <tr>
-                  <th scope="col">項目</th>
-                  <th scope="col">仕様</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row">採用判断</th>
-                  <td>
-                    同じ作品の制作意図・採用状態を共有し、開いた時点のメインの話題と選択中の成果物を引き継ぐ。
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">文脈</th>
-                  <td>
-                    開いた時点の文脈共有と、相談専用の権限制限は維持する。
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">原文</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        原文・要約と参照した記録を保存し、後から開き直せる。
-                      </li>
-                      <li>相談の停止はその入力欄の停止操作で行う。</li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">参照</th>
-                  <td>相談用の接続には参照用ツールを公開する。</td>
-                </tr>
-              </tbody>
-            </table>
+          <div class="contract-cards">
+            <article class="contract-card" aria-label="採用判断">
+              <p class="contract-card-title">採用判断</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  同じ作品の制作意図・採用状態を共有し、開いた時点のメインの話題と選択中の成果物を引き継ぐ。
+                </dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="文脈">
+              <p class="contract-card-title">文脈</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>開いた時点の文脈共有と、相談専用の権限制限は維持する。</dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="原文">
+              <p class="contract-card-title">原文</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>
+                      原文・要約と参照した記録を保存し、後から開き直せる。
+                    </li>
+                    <li>相談の停止はその入力欄の停止操作で行う。</li>
+                  </ul>
+                </dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="参照">
+              <p class="contract-card-title">参照</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>相談用の接続には参照用ツールを公開する。</dd>
+              </dl>
+            </article>
           </div>
         </section>
         <section aria-labelledby="制作履歴復元派生" class="spec-section">
@@ -630,78 +573,71 @@
           <p>
             制作履歴は普段は閉じ、右側の「制作履歴」タブで、左から右へ制作が進むブランチグラフとして広く開く。節点は保存状態、枝は変更記録、採用の表示は採否記録に対応し、定義・作風を管理するGitコミットとは区別する。
           </p>
-          <div
-            aria-label="制作履歴・復元・派生"
-            class="table-scroll"
-            role="region"
-            tabindex="0"
-          >
-            <table class="spec-table">
-              <thead>
-                <tr>
-                  <th scope="col">項目</th>
-                  <th scope="col">仕様</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row">採用判断</th>
-                  <td>
+          <div class="contract-cards">
+            <article class="contract-card" aria-label="採用判断">
+              <p class="contract-card-title">採用判断</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>
+                      編集案の分岐、手修正とAI修正による枝の伸長、採用した状態からの継続を示す。
+                    </li>
+                    <li>指示者と変更者を区別する。</li>
+                  </ul>
+                  <div class="contract-detail">
                     <ul class="cell-list">
                       <li>
-                        編集案の分岐、手修正とAI修正による枝の伸長、採用した状態からの継続を示す。
+                        ホバーで修正理由・採用理由を確認でき、未入力なら未入力と示す。
                       </li>
-                      <li>指示者と変更者を区別する。</li>
+                      <li>
+                        クリックで対象を固定し、成果物リンクからプレビュータブを開く。
+                      </li>
                     </ul>
-                    <div class="contract-detail">
-                      <ul class="cell-list">
-                        <li>
-                          ホバーで修正理由・採用理由を確認でき、未入力なら未入力と示す。
-                        </li>
-                        <li>
-                          クリックで対象を固定し、成果物リンクからプレビュータブを開く。
-                        </li>
-                      </ul>
-                    </div>
-                  </td>
-                </tr>
-
-                <tr>
-                  <th scope="row">復元</th>
-                  <td>
-                    選んだ節点をメインチャットに参照として添え、追加修正・手修正の記録・復元・派生を指示する。
-                    <div class="contract-detail">
-                      <ul class="cell-list">
-                        <li>
-                          「ここに戻して」では復元元と戻す直前の状態を説明し、未登録の手修正があれば先に記録する。
-                        </li>
-                        <li>
-                          後続の履歴は残し、復元元を参照する新しい記録を作る。
-                        </li>
-                      </ul>
-                    </div>
-                  </td>
-                </tr>
-
-                <tr>
-                  <th scope="row">派生</th>
-                  <td>
-                    「ここから別作品を作って」では元作品と起点を明示し、独立した派生先を作る。
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">処理内容</th>
-                  <td>
+                  </div>
+                </dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="復元">
+              <p class="contract-card-title">復元</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  選んだ節点をメインチャットに参照として添え、追加修正・手修正の記録・復元・派生を指示する。
+                  <div class="contract-detail">
                     <ul class="cell-list">
                       <li>
-                        必要な実体や依存が不足・破損していれば理由を示す。
+                        「ここに戻して」では復元元と戻す直前の状態を説明し、未登録の手修正があれば先に記録する。
                       </li>
-                      <li>履歴が残ることと復元できることを区別する。</li>
+                      <li>
+                        後続の履歴は残し、復元元を参照する新しい記録を作る。
+                      </li>
                     </ul>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+                  </div>
+                </dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="派生">
+              <p class="contract-card-title">派生</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  「ここから別作品を作って」では元作品と起点を明示し、独立した派生先を作る。
+                </dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="処理内容">
+              <p class="contract-card-title">処理内容</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>必要な実体や依存が不足・破損していれば理由を示す。</li>
+                    <li>履歴が残ることと復元できることを区別する。</li>
+                  </ul>
+                </dd>
+              </dl>
+            </article>
           </div>
           <p>
             長いグラフの具体的な配置・折り畳み・描画方式は、上記の関係と理由にたどれる契約を保って画面実装で検証する。
@@ -709,63 +645,54 @@
         </section>
         <section aria-labelledby="保護指定" class="spec-section">
           <h2 id="保護指定">7. 保護指定</h2>
-          <div
-            aria-label="保護指定"
-            class="table-scroll"
-            role="region"
-            tabindex="0"
-          >
-            <table class="spec-table">
-              <thead>
-                <tr>
-                  <th scope="col">項目</th>
-                  <th scope="col">仕様</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row">保護指定</th>
-                  <td>
+          <div class="contract-cards">
+            <article class="contract-card" aria-label="保護指定">
+              <p class="contract-card-title">保護指定</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>
+                      右側の「保護一覧」タブで対象・項目・対応範囲を確認でき、タブ内から保護を削除できる。
+                    </li>
+                    <li>
+                      この削除は継続的な保護解除であり、制作実体の削除とは区別する。
+                    </li>
+                    <li>保護の追加はメインチャットからも指示できる。</li>
+                  </ul>
+                  <div class="contract-detail">
                     <ul class="cell-list">
                       <li>
-                        右側の「保護一覧」タブで対象・項目・対応範囲を確認でき、タブ内から保護を削除できる。
+                        保護違反・検証不能な候補は、原因と必要な対処をチャットで説明する。
                       </li>
                       <li>
-                        この削除は継続的な保護解除であり、制作実体の削除とは区別する。
-                      </li>
-                      <li>保護の追加はメインチャットからも指示できる。</li>
-                    </ul>
-                    <div class="contract-detail">
-                      <ul class="cell-list">
-                        <li>
-                          保護違反・検証不能な候補は、原因と必要な対処をチャットで説明する。
-                        </li>
-                        <li>
-                          許可済みでも最新の保護・実際の変更・許可範囲を採用時に照合する。
-                        </li>
-                      </ul>
-                    </div>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">依頼</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        競合時はメインチャットで必要な対象・項目・変更・理由を示し、依頼限定の一時許可と継続的な解除を区別する。
-                      </li>
-                      <li>一時許可は会話でやり取りする。</li>
-                      <li>
-                        直接・間接変更、共有材質等の影響は<a
-                          href="edit-candidates.html"
-                          >編集案・保護設計</a
-                        >に従う。
+                        許可済みでも最新の保護・実際の変更・許可範囲を採用時に照合する。
                       </li>
                     </ul>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+                  </div>
+                </dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="依頼">
+              <p class="contract-card-title">依頼</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>
+                      競合時はメインチャットで必要な対象・項目・変更・理由を示し、依頼限定の一時許可と継続的な解除を区別する。
+                    </li>
+                    <li>一時許可は会話でやり取りする。</li>
+                    <li>
+                      直接・間接変更、共有材質等の影響は<a
+                        href="edit-candidates.html"
+                        >編集案・保護設計</a
+                      >に従う。
+                    </li>
+                  </ul>
+                </dd>
+              </dl>
+            </article>
           </div>
         </section>
         <section aria-labelledby="実行状況停止再開" class="spec-section">
@@ -806,40 +733,34 @@
               </tbody>
             </table>
           </div>
-          <div
-            aria-label="実行状況・停止・再開"
-            class="table-scroll"
-            role="region"
-            tabindex="0"
-          >
-            <table class="spec-table">
-              <thead>
-                <tr>
-                  <th scope="col">観点</th>
-                  <th scope="col">仕様</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row">表示の優先順位</th>
-                  <td>
-                    一つのチャットに複数の依頼がある場合は確認が必要な状態を優先する。
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">チャットの詳細表示</th>
-                  <td>
-                    詳しい状態、現在の処理、待機理由、確認事項、再認証・利用上限・失敗原因、途中成果と再実行回数はチャット内で伝える。
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">未解決の対象</th>
-                  <td>
-                    完了済みの過去の失敗を永続的に現在の異常として扱うような集約を避け、未解決の対象を識別する。
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+          <div class="contract-cards">
+            <article class="contract-card" aria-label="表示の優先順位">
+              <p class="contract-card-title">表示の優先順位</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  一つのチャットに複数の依頼がある場合は確認が必要な状態を優先する。
+                </dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="チャットの詳細表示">
+              <p class="contract-card-title">チャットの詳細表示</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  詳しい状態、現在の処理、待機理由、確認事項、再認証・利用上限・失敗原因、途中成果と再実行回数はチャット内で伝える。
+                </dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="未解決の対象">
+              <p class="contract-card-title">未解決の対象</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  完了済みの過去の失敗を永続的に現在の異常として扱うような集約を避け、未解決の対象を識別する。
+                </dd>
+              </dl>
+            </article>
           </div>
 
           <section
@@ -849,168 +770,88 @@
             <h3 id="操作対象はチャットで今行っている作業">
               8-1. 操作対象はチャットで今行っている作業
             </h3>
-            <div
-              aria-label="操作対象はチャットで今行っている作業"
-              class="table-scroll"
-              role="region"
-              tabindex="0"
-            >
-              <table class="spec-table">
-                <thead>
-                  <tr>
-                    <th scope="col">項目</th>
-                    <th scope="col">仕様</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <th scope="row">停止</th>
-                    <td>
-                      <ul class="cell-list">
-                        <li>作業中は送信欄の右下に停止ボタンを置く。</li>
-                        <li>
-                          利用者はそのチャットで今行っている作業を止める。
-                        </li>
-                      </ul>
-                      <div class="contract-detail">
-                        <ul class="cell-list">
-                          <li>
-                            内部では停止対象を該当する依頼・操作へ対応付け、停止要求受付と実際の停止完了を区別する。
-                          </li>
-                          <li>停止処理中を表示す。</li>
-                        </ul>
-                      </div>
-                    </td>
-                  </tr>
-
-                  <tr>
-                    <th scope="row">処理内容</th>
-                    <td>
-                      <ul class="cell-list">
-                        <li>「続けて」等の明示メッセージで再開する。</li>
-                        <li>
-                          対象が曖昧な場合は確認し、元の依頼と累積回数を維持する。
-                        </li>
-                        <li>
-                          新しい制作指示による追加修正は別の依頼として扱う。
-                        </li>
-                      </ul>
-                      <div class="contract-detail">
-                        結果不明なら先に照合する。
-                      </div>
-                      <div class="contract-detail">
-                        ブラウザを閉じてもローカル実行が継続する契約を保ち、再表示では保存された進捗・結果を取得する。
-                      </div>
-                    </td>
-                  </tr>
-
-                  <tr>
-                    <th scope="row">依頼</th>
-                    <td>
+            <div class="contract-cards">
+              <article class="contract-card" aria-label="停止">
+                <p class="contract-card-title">停止</p>
+                <dl>
+                  <dt>仕様</dt>
+                  <dd>
+                    <ul class="cell-list">
+                      <li>作業中は送信欄の右下に停止ボタンを置く。</li>
+                      <li>利用者はそのチャットで今行っている作業を止める。</li>
+                    </ul>
+                    <div class="contract-detail">
                       <ul class="cell-list">
                         <li>
-                          依頼全体が失敗・中断しても独立して検証済みの途中成果にはリンクを示し、未完成部分と区別する。
+                          内部では停止対象を該当する依頼・操作へ対応付け、停止要求受付と実際の停止完了を区別する。
                         </li>
-                        <li>全体の完了と案の採用も区別する。</li>
+                        <li>停止処理中を表示す。</li>
                       </ul>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+                    </div>
+                  </dd>
+                </dl>
+              </article>
+              <article class="contract-card" aria-label="処理内容">
+                <p class="contract-card-title">処理内容</p>
+                <dl>
+                  <dt>仕様</dt>
+                  <dd>
+                    <ul class="cell-list">
+                      <li>「続けて」等の明示メッセージで再開する。</li>
+                      <li>
+                        対象が曖昧な場合は確認し、元の依頼と累積回数を維持する。
+                      </li>
+                      <li>
+                        新しい制作指示による追加修正は別の依頼として扱う。
+                      </li>
+                    </ul>
+                    <div class="contract-detail">
+                      結果不明なら先に照合する。
+                    </div>
+                    <div class="contract-detail">
+                      ブラウザを閉じてもローカル実行が継続する契約を保ち、再表示では保存された進捗・結果を取得する。
+                    </div>
+                  </dd>
+                </dl>
+              </article>
+              <article class="contract-card" aria-label="依頼">
+                <p class="contract-card-title">依頼</p>
+                <dl>
+                  <dt>仕様</dt>
+                  <dd>
+                    <ul class="cell-list">
+                      <li>
+                        依頼全体が失敗・中断しても独立して検証済みの途中成果にはリンクを示し、未完成部分と区別する。
+                      </li>
+                      <li>全体の完了と案の採用も区別する。</li>
+                    </ul>
+                  </dd>
+                </dl>
+              </article>
             </div>
             <p>同じ作品内の制作操作・採用・復元等は既存の順序・排他に従う。</p>
           </section>
         </section>
         <section aria-labelledby="作風制作方針と版選択" class="spec-section">
           <h2 id="作風制作方針と版選択">9. 作風・制作方針と版選択</h2>
-          <div
-            aria-label="作風・制作方針と版選択"
-            class="table-scroll"
-            role="region"
-            tabindex="0"
-          >
-            <table class="spec-table">
-              <thead>
-                <tr>
-                  <th scope="col">項目</th>
-                  <th scope="col">仕様</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row">Git参照</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        右側の「作風・制作方針」タブで使用中の内容・Gitの版・保存状況を参照し、作品に適用する版を選べる。
-                      </li>
-                      <li>
-                        作風の仮説と採用済みの制作方針、未選択と不採用を区別する。
-                      </li>
-                      <li>
-                        制作意図はメインチャットの明示指示で更新でき、過去の作風より優先する。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">設定</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>エージェント定義の版は別項目として設定に置く。</li>
-                      <li>定義と作風で異なるコミットを使える。</li>
-                      <li>
-                        表示名を付けても版の正はGitフルコミットハッシュとし、詳細で確認できる。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <div
-            aria-label="作風・制作方針と版選択"
-            class="table-scroll"
-            role="region"
-            tabindex="0"
-          >
-            <table class="spec-table">
-              <thead>
-                <tr>
-                  <th scope="col">項目</th>
-                  <th scope="col">仕様</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row">参照</th>
-                  <td>版変更時は旧・新参照と変更理由を記録する。</td>
-                </tr>
-                <tr>
-                  <th scope="row">依頼</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        待機中の依頼に作風変更が影響すれば、開始前に旧版継続／新版切替をメインチャットで確認する。
-                      </li>
-                      <li>実行中の切替は安全な停止後の明示操作とする。</li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">処理内容</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        非互換・欠損・取得失敗は原因と対処を示し、必要な実行だけを止める。
-                      </li>
-                      <li>閲覧と手作業の記録は続けられる。</li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">Git参照</th>
-                  <td>
+          <div class="contract-cards">
+            <article aria-label="Git参照" class="contract-card">
+              <p class="contract-card-title">Git参照</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>
+                      右側の「作風・制作方針」タブで使用中の内容・Gitの版・保存状況を参照し、作品に適用する版を選べる。
+                    </li>
+                    <li>
+                      作風の仮説と採用済みの制作方針、未選択と不採用を区別する。
+                    </li>
+                    <li>
+                      制作意図はメインチャットの明示指示で更新でき、過去の作風より優先する。
+                    </li>
+                  </ul>
+                  <div class="contract-detail">
                     <ul class="cell-list">
                       <li>
                         Gitのローカル保持とリモート保存を区別し、「リモート未保存」「リモート保存済み」と確認時刻を表示する。
@@ -1027,111 +868,148 @@
                         </li>
                       </ul>
                     </div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+                  </div>
+                </dd>
+              </dl>
+            </article>
+            <article aria-label="設定" class="contract-card">
+              <p class="contract-card-title">設定</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>エージェント定義の版は別項目として設定に置く。</li>
+                    <li>定義と作風で異なるコミットを使える。</li>
+                    <li>
+                      表示名を付けても版の正はGitフルコミットハッシュとし、詳細で確認できる。
+                    </li>
+                  </ul>
+                </dd>
+              </dl>
+            </article>
+            <article aria-label="参照" class="contract-card">
+              <p class="contract-card-title">参照</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>版変更時は旧・新参照と変更理由を記録する。</dd>
+              </dl>
+            </article>
+            <article aria-label="依頼" class="contract-card">
+              <p class="contract-card-title">依頼</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>
+                      待機中の依頼に作風変更が影響すれば、開始前に旧版継続／新版切替をメインチャットで確認する。
+                    </li>
+                    <li>実行中の切替は安全な停止後の明示操作とする。</li>
+                  </ul>
+                </dd>
+              </dl>
+            </article>
+            <article aria-label="処理内容" class="contract-card">
+              <p class="contract-card-title">処理内容</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>
+                      非互換・欠損・取得失敗は原因と対処を示し、必要な実行だけを止める。
+                    </li>
+                    <li>閲覧と手作業の記録は続けられる。</li>
+                  </ul>
+                </dd>
+              </dl>
+            </article>
           </div>
         </section>
         <section aria-labelledby="振り返り" class="spec-section">
           <h2 id="振り返り">10. 振り返り</h2>
-          <div
-            aria-label="振り返り"
-            class="table-scroll"
-            role="region"
-            tabindex="0"
-          >
-            <table class="spec-table">
-              <thead>
-                <tr>
-                  <th scope="col">項目</th>
-                  <th scope="col">仕様</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row">処理内容</th>
-                  <td>
+          <div class="contract-cards">
+            <article class="contract-card" aria-label="処理内容">
+              <p class="contract-card-title">処理内容</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>
+                      左側の「作品を振り返る」から対象選択のモーダルを開き、一作品または複数作品を選ぶ。
+                    </li>
+                    <li>
+                      採用状態・保存状態に関係なく、各対象作品の全履歴を対象とする。
+                    </li>
+                    <li>
+                      実際に分析で参照した根拠の固定は<a
+                        href="context-and-style.html"
+                        >文脈・作風設計</a
+                      >に従う。
+                    </li>
+                  </ul>
+                  <div class="contract-detail">
                     <ul class="cell-list">
                       <li>
-                        左側の「作品を振り返る」から対象選択のモーダルを開き、一作品または複数作品を選ぶ。
+                        根拠となる作品・採否・手修正へのリンク、不足、理由未入力、仮説と事実の違いをチャットで返す。
                       </li>
-                      <li>
-                        採用状態・保存状態に関係なく、各対象作品の全履歴を対象とする。
-                      </li>
-                      <li>
-                        実際に分析で参照した根拠の固定は<a
-                          href="context-and-style.html"
-                          >文脈・作風設計</a
-                        >に従う。
-                      </li>
+                      <li>根拠の後日訂正があれば更新を示す。</li>
                     </ul>
-                    <div class="contract-detail">
-                      <ul class="cell-list">
-                        <li>
-                          根拠となる作品・採否・手修正へのリンク、不足、理由未入力、仮説と事実の違いをチャットで返す。
-                        </li>
-                        <li>根拠の後日訂正があれば更新を示す。</li>
-                      </ul>
-                    </div>
-                  </td>
-                </tr>
-
-                <tr>
-                  <th scope="row">採用判断</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>
-                        制作方針の項目別採用・編集・保留も専用チャットで指示する。
-                      </li>
-                      <li>
-                        採用した内容のコミット成功を確認し、作品への版適用は別に選ぶ。
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+                  </div>
+                </dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="採用判断">
+              <p class="contract-card-title">採用判断</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>
+                      制作方針の項目別採用・編集・保留も専用チャットで指示する。
+                    </li>
+                    <li>
+                      採用した内容のコミット成功を確認し、作品への版適用は別に選ぶ。
+                    </li>
+                  </ul>
+                </dd>
+              </dl>
+            </article>
           </div>
         </section>
         <section aria-labelledby="設定と保存データ管理" class="spec-section">
           <h2 id="設定と保存データ管理">11. 設定</h2>
-          <div
-            aria-label="設定"
-            class="table-scroll"
-            role="region"
-            tabindex="0"
-          >
-            <table class="spec-table">
-              <thead>
-                <tr>
-                  <th scope="col">観点</th>
-                  <th scope="col">仕様</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row">設定の入口</th>
-                  <td>
-                    左側の「設定・保存データ」から設定を開き、バックアップ・保存データ・版とGitの項目を切り替える。
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">保存データの操作</th>
-                  <td>
-                    LLMなしで全体バックアップ、バックアップからの復元、保存先管理、大容量実体の削除を操作できる。
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">進捗表示</th>
-                  <td>進捗・不足・失敗を設定画面で確認できる。</td>
-                </tr>
-                <tr>
-                  <th scope="row">Git設定</th>
-                  <td>定義の版、Git保存先と明示公開も設定に置く。</td>
-                </tr>
-              </tbody>
-            </table>
+          <div class="contract-cards">
+            <article class="contract-card" aria-label="設定の入口">
+              <p class="contract-card-title">設定の入口</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  左側の「設定・保存データ」から設定を開き、バックアップ・保存データ・版とGitの項目を切り替える。
+                </dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="保存データの操作">
+              <p class="contract-card-title">保存データの操作</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>
+                  LLMなしで全体バックアップ、バックアップからの復元、保存先管理、大容量実体の削除を操作できる。
+                </dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="進捗表示">
+              <p class="contract-card-title">進捗表示</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>進捗・不足・失敗を設定画面で確認できる。</dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="Git設定">
+              <p class="contract-card-title">Git設定</p>
+              <dl>
+                <dt>仕様</dt>
+                <dd>定義の版、Git保存先と明示公開も設定に置く。</dd>
+              </dl>
+            </article>
           </div>
 
           <section
@@ -1139,59 +1017,50 @@
             class="spec-subsection"
           >
             <h3 id="命名保存用要約モデル">11-1. 命名・保存用要約モデル</h3>
-            <div
-              aria-label="命名・保存用要約モデル"
-              class="table-scroll"
-              role="region"
-              tabindex="0"
-            >
-              <table class="spec-table">
-                <thead>
-                  <tr>
-                    <th scope="col">項目</th>
-                    <th scope="col">仕様</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <th scope="row">モデル</th>
-                    <td>
-                      <ul class="cell-list">
-                        <li>
-                          <a
-                            href="https://github.com/Kurarowa305/scene-craft/blob/main/docs/design/agent-contracts.md#提案数と補助モデル合意済み"
-                            rel="noopener noreferrer"
-                            target="_blank"
-                            >エージェント契約の設計</a
-                          >で、設定から命名・保存用要約のモデルを変更できるよう指定された。
-                        </li>
-                        <li>
-                          「命名・保存用要約モデル」を設定項目として設け、初期構築時はGPT-6
-                          Luna（<code>gpt-6-luna</code>）を初期値にする。
-                        </li>
-                        <li>
-                          制作会話のモデル選択・新規会話への引き継ぎとは別に扱う。
-                        </li>
-                      </ul>
-                    </td>
-                  </tr>
-                  <tr>
-                    <th scope="row">設定</th>
-                    <td>
-                      <ul class="cell-list">
-                        <li>設定変更は以後の補助処理へ適用する。</li>
-                        <li>
-                          指定モデルが利用不可なら原因と設定変更の入口を示す。
-                        </li>
-                        <li>
-                          未命名・未要約でも会話と制作結果を閲覧でき、LLMなしの記録も継続できる。
-                        </li>
-                        <li>具体的な設定画面の配置は実装仕様で定める。</li>
-                      </ul>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+            <div class="contract-cards">
+              <article class="contract-card" aria-label="モデル">
+                <p class="contract-card-title">モデル</p>
+                <dl>
+                  <dt>仕様</dt>
+                  <dd>
+                    <ul class="cell-list">
+                      <li>
+                        <a
+                          href="https://github.com/Kurarowa305/scene-craft/blob/main/docs/design/agent-contracts.md#提案数と補助モデル合意済み"
+                          rel="noopener noreferrer"
+                          target="_blank"
+                          >エージェント契約の設計</a
+                        >で、設定から命名・保存用要約のモデルを変更できるよう指定された。
+                      </li>
+                      <li>
+                        「命名・保存用要約モデル」を設定項目として設け、初期構築時はGPT-6
+                        Luna（<code>gpt-6-luna</code>）を初期値にする。
+                      </li>
+                      <li>
+                        制作会話のモデル選択・新規会話への引き継ぎとは別に扱う。
+                      </li>
+                    </ul>
+                  </dd>
+                </dl>
+              </article>
+              <article class="contract-card" aria-label="設定">
+                <p class="contract-card-title">設定</p>
+                <dl>
+                  <dt>仕様</dt>
+                  <dd>
+                    <ul class="cell-list">
+                      <li>設定変更は以後の補助処理へ適用する。</li>
+                      <li>
+                        指定モデルが利用不可なら原因と設定変更の入口を示す。
+                      </li>
+                      <li>
+                        未命名・未要約でも会話と制作結果を閲覧でき、LLMなしの記録も継続できる。
+                      </li>
+                      <li>具体的な設定画面の配置は実装仕様で定める。</li>
+                    </ul>
+                  </dd>
+                </dl>
+              </article>
             </div>
           </section>
           <section
@@ -1201,58 +1070,54 @@
             <h3 id="バックアップ復元形式移行">
               11-2. バックアップ・復元・形式移行
             </h3>
-            <div
-              aria-label="バックアップ・復元・形式移行"
-              class="table-scroll"
-              role="region"
-              tabindex="0"
-            >
-              <table class="spec-table">
-                <thead>
-                  <tr>
-                    <th scope="col">項目</th>
-                    <th scope="col">仕様</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <th scope="row">バックアップ</th>
-                    <td>
-                      <ul class="cell-list">
-                        <li>
-                          全体バックアップでは保存先・必要容量・既知の不足を示す。
-                        </li>
-                        <li>
-                          安全な停止と照合、作業用ファイルの保存を経て書き出す。
-                        </li>
-                      </ul>
-                      <div class="contract-detail">
-                        不足を持つ正常なバックアップと破損したバックアップを区別する。
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <th scope="row">記録</th>
-                    <td>作業中は新しい制作操作・記録更新を止める。</td>
-                  </tr>
-
-                  <tr>
-                    <th scope="row">認証</th>
-                    <td>GitHubからの取得・別途認証・明示再開を案内する。</td>
-                  </tr>
-                  <tr>
-                    <th scope="row">処理内容</th>
-                    <td>
-                      <ul class="cell-list">
-                        <li>
-                          ローカル保存形式の移行が必要なら対象・変更内容・必要容量・退避先・退避状態を示し、確認後に行う。
-                        </li>
-                        <li>移行失敗時は退避した構成への復旧を案内する。</li>
-                      </ul>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+            <div class="contract-cards">
+              <article class="contract-card" aria-label="バックアップ">
+                <p class="contract-card-title">バックアップ</p>
+                <dl>
+                  <dt>仕様</dt>
+                  <dd>
+                    <ul class="cell-list">
+                      <li>
+                        全体バックアップでは保存先・必要容量・既知の不足を示す。
+                      </li>
+                      <li>
+                        安全な停止と照合、作業用ファイルの保存を経て書き出す。
+                      </li>
+                    </ul>
+                    <div class="contract-detail">
+                      不足を持つ正常なバックアップと破損したバックアップを区別する。
+                    </div>
+                  </dd>
+                </dl>
+              </article>
+              <article class="contract-card" aria-label="記録">
+                <p class="contract-card-title">記録</p>
+                <dl>
+                  <dt>仕様</dt>
+                  <dd>作業中は新しい制作操作・記録更新を止める。</dd>
+                </dl>
+              </article>
+              <article class="contract-card" aria-label="認証">
+                <p class="contract-card-title">認証</p>
+                <dl>
+                  <dt>仕様</dt>
+                  <dd>GitHubからの取得・別途認証・明示再開を案内する。</dd>
+                </dl>
+              </article>
+              <article class="contract-card" aria-label="処理内容">
+                <p class="contract-card-title">処理内容</p>
+                <dl>
+                  <dt>仕様</dt>
+                  <dd>
+                    <ul class="cell-list">
+                      <li>
+                        ローカル保存形式の移行が必要なら対象・変更内容・必要容量・退避先・退避状態を示し、確認後に行う。
+                      </li>
+                      <li>移行失敗時は退避した構成への復旧を案内する。</li>
+                    </ul>
+                  </dd>
+                </dl>
+              </article>
             </div>
           </section>
           <section
@@ -1260,51 +1125,42 @@
             class="spec-subsection"
           >
             <h3 id="大容量実体の明示削除">11-3. 大容量実体の明示削除</h3>
-            <div
-              aria-label="大容量実体の明示削除"
-              class="table-scroll"
-              role="region"
-              tabindex="0"
-            >
-              <table class="spec-table">
-                <thead>
-                  <tr>
-                    <th scope="col">項目</th>
-                    <th scope="col">仕様</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <th scope="row">復元</th>
-                    <td>
-                      <ul class="cell-list">
-                        <li>
-                          設定の「保存データ管理」で対象・容量・影響する保存状態と復元できなくなる内容を示し、人間が明示的に削除する。
-                        </li>
-                        <li>
-                          現在採用中・実行中、別の保存状態・作品で必要な実体は保護する。
-                        </li>
-                        <li>
-                          参照・共有素材の検査と削除は保存設計の契約に従う。
-                        </li>
-                      </ul>
-                    </td>
-                  </tr>
-                  <tr>
-                    <th scope="row">参照</th>
-                    <td>
-                      <ul class="cell-list">
-                        <li>
-                          会話・理由・採否・分岐・ファイルの当時の参照は残し、削除済み・欠落・破損・未確認を区別する。
-                        </li>
-                        <li>
-                          履歴と実体の可用性を表示し、必要な実体が揃った状態で復元・派生・制作を受け付ける。
-                        </li>
-                      </ul>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+            <div class="contract-cards">
+              <article class="contract-card" aria-label="復元">
+                <p class="contract-card-title">復元</p>
+                <dl>
+                  <dt>仕様</dt>
+                  <dd>
+                    <ul class="cell-list">
+                      <li>
+                        設定の「保存データ管理」で対象・容量・影響する保存状態と復元できなくなる内容を示し、人間が明示的に削除する。
+                      </li>
+                      <li>
+                        現在採用中・実行中、別の保存状態・作品で必要な実体は保護する。
+                      </li>
+                      <li>
+                        参照・共有素材の検査と削除は保存設計の契約に従う。
+                      </li>
+                    </ul>
+                  </dd>
+                </dl>
+              </article>
+              <article class="contract-card" aria-label="参照">
+                <p class="contract-card-title">参照</p>
+                <dl>
+                  <dt>仕様</dt>
+                  <dd>
+                    <ul class="cell-list">
+                      <li>
+                        会話・理由・採否・分岐・ファイルの当時の参照は残し、削除済み・欠落・破損・未確認を区別する。
+                      </li>
+                      <li>
+                        履歴と実体の可用性を表示し、必要な実体が揃った状態で復元・派生・制作を受け付ける。
+                      </li>
+                    </ul>
+                  </dd>
+                </dl>
+              </article>
             </div>
           </section>
         </section>
@@ -1313,121 +1169,163 @@
           class="spec-section"
         >
           <h2 id="主要な制作シナリオと操作の入口">12. 制作シナリオ</h2>
-          <div
-            aria-label="主要な制作シナリオと操作の入口"
-            class="table-scroll"
-            role="region"
-            tabindex="0"
-          >
-            <table class="spec-table">
-              <thead>
-                <tr>
-                  <th scope="col">シナリオ</th>
-                  <th scope="col">入口と期待する流れ</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row">作品開始・既存データ取り込み</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>左の作品作成 → 空／取り込み</li>
-                      <li>制作意図</li>
-                      <li>
-                        作風版／なし → プロジェクト名右の入口で直接新規チャット
-                        → 送信時にエージェント選択
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">案の確認・部分採用</th>
-                  <td>
-                    メインチャットの成果物リンク → 右のプレビュータブ →
-                    メインで具体的な案・状態・範囲を採用指示
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">候補のAI修正・手修正の継続</th>
-                  <td>
-                    候補／履歴の状態参照 →
-                    工程・修正元を明示して依頼、または保存済み手修正を会話から記録
-                    → 確認した状態を採用
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">作業方法の相談</th>
-                  <td>右のサイドチャットで質問 → 説明を受ける</td>
-                </tr>
-                <tr>
-                  <th scope="row">プレビューのない手作業記録</th>
-                  <td>
-                    メインの本文・添付／成果物プルダウン →
-                    <code>.blend</code
-                    >から画像を再利用／生成。生成失敗時も制作ファイルと本文を記録し、後から補完
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">理由・要約の訂正</th>
-                  <td>
-                    メインで対象を指定して補記・訂正 →
-                    原文と以前の文章を残して最新を表示
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">保護の競合・削除</th>
-                  <td>
-                    メインで対象・項目を確認して依頼限定許可、または保護一覧タブで継続解除
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">停止・再開・状態不明</th>
-                  <td>
-                    左のアイコンとメインの説明 → 入力欄右下で現在作業を停止 →
-                    照合後、明示メッセージで再開
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">過去状態への復元・派生</th>
-                  <td>
-                    履歴タブの節点をメインへ参照 → 指示と対象・影響の確認 →
-                    必要な実体と直前状態を保存して実行
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">振り返り・制作方針の更新</th>
-                  <td>
-                    左の「作品を振り返る」→ 対象作品選択 →
-                    対象作品の全履歴を専用チャットで振り返る → 根拠付き分析 →
-                    会話で項目別採否・編集 → コミット → 別途作品へ適用
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">版の欠損・リモート未保存</th>
-                  <td>
-                    作風タブ／設定の版と保存状況 → 同じ参照の復旧または明示選択
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">利用上限・認証待ち</th>
-                  <td>
-                    <ul class="cell-list">
-                      <li>原因・途中成果をチャットで表示 → 履歴閲覧</li>
-                      <li>記録として送信</li>
-                      <li>スクリプトのプレビュー</li>
-                      <li>設定でのバックアップは利用可能</li>
-                    </ul>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">実体削除・バックアップ・移行</th>
-                  <td>
-                    設定で対象・容量・影響を確認 → 通常プログラムで処理 →
-                    不足・破損・未完了を区別
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+          <div class="contract-cards">
+            <article
+              class="contract-card"
+              aria-label="作品開始・既存データ取り込み"
+            >
+              <p class="contract-card-title">作品開始・既存データ取り込み</p>
+              <dl>
+                <dt>入口と期待する流れ</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>左の作品作成 → 空／取り込み</li>
+                    <li>制作意図</li>
+                    <li>
+                      作風版／なし → プロジェクト名右の入口で直接新規チャット →
+                      送信時にエージェント選択
+                    </li>
+                  </ul>
+                </dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="案の確認・部分採用">
+              <p class="contract-card-title">案の確認・部分採用</p>
+              <dl>
+                <dt>入口と期待する流れ</dt>
+                <dd>
+                  メインチャットの成果物リンク → 右のプレビュータブ →
+                  メインで具体的な案・状態・範囲を採用指示
+                </dd>
+              </dl>
+            </article>
+            <article
+              class="contract-card"
+              aria-label="候補のAI修正・手修正の継続"
+            >
+              <p class="contract-card-title">候補のAI修正・手修正の継続</p>
+              <dl>
+                <dt>入口と期待する流れ</dt>
+                <dd>
+                  候補／履歴の状態参照 →
+                  工程・修正元を明示して依頼、または保存済み手修正を会話から記録
+                  → 確認した状態を採用
+                </dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="作業方法の相談">
+              <p class="contract-card-title">作業方法の相談</p>
+              <dl>
+                <dt>入口と期待する流れ</dt>
+                <dd>右のサイドチャットで質問 → 説明を受ける</dd>
+              </dl>
+            </article>
+            <article
+              class="contract-card"
+              aria-label="プレビューのない手作業記録"
+            >
+              <p class="contract-card-title">プレビューのない手作業記録</p>
+              <dl>
+                <dt>入口と期待する流れ</dt>
+                <dd>
+                  メインの本文・添付／成果物プルダウン →
+                  <code>.blend</code
+                  >から画像を再利用／生成。生成失敗時も制作ファイルと本文を記録し、後から補完
+                </dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="理由・要約の訂正">
+              <p class="contract-card-title">理由・要約の訂正</p>
+              <dl>
+                <dt>入口と期待する流れ</dt>
+                <dd>
+                  メインで対象を指定して補記・訂正 →
+                  原文と以前の文章を残して最新を表示
+                </dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="保護の競合・削除">
+              <p class="contract-card-title">保護の競合・削除</p>
+              <dl>
+                <dt>入口と期待する流れ</dt>
+                <dd>
+                  メインで対象・項目を確認して依頼限定許可、または保護一覧タブで継続解除
+                </dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="停止・再開・状態不明">
+              <p class="contract-card-title">停止・再開・状態不明</p>
+              <dl>
+                <dt>入口と期待する流れ</dt>
+                <dd>
+                  左のアイコンとメインの説明 → 入力欄右下で現在作業を停止 →
+                  照合後、明示メッセージで再開
+                </dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="過去状態への復元・派生">
+              <p class="contract-card-title">過去状態への復元・派生</p>
+              <dl>
+                <dt>入口と期待する流れ</dt>
+                <dd>
+                  履歴タブの節点をメインへ参照 → 指示と対象・影響の確認 →
+                  必要な実体と直前状態を保存して実行
+                </dd>
+              </dl>
+            </article>
+            <article
+              class="contract-card"
+              aria-label="振り返り・制作方針の更新"
+            >
+              <p class="contract-card-title">振り返り・制作方針の更新</p>
+              <dl>
+                <dt>入口と期待する流れ</dt>
+                <dd>
+                  左の「作品を振り返る」→ 対象作品選択 →
+                  対象作品の全履歴を専用チャットで振り返る → 根拠付き分析 →
+                  会話で項目別採否・編集 → コミット → 別途作品へ適用
+                </dd>
+              </dl>
+            </article>
+            <article
+              class="contract-card"
+              aria-label="版の欠損・リモート未保存"
+            >
+              <p class="contract-card-title">版の欠損・リモート未保存</p>
+              <dl>
+                <dt>入口と期待する流れ</dt>
+                <dd>
+                  作風タブ／設定の版と保存状況 → 同じ参照の復旧または明示選択
+                </dd>
+              </dl>
+            </article>
+            <article class="contract-card" aria-label="利用上限・認証待ち">
+              <p class="contract-card-title">利用上限・認証待ち</p>
+              <dl>
+                <dt>入口と期待する流れ</dt>
+                <dd>
+                  <ul class="cell-list">
+                    <li>原因・途中成果をチャットで表示 → 履歴閲覧</li>
+                    <li>記録として送信</li>
+                    <li>スクリプトのプレビュー</li>
+                    <li>設定でのバックアップは利用可能</li>
+                  </ul>
+                </dd>
+              </dl>
+            </article>
+            <article
+              class="contract-card"
+              aria-label="実体削除・バックアップ・移行"
+            >
+              <p class="contract-card-title">実体削除・バックアップ・移行</p>
+              <dl>
+                <dt>入口と期待する流れ</dt>
+                <dd>
+                  設定で対象・容量・影響を確認 → 通常プログラムで処理 →
+                  不足・破損・未完了を区別
+                </dd>
+              </dl>
+            </article>
           </div>
         </section>
         <section class="sources">
