@@ -45,6 +45,7 @@ export interface ImportOperation {
   input: ImportInput;
   phase: "planned" | "incomplete" | "reconciling" | "committed" | "abandoned";
   error: string | null;
+  completionHash?: string;
   createdAt: string;
 }
 export interface FileRoots {

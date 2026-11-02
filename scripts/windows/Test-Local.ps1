@@ -16,7 +16,7 @@ if ($LASTEXITCODE -ne 0) { throw 'Cannot map source fixture to WSL' }
 $managedWsl = (& wsl.exe --distribution $settings.distribution --exec wslpath -u $managedFixture) -join ''
 if ($LASTEXITCODE -ne 0) { throw 'Cannot map managed fixture to WSL' }
 $rootsConfig = Join-Path $fileFixture 'roots.json'
-@{sources=@(@{id='acceptance-source'; path=$sourceWsl}); managed=@{id='acceptance-production'; path=$managedWsl}} | ConvertTo-Json -Depth 4 | Set-Content -Encoding UTF8 $rootsConfig
+[IO.File]::WriteAllText($rootsConfig, (@{sources=@(@{id='acceptance-source'; path=$sourceWsl}); managed=@{id='acceptance-production'; path=$managedWsl}} | ConvertTo-Json -Depth 4), (New-Object Text.UTF8Encoding($false)))
 $rootsWsl = (& wsl.exe --distribution $settings.distribution --exec wslpath -u $rootsConfig) -join ''
 if ($LASTEXITCODE -ne 0) { throw 'Cannot map roots configuration to WSL' }
 $settings | Add-Member -NotePropertyName fileRoots -NotePropertyValue $rootsWsl -Force

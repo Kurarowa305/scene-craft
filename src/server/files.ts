@@ -45,6 +45,11 @@ export function validateFileRoots(value: FileRoots) {
 export interface DependencyInspection {
   dependencies: Pick<SourceFile, "rootId" | "relativePath">[];
   verified: boolean;
+  observedInputs?: {
+    source: Pick<SourceFile, "rootId" | "relativePath">;
+    size: number;
+    sha256: string;
+  }[];
 }
 /** Future Blender content inspector plugs in here; declarations alone never verify a blend. */
 export type DependencyInspector = (
@@ -145,12 +150,23 @@ const declaredDependencies =
   (roots: FileRoots): DependencyInspector =>
   async (source) => {
     try {
-      const manifest = await resolveSource(roots, {
+      const manifestSource = {
         rootId: source.rootId,
         relativePath: source.relativePath + ".scene-craft-dependencies.json",
-      });
+      };
+      const manifest = await resolveSource(roots, manifestSource);
       if ((await stat(manifest)).size > 1024 * 1024) throw new Error();
-      const items: unknown = JSON.parse(await readFile(manifest, "utf8"));
+      const content = await readFile(manifest);
+      const digest = {
+        size: content.length,
+        sha256: createHash("sha256").update(content).digest("hex"),
+      };
+      const current = await hashFile(manifest);
+      if (current.size !== digest.size || current.sha256 !== digest.sha256)
+        throw new OperationError(409, "SOURCE_CHANGED");
+      const items: unknown = JSON.parse(
+        content.toString("utf8").replace(/^\uFEFF/, ""),
+      );
       if (
         !Array.isArray(items) ||
         items.length > 10000 ||
@@ -162,10 +178,16 @@ const declaredDependencies =
         )
       )
         throw new Error();
-      return { dependencies: items, verified: false };
+      return {
+        dependencies: items,
+        verified: false,
+        observedInputs: [{ source: manifestSource, ...digest }],
+      };
     } catch (error) {
       if ((error as NodeJS.ErrnoException).code === "ENOENT")
         return { dependencies: [], verified: false };
+      if (error instanceof OperationError && error.code === "SOURCE_CHANGED")
+        throw error;
       throw new OperationError(400, "INVALID_DEPENDENCY_MANIFEST");
     }
   };
@@ -196,7 +218,14 @@ export function fileService(
     await checkedPath(base, completed);
     const marker = join(completed, "complete.json");
     await checkedPath(base, marker);
-    const manifest = JSON.parse(await readFile(marker, "utf8")) as {
+    const content = await readFile(marker, "utf8");
+    const expectedHash = store.operation(op.id).completionHash;
+    if (
+      !expectedHash ||
+      createHash("sha256").update(content).digest("hex") !== expectedHash
+    )
+      throw new OperationError(409, "COMPLETION_MISMATCH");
+    const manifest = JSON.parse(content) as {
       version: number;
       operationId: string;
       state: SavedState;
@@ -336,6 +365,15 @@ export function fileService(
           });
           fingerprints.push({ source, path, ...digest });
           const inspection = await inspector(source, path);
+          for (const observed of inspection.observedInputs ?? []) {
+            const path = await resolveSource(roots, observed.source);
+            fingerprints.push({
+              source: { ...observed.source, role: "dependency" },
+              path,
+              size: observed.size,
+              sha256: observed.sha256,
+            });
+          }
           if (
             [".blend", ".psd", ".psb"].includes(extension) &&
             !inspection.verified
@@ -376,27 +414,26 @@ export function fileService(
           render: input.render ?? before?.render ?? null,
           historyBeforeImport: before ? "recorded" : "unknown",
           files: [...files, ...inherited],
-          missing: [
-            ...missing,
-            ...(before?.missing.filter((item) =>
-              inherited.some(
-                (file) =>
-                  file.source.rootId === item.source.rootId &&
-                  file.source.relativePath === item.source.relativePath,
-              ),
-            ) ?? []),
-          ],
+          // Unresolved shortages remain until an explicit verified reinspection resolves them.
+          missing: [...missing, ...(before?.missing ?? [])],
           createdAt: op.createdAt,
         };
+        const completion = JSON.stringify({
+          version: 1,
+          operationId: op.id,
+          state,
+        });
+        store.sealImport(
+          op.id,
+          createHash("sha256").update(completion).digest("hex"),
+        );
         const marker = await open(
           join(temporary, "complete.json"),
           "wx",
           0o400,
         );
         try {
-          await marker.writeFile(
-            JSON.stringify({ version: 1, operationId: op.id, state }),
-          );
+          await marker.writeFile(completion);
           await marker.sync();
         } finally {
           await marker.close();

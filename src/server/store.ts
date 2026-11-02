@@ -149,7 +149,20 @@ export function openStore(directory: string) {
     planImport: (conversationId: string, input: ImportInput) => {
       const planned = once(
         input.requestKey,
-        ["import", conversationId, input],
+        [
+          "import",
+          conversationId,
+          input.body,
+          input.application,
+          input.beforeStateId,
+          input.reason ?? null,
+          input.render ? [input.render.stateId, input.render.fileId] : null,
+          input.files.map((file) => [
+            file.rootId,
+            file.relativePath,
+            file.role,
+          ]),
+        ],
         () => {
           requireEntity("conversations", conversationId);
           const workId = (
@@ -207,6 +220,14 @@ export function openStore(directory: string) {
         },
       );
       return operation(planned.id);
+    },
+    sealImport: (id: string, completionHash: string) => {
+      const op = operation(id);
+      op.completionHash = completionHash;
+      db.prepare("UPDATE import_operations SET data = ? WHERE id = ?").run(
+        JSON.stringify(op),
+        id,
+      );
     },
     abandonImport: (key: string, id: string) =>
       once(key, ["abandon-import", id], () => {

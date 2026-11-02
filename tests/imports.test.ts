@@ -515,3 +515,156 @@ test("完成実体が破損した照合待ちを成功や中止にせず、現�
     await f.close();
   }
 });
+
+test("blendを保持してPhotoshopを手修正しても依存不足を履歴から落とさず、同内容のキー順変更を受け付ける", async () => {
+  const f = await fixture();
+  try {
+    await writeFile(join(f.source, "scene.blend"), "scene");
+    await writeFile(join(f.source, "drawing.psd"), "drawing");
+    await writeFile(
+      join(f.source, "scene.blend.scene-craft-dependencies.json"),
+      JSON.stringify([{ rootId: "source", relativePath: "lost.png" }]),
+    );
+    const first = (
+      await f.post({
+        requestKey: "retain-missing",
+        body: "最初",
+        application: "Blender",
+        beforeStateId: null,
+        files: [
+          { rootId: "source", relativePath: "scene.blend", role: "blend" },
+        ],
+      })
+    ).json();
+    const next = {
+      requestKey: "retouch-with-missing",
+      body: "PSDを調整",
+      application: "Photoshop",
+      beforeStateId: first.state.id,
+      files: [{ rootId: "source", relativePath: "drawing.psd", role: "psd" }],
+    };
+    const result = await f.post(next);
+    assert.equal(result.statusCode, 200, result.body);
+    assert.ok(
+      result
+        .json()
+        .state.missing.some(
+          (item: { reason: string }) => item.reason === "not_found",
+        ),
+    );
+    const replay = await f.post({
+      files: [{ role: "psd", relativePath: "drawing.psd", rootId: "source" }],
+      beforeStateId: first.state.id,
+      application: "Photoshop",
+      body: "PSDを調整",
+      requestKey: "retouch-with-missing",
+    });
+    assert.equal(replay.statusCode, 200, replay.body);
+    assert.deepEqual(replay.json(), result.json());
+  } finally {
+    await f.close();
+  }
+});
+
+test("完成記録の構成・理由が変わっていたらDBの予定と不一致として照合を止める", async () => {
+  const { rename, chmod } = await import("node:fs/promises");
+  let fail = false;
+  const f = await fixture({
+    publishFiles: async (from, to) => {
+      await rename(from, to);
+      if (fail) throw new Error("lost response");
+    },
+  });
+  try {
+    await writeFile(join(f.source, "scene.blend"), "scene");
+    await writeFile(join(f.source, "drawing.psd"), "drawing");
+    const first = (
+      await f.post({
+        requestKey: "metadata-first",
+        body: "取り込み",
+        application: "Blender",
+        beforeStateId: null,
+        files: [
+          { rootId: "source", relativePath: "scene.blend", role: "blend" },
+        ],
+      })
+    ).json();
+    const payload = {
+      requestKey: "metadata-second",
+      body: "手修正",
+      reason: "本来の理由",
+      application: "Photoshop",
+      beforeStateId: first.state.id,
+      files: [{ rootId: "source", relativePath: "drawing.psd", role: "psd" }],
+    };
+    fail = true;
+    assert.equal((await f.post(payload)).statusCode, 500);
+    const op = (await f.get(`/api/works/${f.work.id}/imports`))[1];
+    const path = join(f.managed, op.id, "complete.json");
+    const marker = JSON.parse(await readFile(path, "utf8"));
+    marker.state.reason = "異なる理由";
+    marker.state.files = marker.state.files.filter(
+      (file: { role: string }) => file.role !== "blend",
+    );
+    await chmod(path, 0o600);
+    await writeFile(path, JSON.stringify(marker));
+    assert.equal((await f.post(payload)).statusCode, 409);
+    assert.equal(
+      (await f.get(`/api/works/${f.work.id}/states`)).states.length,
+      1,
+    );
+  } finally {
+    await f.close();
+  }
+});
+
+test("依存列挙の根拠ファイルが収集中に変わったら未完成とし、依存集合を固定しない", async () => {
+  const { createHash } = await import("node:crypto");
+  const f = await fixture({
+    dependencyInspector: async (source, path) => {
+      const bytes = await readFile(path + ".scene-craft-dependencies.json");
+      const sha256 = createHash("sha256").update(bytes).digest("hex");
+      await writeFile(path + ".scene-craft-dependencies.json", "[]");
+      return {
+        dependencies: [],
+        verified: false,
+        observedInputs: [
+          {
+            source: {
+              rootId: source.rootId,
+              relativePath:
+                source.relativePath + ".scene-craft-dependencies.json",
+            },
+            size: bytes.length,
+            sha256,
+          },
+        ],
+      };
+    },
+  });
+  try {
+    await writeFile(join(f.source, "scene.blend"), "scene");
+    await writeFile(
+      join(f.source, "scene.blend.scene-craft-dependencies.json"),
+      "[ ]",
+    );
+    const result = await f.post({
+      requestKey: "manifest-changed",
+      body: "依存を取り込む",
+      application: "Blender",
+      beforeStateId: null,
+      files: [{ rootId: "source", relativePath: "scene.blend", role: "blend" }],
+    });
+    assert.equal(result.statusCode, 409, result.body);
+    assert.equal(
+      (await f.get(`/api/works/${f.work.id}/states`)).states.length,
+      0,
+    );
+    assert.equal(
+      (await f.get(`/api/works/${f.work.id}/imports`))[0].error,
+      "SOURCE_CHANGED",
+    );
+  } finally {
+    await f.close();
+  }
+});

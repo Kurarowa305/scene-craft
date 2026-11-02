@@ -112,7 +112,10 @@ async function main() {
       instanceSecret: secret,
       fileRoots: values["file-roots"]
         ? (JSON.parse(
-            await readFile(values["file-roots"], "utf8"),
+            (await readFile(values["file-roots"], "utf8")).replace(
+              /^\uFEFF/,
+              "",
+            ),
           ) as FileRoots)
         : undefined,
       staticRoot: fileURLToPath(new URL("../client", import.meta.url)),

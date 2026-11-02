@@ -6,7 +6,7 @@ import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { createServer } from "node:http";
 
-async function launch(directory: string, port: number) {
+async function launch(directory: string, port: number, extra: string[] = []) {
   const child = spawn(
     process.execPath,
     [
@@ -17,6 +17,7 @@ async function launch(directory: string, port: number) {
       directory,
       "--port",
       String(port),
+      ...extra,
     ],
     { stdio: ["ignore", "pipe", "pipe"] },
   );
@@ -131,6 +132,34 @@ test("起動識別の秘密が一致しなければ既存扱いせず、クラ�
         first.child.once("exit", () => resolveExit()),
       );
     }
+    await rm(directory, { recursive: true, force: true });
+  }
+});
+
+test("Windows PowerShell形式のUTF-8 BOM付き保存ルート設定でも起動する", async () => {
+  const directory = await mkdtemp(join(tmpdir(), "scene-bom-"));
+  const config = join(directory, "roots.json");
+  await writeFile(
+    config,
+    "\uFEFF" +
+      JSON.stringify({
+        sources: [{ id: "source", path: directory }],
+        managed: { id: "production", path: join(directory, "files") },
+      }),
+  );
+  const instance = await launch(directory, 4428, ["--file-roots", config]);
+  try {
+    assert.equal((await instance.ready).status, "started");
+    const result = await fetch("http://localhost:4428/api/file-roots");
+    assert.deepEqual(await result.json(), {
+      sources: [{ id: "source" }],
+      configured: true,
+    });
+  } finally {
+    instance.child.kill();
+    await new Promise<void>((resolveExit) =>
+      instance.child.once("exit", () => resolveExit()),
+    );
     await rm(directory, { recursive: true, force: true });
   }
 });
