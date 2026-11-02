@@ -1,0 +1,17 @@
+{
+  "checkedAt": "2026-11-02T16:11:52.563Z",
+  "runtime": "scene_craft/0.166.0 (Ubuntu 22.4.0; x86_64) unknown (scene_craft; 0.1.0)",
+  "authEmpty": true,
+  "modelCatalog": 2,
+  "paginated": "paginated",
+  "startModel": "gpt-6.1-sol",
+  "startProvider": "openai",
+  "turnPage": "RPC_REJECTED",
+  "itemPage": "RPC_REJECTED",
+  "resume": "RPC_REJECTED",
+  "coldResumeSameThread": false,
+  "instructionSourceCount": 0,
+  "inference": "not run",
+  "emptyThreadLimitation": "Before the first turn, durable history and cold resume may be unavailable. Authenticated turn/start and post-turn pagination require Windows manual verification.",
+  "authExpirationAndLimits": "simulated only"
+}

@@ -11,10 +11,14 @@ import {
 import { mkdir, open } from "node:fs/promises";
 import { openStore, OperationError } from "./store.js";
 import { gitVersions } from "./versions.js";
+import { registerChat } from "./chat.js";
+import { connectCodex, type CodexConnection } from "./codex.js";
 
 interface AppOptions {
   directory: string;
   gitRepository?: string;
+  codex?: CodexConnection;
+  codexBinary?: string;
   fileRoots?: FileRoots;
   dependencyInspector?: DependencyInspector;
   publishFiles?: typeof import("node:fs/promises").rename;
@@ -71,6 +75,39 @@ export async function createApp(options: AppOptions) {
   const origin = `http://localhost:${options.port}`;
   const csrfToken = randomBytes(32).toString("hex");
   const session = randomBytes(32).toString("hex");
+  let codexPromise: Promise<CodexConnection> | undefined;
+  registerChat(
+    app,
+    store,
+    async () => {
+      if (options.codex) return options.codex;
+      if (!options.codexBinary)
+        throw new OperationError(409, "CODEX_NOT_CONFIGURED");
+      if (codexPromise) {
+        const previous = await codexPromise;
+        if (previous.available === false) {
+          await previous.close();
+          codexPromise = undefined;
+        }
+      }
+      codexPromise ??= connectCodex(
+        options.codexBinary,
+        options.directory,
+      ).catch((error) => {
+        codexPromise = undefined;
+        throw error;
+      });
+      return codexPromise;
+    },
+    (workId) =>
+      versions().prepare(
+        store.defaultDefinition(),
+        store.workVersions(workId).style,
+      ),
+    (plan) => {
+      versions().prepare(plan.definition, plan.style);
+    },
+  );
   app.addHook("onClose", async () => {
     store.close();
   });

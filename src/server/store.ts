@@ -9,6 +9,7 @@ import type {
 import { join } from "node:path";
 import type { Work, Conversation, BodyRecord } from "../shared/contracts.js";
 import type { GitReference, VersionPlan } from "../shared/versions.js";
+import { chatStore } from "./chat-store.js";
 
 export class OperationError extends Error {
   constructor(
@@ -162,7 +163,28 @@ export function openStore(directory: string) {
     "id, sequence, work_id AS workId, NULL AS title, created_at AS createdAt";
   const recordColumns =
     "id, sequence, conversation_id AS conversationId, body, 'record' AS kind, 'human' AS author, created_at AS createdAt";
+  if (
+    !db
+      .prepare("SELECT name FROM sqlite_master WHERE name = 'chat_sessions'")
+      .get()
+  ) {
+    const backup = join(directory, "records.before-chat.sqlite");
+    if (!existsSync(backup)) db.prepare("VACUUM INTO ?").run(backup);
+    db.exec(`BEGIN IMMEDIATE;
+      CREATE TABLE chat_sessions (conversation_id TEXT PRIMARY KEY REFERENCES conversations(id), data TEXT NOT NULL);
+      CREATE TABLE chat_selections (sequence INTEGER PRIMARY KEY AUTOINCREMENT, data TEXT NOT NULL);
+      CREATE TABLE chat_requests (sequence INTEGER PRIMARY KEY AUTOINCREMENT, id TEXT NOT NULL UNIQUE, conversation_id TEXT NOT NULL REFERENCES conversations(id), work_id TEXT NOT NULL REFERENCES works(id), data TEXT NOT NULL);
+      CREATE TABLE chat_events (sequence INTEGER PRIMARY KEY AUTOINCREMENT, conversation_id TEXT NOT NULL REFERENCES conversations(id), request_id TEXT NOT NULL REFERENCES chat_requests(id));
+      COMMIT;`);
+  }
+  const chat = chatStore(db, once);
+  // Existing chats receive their inherited selection before a later choice changes it.
+  for (const row of db
+    .prepare("SELECT id FROM conversations ORDER BY sequence")
+    .all())
+    chat.session(row.id as string);
   return {
+    chat,
     close: () => db.close(),
     defaultDefinition,
     workVersions,
@@ -433,6 +455,7 @@ export function openStore(directory: string) {
         db.prepare(
           "INSERT INTO conversations (id, work_id, created_at) VALUES (?, ?, ?)",
         ).run(id, workId, new Date().toISOString());
+        chat.session(id);
         return db
           .prepare(
             `SELECT ${conversationColumns} FROM conversations WHERE id = ?`,

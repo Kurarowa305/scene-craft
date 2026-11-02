@@ -35,6 +35,7 @@ try {
   $argsList = @('--distribution', $settings.distribution, '--exec', $settings.node, '--disable-warning=ExperimentalWarning', ($settings.repository.TrimEnd('/') + '/dist/server/cli.js'), '--data-dir', $settings.dataDirectory, '--port', [string]$settings.port)
   if ($settings.fileRoots) { $argsList += @('--file-roots', [string]$settings.fileRoots) }
   if ($settings.gitRepository) { $argsList += @('--git-repository', [string]$settings.gitRepository) }
+  if ($settings.codexBinary) { $argsList += @('--codex-binary', [string]$settings.codexBinary) }
   if (-not $ownsMutex) { $argsList += '--probe-only' }
   $info = New-Object System.Diagnostics.ProcessStartInfo
   $info.FileName = Join-Path $env:WINDIR 'System32\wsl.exe'
