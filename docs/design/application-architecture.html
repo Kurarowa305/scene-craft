@@ -269,7 +269,7 @@
         <section aria-labelledby="技術とプロセス" class="spec-section">
           <h2 id="技術とプロセス">3. 採用技術</h2>
           <div class="contract-cards">
-            <article class="contract-card" aria-label="画面">
+            <article aria-label="画面" class="contract-card">
               <p class="contract-card-title">画面</p>
               <dl>
                 <dt>仕様</dt>
@@ -284,7 +284,7 @@
                 </dd>
               </dl>
             </article>
-            <article class="contract-card" aria-label="バックエンド">
+            <article aria-label="バックエンド" class="contract-card">
               <p class="contract-card-title">バックエンド</p>
               <dl>
                 <dt>仕様</dt>
@@ -294,7 +294,7 @@
                 </dd>
               </dl>
             </article>
-            <article class="contract-card" aria-label="データベース">
+            <article aria-label="データベース" class="contract-card">
               <p class="contract-card-title">データベース</p>
               <dl>
                 <dt>仕様</dt>
@@ -311,7 +311,7 @@
                 </dd>
               </dl>
             </article>
-            <article class="contract-card" aria-label="通信分離">
+            <article aria-label="通信分離" class="contract-card">
               <p class="contract-card-title">通信分離</p>
               <dl>
                 <dt>仕様</dt>
@@ -440,34 +440,31 @@
         </section>
         <section aria-labelledby="通信とモジュールの責務" class="spec-section">
           <h2 id="通信とモジュールの責務">5. 通信とモジュールの責務</h2>
-          <div class="contract-cards">
-            <article class="contract-card" aria-label="通信方式">
-              <p class="contract-card-title">通信方式</p>
-              <dl>
-                <dt>仕様</dt>
-                <dd>ブラウザからの指示は HTTP、進捗配信は SSE を採用する。</dd>
-              </dl>
-            </article>
-            <article class="contract-card" aria-label="受付範囲">
-              <p class="contract-card-title">受付範囲</p>
-              <dl>
-                <dt>仕様</dt>
-                <dd>
+          <ul class="spec-list">
+            <li class="spec-list-item" data-spec-title="通信方式">
+              <span class="spec-list-label">通信方式</span>
+              <ul class="spec-list-details">
+                <li>ブラウザからの指示は HTTP、進捗配信は SSE を採用する。</li>
+              </ul>
+            </li>
+            <li class="spec-list-item" data-spec-title="受付範囲">
+              <span class="spec-list-label">受付範囲</span>
+              <ul class="spec-list-details">
+                <li>
                   画面・指示・進捗を同じ origin から提供し、localhost
                   のみで受け付ける。
-                </dd>
-              </dl>
-            </article>
-            <article class="contract-card" aria-label="再接続">
-              <p class="contract-card-title">再接続</p>
-              <dl>
-                <dt>仕様</dt>
-                <dd>
+                </li>
+              </ul>
+            </li>
+            <li class="spec-list-item" data-spec-title="再接続">
+              <span class="spec-list-label">再接続</span>
+              <ul class="spec-list-details">
+                <li>
                   再接続時は保存済み状態を読み、イベントの重複・欠落を照合する。
-                </dd>
-              </dl>
-            </article>
-          </div>
+                </li>
+              </ul>
+            </li>
+          </ul>
           <div
             aria-label="通信とモジュールの責務"
             class="table-scroll"
@@ -845,123 +842,95 @@
         </section>
         <section aria-labelledby="認証" class="spec-section">
           <h2 id="認証">8. 認証</h2>
-          <div class="contract-cards">
-            <article class="contract-card" aria-label="Codex専用領域とログイン">
-              <p class="contract-card-title">Codex専用領域とログイン</p>
-              <dl>
-                <dt>仕様</dt>
-                <dd>
-                  <ul class="cell-list">
-                    <li>
-                      Codex 用には WSL に scene-craft
-                      専用の保存領域を用意し、普段の開発用 Codex
-                      の設定・会話・認証ファイルと分ける。
-                    </li>
-                    <li>
-                      初回はその領域で同じ ChatGPT アカウントへログインする。
-                    </li>
-                  </ul>
-                </dd>
-              </dl>
-            </article>
-            <article aria-label="認証情報の保管と更新" class="contract-card">
-              <p class="contract-card-title">認証情報の保管と更新</p>
-              <dl>
-                <dt>仕様</dt>
-                <dd>
-                  <ul class="cell-list">
-                    <li>
-                      Codex標準のファイル保管を採用し、保存ディレクトリと認証ファイルへのアクセスを所有ユーザーに限定する。
-                    </li>
-
-                    <li>認証ファイルの作成・更新は Codex が行う。</li>
-                  </ul>
-                  <p>
-                    <a href="llm-connection.html#認証方式">認証方式の詳細 →</a>
-                  </p>
-                </dd>
-              </dl>
-            </article>
-          </div>
+          <ul class="spec-list">
+            <li
+              class="spec-list-item"
+              data-spec-title="Codex専用領域とログイン"
+            >
+              <span class="spec-list-label">Codex専用領域とログイン</span>
+              <ul class="spec-list-details">
+                <li>
+                  Codex 用には WSL に scene-craft
+                  専用の保存領域を用意し、普段の開発用 Codex
+                  の設定・会話・認証ファイルと分ける。
+                </li>
+                <li>初回はその領域で同じ ChatGPT アカウントへログインする。</li>
+              </ul>
+            </li>
+            <li class="spec-list-item" data-spec-title="認証情報の保管と更新">
+              <span class="spec-list-label">認証情報の保管と更新</span>
+              <ul class="spec-list-details">
+                <li>
+                  Codex標準のファイル保管を採用し、保存ディレクトリと認証ファイルへのアクセスを所有ユーザーに限定する。
+                </li>
+                <li>認証ファイルの作成・更新は Codex が行う。</li>
+                <li>
+                  <a href="llm-connection.html#認証方式">認証方式の詳細 →</a>
+                </li>
+              </ul>
+            </li>
+          </ul>
         </section>
         <section aria-labelledby="設定" class="spec-section">
           <h2 id="設定">9. 設定</h2>
-          <div class="contract-cards">
-            <article class="contract-card" aria-label="制作ルートの登録">
-              <p class="contract-card-title">制作ルートの登録</p>
-              <dl>
-                <dt>仕様</dt>
-                <dd>
-                  <ul class="cell-list">
-                    <li>
-                      Windows の制作ルートは設定で登録し、初期の対象はこの PC
-                      のローカルディスクとする。
-                    </li>
-                    <li>具体的なドライブ名は利用開始時に設定する。</li>
-                  </ul>
-                </dd>
-              </dl>
-            </article>
-            <article class="contract-card" aria-label="接続時の設定確認">
-              <p class="contract-card-title">接続時の設定確認</p>
-              <dl>
-                <dt>仕様</dt>
-                <dd>
+          <ul class="spec-list">
+            <li class="spec-list-item" data-spec-title="制作ルートの登録">
+              <span class="spec-list-label">制作ルートの登録</span>
+              <ul class="spec-list-details">
+                <li>
+                  Windows の制作ルートは設定で登録し、初期の対象はこの PC
+                  のローカルディスクとする。
+                </li>
+                <li>具体的なドライブ名は利用開始時に設定する。</li>
+              </ul>
+            </li>
+            <li class="spec-list-item" data-spec-title="接続時の設定確認">
+              <span class="spec-list-label">接続時の設定確認</span>
+              <ul class="spec-list-details">
+                <li>
                   Codex
                   のプロジェクト設定など別の設定層もあるため、許可するツールと実行設定を接続時に確認する。
-                  <p>
-                    <a href="user-interface.html#設定と保存データ管理"
-                      >設定画面の詳細 →</a
-                    >
-                  </p>
-                </dd>
-              </dl>
-            </article>
-          </div>
+                </li>
+                <li>
+                  <a href="user-interface.html#設定と保存データ管理"
+                    >設定画面の詳細 →</a
+                  >
+                </li>
+              </ul>
+            </li>
+          </ul>
         </section>
         <section aria-labelledby="復元" class="spec-section">
           <h2 id="復元">10. 復元</h2>
-          <div class="contract-cards">
-            <article
-              class="contract-card"
-              aria-label="整合性・復元・バックアップ"
+          <ul class="spec-list">
+            <li
+              class="spec-list-item"
+              data-spec-title="整合性・復元・バックアップ"
             >
-              <p class="contract-card-title">整合性・復元・バックアップ</p>
-              <dl>
-                <dt>仕様</dt>
-                <dd>
-                  <ul class="cell-list">
-                    <li>
-                      整合性・復元・バックアップの契約は保存設計へ引き継ぐ。
-                    </li>
-                    <li>ルートからの逸脱やリンク先も確認する。</li>
-                  </ul>
-                  <p>
-                    <a href="artifact-storage.html"
-                      >保存・復元・バックアップの詳細 →</a
-                    >
-                  </p>
-                </dd>
-              </dl>
-            </article>
-            <article
-              class="contract-card"
-              aria-label="Codexデータと制作記録の移行"
+              <span class="spec-list-label">整合性・復元・バックアップ</span>
+              <ul class="spec-list-details">
+                <li>整合性・復元・バックアップの契約は保存設計へ引き継ぐ。</li>
+                <li>ルートからの逸脱やリンク先も確認する。</li>
+                <li>
+                  <a href="artifact-storage.html"
+                    >保存・復元・バックアップの詳細 →</a
+                  >
+                </li>
+              </ul>
+            </li>
+            <li
+              class="spec-list-item"
+              data-spec-title="Codexデータと制作記録の移行"
             >
-              <p class="contract-card-title">Codexデータと制作記録の移行</p>
-              <dl>
-                <dt>仕様</dt>
-                <dd>
-                  <ul class="cell-list">
-                    <li>
-                      Codex
-                      の会話継続用データをどこまで移行対象にするかは、制作記録との区別を保って保存設計で決める。
-                    </li>
-                  </ul>
-                </dd>
-              </dl>
-            </article>
-          </div>
+              <span class="spec-list-label">Codexデータと制作記録の移行</span>
+              <ul class="spec-list-details">
+                <li>
+                  Codex
+                  の会話継続用データをどこまで移行対象にするかは、制作記録との区別を保って保存設計で決める。
+                </li>
+              </ul>
+            </li>
+          </ul>
         </section>
         <section class="sources">
           <h2 id="sources">11. 詳細資料</h2>

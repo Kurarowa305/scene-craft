@@ -81,73 +81,58 @@
         </nav>
         <section aria-labelledby="責務と前提" class="spec-section">
           <h2 id="責務と前提">1. 責務</h2>
-          <div class="contract-cards">
-            <article class="contract-card" aria-label="処理内容">
-              <p class="contract-card-title">処理内容</p>
-              <dl>
-                <dt>仕様</dt>
-                <dd>
-                  <ul class="cell-list">
-                    <li>
-                      <a
-                        href="https://github.com/Kurarowa305/scene-craft/blob/main/docs/adr/0001-git-authoritative-versioning.md"
-                        rel="noopener noreferrer"
-                        target="_blank"
-                        >ADR 0001</a
-                      >・<a
-                        href="https://github.com/Kurarowa305/scene-craft/blob/main/docs/adr/0002-short-lived-branches-and-human-validation-choice.md"
-                        rel="noopener noreferrer"
-                        target="_blank"
-                        >ADR 0002</a
-                      >を前提とする。
-                    </li>
-                    <li>定義・作風の版の正はGitフルコミットハッシュ。</li>
-                    <li>作品・実行・保存状態のIDとは区別する。</li>
-                  </ul>
-                  <div class="contract-detail">
-                    <ul class="cell-list">
-                      <li>
-                        版管理はコミットの解決・保持・内容の取り出し・互換性確認を担当する。
-                      </li>
-                      <li>
-                        実行管理は受付・停止・順序・再実行予算、保存はDB・制作ファイルとの整合性とバックアップ全体、エージェント契約は定義の具体的な構造を担当する。
-                      </li>
-                    </ul>
-                  </div>
-                </dd>
-              </dl>
-            </article>
-            <article class="contract-card" aria-label="参照">
-              <p class="contract-card-title">参照</p>
-              <dl>
-                <dt>仕様</dt>
-                <dd>
-                  <ul class="cell-list">
-                    <li>
-                      定義と作風は同じリポジトリに置き、別々のコミットを参照できる。
-                    </li>
-                    <li>
-                      「作風の傾向」と採用済みの「制作方針」を別の内容として扱い、作品の制作意図を優先する。
-                    </li>
-                  </ul>
-                </dd>
-              </dl>
-            </article>
-            <article class="contract-card" aria-label="復元">
-              <p class="contract-card-title">復元</p>
-              <dl>
-                <dt>仕様</dt>
-                <dd>
+          <ul class="spec-list">
+            <li class="spec-list-item" data-spec-title="処理内容">
+              <span class="spec-list-label">処理内容</span>
+              <ul class="spec-list-details">
+                <li>
+                  <a
+                    href="https://github.com/Kurarowa305/scene-craft/blob/main/docs/adr/0001-git-authoritative-versioning.md"
+                    rel="noopener noreferrer"
+                    target="_blank"
+                    >ADR 0001</a
+                  >・<a
+                    href="https://github.com/Kurarowa305/scene-craft/blob/main/docs/adr/0002-short-lived-branches-and-human-validation-choice.md"
+                    rel="noopener noreferrer"
+                    target="_blank"
+                    >ADR 0002</a
+                  >を前提とする。
+                </li>
+                <li>定義・作風の版の正はGitフルコミットハッシュ。</li>
+                <li>作品・実行・保存状態のIDとは区別する。</li>
+                <li>
+                  版管理はコミットの解決・保持・内容の取り出し・互換性確認を担当する。
+                </li>
+                <li>
+                  実行管理は受付・停止・順序・再実行予算、保存はDB・制作ファイルとの整合性とバックアップ全体、エージェント契約は定義の具体的な構造を担当する。
+                </li>
+              </ul>
+            </li>
+            <li class="spec-list-item" data-spec-title="参照">
+              <span class="spec-list-label">参照</span>
+              <ul class="spec-list-details">
+                <li>
+                  定義と作風は同じリポジトリに置き、別々のコミットを参照できる。
+                </li>
+                <li>
+                  「作風の傾向」と採用済みの「制作方針」を別の内容として扱い、作品の制作意図を優先する。
+                </li>
+              </ul>
+            </li>
+            <li class="spec-list-item" data-spec-title="復元">
+              <span class="spec-list-label">復元</span>
+              <ul class="spec-list-details">
+                <li>
                   過去の内容を読み出せることと、当時の環境を復元して同じ結果を生成できることは区別する。
-                </dd>
-              </dl>
-            </article>
-          </div>
+                </li>
+              </ul>
+            </li>
+          </ul>
         </section>
         <section aria-labelledby="ローカル記録の参照契約" class="spec-section">
           <h2 id="ローカル記録の参照契約">2. ローカル記録の参照契約</h2>
           <div class="contract-cards">
-            <article class="contract-card" aria-label="Git参照">
+            <article aria-label="Git参照" class="contract-card">
               <p class="contract-card-title">Git参照</p>
               <dl>
                 <dt>保持する情報</dt>
@@ -157,7 +142,7 @@
                 </dd>
               </dl>
             </article>
-            <article class="contract-card" aria-label="使用内容">
+            <article aria-label="使用内容" class="contract-card">
               <p class="contract-card-title">使用内容</p>
               <dl>
                 <dt>保持する情報</dt>
@@ -167,7 +152,7 @@
                 </dd>
               </dl>
             </article>
-            <article class="contract-card" aria-label="依頼">
+            <article aria-label="依頼" class="contract-card">
               <p class="contract-card-title">依頼</p>
               <dl>
                 <dt>保持する情報</dt>
@@ -176,7 +161,7 @@
                 </dd>
               </dl>
             </article>
-            <article class="contract-card" aria-label="実行">
+            <article aria-label="実行" class="contract-card">
               <p class="contract-card-title">実行</p>
               <dl>
                 <dt>保持する情報</dt>
@@ -191,7 +176,7 @@
                 </dd>
               </dl>
             </article>
-            <article class="contract-card" aria-label="作品の作風更新">
+            <article aria-label="作品の作風更新" class="contract-card">
               <p class="contract-card-title">作品の作風更新</p>
               <dl>
                 <dt>保持する情報</dt>
@@ -200,7 +185,7 @@
                 </dd>
               </dl>
             </article>
-            <article class="contract-card" aria-label="保持・リモート保存">
+            <article aria-label="保持・リモート保存" class="contract-card">
               <p class="contract-card-title">保持・リモート保存</p>
               <dl>
                 <dt>保持する情報</dt>
@@ -210,153 +195,111 @@
                 </dd>
               </dl>
             </article>
-            <article class="contract-card" aria-label="復元">
-              <p class="contract-card-title">復元</p>
-              <dl>
-                <dt>仕様</dt>
-                <dd>
-                  <ul class="cell-list">
-                    <li>
-                      リポジトリ識別は保存場所・remote
-                      URLから独立した永続IDとし、バックアップ・復元で維持する。
-                    </li>
-                    <li>復元先のcloneを保存元のリポジトリ識別へ対応付ける。</li>
-                    <li>保存場所の移動後も過去参照を維持する。</li>
-                  </ul>
-                </dd>
-              </dl>
-            </article>
-            <article class="contract-card" aria-label="Git参照">
-              <p class="contract-card-title">Git参照</p>
-              <dl>
-                <dt>仕様</dt>
-                <dd>
-                  <ul class="cell-list">
-                    <li>
-                      定義・作風の使用版について、ローカルで作った保持用タグを、そのまま同名・同じ対象コミットのタグとしてGitHubへpushする。
-                    </li>
-                    <li>
-                      使用内容の識別にはコミットハッシュも残し、保持用タグと両方を記録する。
-                    </li>
-                    <li>
-                      表示名用タグの併用は任意だが、参照済みコミットの保持用タグは必須とする。
-                    </li>
-                  </ul>
-                </dd>
-              </dl>
-            </article>
-            <article class="contract-card" aria-label="参照">
-              <p class="contract-card-title">参照</p>
-              <dl>
-                <dt>仕様</dt>
-                <dd>
-                  <ul class="cell-list">
-                    <li>
-                      「適用なし」「未選択」「不明」「参照先欠損」を区別する。
-                    </li>
-                    <li>
-                      モデル等の実行時選択は、Gitの既定設定と区別して実効値・変更理由を記録する。
-                    </li>
-                  </ul>
-                </dd>
-              </dl>
-            </article>
           </div>
+          <ul class="spec-list">
+            <li class="spec-list-item" data-spec-title="復元">
+              <span class="spec-list-label">復元</span>
+              <ul class="spec-list-details">
+                <li>
+                  リポジトリ識別は保存場所・remote
+                  URLから独立した永続IDとし、バックアップ・復元で維持する。
+                </li>
+                <li>復元先のcloneを保存元のリポジトリ識別へ対応付ける。</li>
+                <li>保存場所の移動後も過去参照を維持する。</li>
+              </ul>
+            </li>
+            <li class="spec-list-item" data-spec-title="Git参照">
+              <span class="spec-list-label">Git参照</span>
+              <ul class="spec-list-details">
+                <li>
+                  定義・作風の使用版について、ローカルで作った保持用タグを、そのまま同名・同じ対象コミットのタグとしてGitHubへpushする。
+                </li>
+                <li>
+                  使用内容の識別にはコミットハッシュも残し、保持用タグと両方を記録する。
+                </li>
+                <li>
+                  表示名用タグの併用は任意だが、参照済みコミットの保持用タグは必須とする。
+                </li>
+              </ul>
+            </li>
+            <li class="spec-list-item" data-spec-title="参照">
+              <span class="spec-list-label">参照</span>
+              <ul class="spec-list-details">
+                <li>
+                  「適用なし」「未選択」「不明」「参照先欠損」を区別する。
+                </li>
+                <li>
+                  モデル等の実行時選択は、Gitの既定設定と区別して実効値・変更理由を記録する。
+                </li>
+              </ul>
+            </li>
+          </ul>
         </section>
         <section aria-labelledby="依頼受付開始切替" class="spec-section">
           <h2 id="依頼受付開始切替">3. 依頼受付・開始・切替</h2>
-          <div class="contract-cards">
-            <article class="contract-card" aria-label="採用判断">
-              <p class="contract-card-title">採用判断</p>
-              <dl>
-                <dt>仕様</dt>
-                <dd>
-                  <ul class="cell-list">
-                    <li>
-                      通常制作では利用者が採用した定義の既定コミットと、作品に固定した作風を受付時に解決する。
-                    </li>
-                    <li>既定定義の変更は以後の依頼から適用する。</li>
-                    <li>
-                      試行は変更ブランチのコミットを明示し、制作データのコピーを使う。
-                    </li>
-                  </ul>
-                </dd>
-              </dl>
-            </article>
-            <article class="contract-card" aria-label="Git参照">
-              <p class="contract-card-title">Git参照</p>
-              <dl>
-                <dt>仕様</dt>
-                <dd>
-                  <ul class="cell-list">
-                    <li>
-                      ローカルの保持用タグと必要なGitオブジェクトの存在を先に確定し、その後、使用予定参照を依頼と一緒にDBへ保存する。
-                    </li>
-                    <li>受付失敗は原因を残す。</li>
-                  </ul>
-                </dd>
-              </dl>
-            </article>
-            <article class="contract-card" aria-label="保護指定">
-              <p class="contract-card-title">保護指定</p>
-              <dl>
-                <dt>仕様</dt>
-                <dd>
-                  <ul class="cell-list">
-                    <li>
-                      開始直前に制作データ・保護指定・変更範囲を確認する。
-                    </li>
-                    <li>受付時に固定した定義・作風を使う。</li>
-                    <li>
-                      作品の作風参照が受付時から変わっていれば、旧版で続けるか新版へ切り替えるかを確認する。
-                    </li>
-                    <li>回答後にも前提を再確認する。</li>
-                  </ul>
-                </dd>
-              </dl>
-            </article>
-            <article class="contract-card" aria-label="再実行">
-              <p class="contract-card-title">再実行</p>
-              <dl>
-                <dt>仕様</dt>
-                <dd>
-                  <ul class="cell-list">
-                    <li>自動再実行・通信再送は版を維持する。</li>
-                    <li>
-                      人間による切替は動作中の操作と未解決の開始許可がなくなった後に行う。
-                    </li>
-                    <li>
-                      同じ依頼IDと累積回数を維持し、旧・新参照と理由を残す。
-                    </li>
-                    <li>同じ試行IDの通信再送では、保存済みの内容を使う。</li>
-                    <li>
-                      未送信を含めて既存の試行がある場合は先に照合し、切替後の実行・試行を別に対応付ける。
-                    </li>
-                  </ul>
-                </dd>
-              </dl>
-            </article>
-            <article class="contract-card" aria-label="停止">
-              <p class="contract-card-title">停止</p>
-              <dl>
-                <dt>仕様</dt>
-                <dd>
-                  <ul class="cell-list">
-                    <li>
-                      失敗・停止した操作をやり直す開始予定記録で、<a
-                        href="execution-lifecycle.html"
-                        >実行状態設計</a
-                      >どおり消費する。
-                    </li>
-                    <li>版の切替後も累積回数と上限を維持する。</li>
-                    <li>
-                      完了済み結果を再利用する場合は、新旧の定義・作風と依存条件の整合性も確認する。
-                    </li>
-                  </ul>
-                </dd>
-              </dl>
-            </article>
-          </div>
+          <ul class="spec-list">
+            <li class="spec-list-item" data-spec-title="採用判断">
+              <span class="spec-list-label">採用判断</span>
+              <ul class="spec-list-details">
+                <li>
+                  通常制作では利用者が採用した定義の既定コミットと、作品に固定した作風を受付時に解決する。
+                </li>
+                <li>既定定義の変更は以後の依頼から適用する。</li>
+                <li>
+                  試行は変更ブランチのコミットを明示し、制作データのコピーを使う。
+                </li>
+              </ul>
+            </li>
+            <li class="spec-list-item" data-spec-title="Git参照">
+              <span class="spec-list-label">Git参照</span>
+              <ul class="spec-list-details">
+                <li>
+                  ローカルの保持用タグと必要なGitオブジェクトの存在を先に確定し、その後、使用予定参照を依頼と一緒にDBへ保存する。
+                </li>
+                <li>受付失敗は原因を残す。</li>
+              </ul>
+            </li>
+            <li class="spec-list-item" data-spec-title="保護指定">
+              <span class="spec-list-label">保護指定</span>
+              <ul class="spec-list-details">
+                <li>開始直前に制作データ・保護指定・変更範囲を確認する。</li>
+                <li>受付時に固定した定義・作風を使う。</li>
+                <li>
+                  作品の作風参照が受付時から変わっていれば、旧版で続けるか新版へ切り替えるかを確認する。
+                </li>
+                <li>回答後にも前提を再確認する。</li>
+              </ul>
+            </li>
+            <li class="spec-list-item" data-spec-title="再実行">
+              <span class="spec-list-label">再実行</span>
+              <ul class="spec-list-details">
+                <li>自動再実行・通信再送は版を維持する。</li>
+                <li>
+                  人間による切替は動作中の操作と未解決の開始許可がなくなった後に行う。
+                </li>
+                <li>同じ依頼IDと累積回数を維持し、旧・新参照と理由を残す。</li>
+                <li>同じ試行IDの通信再送では、保存済みの内容を使う。</li>
+                <li>
+                  未送信を含めて既存の試行がある場合は先に照合し、切替後の実行・試行を別に対応付ける。
+                </li>
+              </ul>
+            </li>
+            <li class="spec-list-item" data-spec-title="停止">
+              <span class="spec-list-label">停止</span>
+              <ul class="spec-list-details">
+                <li>
+                  失敗・停止した操作をやり直す開始予定記録で、<a
+                    href="execution-lifecycle.html"
+                    >実行状態設計</a
+                  >どおり消費する。
+                </li>
+                <li>版の切替後も累積回数と上限を維持する。</li>
+                <li>
+                  完了済み結果を再利用する場合は、新旧の定義・作風と依存条件の整合性も確認する。
+                </li>
+              </ul>
+            </li>
+          </ul>
           <p>
             依頼内の明示切替も、作品の作風の現在値を変える操作とは分けて記録する。
           </p>
@@ -369,92 +312,62 @@
           <p>
             既存の定義・作風リポジトリに保持用タグを作る。通常のローカルリポジトリとGitHubのremoteを使う。
           </p>
-          <div class="contract-cards">
-            <article class="contract-card" aria-label="処理内容">
-              <p class="contract-card-title">処理内容</p>
-              <dl>
-                <dt>仕様</dt>
-                <dd>
-                  <ul class="cell-list">
-                    <li>
-                      タグは
-                      <code
-                        >refs/tags/scene-craft/retained/&lt;full-commit-hash&gt;</code
-                      >
-                      とし、対象コミットを直接指す軽量タグとする。
-                    </li>
-                    <li>
-                      タグ名は保持のための参照であり、ローカル記録の版は引き続きフルコミットハッシュとする。
-                    </li>
-                  </ul>
-                  <div class="contract-detail">
-                    <ul class="cell-list">
-                      <li>
-                        <code>git update-ref</code>
-                        の未作成確認付き操作等で作成する。
-                      </li>
-                      <li>
-                        既存の同名タグが同じコミットを直接指せば再利用できる。
-                      </li>
-                      <li>保持用タグとその参照先を維持する。</li>
-                    </ul>
-                  </div>
-                  <div class="contract-detail">
-                    <ul class="cell-list">
-                      <li>試行ブランチを削除する前に保持用タグを確認する。</li>
-                      <li>元コミットを保つマージを使う。</li>
-                    </ul>
-                  </div>
-                  <div class="contract-detail">
-                    <ul class="cell-list">
-                      <li>タグ作成をDB確定より先に行う。</li>
-                      <li>
-                        起動・保存状態の確認時にはDB参照とローカルのタグ・オブジェクトを照合する。
-                      </li>
-                    </ul>
-                  </div>
-                </dd>
-              </dl>
-            </article>
-            <article class="contract-card" aria-label="依頼">
-              <p class="contract-card-title">依頼</p>
-              <dl>
-                <dt>仕様</dt>
-                <dd>
-                  <ul class="cell-list">
-                    <li>
-                      作風の作品への選択、依頼受付、版切替などのDB確定前に作る。
-                    </li>
-                    <li>コミットと使用内容の存在を確認する。</li>
-                  </ul>
-                </dd>
-              </dl>
-            </article>
-            <article class="contract-card" aria-label="Git参照">
-              <p class="contract-card-title">Git参照</p>
-              <dl>
-                <dt>仕様</dt>
-                <dd>
+          <ul class="spec-list">
+            <li class="spec-list-item" data-spec-title="処理内容">
+              <span class="spec-list-label">処理内容</span>
+              <ul class="spec-list-details">
+                <li>
+                  タグは
+                  <code
+                    >refs/tags/scene-craft/retained/&lt;full-commit-hash&gt;</code
+                  >
+                  とし、対象コミットを直接指す軽量タグとする。
+                </li>
+                <li>
+                  タグ名は保持のための参照であり、ローカル記録の版は引き続きフルコミットハッシュとする。
+                </li>
+                <li>
+                  <code>git update-ref</code>
+                  の未作成確認付き操作等で作成する。
+                </li>
+                <li>既存の同名タグが同じコミットを直接指せば再利用できる。</li>
+                <li>保持用タグとその参照先を維持する。</li>
+                <li>試行ブランチを削除する前に保持用タグを確認する。</li>
+                <li>元コミットを保つマージを使う。</li>
+                <li>タグ作成をDB確定より先に行う。</li>
+                <li>
+                  起動・保存状態の確認時にはDB参照とローカルのタグ・オブジェクトを照合する。
+                </li>
+              </ul>
+            </li>
+            <li class="spec-list-item" data-spec-title="依頼">
+              <span class="spec-list-label">依頼</span>
+              <ul class="spec-list-details">
+                <li>
+                  作風の作品への選択、依頼受付、版切替などのDB確定前に作る。
+                </li>
+                <li>コミットと使用内容の存在を確認する。</li>
+              </ul>
+            </li>
+            <li class="spec-list-item" data-spec-title="Git参照">
+              <span class="spec-list-label">Git参照</span>
+              <ul class="spec-list-details">
+                <li>
                   リモート保存は人間が明示的に公開する操作とし、対象の保持用タグをGitHubへ明示的にpushする。
-                </dd>
-              </dl>
-            </article>
-            <article class="contract-card" aria-label="整合性">
-              <p class="contract-card-title">整合性</p>
-              <dl>
-                <dt>仕様</dt>
-                <dd>
-                  <ul class="cell-list">
-                    <li>
-                      push成功後にリモートの同名タグが記録ハッシュを直接指すことを照合し、保存先と確認時刻を記録する。
-                    </li>
-                    <li>同じ対象なら再送は冪等に扱う。</li>
-                    <li>認証・通信失敗や結果不明は未確認として残す。</li>
-                  </ul>
-                </dd>
-              </dl>
-            </article>
-          </div>
+                </li>
+              </ul>
+            </li>
+            <li class="spec-list-item" data-spec-title="整合性">
+              <span class="spec-list-label">整合性</span>
+              <ul class="spec-list-details">
+                <li>
+                  push成功後にリモートの同名タグが記録ハッシュを直接指すことを照合し、保存先と確認時刻を記録する。
+                </li>
+                <li>同じ対象なら再送は冪等に扱う。</li>
+                <li>認証・通信失敗や結果不明は未確認として残す。</li>
+              </ul>
+            </li>
+          </ul>
           <div
             aria-label="保持用タグとGitHubへの保存"
             class="table-scroll"
@@ -496,110 +409,81 @@
               </tbody>
             </table>
           </div>
-          <div class="contract-cards">
-            <article class="contract-card" aria-label="処理内容">
-              <p class="contract-card-title">処理内容</p>
-              <dl>
-                <dt>仕様</dt>
-                <dd>
-                  <ul class="cell-list">
-                    <li>
-                      ローカルコミットと公開は別操作という既存合意を維持する。
-                    </li>
-                    <li>
-                      pushでは未統合コミットやその祖先の内容も送られるため、公開先の可視性を含めて通常の公開確認に従う。
-                    </li>
-                  </ul>
-                </dd>
-              </dl>
-            </article>
-            <article class="contract-card" aria-label="Git参照">
-              <p class="contract-card-title">Git参照</p>
-              <dl>
-                <dt>仕様</dt>
-                <dd>
-                  <ul class="cell-list">
-                    <li>GitHubへの保存はPC故障・移行への備えとする。</li>
-                    <li>
-                      アプリ外からのタグ削除・移動が起きた場合は照合で不足を示す。
-                    </li>
-                  </ul>
-                </dd>
-              </dl>
-            </article>
-          </div>
+          <ul class="spec-list">
+            <li class="spec-list-item" data-spec-title="処理内容">
+              <span class="spec-list-label">処理内容</span>
+              <ul class="spec-list-details">
+                <li>
+                  ローカルコミットと公開は別操作という既存合意を維持する。
+                </li>
+                <li>
+                  pushでは未統合コミットやその祖先の内容も送られるため、公開先の可視性を含めて通常の公開確認に従う。
+                </li>
+              </ul>
+            </li>
+            <li class="spec-list-item" data-spec-title="Git参照">
+              <span class="spec-list-label">Git参照</span>
+              <ul class="spec-list-details">
+                <li>GitHubへの保存はPC故障・移行への備えとする。</li>
+                <li>
+                  アプリ外からのタグ削除・移動が起きた場合は照合で不足を示す。
+                </li>
+              </ul>
+            </li>
+          </ul>
 
           <section
             aria-labelledby="コミット内容の取り出しと実行"
             class="spec-subsection"
           >
             <h3 id="コミット内容の取り出しと実行">4-1. 固定コミットの利用</h3>
-            <div class="contract-cards">
-              <article class="contract-card" aria-label="処理内容">
-                <p class="contract-card-title">処理内容</p>
-                <dl>
-                  <dt>仕様</dt>
-                  <dd>
+            <ul class="spec-list">
+              <li class="spec-list-item" data-spec-title="処理内容">
+                <span class="spec-list-label">処理内容</span>
+                <ul class="spec-list-details">
+                  <li>
                     使用対象のパス一覧を確定し、コミットのtree／blobから取り出す。
-                    <div class="contract-detail">
-                      <ul class="cell-list">
-                        <li>定義と作風は別領域へ取り出す。</li>
-                        <li>
-                          定義が読み込む指示・手順・同梱ツール等も固定対象に含める。
-                        </li>
-                        <li>
-                          外部パスへのリンク、欠けたsubmodule・LFS実体等は未解決依存として扱う。
-                        </li>
-                      </ul>
-                    </div>
-                    <div class="contract-detail">
-                      固定した領域の指示・ツールを読み込み、使用内容を照合する。
-                    </div>
-                    <div class="contract-detail">
-                      <ul class="cell-list">
-                        <li>定義内に同梱するツールはそのblobまで固定する。</li>
-                        <li>
-                          Node、Codex、Blender、ライブラリ等の外部runtimeは実際の版・設定を記録して互換性を確認する。
-                        </li>
-                      </ul>
-                    </div>
-                  </dd>
-                </dl>
-              </article>
-              <article class="contract-card" aria-label="出力">
-                <p class="contract-card-title">出力</p>
-                <dl>
-                  <dt>仕様</dt>
-                  <dd>
-                    <ul class="cell-list">
-                      <li>
-                        生成スクリプト・ログ・制作出力は別の実行領域へ保存する。
-                      </li>
-                      <li>
-                        取り出し時に使用パスとblobを照合し、キャッシュを再利用するときも内容の一致を確認する。
-                      </li>
-                      <li>保持用タグが指すオブジェクトから再構築する。</li>
-                    </ul>
-                  </dd>
-                </dl>
-              </article>
-              <article class="contract-card" aria-label="整合性">
-                <p class="contract-card-title">整合性</p>
-                <dl>
-                  <dt>仕様</dt>
-                  <dd>
-                    <ul class="cell-list">
-                      <li>
-                        その場で生成した操作スクリプトは実体またはハッシュと保持先を記録し、恒久的な定義の改訂とは分ける。
-                      </li>
-                      <li>
-                        Git管理の定義そのものを直す場合は人間の採用・コミットを経る。
-                      </li>
-                    </ul>
-                  </dd>
-                </dl>
-              </article>
-            </div>
+                  </li>
+                  <li>定義と作風は別領域へ取り出す。</li>
+                  <li>
+                    定義が読み込む指示・手順・同梱ツール等も固定対象に含める。
+                  </li>
+                  <li>
+                    外部パスへのリンク、欠けたsubmodule・LFS実体等は未解決依存として扱う。
+                  </li>
+                  <li>
+                    固定した領域の指示・ツールを読み込み、使用内容を照合する。
+                  </li>
+                  <li>定義内に同梱するツールはそのblobまで固定する。</li>
+                  <li>
+                    Node、Codex、Blender、ライブラリ等の外部runtimeは実際の版・設定を記録して互換性を確認する。
+                  </li>
+                </ul>
+              </li>
+              <li class="spec-list-item" data-spec-title="出力">
+                <span class="spec-list-label">出力</span>
+                <ul class="spec-list-details">
+                  <li>
+                    生成スクリプト・ログ・制作出力は別の実行領域へ保存する。
+                  </li>
+                  <li>
+                    取り出し時に使用パスとblobを照合し、キャッシュを再利用するときも内容の一致を確認する。
+                  </li>
+                  <li>保持用タグが指すオブジェクトから再構築する。</li>
+                </ul>
+              </li>
+              <li class="spec-list-item" data-spec-title="整合性">
+                <span class="spec-list-label">整合性</span>
+                <ul class="spec-list-details">
+                  <li>
+                    その場で生成した操作スクリプトは実体またはハッシュと保持先を記録し、恒久的な定義の改訂とは分ける。
+                  </li>
+                  <li>
+                    Git管理の定義そのものを直す場合は人間の採用・コミットを経る。
+                  </li>
+                </ul>
+              </li>
+            </ul>
           </section>
         </section>
         <section
@@ -711,85 +595,64 @@
           <p>
             制作ファイル・依存素材・会話・制作履歴DBの一括書き出しと復元は引き続き必要とし、通常プログラムで実装する。Gitデータの実体はGitHubへ保存する。保存設計へは次の情報を渡す。
           </p>
-          <div class="contract-cards">
-            <article aria-label="Git参照" class="contract-card">
-              <p class="contract-card-title">Git参照</p>
-              <dl>
-                <dt>仕様</dt>
-                <dd>
+          <ul class="spec-list">
+            <li class="spec-list-item" data-spec-title="Git参照">
+              <span class="spec-list-label">Git参照</span>
+              <ul class="spec-list-details">
+                <li>
                   リポジトリ識別、資格情報を含まないGitHubリポジトリの所在、Gitオブジェクト形式。
-                  <div class="contract-detail">
-                    <ul class="cell-list">
-                      <li>
-                        未保存分があっても制作データの書き出しは可能とし、Git参照先の不足を明示する。
-                      </li>
-                      <li>新しい環境で別途認証する。</li>
-                    </ul>
-                  </div>
-                </dd>
-              </dl>
-            </article>
-            <article aria-label="整合性" class="contract-card">
-              <p class="contract-card-title">整合性</p>
-              <dl>
-                <dt>仕様</dt>
-                <dd>
-                  <ul class="cell-list">
-                    <li>
-                      作品の固定作風、依頼の使用予定版、全実行、旧・新の切替等が参照するフルコミットハッシュと保持用タグ。
-                    </li>
-                    <li>全実行・全判断の参照を対象とする。</li>
-                  </ul>
-                </dd>
-              </dl>
-            </article>
-            <article aria-label="処理内容" class="contract-card">
-              <p class="contract-card-title">処理内容</p>
-              <dl>
-                <dt>仕様</dt>
-                <dd>
+                </li>
+                <li>
+                  未保存分があっても制作データの書き出しは可能とし、Git参照先の不足を明示する。
+                </li>
+                <li>新しい環境で別途認証する。</li>
+              </ul>
+            </li>
+            <li class="spec-list-item" data-spec-title="整合性">
+              <span class="spec-list-label">整合性</span>
+              <ul class="spec-list-details">
+                <li>
+                  作品の固定作風、依頼の使用予定版、全実行、旧・新の切替等が参照するフルコミットハッシュと保持用タグ。
+                </li>
+                <li>全実行・全判断の参照を対象とする。</li>
+              </ul>
+            </li>
+            <li class="spec-list-item" data-spec-title="処理内容">
+              <span class="spec-list-label">処理内容</span>
+              <ul class="spec-list-details">
+                <li>
                   書き出し時点で確認できたローカル可用性、リモート保存の最終確認結果・時刻、未保存・欠損・確認不能の情報。
-                  <div class="contract-detail">
-                    <ul class="cell-list">
-                      <li>
-                        ローカル専用のコミットは、元のローカルデータから復旧する。
-                      </li>
-                      <li>
-                        この制約を未保存表示として明示することで、公開を別操作とする運用を保つ。
-                      </li>
-                      <li>
-                        制作データのバックアップ全体の整合性、部分復元・表示の導線は保存設計で定める。
-                      </li>
-                    </ul>
-                  </div>
-                </dd>
-              </dl>
-            </article>
-
-            <article aria-label="復元" class="contract-card">
-              <p class="contract-card-title">復元</p>
-              <dl>
-                <dt>仕様</dt>
-                <dd>
-                  <ul class="cell-list">
-                    <li>
-                      復元先では登録したGitHubリポジトリをclone／fetchし、必要な保持用タグを明示的に取得する。
-                    </li>
-                    <li>
-                      対象タグ、フルコミットハッシュ、使用内容の存在を照合する。
-                    </li>
-                    <li>
-                      同名タグの参照先が異なる場合は、不一致を示して停止する。
-                    </li>
-                    <li>欠損やネットワーク不通ならGit内容は未復旧とする。</li>
-                    <li>
-                      復元済みの制作記録の閲覧・手作業の記録は続けられ、欠けた定義・作風を必要とする実行だけを止める。
-                    </li>
-                  </ul>
-                </dd>
-              </dl>
-            </article>
-          </div>
+                </li>
+                <li>
+                  ローカル専用のコミットは、元のローカルデータから復旧する。
+                </li>
+                <li>
+                  この制約を未保存表示として明示することで、公開を別操作とする運用を保つ。
+                </li>
+                <li>
+                  制作データのバックアップ全体の整合性、部分復元・表示の導線は保存設計で定める。
+                </li>
+              </ul>
+            </li>
+            <li class="spec-list-item" data-spec-title="復元">
+              <span class="spec-list-label">復元</span>
+              <ul class="spec-list-details">
+                <li>
+                  復元先では登録したGitHubリポジトリをclone／fetchし、必要な保持用タグを明示的に取得する。
+                </li>
+                <li>
+                  対象タグ、フルコミットハッシュ、使用内容の存在を照合する。
+                </li>
+                <li>
+                  同名タグの参照先が異なる場合は、不一致を示して停止する。
+                </li>
+                <li>欠損やネットワーク不通ならGit内容は未復旧とする。</li>
+                <li>
+                  復元済みの制作記録の閲覧・手作業の記録は続けられ、欠けた定義・作風を必要とする実行だけを止める。
+                </li>
+              </ul>
+            </li>
+          </ul>
         </section>
         <section class="sources">
           <h2 id="sources">8. 詳細資料</h2>
