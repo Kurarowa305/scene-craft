@@ -18,6 +18,8 @@ Issue の状態・依存関係・担当者は GitHub を正とする。この一
 
 2026-10-31、[13レイヤーPSD出力の変換調査](../research/psd16-conversion-validation.md)で、小さなCycles実EXRからPSD/PSBへの一貫変換を確認した。PhotoshopAPIとpsd-toolsの組合せ、名称・merged imageの補修、Blender付属の表示変換、データ画像の符号化、容量・メモリの検査方針を確定し、確認用ファイルを保存した。Photoshop実機・2GB超の実生成・透明/ボリューム品質は受け入れ設計へ引き継ぐ。
 
+2026-11-02、[テスト・診断・受け入れ設計](testing-and-diagnostics.md)を確定した。PR作成・更新時の自動CIと成功をマージ条件とする運用、Windowsから手動開始する実機確認と初期構築完了時の必須実施、異常系の確認境界、診断ログ30日・1GiB、必須結果と再確認の証跡を合意した。CI・実機入口の実装と受け入れ実施は後続へ引き継ぐ。本領域は現在のHTML作成スキルに従いMarkdownのみで管理する。
+
 ## 項目一覧
 
 設計がまとまった項目から資料を作成する。下表のファイル名は作成予定先であり、未作成の資料を設計済みとして扱わない。作成したらファイル名をリンクに更新する。大きい問いは追加 Issue に分割して、この領域の資料へ統合する。
@@ -36,7 +38,7 @@ Issue の状態・依存関係・担当者は GitHub を正とする。この一
 | Git の版参照・保持 | [Git の版固定・保持・更新互換性を決める](https://github.com/Kurarowa305/scene-craft/issues/11) | [git-versioning.md](git-versioning.md)（設計合意済み） |
 | 画面・制作導線 | [専用アプリの画面と制作・記録の導線を決める](https://github.com/Kurarowa305/scene-craft/issues/12) | [user-interface.md](user-interface.md)（設計合意済み） |
 | 参考調査・素材サービス | [参考調査と素材サービスの選定・取り込み契約を決める](https://github.com/Kurarowa305/scene-craft/issues/13) | [reference-and-assets.md](reference-and-assets.md)（設計合意済み） |
-| テスト・診断・受け入れ | [テスト境界・診断情報・初期版の受け入れ手順を決める](https://github.com/Kurarowa305/scene-craft/issues/14) | `testing-and-diagnostics.md` |
+| テスト・診断・受け入れ | [テスト境界・診断情報・初期版の受け入れ手順を決める](https://github.com/Kurarowa305/scene-craft/issues/14) | [testing-and-diagnostics.md](testing-and-diagnostics.md)（設計合意済み） |
 
 ## 追加の設計調査
 
