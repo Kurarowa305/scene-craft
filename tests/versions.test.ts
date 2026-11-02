@@ -429,6 +429,17 @@ test("partial cloneは古いGitでもオブジェクト読み出し前に拒否�
     });
     assert.equal(r.statusCode, 409);
     assert.equal(r.json().error, "GIT_INCOMPLETE_HISTORY");
+    f.git("config", "--unset", "remote.origin.promisor");
+    f.git("config", "extensions.worktreeConfig", "true");
+    f.git("config", "--worktree", "remote.origin.promisor", "true");
+    const worktree = await app.inject({
+      method: "POST",
+      url: "/api/versions/default",
+      headers,
+      payload: { requestKey: "partial-worktree-001", commit: f.definition },
+    });
+    assert.equal(worktree.statusCode, 409);
+    assert.equal(worktree.json().error, "GIT_INCOMPLETE_HISTORY");
   } finally {
     await app.close();
     await cleanGitFixture(directory);

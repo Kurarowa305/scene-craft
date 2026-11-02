@@ -68,7 +68,6 @@ export function gitVersions(repository: string, directory: string) {
       "-C",
       repository,
       "config",
-      "--local",
       "--includes",
       "--get-regexp",
       "^(extensions\\.partialclone|remote\\..*\\.(promisor|partialclonefilter))$",
