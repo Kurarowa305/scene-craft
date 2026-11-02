@@ -1,5 +1,5 @@
 import { execFileSync, spawnSync } from "node:child_process";
-import { randomUUID } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 import {
   chmodSync,
   mkdirSync,
@@ -60,6 +60,23 @@ export function gitVersions(repository: string, directory: string) {
     git(...args)
       .toString("utf8")
       .trim();
+  // Older installed Git versions do not honor GIT_NO_LAZY_FETCH. Reject promisor
+  // repositories before object reads, so selection cannot initiate a network fetch.
+  const partial = spawnSync(
+    "git",
+    [
+      "-C",
+      repository,
+      "config",
+      "--local",
+      "--includes",
+      "--get-regexp",
+      "^(extensions\\.partialclone|remote\\..*\\.(promisor|partialclonefilter))$",
+    ],
+    { env, stdio: "pipe", timeout: 15000 },
+  );
+  if (partial.status === 0) fail("GIT_INCOMPLETE_HISTORY");
+  if (partial.status !== 1) fail("GIT_CONTENT_UNAVAILABLE");
   const common = value(
     "rev-parse",
     "--path-format=absolute",
@@ -76,6 +93,15 @@ export function gitVersions(repository: string, directory: string) {
   const objectFormat = value("rev-parse", "--show-object-format");
   if (objectFormat !== "sha1" && objectFormat !== "sha256")
     fail("GIT_FORMAT_UNSUPPORTED");
+  function object(type: "commit" | "tree" | "blob", id: string) {
+    const data = git("cat-file", type, id);
+    const actual = createHash(objectFormat)
+      .update(`${type} ${data.length}\0`)
+      .update(data)
+      .digest("hex");
+    if (actual !== id) fail("GIT_CONTENT_MISMATCH");
+    return data;
+  }
 
   function inspect(commit: string, kind: "definition" | "style") {
     if (
@@ -86,13 +112,15 @@ export function gitVersions(repository: string, directory: string) {
       fail("GIT_FULL_COMMIT_REQUIRED");
     if (value("cat-file", "-t", commit) !== "commit")
       fail("GIT_COMMIT_REQUIRED");
+    object("commit", commit);
     if (value("rev-parse", "--is-shallow-repository") !== "false")
       fail("GIT_INCOMPLETE_HISTORY");
     // Traverse ancestors too; a partial clone cannot silently fetch missing objects.
     git("rev-list", "--objects", "--missing=error", commit);
     const tree = value("rev-parse", `${commit}^{tree}`);
+    object("tree", tree);
     const entries = new Map(
-      git("ls-tree", "-rz", "--full-tree", commit)
+      git("ls-tree", "-rtz", "--full-tree", commit)
         .toString("utf8")
         .split("\0")
         .filter(Boolean)
@@ -104,6 +132,8 @@ export function gitVersions(repository: string, directory: string) {
           ] as const;
         }),
     );
+    for (const entry of entries.values())
+      if (entry[1] === "tree") object("tree", entry[2]);
     function blob(path: string) {
       if (!pathValid(path)) fail("GIT_PATH_INVALID");
       const entry = entries.get(path);
@@ -113,7 +143,7 @@ export function gitVersions(repository: string, directory: string) {
         entry[1] !== "blob"
       )
         fail("GIT_DEPENDENCY_UNRESOLVED");
-      const data = git("cat-file", "blob", entry![2]);
+      const data = object("blob", entry![2]);
       if (
         data
           .subarray(0, 80)
@@ -268,6 +298,13 @@ export function gitVersions(repository: string, directory: string) {
   }
   return {
     repositoryId,
+    prepare(definition: GitReference | null, style: GitReference | null) {
+      const status = this.status(definition, style);
+      if (!status.availability.available) fail(status.availability.reason!);
+      this.materialize(definition!, "definition");
+      if (style) this.materialize(style, "style");
+      return { definition: definition!, style };
+    },
     content(
       reference: GitReference,
       kind: "definition" | "style",

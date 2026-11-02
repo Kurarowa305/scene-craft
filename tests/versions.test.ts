@@ -1,12 +1,8 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { execFileSync } from "node:child_process";
 import {
   mkdtemp,
-  mkdir,
   writeFile,
-  rm,
-  chmod,
   readdir,
   unlink,
   readFile,
@@ -16,66 +12,16 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { createApp } from "../src/server/app.js";
 import { DatabaseSync } from "node:sqlite";
+import { deflateSync } from "node:zlib";
 import {
   gitFixture,
   cleanGitFixture,
   definitionManifest,
 } from "./git-fixture.js";
 
-async function clean(directory: string) {
-  await chmod(directory, 0o700);
-  for (const entry of await readdir(directory, { withFileTypes: true }))
-    if (entry.isDirectory()) await clean(join(directory, entry.name));
-  await rm(directory, { recursive: true, force: true });
-}
-
 test("定義の既定版と別コミットの作風を固定し、再送と再起動で保持する", async () => {
   const directory = await mkdtemp(join(tmpdir(), "scene-versions-"));
-  const repository = join(directory, "repo");
-  await mkdir(repository);
-  const git = (...args: string[]) =>
-    execFileSync("git", ["-C", repository, ...args], {
-      encoding: "utf8",
-    }).trim();
-  git("init", "-b", "main");
-  git("config", "user.email", "test@example.invalid");
-  git("config", "user.name", "Test");
-  await writeFile(join(repository, "instructions.md"), "固定された指示");
-  await writeFile(
-    join(repository, "definition.json"),
-    JSON.stringify({
-      schema: "scene-craft.definition.v1",
-      runtime: "scene-craft.v1",
-      roles: [
-        {
-          id: "reference",
-          description: "参考調査",
-          instructions: ["instructions.md"],
-          procedures: [],
-          code: [],
-          context: ["work.intent"],
-          tools: [],
-          operations: [],
-          outputs: ["text"],
-        },
-      ],
-      style: { required: false, formats: ["scene-craft.style.v1"] },
-    }),
-  );
-  git("add", ".");
-  git("commit", "-m", "definition");
-  const definition = git("rev-parse", "HEAD");
-  await writeFile(
-    join(repository, "style.json"),
-    JSON.stringify({
-      schema: "scene-craft.style.v1",
-      tendencies: ["静けさ"],
-      policies: ["余白を残す"],
-    }),
-  );
-  git("add", ".");
-  git("commit", "-m", "style");
-  const style = git("rev-parse", "HEAD");
+  const { repository, git, definition, style } = await gitFixture(directory);
   await writeFile(join(repository, "instructions.md"), "未コミットの指示");
   let app = await createApp({
     directory,
@@ -146,7 +92,7 @@ test("定義の既定版と別コミットの作風を固定し、再送と再�
     assert.equal(status.json().availability.available, true);
   } finally {
     await app.close();
-    await clean(directory);
+    await cleanGitFixture(directory);
   }
 });
 
@@ -405,6 +351,85 @@ test("DB確定失敗でも保持タグを残し、同じ受付で安全に再送
     );
   } finally {
     db.close();
+    await app.close();
+    await cleanGitFixture(directory);
+  }
+});
+
+test("Gitオブジェクトの内容とblob識別子が不一致なら保存しない", async () => {
+  const directory = await mkdtemp(join(tmpdir(), "scene-git-corrupt-"));
+  const f = await gitFixture(directory);
+  const app = await createApp({
+    directory,
+    port: 4317,
+    gitRepository: f.repository,
+  });
+  try {
+    const blob = f.git("rev-parse", `${f.definition}:instructions.md`);
+    const data = Buffer.from("別の指示");
+    await unlink(
+      join(f.repository, ".git", "objects", blob.slice(0, 2), blob.slice(2)),
+    );
+    await writeFile(
+      join(f.repository, ".git", "objects", blob.slice(0, 2), blob.slice(2)),
+      deflateSync(Buffer.concat([Buffer.from(`blob ${data.length}\0`), data])),
+    );
+    const s = await app.inject({
+      url: "/api/session",
+      headers: { host: "localhost:4317" },
+    });
+    const headers = {
+      host: "localhost:4317",
+      origin: "http://localhost:4317",
+      cookie: s.headers["set-cookie"]!.toString().split(";")[0],
+      "x-csrf-token": s.json().csrfToken,
+    };
+    const r = await app.inject({
+      method: "POST",
+      url: "/api/versions/default",
+      headers,
+      payload: { requestKey: "corrupt-object-001", commit: f.definition },
+    });
+    assert.equal(r.statusCode, 409);
+    assert.equal(
+      (await app.inject({ url: "/api/versions", headers })).json().definition,
+      null,
+    );
+  } finally {
+    await app.close();
+    await cleanGitFixture(directory);
+  }
+});
+
+test("partial cloneは古いGitでもオブジェクト読み出し前に拒否する", async () => {
+  const directory = await mkdtemp(join(tmpdir(), "scene-git-partial-"));
+  const f = await gitFixture(directory);
+  f.git("config", "remote.origin.promisor", "true");
+  const app = await createApp({
+    directory,
+    port: 4317,
+    gitRepository: f.repository,
+  });
+  try {
+    const s = await app.inject({
+      url: "/api/session",
+      headers: { host: "localhost:4317" },
+    });
+    const headers = {
+      host: "localhost:4317",
+      origin: "http://localhost:4317",
+      cookie: s.headers["set-cookie"]!.toString().split(";")[0],
+      "x-csrf-token": s.json().csrfToken,
+    };
+    const r = await app.inject({
+      method: "POST",
+      url: "/api/versions/default",
+      headers,
+      payload: { requestKey: "partial-clone-001", commit: f.definition },
+    });
+    assert.equal(r.statusCode, 409);
+    assert.equal(r.json().error, "GIT_INCOMPLETE_HISTORY");
+  } finally {
     await app.close();
     await cleanGitFixture(directory);
   }

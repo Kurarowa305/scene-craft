@@ -61,7 +61,8 @@ Windowsショートカットは既存の`launcher.json`に`"gitRepository": "/ab
 
 - リポジトリIDをGit common directoryの`scene-craft-repository-id`に一度だけ作る。場所・remote URLとは独立し、worktree間で共有する。移動時もこのIDを維持する。別cloneへの対応付け・バックアップでのID復元は後続実装であり、異なるIDを自動で同一扱いしない。
 - Gitオブジェクト形式・フルcommit・tree・使用パス/blob・保持用軽量タグをSQLiteへ保存する。作風なしは`null`で明示する。
-- shallow履歴を拒否し、先祖を含むオブジェクトの可用性を検査する。暗黙fetchとreplace objectsを無効にする。
+- shallow履歴とpromisor/partial clone設定を拒否し、先祖を含むオブジェクトの可用性を検査する。暗黙fetchとreplace objectsを無効にする。導入済みの古いGitでもネットワーク取得を開始しないよう、partial cloneはオブジェクト読み出し前に保守的に拒否する。
+- 使用commit・root/nested tree・blobの実データからGitオブジェクト識別子を再計算し、不一致を拒否する。展開可能な圧縮データであっても、記録したblobとは別の内容を使わない。
 - `refs/tags/scene-craft/retained/<full-commit>`を未作成確認付きで作り、DB確定前に再照合する。同対象の軽量タグのみ再利用する。別対象・注釈タグ・symbolic ref（参照先欠損も含む）を上書きしない。タグを移動・自動削除しない。
 - DB保存が失敗したら参照を確定せず、余分な保持タグと取り出し領域は残す。再送は同一受付キーの結果を返し、既定変更後も選び直さない。
 - `git-exports`下に定義と作風を別領域で取り出す。ファイル0400・ディレクトリ0500。毎回Git blobから新規に構築し、既存キャッシュを信頼しない。実行側が所有ユーザーの権限を使ってchmodすることまで防ぐsandboxではない。Codex・外部runtimeの探索制限と実行権限は後続の実接続で検証する。

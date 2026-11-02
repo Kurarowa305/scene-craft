@@ -203,12 +203,7 @@ export async function createApp(options: AppOptions) {
         const service = versions();
         const definition = store.defaultDefinition();
         const { style } = store.workVersions(request.params.id);
-        const status = service.status(definition, style);
-        if (!status.availability.available)
-          throw new OperationError(409, status.availability.reason!);
-        service.materialize(definition!, "definition");
-        if (style) service.materialize(style, "style");
-        return { definition: definition!, style };
+        return service.prepare(definition, style);
       }),
   );
   app.get<{
@@ -276,12 +271,7 @@ export async function createApp(options: AppOptions) {
           const style = request.body.styleCommit
             ? service.select(request.body.styleCommit, "style")
             : null;
-          const status = service.status(definition, style);
-          if (!status.availability.available)
-            throw new OperationError(409, status.availability.reason!);
-          service.materialize(definition!, "definition");
-          if (style) service.materialize(style, "style");
-          return { definition, style };
+          return service.prepare(definition, style);
         },
       ),
   );
