@@ -1,0 +1,57 @@
+<svg role="img" aria-labelledby="diagram-title diagram-description" width="727pt" height="199pt"
+ viewBox="0.00 0.00 727.40 199.40" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<title id="diagram-title">依頼の状態遷移：待機へ戻る再開・再受付</title>
+<desc id="diagram-description">保留から待機へ：人間が再開。確認待ちから待機へ：人間の回答・再受付。失敗から待機へ：許可条件と残り予算を確認。中断から待機へ：人間が再開・入力を再確認。</desc>
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(25.2 174.2)">
+
+<g id="transition&#45;8" class="edge">
+<title>state0&#45;&gt;state1</title>
+<path fill="none" stroke="#48716b" stroke-width="1.4" d="M33.66,-106.75C35.82,-93.39 40.75,-76.49 52,-66 88.59,-31.9 147.6,-23.22 186.84,-21.52"/>
+<polygon fill="#48716b" stroke="#48716b" stroke-width="1.4" points="186.99,-24.31 194.9,-21.25 186.81,-18.72 186.99,-24.31"/>
+<text text-anchor="middle" x="90" y="-71" font-family="Noto Sans CJK JP" font-size="15.00" fill="#233b37">人間が再開</text>
+</g>
+<g id="transition&#45;10" class="edge">
+<title>state2&#45;&gt;state1</title>
+<path fill="none" stroke="#48716b" stroke-width="1.4" d="M136,-106.88C133.46,-94.24 132.56,-78.1 140,-66 150.3,-49.25 169.18,-38.64 186.72,-32.04"/>
+<polygon fill="#48716b" stroke="#48716b" stroke-width="1.4" points="188.01,-34.56 194.65,-29.29 186.17,-29.27 188.01,-34.56"/>
+<text text-anchor="middle" x="208" y="-71" font-family="Noto Sans CJK JP" font-size="15.00" fill="#233b37">人間の回答・再受付</text>
+</g>
+<g id="transition&#45;23" class="edge">
+<title>state3&#45;&gt;state1</title>
+<path fill="none" stroke="#48716b" stroke-width="1.4" d="M303.46,-106.89C297.61,-94.41 289.1,-78.43 279,-66 273.74,-59.53 267.44,-53.28 261.06,-47.63"/>
+<polygon fill="#48716b" stroke="#48716b" stroke-width="1.4" points="262.6,-45.26 254.7,-42.19 258.96,-49.52 262.6,-45.26"/>
+<text text-anchor="middle" x="379.5" y="-71" font-family="Noto Sans CJK JP" font-size="15.00" fill="#233b37">許可条件と残り予算を確認</text>
+</g>
+<g id="transition&#45;24" class="edge">
+<title>state4&#45;&gt;state1</title>
+<path fill="none" stroke="#48716b" stroke-width="1.4" d="M515.7,-106.74C506.95,-93.01 493.55,-75.68 477,-66 442.12,-45.6 328.94,-31.85 267.52,-25.69"/>
+<polygon fill="#48716b" stroke="#48716b" stroke-width="1.4" points="267.45,-22.87 259.21,-24.87 266.9,-28.44 267.45,-22.87"/>
+<text text-anchor="middle" x="586.5" y="-71" font-family="Noto Sans CJK JP" font-size="15.00" fill="#233b37">人間が再開・入力を再確認</text>
+</g>
+<g id="node1" class="node">
+<title>state0</title>
+<path fill="#edf2eb" stroke="#9fb7ae" d="M52,-149C52,-149 12,-149 12,-149 6,-149 0,-143 0,-137 0,-137 0,-119 0,-119 0,-113 6,-107 12,-107 12,-107 52,-107 52,-107 58,-107 64,-113 64,-119 64,-119 64,-137 64,-137 64,-143 58,-149 52,-149"/>
+<text text-anchor="middle" x="32" y="-124.2" font-family="Noto Sans CJK JP" font-size="16.00">保留</text>
+</g>
+<g id="node2" class="node">
+<title>state1</title>
+<path fill="#edf2eb" stroke="#9fb7ae" d="M247,-42C247,-42 207,-42 207,-42 201,-42 195,-36 195,-30 195,-30 195,-12 195,-12 195,-6 201,0 207,0 207,0 247,0 247,0 253,0 259,-6 259,-12 259,-12 259,-30 259,-30 259,-36 253,-42 247,-42"/>
+<text text-anchor="middle" x="227" y="-17.2" font-family="Noto Sans CJK JP" font-size="16.00">待機</text>
+</g>
+<g id="node3" class="node">
+<title>state2</title>
+<path fill="#edf2eb" stroke="#9fb7ae" d="M178,-149C178,-149 106,-149 106,-149 100,-149 94,-143 94,-137 94,-137 94,-119 94,-119 94,-113 100,-107 106,-107 106,-107 178,-107 178,-107 184,-107 190,-113 190,-119 190,-119 190,-137 190,-137 190,-143 184,-149 178,-149"/>
+<text text-anchor="middle" x="142" y="-124.2" font-family="Noto Sans CJK JP" font-size="16.00">確認待ち</text>
+</g>
+<g id="node4" class="node">
+<title>state3</title>
+<path fill="#edf2eb" stroke="#9fb7ae" d="M332,-149C332,-149 292,-149 292,-149 286,-149 280,-143 280,-137 280,-137 280,-119 280,-119 280,-113 286,-107 292,-107 292,-107 332,-107 332,-107 338,-107 344,-113 344,-119 344,-119 344,-137 344,-137 344,-143 338,-149 332,-149"/>
+<text text-anchor="middle" x="312" y="-124.2" font-family="Noto Sans CJK JP" font-size="16.00">失敗</text>
+</g>
+<g id="node5" class="node">
+<title>state4</title>
+<path fill="#edf2eb" stroke="#9fb7ae" d="M547,-149C547,-149 507,-149 507,-149 501,-149 495,-143 495,-137 495,-137 495,-119 495,-119 495,-113 501,-107 507,-107 507,-107 547,-107 547,-107 553,-107 559,-113 559,-119 559,-119 559,-137 559,-137 559,-143 553,-149 547,-149"/>
+<text text-anchor="middle" x="527" y="-124.2" font-family="Noto Sans CJK JP" font-size="16.00">中断</text>
+</g>
+</g>
+</svg>

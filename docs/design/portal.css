@@ -909,3 +909,37 @@ main h2 {
     max-height: 440px;
   }
 }
+
+/* State transitions are split by purpose so conditions stay readable. */
+.state-transition-figure {
+  margin-top: 28px;
+}
+.state-diagram-title {
+  margin-bottom: 12px;
+  color: var(--accent);
+  font-size: 16px;
+  font-weight: 600;
+}
+.state-transition-image {
+  display: block;
+  width: 100%;
+  min-width: var(--diagram-width);
+  height: auto;
+}
+.transition-text {
+  margin-top: 24px;
+  font-size: 13px;
+}
+.transition-text summary {
+  cursor: pointer;
+  color: var(--accent);
+}
+.transition-text summary:focus-visible {
+  outline: rgb(170, 99, 29) solid 3px;
+  outline-offset: 4px;
+}
+@media print {
+  .state-transition-image {
+    min-width: 0;
+  }
+}

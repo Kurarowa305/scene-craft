@@ -600,149 +600,165 @@
 
           <section aria-labelledby="状態遷移の全経路" class="spec-subsection">
             <h3 id="状態遷移の全経路">6-1. 状態遷移の全経路</h3>
-            <div
-              aria-label="状態遷移の全経路"
-              class="table-scroll"
-              role="region"
-              tabindex="0"
-            >
-              <table class="spec-table">
-                <thead>
-                  <tr>
-                    <th scope="col">遷移前</th>
-                    <th scope="col">条件・操作</th>
-                    <th scope="col">遷移後</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <th scope="row">開始</th>
-                    <td>受付</td>
-                    <td>待機</td>
-                  </tr>
-                  <tr>
-                    <th scope="row">待機</th>
-                    <td>順番・前提・入力を確認</td>
-                    <td>実行中</td>
-                  </tr>
-                  <tr>
-                    <th scope="row">待機</th>
-                    <td>前提の変更</td>
-                    <td>確認待ち</td>
-                  </tr>
-                  <tr>
-                    <th scope="row">待機</th>
-                    <td>アプリ終了・再起動</td>
-                    <td>保留</td>
-                  </tr>
-                  <tr>
-                    <th scope="row">待機</th>
-                    <td>個別停止・外部操作なし</td>
-                    <td>中断</td>
-                  </tr>
-                  <tr>
-                    <th scope="row">保留</th>
-                    <td>個別停止・外部操作なし</td>
-                    <td>中断</td>
-                  </tr>
-                  <tr>
-                    <th scope="row">確認待ち</th>
-                    <td>個別停止・外部操作なし</td>
-                    <td>中断</td>
-                  </tr>
-                  <tr>
-                    <th scope="row">保留</th>
-                    <td>人間が再開</td>
-                    <td>待機</td>
-                  </tr>
-                  <tr>
-                    <th scope="row">実行中</th>
-                    <td>操作停止を確認し判断を求める</td>
-                    <td>確認待ち</td>
-                  </tr>
-                  <tr>
-                    <th scope="row">確認待ち</th>
-                    <td>人間の回答・再受付</td>
-                    <td>待機</td>
-                  </tr>
-                  <tr>
-                    <th scope="row">実行中</th>
-                    <td>停止要求・上限・認証切れ</td>
-                    <td>停止待ち</td>
-                  </tr>
-                  <tr>
-                    <th scope="row">停止待ち</th>
-                    <td>操作の停止を確認</td>
-                    <td>中断</td>
-                  </tr>
-                  <tr>
-                    <th scope="row">停止待ち</th>
-                    <td>判断待ちのため安全な停止を確認</td>
-                    <td>確認待ち</td>
-                  </tr>
-                  <tr>
-                    <th scope="row">停止待ち</th>
-                    <td>障害で停止後に失敗を確認</td>
-                    <td>失敗</td>
-                  </tr>
-                  <tr>
-                    <th scope="row">停止待ち</th>
-                    <td>依頼全体の完了を確認</td>
-                    <td>完了</td>
-                  </tr>
-                  <tr>
-                    <th scope="row">実行中</th>
-                    <td>終端・結果・保存を確認</td>
-                    <td>完了</td>
-                  </tr>
-                  <tr>
-                    <th scope="row">実行中</th>
-                    <td>失敗確定</td>
-                    <td>失敗</td>
-                  </tr>
-                  <tr>
-                    <th scope="row">実行中</th>
-                    <td>受付・終端・所有権が不明</td>
-                    <td>状態確認が必要</td>
-                  </tr>
-                  <tr>
-                    <th scope="row">停止待ち</th>
-                    <td>停止結果が不明</td>
-                    <td>状態確認が必要</td>
-                  </tr>
-                  <tr>
-                    <th scope="row">状態確認が必要</th>
-                    <td>照合して停止を確認</td>
-                    <td>中断</td>
-                  </tr>
-                  <tr>
-                    <th scope="row">状態確認が必要</th>
-                    <td>照合して完了を確認</td>
-                    <td>完了</td>
-                  </tr>
-                  <tr>
-                    <th scope="row">状態確認が必要</th>
-                    <td>照合して失敗を確認</td>
-                    <td>失敗</td>
-                  </tr>
-                  <tr>
-                    <th scope="row">失敗</th>
-                    <td>許可条件と残り予算を確認</td>
-                    <td>待機</td>
-                  </tr>
-                  <tr>
-                    <th scope="row">中断</th>
-                    <td>人間が再開・入力を再確認</td>
-                    <td>待機</td>
-                  </tr>
-                  <tr>
-                    <th scope="row">状態確認が必要</th>
-                    <td>照合で稼働を確認・停止を待つ</td>
-                    <td>停止待ち</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+            <p>
+              矢印は条件・操作による状態の遷移を表す。同じ状態名は図をまたいでも同じ状態を指し、待機へ戻る経路は最後の図にまとめる。完了は二重枠で示す。
+            </p>
+            <figure class="state-transition-figure">
+              <p class="state-diagram-title">1. 受付・着手・確認・保留</p>
+              <div
+                aria-label="受付・着手・確認・保留の状態遷移図"
+                class="diagram-scroll"
+                role="region"
+                tabindex="0"
+              >
+                <img
+                  alt="受付・着手・確認・保留。各矢印に遷移条件を示した状態遷移図。条件の一覧は後続のテキストでも確認できる。"
+                  class="state-transition-image"
+                  height="563"
+                  src="assets/execution-state/acceptance.svg"
+                  style="--diagram-width: 748px"
+                  width="748"
+                />
+              </div>
+              <figcaption>
+                <a href="assets/execution-state/acceptance.svg"
+                  >受付・着手・確認・保留の図を原寸で開く</a
+                >
+              </figcaption>
+            </figure>
+            <figure class="state-transition-figure">
+              <p class="state-diagram-title">2. 実行の完了・失敗と停止確認</p>
+              <div
+                aria-label="実行の完了・失敗と停止確認の状態遷移図"
+                class="diagram-scroll"
+                role="region"
+                tabindex="0"
+              >
+                <img
+                  alt="実行の完了・失敗と停止確認。各矢印に遷移条件を示した状態遷移図。条件の一覧は後続のテキストでも確認できる。"
+                  class="state-transition-image"
+                  height="331"
+                  src="assets/execution-state/completion.svg"
+                  style="--diagram-width: 931px"
+                  width="931"
+                />
+              </div>
+              <figcaption>
+                <a href="assets/execution-state/completion.svg"
+                  >実行の完了・失敗と停止確認の図を原寸で開く</a
+                >
+              </figcaption>
+            </figure>
+            <figure class="state-transition-figure">
+              <p class="state-diagram-title">3. 結果不明時の照合</p>
+              <div
+                aria-label="結果不明時の照合の状態遷移図"
+                class="diagram-scroll"
+                role="region"
+                tabindex="0"
+              >
+                <img
+                  alt="結果不明時の照合。各矢印に遷移条件を示した状態遷移図。条件の一覧は後続のテキストでも確認できる。"
+                  class="state-transition-image"
+                  height="314"
+                  src="assets/execution-state/reconciliation.svg"
+                  style="--diagram-width: 769px"
+                  width="769"
+                />
+              </div>
+              <figcaption>
+                <a href="assets/execution-state/reconciliation.svg"
+                  >結果不明時の照合の図を原寸で開く</a
+                >
+              </figcaption>
+            </figure>
+            <figure class="state-transition-figure">
+              <p class="state-diagram-title">4. 待機へ戻る再開・再受付</p>
+              <div
+                aria-label="待機へ戻る再開・再受付の状態遷移図"
+                class="diagram-scroll"
+                role="region"
+                tabindex="0"
+              >
+                <img
+                  alt="待機へ戻る再開・再受付。各矢印に遷移条件を示した状態遷移図。条件の一覧は後続のテキストでも確認できる。"
+                  class="state-transition-image"
+                  height="199"
+                  src="assets/execution-state/resumption.svg"
+                  style="--diagram-width: 727px"
+                  width="727"
+                />
+              </div>
+              <figcaption>
+                <a href="assets/execution-state/resumption.svg"
+                  >待機へ戻る再開・再受付の図を原寸で開く</a
+                >
+              </figcaption>
+            </figure>
+            <details class="transition-text">
+              <summary>全25経路の条件をテキストで確認</summary>
+              <ul>
+                <li data-transition="1">開始 → 待機：受付</li>
+                <li data-transition="2">
+                  待機 → 実行中：順番・前提・入力を確認
+                </li>
+                <li data-transition="3">待機 → 確認待ち：前提の変更</li>
+                <li data-transition="4">待機 → 保留：アプリ終了・再起動</li>
+                <li data-transition="5">待機 → 中断：個別停止・外部操作なし</li>
+                <li data-transition="6">保留 → 中断：個別停止・外部操作なし</li>
+                <li data-transition="7">
+                  確認待ち → 中断：個別停止・外部操作なし
+                </li>
+                <li data-transition="8">保留 → 待機：人間が再開</li>
+                <li data-transition="9">
+                  実行中 → 確認待ち：操作停止を確認し判断を求める
+                </li>
+                <li data-transition="10">
+                  確認待ち → 待機：人間の回答・再受付
+                </li>
+                <li data-transition="11">
+                  実行中 → 停止待ち：停止要求・上限・認証切れ
+                </li>
+                <li data-transition="12">停止待ち → 中断：操作の停止を確認</li>
+                <li data-transition="13">
+                  停止待ち → 確認待ち：判断待ちのため安全な停止を確認
+                </li>
+                <li data-transition="14">
+                  停止待ち → 失敗：障害で停止後に失敗を確認
+                </li>
+                <li data-transition="15">
+                  停止待ち → 完了：依頼全体の完了を確認
+                </li>
+                <li data-transition="16">
+                  実行中 → 完了：終端・結果・保存を確認
+                </li>
+                <li data-transition="17">実行中 → 失敗：失敗確定</li>
+                <li data-transition="18">
+                  実行中 → 状態確認が必要：受付・終端・所有権が不明
+                </li>
+                <li data-transition="19">
+                  停止待ち → 状態確認が必要：停止結果が不明
+                </li>
+                <li data-transition="20">
+                  状態確認が必要 → 中断：照合して停止を確認
+                </li>
+                <li data-transition="21">
+                  状態確認が必要 → 完了：照合して完了を確認
+                </li>
+                <li data-transition="22">
+                  状態確認が必要 → 失敗：照合して失敗を確認
+                </li>
+                <li data-transition="23">
+                  失敗 → 待機：許可条件と残り予算を確認
+                </li>
+                <li data-transition="24">
+                  中断 → 待機：人間が再開・入力を再確認
+                </li>
+                <li data-transition="25">
+                  状態確認が必要 → 停止待ち：照合で稼働を確認・停止を待つ
+                </li>
+              </ul>
+            </details>
             <p>
               状態遷移と停止要求・実行枠・予算の更新は DB
               内で一体として記録する。開始前の記録と外部の実行記録を照合する。具体的な受付キー・世代・期限は以下に定める。

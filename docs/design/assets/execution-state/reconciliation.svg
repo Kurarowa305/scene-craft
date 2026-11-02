@@ -1,0 +1,80 @@
+<svg role="img" aria-labelledby="diagram-title diagram-description" width="769pt" height="314pt"
+ viewBox="0.00 0.00 769.40 314.40" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<title id="diagram-title">依頼の状態遷移：結果不明時の照合</title>
+<desc id="diagram-description">実行中から状態確認が必要へ：受付・終端・所有権が不明。停止待ちから状態確認が必要へ：停止結果が不明。状態確認が必要から中断へ：照合して停止を確認。状態確認が必要から完了へ：照合して完了を確認。状態確認が必要から失敗へ：照合して失敗を確認。状態確認が必要から停止待ちへ：照合で稼働を確認・停止を待つ。</desc>
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(25.2 289.2)">
+
+<g id="transition&#45;18" class="edge">
+<title>state0&#45;&gt;state1</title>
+<path fill="none" stroke="#48716b" stroke-width="1.4" d="M171.72,-221.95C168.99,-209.17 168,-192.86 176,-181 183.42,-170 194.1,-161.75 205.91,-155.57"/>
+<polygon fill="#48716b" stroke="#48716b" stroke-width="1.4" points="207.39,-157.96 213.38,-151.97 204.96,-152.91 207.39,-157.96"/>
+<text text-anchor="middle" x="266.5" y="-186" font-family="Noto Sans CJK JP" font-size="15.00" fill="#233b37">受付・終端・所有権が不明</text>
+</g>
+<g id="transition&#45;20" class="edge">
+<title>state1&#45;&gt;state3</title>
+<path fill="none" stroke="#48716b" stroke-width="1.4" d="M213.31,-129.53C153.86,-123.57 75.44,-111.95 52,-91 41.67,-81.77 36.61,-67.35 34.16,-54.44"/>
+<polygon fill="#48716b" stroke="#48716b" stroke-width="1.4" points="36.88,-53.72 32.89,-46.24 31.35,-54.57 36.88,-53.72"/>
+<text text-anchor="middle" x="119.5" y="-79" font-family="Noto Sans CJK JP" font-size="15.00" fill="#233b37">照合して停止を確認</text>
+</g>
+<g id="transition&#45;21" class="edge">
+<title>state1&#45;&gt;state4</title>
+<path fill="none" stroke="#48716b" stroke-width="1.4" d="M224.47,-114.93C214.33,-108.84 205.13,-101.01 199,-91 193.13,-81.41 192.13,-69.44 193.1,-58.39"/>
+<polygon fill="#48716b" stroke="#48716b" stroke-width="1.4" points="195.92,-58.48 194.18,-50.18 190.36,-57.75 195.92,-58.48"/>
+<text text-anchor="middle" x="266.5" y="-79" font-family="Noto Sans CJK JP" font-size="15.00" fill="#233b37">照合して完了を確認</text>
+</g>
+<g id="transition&#45;22" class="edge">
+<title>state1&#45;&gt;state5</title>
+<path fill="none" stroke="#48716b" stroke-width="1.4" d="M312.83,-114.92C321.26,-107.97 330.1,-99.72 337,-91 345.82,-79.84 353.26,-65.96 358.83,-53.89"/>
+<polygon fill="#48716b" stroke="#48716b" stroke-width="1.4" points="361.52,-54.71 362.21,-46.26 356.4,-52.44 361.52,-54.71"/>
+<text text-anchor="middle" x="415.5" y="-79" font-family="Noto Sans CJK JP" font-size="15.00" fill="#233b37">照合して失敗を確認</text>
+</g>
+<g id="transition&#45;25" class="edge">
+<title>state1&#45;&gt;state6</title>
+<path fill="none" stroke="#48716b" stroke-width="1.4" d="M356.59,-131.97C398.27,-127.33 450.27,-116.36 490,-91 504.47,-81.76 516.25,-66.65 524.62,-53.32"/>
+<polygon fill="#48716b" stroke="#48716b" stroke-width="1.4" points="527.21,-54.45 528.92,-46.15 522.4,-51.57 527.21,-54.45"/>
+<text text-anchor="middle" x="613.5" y="-79" font-family="Noto Sans CJK JP" font-size="15.00" fill="#233b37">照合で稼働を確認・停止を待つ</text>
+</g>
+<g id="transition&#45;19" class="edge">
+<title>state2&#45;&gt;state1</title>
+<path fill="none" stroke="#48716b" stroke-width="1.4" d="M385.42,-221.84C379.85,-209.02 371.29,-192.69 360,-181 352.81,-173.56 344.1,-166.95 335.19,-161.26"/>
+<polygon fill="#48716b" stroke="#48716b" stroke-width="1.4" points="336.65,-158.87 328.36,-157.09 333.73,-163.65 336.65,-158.87"/>
+<text text-anchor="middle" x="425" y="-186" font-family="Noto Sans CJK JP" font-size="15.00" fill="#233b37">停止結果が不明</text>
+</g>
+<g id="node1" class="node">
+<title>state0</title>
+<path fill="#edf2eb" stroke="#9fb7ae" d="M206,-264C206,-264 150,-264 150,-264 144,-264 138,-258 138,-252 138,-252 138,-234 138,-234 138,-228 144,-222 150,-222 150,-222 206,-222 206,-222 212,-222 218,-228 218,-234 218,-234 218,-252 218,-252 218,-258 212,-264 206,-264"/>
+<text text-anchor="middle" x="178" y="-239.2" font-family="Noto Sans CJK JP" font-size="16.00">実行中</text>
+</g>
+<g id="node2" class="node">
+<title>state1</title>
+<path fill="#fff3df" stroke="#b79b6a" d="M344.5,-157C344.5,-157 225.5,-157 225.5,-157 219.5,-157 213.5,-151 213.5,-145 213.5,-145 213.5,-127 213.5,-127 213.5,-121 219.5,-115 225.5,-115 225.5,-115 344.5,-115 344.5,-115 350.5,-115 356.5,-121 356.5,-127 356.5,-127 356.5,-145 356.5,-145 356.5,-151 350.5,-157 344.5,-157"/>
+<text text-anchor="middle" x="285" y="-132.2" font-family="Noto Sans CJK JP" font-size="16.00">状態確認が必要</text>
+</g>
+<g id="node3" class="node">
+<title>state2</title>
+<path fill="#edf2eb" stroke="#9fb7ae" d="M429,-264C429,-264 357,-264 357,-264 351,-264 345,-258 345,-252 345,-252 345,-234 345,-234 345,-228 351,-222 357,-222 357,-222 429,-222 429,-222 435,-222 441,-228 441,-234 441,-234 441,-252 441,-252 441,-258 435,-264 429,-264"/>
+<text text-anchor="middle" x="393" y="-239.2" font-family="Noto Sans CJK JP" font-size="16.00">停止待ち</text>
+</g>
+<g id="node4" class="node">
+<title>state3</title>
+<path fill="#edf2eb" stroke="#9fb7ae" d="M52,-46C52,-46 12,-46 12,-46 6,-46 0,-40 0,-34 0,-34 0,-16 0,-16 0,-10 6,-4 12,-4 12,-4 52,-4 52,-4 58,-4 64,-10 64,-16 64,-16 64,-34 64,-34 64,-40 58,-46 52,-46"/>
+<text text-anchor="middle" x="32" y="-21.2" font-family="Noto Sans CJK JP" font-size="16.00">中断</text>
+</g>
+<g id="node5" class="node">
+<title>state4</title>
+<path fill="#edf2eb" stroke="#9fb7ae" d="M221,-46C221,-46 181,-46 181,-46 175,-46 169,-40 169,-34 169,-34 169,-16 169,-16 169,-10 175,-4 181,-4 181,-4 221,-4 221,-4 227,-4 233,-10 233,-16 233,-16 233,-34 233,-34 233,-40 227,-46 221,-46"/>
+<path fill="none" stroke="#9fb7ae" d="M225,-50C225,-50 177,-50 177,-50 171,-50 165,-44 165,-38 165,-38 165,-12 165,-12 165,-6 171,0 177,0 177,0 225,0 225,0 231,0 237,-6 237,-12 237,-12 237,-38 237,-38 237,-44 231,-50 225,-50"/>
+<text text-anchor="middle" x="201" y="-21.2" font-family="Noto Sans CJK JP" font-size="16.00">完了</text>
+</g>
+<g id="node6" class="node">
+<title>state5</title>
+<path fill="#edf2eb" stroke="#9fb7ae" d="M390,-46C390,-46 350,-46 350,-46 344,-46 338,-40 338,-34 338,-34 338,-16 338,-16 338,-10 344,-4 350,-4 350,-4 390,-4 390,-4 396,-4 402,-10 402,-16 402,-16 402,-34 402,-34 402,-40 396,-46 390,-46"/>
+<text text-anchor="middle" x="370" y="-21.2" font-family="Noto Sans CJK JP" font-size="16.00">失敗</text>
+</g>
+<g id="node7" class="node">
+<title>state6</title>
+<path fill="#edf2eb" stroke="#9fb7ae" d="M575,-46C575,-46 503,-46 503,-46 497,-46 491,-40 491,-34 491,-34 491,-16 491,-16 491,-10 497,-4 503,-4 503,-4 575,-4 575,-4 581,-4 587,-10 587,-16 587,-16 587,-34 587,-34 587,-40 581,-46 575,-46"/>
+<text text-anchor="middle" x="539" y="-21.2" font-family="Noto Sans CJK JP" font-size="16.00">停止待ち</text>
+</g>
+</g>
+</svg>

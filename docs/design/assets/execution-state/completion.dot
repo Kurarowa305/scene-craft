@@ -1,0 +1,18 @@
+digraph G {
+  graph [rankdir=TB, bgcolor="transparent", pad="0.35", nodesep="0.4", ranksep="0.65", splines=spline, outputorder=edgesfirst];
+  node [shape=box, style="rounded,filled", color="#9fb7ae", fillcolor="#edf2eb", fontname="Noto Sans CJK JP", fontsize=16, margin="0.22,0.16"];
+  edge [color="#48716b", fontcolor="#233b37", fontname="Noto Sans CJK JP", fontsize=15, arrowsize=0.8, penwidth=1.4];
+  state0 [label="実行中"];
+  state1 [label="停止待ち"];
+  state2 [label="中断"];
+  state3 [label="確認待ち"];
+  state4 [label="失敗"];
+  state5 [label="完了", peripheries=2];
+  state0 -> state1 [id="transition-11", label="停止要求・上限・認証切れ"];
+  state1 -> state2 [id="transition-12", label="操作の停止を確認"];
+  state1 -> state3 [id="transition-13", label="判断待ちのため安\n全な停止を確認"];
+  state1 -> state4 [id="transition-14", label="障害で停止後に失敗を確認"];
+  state1 -> state5 [id="transition-15", label="依頼全体の完了を確認"];
+  state0 -> state5 [id="transition-16", label="終端・結果・保存を確認"];
+  state0 -> state4 [id="transition-17", label="失敗確定"];
+}
