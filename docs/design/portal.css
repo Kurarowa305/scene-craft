@@ -943,3 +943,40 @@ main h2 {
     min-width: 0;
   }
 }
+/* Procedural explanations and notes use hierarchy rather than card boxes. */
+.spec-list {
+  margin: 24px 0;
+  padding-left: 1.5em;
+  font-size: 14px;
+  line-height: 1.85;
+}
+.spec-list > .spec-list-item + .spec-list-item {
+  margin-top: 22px;
+}
+.spec-list-label {
+  font-weight: 400;
+}
+.spec-list-item > .spec-list-label {
+  display: block;
+  break-after: avoid;
+}
+.spec-list ul {
+  margin: 8px 0 0;
+  padding-left: 1.4em;
+}
+.spec-list ul > li + li {
+  margin-top: 0.5em;
+}
+.spec-list > li::marker,
+.spec-list ul > li::marker {
+  content: "・ ";
+}
+.spec-list .prototype-shot {
+  margin-top: 12px;
+}
+.spec-list .prototype-shot + .spec-list-details {
+  margin-top: 16px;
+}
+.spec-list-item > .spec-list-details {
+  overflow-wrap: anywhere;
+}

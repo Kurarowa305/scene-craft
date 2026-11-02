@@ -1,0 +1,374 @@
+[
+  {
+    "title": "処理内容",
+    "screenshot": "overview.png",
+    "example_index": 1,
+    "component": "list-item"
+  },
+  {
+    "title": "保護指定",
+    "screenshot": "tab-chooser.png",
+    "example_index": 2,
+    "component": "list-item"
+  },
+  {
+    "title": "処理内容",
+    "screenshot": "new-work.png",
+    "example_index": 3,
+    "component": "list-item"
+  },
+  {
+    "title": "記録",
+    "screenshot": "new-work.png",
+    "example_index": 4,
+    "component": "list-item"
+  },
+  {
+    "title": "モデル",
+    "screenshot": "composer.png",
+    "example_index": 5,
+    "component": "list-item"
+  },
+  {
+    "title": "依頼",
+    "screenshot": "preview.png",
+    "example_index": 6,
+    "component": "list-item"
+  },
+  {
+    "title": "保存状態",
+    "screenshot": "deleted-preview.png",
+    "example_index": 7,
+    "component": "list-item"
+  },
+  {
+    "title": "採用判断",
+    "screenshot": "adoption.png",
+    "example_index": 8,
+    "component": "list-item"
+  },
+  {
+    "title": "処理内容",
+    "screenshot": "adoption.png",
+    "example_index": 9,
+    "component": "list-item"
+  },
+  {
+    "title": "記録",
+    "screenshot": "attachments.png",
+    "example_index": 10,
+    "component": "list-item"
+  },
+  {
+    "title": "処理内容",
+    "screenshot": "attachments.png",
+    "example_index": 11,
+    "component": "list-item"
+  },
+  {
+    "title": "処理内容",
+    "screenshot": "missing-preview.png",
+    "example_index": 12,
+    "component": "list-item"
+  },
+  {
+    "title": "記録",
+    "screenshot": "preview.png",
+    "example_index": 13,
+    "component": "list-item"
+  },
+  {
+    "title": "適用条件",
+    "screenshot": "missing-preview.png",
+    "example_index": 14,
+    "component": "list-item"
+  },
+  {
+    "title": "採用判断",
+    "screenshot": "side-chat.png",
+    "example_index": 15,
+    "component": "list-item"
+  },
+  {
+    "title": "文脈",
+    "screenshot": "side-chat.png",
+    "example_index": 16,
+    "component": "list-item"
+  },
+  {
+    "title": "原文",
+    "screenshot": "side-stop.png",
+    "example_index": 17,
+    "component": "list-item"
+  },
+  {
+    "title": "参照",
+    "screenshot": "side-chat.png",
+    "example_index": 18,
+    "component": "list-item"
+  },
+  {
+    "title": "採用判断",
+    "screenshot": "history.png",
+    "example_index": 19,
+    "component": "list-item"
+  },
+  {
+    "title": "復元",
+    "screenshot": "restore.png",
+    "example_index": 20,
+    "component": "list-item"
+  },
+  {
+    "title": "派生",
+    "screenshot": "derive.png",
+    "example_index": 21,
+    "component": "list-item"
+  },
+  {
+    "title": "処理内容",
+    "screenshot": "deleted-preview.png",
+    "example_index": 22,
+    "component": "list-item"
+  },
+  {
+    "title": "保護指定",
+    "screenshot": "guards.png",
+    "example_index": 23,
+    "component": "list-item"
+  },
+  {
+    "title": "依頼",
+    "screenshot": "protection-conflict.png",
+    "example_index": 24,
+    "component": "list-item"
+  },
+  {
+    "title": "表示の優先順位",
+    "screenshot": "unknown.png",
+    "example_index": 25,
+    "component": "list-item"
+  },
+  {
+    "title": "チャットの詳細表示",
+    "screenshot": "running.png",
+    "example_index": 26,
+    "component": "list-item"
+  },
+  {
+    "title": "未解決の対象",
+    "screenshot": "unknown.png",
+    "example_index": 27,
+    "component": "list-item"
+  },
+  {
+    "title": "停止",
+    "screenshot": "running.png",
+    "example_index": 28,
+    "component": "list-item"
+  },
+  {
+    "title": "処理内容",
+    "screenshot": "stopped.png",
+    "example_index": 29,
+    "component": "list-item"
+  },
+  {
+    "title": "依頼",
+    "screenshot": "missing-preview.png",
+    "example_index": 30,
+    "component": "list-item"
+  },
+  {
+    "title": "Git参照",
+    "screenshot": "style.png",
+    "example_index": 31,
+    "component": "list-item"
+  },
+  {
+    "title": "設定",
+    "screenshot": "versions.png",
+    "example_index": 32,
+    "component": "list-item"
+  },
+  {
+    "title": "参照",
+    "screenshot": "style.png",
+    "example_index": 33,
+    "component": "list-item"
+  },
+  {
+    "title": "依頼",
+    "screenshot": "style.png",
+    "example_index": 34,
+    "component": "list-item"
+  },
+  {
+    "title": "処理内容",
+    "screenshot": "versions.png",
+    "example_index": 35,
+    "component": "list-item"
+  },
+  {
+    "title": "処理内容",
+    "screenshot": "reflection-picker.png",
+    "example_index": 36,
+    "component": "list-item"
+  },
+  {
+    "title": "採用判断",
+    "screenshot": "reflection-result.png",
+    "example_index": 37,
+    "component": "list-item"
+  },
+  {
+    "title": "設定の入口",
+    "screenshot": "backup.png",
+    "example_index": 38,
+    "component": "list-item"
+  },
+  {
+    "title": "保存データの操作",
+    "screenshot": "backup.png",
+    "example_index": 39,
+    "component": "list-item"
+  },
+  {
+    "title": "進捗表示",
+    "screenshot": "backup-result.png",
+    "example_index": 40,
+    "component": "list-item"
+  },
+  {
+    "title": "Git設定",
+    "screenshot": "versions.png",
+    "example_index": 41,
+    "component": "list-item"
+  },
+  {
+    "title": "モデル",
+    "screenshot": "versions.png",
+    "example_index": 42,
+    "component": "list-item"
+  },
+  {
+    "title": "設定",
+    "screenshot": "offline.png",
+    "example_index": 43,
+    "component": "list-item"
+  },
+  {
+    "title": "バックアップ",
+    "screenshot": "backup.png",
+    "example_index": 44,
+    "component": "list-item"
+  },
+  {
+    "title": "記録",
+    "screenshot": "backup-busy.png",
+    "example_index": 45,
+    "component": "list-item"
+  },
+  {
+    "title": "認証",
+    "screenshot": "backup-restore.png",
+    "example_index": 46,
+    "component": "list-item"
+  },
+  {
+    "title": "処理内容",
+    "screenshot": "migration.png",
+    "example_index": 47,
+    "component": "list-item"
+  },
+  {
+    "title": "復元",
+    "screenshot": "delete-confirm.png",
+    "example_index": 48,
+    "component": "list-item"
+  },
+  {
+    "title": "参照",
+    "screenshot": "deleted-preview.png",
+    "example_index": 49,
+    "component": "list-item"
+  },
+  {
+    "title": "作品開始・既存データ取り込み",
+    "screenshot": "new-chat.png",
+    "example_index": 50,
+    "component": "card"
+  },
+  {
+    "title": "案の確認・部分採用",
+    "screenshot": "adoption.png",
+    "example_index": 51,
+    "component": "card"
+  },
+  {
+    "title": "候補のAI修正・手修正の継続",
+    "screenshot": "manual-record.png",
+    "example_index": 52,
+    "component": "card"
+  },
+  {
+    "title": "作業方法の相談",
+    "screenshot": "side-chat.png",
+    "example_index": 53,
+    "component": "card"
+  },
+  {
+    "title": "プレビューのない手作業記録",
+    "screenshot": "missing-preview.png",
+    "example_index": 54,
+    "component": "card"
+  },
+  {
+    "title": "理由・要約の訂正",
+    "screenshot": "amend-reason.png",
+    "example_index": 55,
+    "component": "card"
+  },
+  {
+    "title": "保護の競合・削除",
+    "screenshot": "protection-conflict.png",
+    "example_index": 56,
+    "component": "card"
+  },
+  {
+    "title": "停止・再開・状態不明",
+    "screenshot": "stopped.png",
+    "example_index": 57,
+    "component": "card"
+  },
+  {
+    "title": "過去状態への復元・派生",
+    "screenshot": "restore.png",
+    "example_index": 58,
+    "component": "card"
+  },
+  {
+    "title": "振り返り・制作方針の更新",
+    "screenshot": "reflection-result.png",
+    "example_index": 59,
+    "component": "card"
+  },
+  {
+    "title": "版の欠損・リモート未保存",
+    "screenshot": "versions.png",
+    "example_index": 60,
+    "component": "card"
+  },
+  {
+    "title": "利用上限・認証待ち",
+    "screenshot": "offline.png",
+    "example_index": 61,
+    "component": "card"
+  },
+  {
+    "title": "実体削除・バックアップ・移行",
+    "screenshot": "saved-data.png",
+    "example_index": 62,
+    "component": "card"
+  }
+]

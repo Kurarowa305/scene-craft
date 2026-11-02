@@ -176,7 +176,7 @@
               2-1. 候補と実際の取り込みに残す情報
             </h3>
             <div class="contract-cards">
-              <article class="contract-card" aria-label="検索">
+              <article aria-label="検索" class="contract-card">
                 <p class="contract-card-title">検索</p>
                 <dl>
                   <dt>記録する内容</dt>
@@ -190,7 +190,7 @@
                   </dd>
                 </dl>
               </article>
-              <article class="contract-card" aria-label="候補共通">
+              <article aria-label="候補共通" class="contract-card">
                 <p class="contract-card-title">候補共通</p>
                 <dl>
                   <dt>記録する内容</dt>
@@ -208,7 +208,7 @@
                   </dd>
                 </dl>
               </article>
-              <article class="contract-card" aria-label="素材候補">
+              <article aria-label="素材候補" class="contract-card">
                 <p class="contract-card-title">素材候補</p>
                 <dl>
                   <dt>記録する内容</dt>
@@ -218,7 +218,7 @@
                   </dd>
                 </dl>
               </article>
-              <article class="contract-card" aria-label="人間の選択">
+              <article aria-label="人間の選択" class="contract-card">
                 <p class="contract-card-title">人間の選択</p>
                 <dl>
                   <dt>記録する内容</dt>
@@ -232,7 +232,7 @@
                   </dd>
                 </dl>
               </article>
-              <article class="contract-card" aria-label="取得・取り込み">
+              <article aria-label="取得・取り込み" class="contract-card">
                 <p class="contract-card-title">取得・取り込み</p>
                 <dl>
                   <dt>記録する内容</dt>
@@ -249,86 +249,67 @@
                   </dd>
                 </dl>
               </article>
-              <article class="contract-card" aria-label="記録">
-                <p class="contract-card-title">記録</p>
-                <dl>
-                  <dt>仕様</dt>
-                  <dd>
-                    <ul class="cell-list">
-                      <li>作者・容量等が分からない場合は不明と記録する。</li>
-                      <li>
-                        利用条件が不明な場合は、他の項目が揃っていても取り込みを保留する。
-                      </li>
-                      <li>取得した実体と依存素材をハッシュで固定する。</li>
-                    </ul>
-                    <div class="contract-detail">
-                      <ul class="cell-list">
-                        <li>
-                          検索・参考資料の選択は会話・出典の記録として保存する。
-                        </li>
-                        <li>具体的なテーブル分割は実装仕様へ引き継ぐ。</li>
-                      </ul>
-                    </div>
-                  </dd>
-                </dl>
-              </article>
             </div>
+            <ul class="spec-list">
+              <li class="spec-list-item" data-spec-title="記録">
+                <span class="spec-list-label">記録</span>
+                <ul class="spec-list-details">
+                  <li>作者・容量等が分からない場合は不明と記録する。</li>
+                  <li>
+                    利用条件が不明な場合は、他の項目が揃っていても取り込みを保留する。
+                  </li>
+                  <li>取得した実体と依存素材をハッシュで固定する。</li>
+                  <li>
+                    検索・参考資料の選択は会話・出典の記録として保存する。
+                  </li>
+                  <li>具体的なテーブル分割は実装仕様へ引き継ぐ。</li>
+                </ul>
+              </li>
+            </ul>
           </section>
           <section
             aria-labelledby="プレビューと参考画像の保存"
             class="spec-subsection"
           >
             <h3 id="プレビューと参考画像の保存">2-2. 参考画像の保存</h3>
-            <div class="contract-cards">
-              <article class="contract-card" aria-label="出典">
-                <p class="contract-card-title">出典</p>
-                <dl>
-                  <dt>仕様</dt>
-                  <dd>
+            <ul class="spec-list">
+              <li class="spec-list-item" data-spec-title="出典">
+                <span class="spec-list-label">出典</span>
+                <ul class="spec-list-details">
+                  <li>
                     プレビューの出典と、制作へ取り込むファイルの出典・利用条件を区別する。
-                  </dd>
-                </dl>
-              </article>
-              <article class="contract-card" aria-label="保存条件">
-                <p class="contract-card-title">保存条件</p>
-                <dl>
-                  <dt>仕様</dt>
-                  <dd>
-                    <ul class="cell-list">
-                      <li>
-                        一般Webの参考画像は、保存できる条件を確認できたものを管理下へコピーする。
-                      </li>
-                      <li>
-                        保存可否が不明なら出典URL・参考要素・制作意図との関係と、画像の可用性を記録する。
-                      </li>
-                    </ul>
-                  </dd>
-                </dl>
-              </article>
-              <article class="contract-card" aria-label="記録保持">
-                <p class="contract-card-title">記録保持</p>
-                <dl>
-                  <dt>仕様</dt>
-                  <dd>
-                    <ul class="cell-list">
-                      <li>
-                        リンク切れや画像の欠落が起きても文章と当時の選択の記録は残す。
-                      </li>
-                      <li>当時の参考資料と出典を保持する。</li>
-                    </ul>
-                  </dd>
-                </dl>
-              </article>
-              <article class="contract-card" aria-label="素材への用途変更">
-                <p class="contract-card-title">素材への用途変更</p>
-                <dl>
-                  <dt>仕様</dt>
-                  <dd>
+                  </li>
+                </ul>
+              </li>
+              <li class="spec-list-item" data-spec-title="保存条件">
+                <span class="spec-list-label">保存条件</span>
+                <ul class="spec-list-details">
+                  <li>
+                    一般Webの参考画像は、保存できる条件を確認できたものを管理下へコピーする。
+                  </li>
+                  <li>
+                    保存可否が不明なら出典URL・参考要素・制作意図との関係と、画像の可用性を記録する。
+                  </li>
+                </ul>
+              </li>
+              <li class="spec-list-item" data-spec-title="記録保持">
+                <span class="spec-list-label">記録保持</span>
+                <ul class="spec-list-details">
+                  <li>
+                    リンク切れや画像の欠落が起きても文章と当時の選択の記録は残す。
+                  </li>
+                  <li>当時の参考資料と出典を保持する。</li>
+                </ul>
+              </li>
+              <li class="spec-list-item" data-spec-title="素材への用途変更">
+                <span class="spec-list-label">素材への用途変更</span>
+                <ul class="spec-list-details">
+                  <li>
                     役割を変えて取り込む際は素材としての利用条件を確認する。
-                  </dd>
-                </dl>
-              </article>
-            </div>
+                  </li>
+                </ul>
+              </li>
+            </ul>
           </section>
         </section>
         <section aria-labelledby="対応形式と品質" class="spec-section">
@@ -339,7 +320,7 @@
           ></span>
           <h2 id="対応形式と品質">3. 取得条件</h2>
           <div class="contract-cards">
-            <article class="contract-card" aria-label="3D">
+            <article aria-label="3D" class="contract-card">
               <p class="contract-card-title">3D</p>
               <dl>
                 <dt>初期の対象と契約</dt>
@@ -352,7 +333,7 @@
                 </dd>
               </dl>
             </article>
-            <article class="contract-card" aria-label="画像">
+            <article aria-label="画像" class="contract-card">
               <p class="contract-card-title">画像</p>
               <dl>
                 <dt>初期の対象と契約</dt>
@@ -361,22 +342,24 @@
                 </dd>
               </dl>
             </article>
-            <article class="contract-card" aria-label="取得品質">
-              <p class="contract-card-title">取得品質</p>
-              <dl>
-                <dt>初期の対象と契約</dt>
-                <dd>
-                  <ul class="cell-list">
+          </div>
+          <ul class="spec-list">
+            <li class="spec-list-item" data-spec-title="取得品質">
+              <span class="spec-list-label">取得品質</span>
+              <ul class="spec-list-details">
+                <li>
+                  <span class="spec-list-label">初期の対象と契約</span>
+                  <ul class="spec-list-details">
                     <li>テクスチャは2K、HDRIは4Kを既定とする。</li>
                     <li>
                       取得前に形式・解像度・容量を提示し、会話で変更できる。
                     </li>
                     <li>実際に選んだ品質を保存する 。</li>
                   </ul>
-                </dd>
-              </dl>
-            </article>
-          </div>
+                </li>
+              </ul>
+            </li>
+          </ul>
           <p>
             既定の品質が提供されていない場合も、選べるものを示す。拡張子が対象でも、追加アドオンが必要な素材や読めない内容は保留し、原因を示す。対応形式の設計上の採用と、現在のWindows
             Blenderでの検証済みを区別する。
@@ -602,26 +585,24 @@
         </section>
         <section aria-labelledby="検索と制作操作の境界" class="spec-section">
           <h2 id="検索と制作操作の境界">6. 検索と制作操作の境界</h2>
-          <div class="contract-cards">
-            <article class="contract-card" aria-label="処理の担当">
-              <p class="contract-card-title">処理の担当</p>
-              <dl>
-                <dt>仕様</dt>
-                <dd>
+          <ul class="spec-list">
+            <li class="spec-list-item" data-spec-title="処理の担当">
+              <span class="spec-list-label">処理の担当</span>
+              <ul class="spec-list-details">
+                <li>
                   一般Web検索・画像参照・ツール呼び出しと、scene-craftによる出典・利用条件の記録・サービス別取得・管理下コピー・Blender取り込みを区別する。
-                </dd>
-              </dl>
-            </article>
-            <article class="contract-card" aria-label="取得APIの運用">
-              <p class="contract-card-title">取得APIの運用</p>
-              <dl>
-                <dt>仕様</dt>
-                <dd>
+                </li>
+              </ul>
+            </li>
+            <li class="spec-list-item" data-spec-title="取得APIの運用">
+              <span class="spec-list-label">取得APIの運用</span>
+              <ul class="spec-list-details">
+                <li>
                   具体的なAPIページング・キャッシュ・アクセス間隔・ファイル選択規則は、採用した条件と利用者の選択を維持する形で定める。
-                </dd>
-              </dl>
-            </article>
-          </div>
+                </li>
+              </ul>
+            </li>
+          </ul>
         </section>
         <section class="sources">
           <h2 id="sources">7. 詳細資料</h2>

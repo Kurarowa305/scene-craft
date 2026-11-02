@@ -94,132 +94,94 @@
         </nav>
         <section aria-labelledby="制作時の使い方" class="spec-section">
           <h2 id="制作時の使い方">1. 制作時の使い方</h2>
-          <div class="contract-cards">
-            <article class="contract-card" aria-label="編集案">
-              <p class="contract-card-title">編集案</p>
-              <dl>
-                <dt>仕様</dt>
-                <dd>
-                  <ul class="cell-list">
-                    <li>
-                      保存した制作データを入力として、元の制作データと分けた編集案を作る。
-                    </li>
-                    <li>人間は結果を Blender で開いて確認する。</li>
-                  </ul>
-                </dd>
-              </dl>
-            </article>
-            <article class="contract-card" aria-label="レンダー形式">
-              <p class="contract-card-title">レンダー形式</p>
-              <dl>
-                <dt>仕様</dt>
-                <dd>
-                  <ul class="cell-list">
-                    <li>
-                      初期構築のレンダー出力は、シーン全体に対する後述の13種類のレイヤーに限定する。
-                    </li>
-                    <li>
-                      形式は16 bit
-                      RGBのPSD（上限超過時はPSB）、色空間はsRGBとする。
-                    </li>
-                    <li>各パスの意味は後述の表に従う。</li>
-                    <li>表示用の変換規約は後述の出力契約に従う。</li>
-                  </ul>
-                </dd>
-              </dl>
-            </article>
-            <article class="contract-card" aria-label="植物配置">
-              <p class="contract-card-title">植物配置</p>
-              <dl>
-                <dt>仕様</dt>
-                <dd>
-                  <ul class="cell-list">
-                    <li>
-                      植物などの配置は密度・範囲などをまとめて調整でき、必要な個体を取り出して手修正できる方針とする。
-                    </li>
-                    <li>取り出した個体は元の分布から除外する。</li>
-                    <li>具体的なノード構成は実装仕様で検証する。</li>
-                  </ul>
-                </dd>
-              </dl>
-            </article>
-            <article class="contract-card" aria-label="ID画像">
-              <p class="contract-card-title">ID画像</p>
-              <dl>
-                <dt>仕様</dt>
-                <dd>
-                  <ul class="cell-list">
-                    <li>
-                      Material ID と Object ID
-                      は、それぞれ材質・物体ごとに異なる色で塗り分けた画像とする。
-                    </li>
-                    <li>
-                      成分出力は Photoshop
-                      での色調整・描き足しの使いやすさを優先する。
-                    </li>
-                  </ul>
-                </dd>
-              </dl>
-            </article>
-            <article class="contract-card" aria-label="パス処理">
-              <p class="contract-card-title">パス処理</p>
-              <dl>
-                <dt>仕様</dt>
-                <dd>
-                  <ul class="cell-list">
-                    <li>
-                      Blender
-                      標準のマルチパス機能で目的を満たせるなら、その機能に合わせる。
-                    </li>
-                    <li>分離・書き出しは通常プログラムが担当する。</li>
-                    <li>
-                      標準機能で満たす具体的な出力の組み合わせは、下記の制約を踏まえて確認する。
-                    </li>
-                  </ul>
-                </dd>
-              </dl>
-            </article>
-            <article class="contract-card" aria-label="レンダー停止">
-              <p class="contract-card-title">レンダー停止</p>
-              <dl>
-                <dt>仕様</dt>
-                <dd>
-                  <ul class="cell-list">
-                    <li>長いレンダーの停止では現在のレンダーも中断する。</li>
-                    <li>
-                      レンダー前に保存した制作データと完成済みの出力は残し、中断した画像は人間の再開指示後に作り直す。
-                    </li>
-                    <li>
-                      小さな検証では保存後の所有プロセスを強制終了できた。
-                    </li>
-                    <li>製品の停止・完成判定の契約は後述する。</li>
-                    <li>
-                      応答時間と異常系の実機確認は実行状態・受け入れ設計へ引き継ぐ。
-                    </li>
-                  </ul>
-                </dd>
-              </dl>
-            </article>
-            <article class="contract-card" aria-label="影の用途">
-              <p class="contract-card-title">影の用途</p>
-              <dl>
-                <dt>仕様</dt>
-                <dd>
-                  <ul class="cell-list">
-                    <li>
-                      Diffuse Lighting
-                      は影による暗さを含む陰影付きの出力とし、Shadows
-                      は影部分の選択・補助調整に使う。
-                    </li>
-                    <li>
-                      ShadowsはCycles標準のShadow
-                      Catcherを使い、人間が指定した地面・壁などの受け面を対象とする。
-                    </li>
-                  </ul>
-                </dd>
-              </dl>
-            </article>
-          </div>
+          <ul class="spec-list">
+            <li class="spec-list-item" data-spec-title="編集案">
+              <span class="spec-list-label">編集案</span>
+              <ul class="spec-list-details">
+                <li>
+                  保存した制作データを入力として、元の制作データと分けた編集案を作る。
+                </li>
+                <li>人間は結果を Blender で開いて確認する。</li>
+              </ul>
+            </li>
+            <li class="spec-list-item" data-spec-title="レンダー形式">
+              <span class="spec-list-label">レンダー形式</span>
+              <ul class="spec-list-details">
+                <li>
+                  初期構築のレンダー出力は、シーン全体に対する後述の13種類のレイヤーに限定する。
+                </li>
+                <li>
+                  形式は16 bit RGBのPSD（上限超過時はPSB）、色空間はsRGBとする。
+                </li>
+                <li>各パスの意味は後述の表に従う。</li>
+                <li>表示用の変換規約は後述の出力契約に従う。</li>
+              </ul>
+            </li>
+            <li class="spec-list-item" data-spec-title="植物配置">
+              <span class="spec-list-label">植物配置</span>
+              <ul class="spec-list-details">
+                <li>
+                  植物などの配置は密度・範囲などをまとめて調整でき、必要な個体を取り出して手修正できる方針とする。
+                </li>
+                <li>取り出した個体は元の分布から除外する。</li>
+                <li>具体的なノード構成は実装仕様で検証する。</li>
+              </ul>
+            </li>
+            <li class="spec-list-item" data-spec-title="ID画像">
+              <span class="spec-list-label">ID画像</span>
+              <ul class="spec-list-details">
+                <li>
+                  Material ID と Object ID
+                  は、それぞれ材質・物体ごとに異なる色で塗り分けた画像とする。
+                </li>
+                <li>
+                  成分出力は Photoshop
+                  での色調整・描き足しの使いやすさを優先する。
+                </li>
+              </ul>
+            </li>
+            <li class="spec-list-item" data-spec-title="パス処理">
+              <span class="spec-list-label">パス処理</span>
+              <ul class="spec-list-details">
+                <li>
+                  Blender
+                  標準のマルチパス機能で目的を満たせるなら、その機能に合わせる。
+                </li>
+                <li>分離・書き出しは通常プログラムが担当する。</li>
+                <li>
+                  標準機能で満たす具体的な出力の組み合わせは、下記の制約を踏まえて確認する。
+                </li>
+              </ul>
+            </li>
+            <li class="spec-list-item" data-spec-title="レンダー停止">
+              <span class="spec-list-label">レンダー停止</span>
+              <ul class="spec-list-details">
+                <li>長いレンダーの停止では現在のレンダーも中断する。</li>
+                <li>
+                  レンダー前に保存した制作データと完成済みの出力は残し、中断した画像は人間の再開指示後に作り直す。
+                </li>
+                <li>小さな検証では保存後の所有プロセスを強制終了できた。</li>
+                <li>製品の停止・完成判定の契約は後述する。</li>
+                <li>
+                  応答時間と異常系の実機確認は実行状態・受け入れ設計へ引き継ぐ。
+                </li>
+              </ul>
+            </li>
+            <li class="spec-list-item" data-spec-title="影の用途">
+              <span class="spec-list-label">影の用途</span>
+              <ul class="spec-list-details">
+                <li>
+                  Diffuse Lighting
+                  は影による暗さを含む陰影付きの出力とし、Shadows
+                  は影部分の選択・補助調整に使う。
+                </li>
+                <li>
+                  ShadowsはCycles標準のShadow
+                  Catcherを使い、人間が指定した地面・壁などの受け面を対象とする。
+                </li>
+              </ul>
+            </li>
+          </ul>
           <p>
             人間とAIは制作データを交互に編集する。編集案の採否と、Photoshopへの読み込み・レイヤー整理・レタッチ・保存は人間が行う。
           </p>
@@ -229,155 +191,111 @@
           class="spec-section"
         >
           <h2 id="採用する操作経路と確認範囲">2. Blenderの操作経路</h2>
-          <div class="contract-cards">
-            <article class="contract-card" aria-label="採用判断">
-              <p class="contract-card-title">採用判断</p>
-              <dl>
-                <dt>仕様</dt>
-                <dd>
-                  <ul class="cell-list">
-                    <li>
-                      Windows Blender
-                      をバックグラウンドで起動し、保存済み入力から Python
-                      スクリプトで編集案とレンダーを作る経路を採用する。
-                    </li>
-                    <li>
-                      保存済みの入力をWindows Blenderのbackground処理へ渡す。
-                    </li>
-                  </ul>
-                </dd>
-              </dl>
-            </article>
-            <article class="contract-card" aria-label="処理内容">
-              <p class="contract-card-title">処理内容</p>
-              <dl>
-                <dt>仕様</dt>
-                <dd>
-                  <ul class="cell-list">
-                    <li>
-                      Blender 5.2.2
-                      LTSを既存の導入版とし、実行時に使用する版・機能・依存を検査する。
-                    </li>
-                    <li>実行ファイルの所在は環境設定で解決する。</li>
-                  </ul>
-                  <div class="contract-detail">
-                    <ul class="cell-list">
-                      <li>プロセス終了と成果物の完成は別に判定する。</li>
-                      <li>アプリが所有するBlenderプロセスを対象に終了する。</li>
-                    </ul>
-                  </div>
-                </dd>
-              </dl>
-            </article>
-          </div>
+          <ul class="spec-list">
+            <li class="spec-list-item" data-spec-title="採用判断">
+              <span class="spec-list-label">採用判断</span>
+              <ul class="spec-list-details">
+                <li>
+                  Windows Blender をバックグラウンドで起動し、保存済み入力から
+                  Python スクリプトで編集案とレンダーを作る経路を採用する。
+                </li>
+                <li>保存済みの入力をWindows Blenderのbackground処理へ渡す。</li>
+              </ul>
+            </li>
+            <li class="spec-list-item" data-spec-title="処理内容">
+              <span class="spec-list-label">処理内容</span>
+              <ul class="spec-list-details">
+                <li>
+                  Blender 5.2.2
+                  LTSを既存の導入版とし、実行時に使用する版・機能・依存を検査する。
+                </li>
+                <li>実行ファイルの所在は環境設定で解決する。</li>
+                <li>プロセス終了と成果物の完成は別に判定する。</li>
+                <li>アプリが所有するBlenderプロセスを対象に終了する。</li>
+              </ul>
+            </li>
+          </ul>
 
           <section
             aria-labelledby="標準レンダー機能の利用"
             class="spec-subsection"
           >
             <h3 id="標準レンダー機能の利用">2-1. 標準レンダー機能の利用</h3>
-            <div class="contract-cards">
-              <article class="contract-card" aria-label="レンダー機能">
-                <p class="contract-card-title">レンダー機能</p>
-                <dl>
-                  <dt>仕様</dt>
-                  <dd>
+            <ul class="spec-list">
+              <li class="spec-list-item" data-spec-title="レンダー機能">
+                <span class="spec-list-label">レンダー機能</span>
+                <ul class="spec-list-details">
+                  <li>
                     CyclesのRender Passesを使い、Shadowsは指定受け面の標準Shadow
                     Catcherとする。
-                  </dd>
-                </dl>
-              </article>
-              <article class="contract-card" aria-label="レイヤー変換">
-                <p class="contract-card-title">レイヤー変換</p>
-                <dl>
-                  <dt>仕様</dt>
-                  <dd>
+                  </li>
+                </ul>
+              </li>
+              <li class="spec-list-item" data-spec-title="レイヤー変換">
+                <span class="spec-list-label">レイヤー変換</span>
+                <ul class="spec-list-details">
+                  <li>
                     Material color、光・反射、空を除くGlobal Alpha
                     Maskは、以下のレイヤー定義と変換規約に従う。
-                  </dd>
-                </dl>
-              </article>
-              <article class="contract-card" aria-label="出力単位">
-                <p class="contract-card-title">出力単位</p>
-                <dl>
-                  <dt>仕様</dt>
-                  <dd>
-                    <ul class="cell-list">
-                      <li>出力の単位はシーン全体とする。</li>
-                      <li>
-                        ID の色分けは見えている物体・材質を識別するために使う。
-                      </li>
-                    </ul>
-                  </dd>
-                </dl>
-              </article>
-              <article class="contract-card" aria-label="Render Passes">
-                <p class="contract-card-title">Render Passes</p>
-                <dl>
-                  <dt>仕様</dt>
-                  <dd>
-                    <ul class="cell-list">
-                      <li>成分の分離には Render Passes を使う。</li>
-                      <li>
-                        Cycles では Diffuse／Glossy／Transmission の
-                        Color・Direct・Indirect、Volume、Emission などがある。
-                      </li>
-                      <li>使う成分だけを指定する。</li>
-                    </ul>
-                  </dd>
-                </dl>
-              </article>
-              <article class="contract-card" aria-label="Shadow Catcher">
-                <p class="contract-card-title">Shadow Catcher</p>
-                <dl>
-                  <dt>仕様</dt>
-                  <dd>
-                    <ul class="cell-list">
-                      <li>
-                        Cycles の Shadow Catcher
-                        は指定した受け側で影を扱うための機能であり、物体の陰影全体を別レイヤーへ移す機能とは区別する。
-                      </li>
-                      <li>EEVEE の Shadow パスとも仕様が異なる。</li>
-                    </ul>
-                  </dd>
-                </dl>
-              </article>
-              <article class="contract-card" aria-label="EXR出力">
-                <p class="contract-card-title">EXR出力</p>
-                <dl>
-                  <dt>仕様</dt>
-                  <dd>
-                    <ul class="cell-list">
-                      <li>
-                        File Output ノードでパスを個別ファイル、または
-                        Multi-Layer OpenEXR として保存できる。
-                      </li>
-                      <li>
-                        初期要件に従い、Photoshop
-                        への読み込みとレイヤー整理は人間が行う。
-                      </li>
-                    </ul>
-                  </dd>
-                </dl>
-              </article>
-              <article class="contract-card" aria-label="設定の反映">
-                <p class="contract-card-title">設定の反映</p>
-                <dl>
-                  <dt>仕様</dt>
-                  <dd>
-                    <ul class="cell-list">
-                      <li>
-                        通常のプログラムが指定済みの対象・パス・出力設定から
-                        Blender の設定と書き出しを実行する。
-                      </li>
-                      <li>
-                        標準機能で表せない分離要求は未対応または追加設計として示す。
-                      </li>
-                    </ul>
-                  </dd>
-                </dl>
-              </article>
-            </div>
+                  </li>
+                </ul>
+              </li>
+              <li class="spec-list-item" data-spec-title="出力単位">
+                <span class="spec-list-label">出力単位</span>
+                <ul class="spec-list-details">
+                  <li>出力の単位はシーン全体とする。</li>
+                  <li>
+                    ID の色分けは見えている物体・材質を識別するために使う。
+                  </li>
+                </ul>
+              </li>
+              <li class="spec-list-item" data-spec-title="Render Passes">
+                <span class="spec-list-label">Render Passes</span>
+                <ul class="spec-list-details">
+                  <li>成分の分離には Render Passes を使う。</li>
+                  <li>
+                    Cycles では Diffuse／Glossy／Transmission の
+                    Color・Direct・Indirect、Volume、Emission などがある。
+                  </li>
+                  <li>使う成分だけを指定する。</li>
+                </ul>
+              </li>
+              <li class="spec-list-item" data-spec-title="Shadow Catcher">
+                <span class="spec-list-label">Shadow Catcher</span>
+                <ul class="spec-list-details">
+                  <li>
+                    Cycles の Shadow Catcher
+                    は指定した受け側で影を扱うための機能であり、物体の陰影全体を別レイヤーへ移す機能とは区別する。
+                  </li>
+                  <li>EEVEE の Shadow パスとも仕様が異なる。</li>
+                </ul>
+              </li>
+              <li class="spec-list-item" data-spec-title="EXR出力">
+                <span class="spec-list-label">EXR出力</span>
+                <ul class="spec-list-details">
+                  <li>
+                    File Output ノードでパスを個別ファイル、または Multi-Layer
+                    OpenEXR として保存できる。
+                  </li>
+                  <li>
+                    初期要件に従い、Photoshop
+                    への読み込みとレイヤー整理は人間が行う。
+                  </li>
+                </ul>
+              </li>
+              <li class="spec-list-item" data-spec-title="設定の反映">
+                <span class="spec-list-label">設定の反映</span>
+                <ul class="spec-list-details">
+                  <li>
+                    通常のプログラムが指定済みの対象・パス・出力設定から Blender
+                    の設定と書き出しを実行する。
+                  </li>
+                  <li>
+                    標準機能で表せない分離要求は未対応または追加設計として示す。
+                  </li>
+                </ul>
+              </li>
+            </ul>
           </section>
         </section>
         <section aria-labelledby="レタッチ用レイヤー" class="spec-section">
@@ -509,66 +427,56 @@
               </tbody>
             </table>
           </div>
-          <div class="contract-cards">
-            <article class="contract-card" aria-label="出力">
-              <p class="contract-card-title">出力</p>
-              <dl>
-                <dt>仕様</dt>
-                <dd>出力はシーン全体の13種類に限定する。</dd>
-              </dl>
-            </article>
-            <article class="contract-card" aria-label="処理内容">
-              <p class="contract-card-title">処理内容</p>
-              <dl>
-                <dt>仕様</dt>
-                <dd>
+          <ul class="spec-list">
+            <li class="spec-list-item" data-spec-title="出力">
+              <span class="spec-list-label">出力</span>
+              <ul class="spec-list-details">
+                <li>出力はシーン全体の13種類に限定する。</li>
+              </ul>
+            </li>
+            <li class="spec-list-item" data-spec-title="処理内容">
+              <span class="spec-list-label">処理内容</span>
+              <ul class="spec-list-details">
+                <li>
                   パス取得・ID可視化・数式合成・深度変換・書き出しは通常プログラムが担当する。
-                </dd>
-              </dl>
-            </article>
-          </div>
+                </li>
+              </ul>
+            </li>
+          </ul>
 
           <section aria-labelledby="psd-への引き渡し" class="spec-subsection">
             <h3 id="psd-への引き渡し">3-1. PSD への引き渡し</h3>
+            <ul class="spec-list">
+              <li class="spec-list-item" data-spec-title="処理内容">
+                <span class="spec-list-label">処理内容</span>
+                <ul class="spec-list-details">
+                  <li>
+                    利用者は13種類を名前付きの画像レイヤーとして一つの16 bit RGB
+                    PSDにまとめる方式を承認した。
+                  </li>
+                  <li>
+                    初期表示は統合レイヤーだけを表示し、残り12種類は非表示とする。
+                  </li>
+                  <li>方式の採用と実機検証の完了は区別する。</li>
+                </ul>
+              </li>
+              <li class="spec-list-item" data-spec-title="出力">
+                <span class="spec-list-label">出力</span>
+                <ul class="spec-list-details">
+                  <li>
+                    Blender でパスを出力した後、通常のプログラムで PSD
+                    を新規生成する。
+                  </li>
+                  <li>人間が成果物を開いてレタッチする流れとする。</li>
+                  <li>
+                    PSD 内に出力画像を配置する処理と、Photoshop
+                    で人間が行うその後の編集を区別する。
+                  </li>
+                </ul>
+              </li>
+            </ul>
             <div class="contract-cards">
-              <article class="contract-card" aria-label="処理内容">
-                <p class="contract-card-title">処理内容</p>
-                <dl>
-                  <dt>仕様</dt>
-                  <dd>
-                    <ul class="cell-list">
-                      <li>
-                        利用者は13種類を名前付きの画像レイヤーとして一つの16 bit
-                        RGB PSDにまとめる方式を承認した。
-                      </li>
-                      <li>
-                        初期表示は統合レイヤーだけを表示し、残り12種類は非表示とする。
-                      </li>
-                      <li>方式の採用と実機検証の完了は区別する。</li>
-                    </ul>
-                  </dd>
-                </dl>
-              </article>
-              <article class="contract-card" aria-label="出力">
-                <p class="contract-card-title">出力</p>
-                <dl>
-                  <dt>仕様</dt>
-                  <dd>
-                    <ul class="cell-list">
-                      <li>
-                        Blender でパスを出力した後、通常のプログラムで PSD
-                        を新規生成する。
-                      </li>
-                      <li>人間が成果物を開いてレタッチする流れとする。</li>
-                      <li>
-                        PSD 内に出力画像を配置する処理と、Photoshop
-                        で人間が行うその後の編集を区別する。
-                      </li>
-                    </ul>
-                  </dd>
-                </dl>
-              </article>
-              <article class="contract-card" aria-label="レイヤー構成">
+              <article aria-label="レイヤー構成" class="contract-card">
                 <p class="contract-card-title">レイヤー構成</p>
                 <dl>
                   <dt>仕様</dt>
@@ -582,7 +490,7 @@
                   </dd>
                 </dl>
               </article>
-              <article class="contract-card" aria-label="画像形式">
+              <article aria-label="画像形式" class="contract-card">
                 <p class="contract-card-title">画像形式</p>
                 <dl>
                   <dt>仕様</dt>
@@ -601,40 +509,7 @@
                   </dd>
                 </dl>
               </article>
-              <article class="contract-card" aria-label="変換処理">
-                <p class="contract-card-title">変換処理</p>
-                <dl>
-                  <dt>仕様</dt>
-                  <dd>
-                    <ul class="cell-list">
-                      <li>
-                        2026-10-31の<a
-                          href="https://github.com/Kurarowa305/scene-craft/blob/main/docs/research/psd16-conversion-validation.md"
-                          rel="noopener noreferrer"
-                          target="_blank"
-                          >実EXR変換検証</a
-                        >に基づき、PhotoshopAPI 0.9.1でレイヤーを書き、psd-tools
-                        1.24.0で期待する名称を設定し直し、変換済みCombinedをmerged
-                        imageへ直接格納する方式を採用する。
-                      </li>
-                      <li>
-                        psd-toolsの内部APIを使うため版を固定し、更新時は再検証する。
-                      </li>
-                      <li>
-                        一時ファイルを再読込して全レイヤー・merged
-                        image・ICCを検証してから完成として公開する。
-                      </li>
-                      <li>
-                        小さなCycles実出力からの13種類の変換とPSD/PSBでの16bit値保持は確認済み。
-                      </li>
-                      <li>
-                        Photoshop実機の表示・編集、大容量の実動作は未確認。
-                      </li>
-                    </ul>
-                  </dd>
-                </dl>
-              </article>
-              <article class="contract-card" aria-label="PSB切替">
+              <article aria-label="PSB切替" class="contract-card">
                 <p class="contract-card-title">PSB切替</p>
                 <dl>
                   <dt>仕様</dt>
@@ -650,23 +525,46 @@
                   </dd>
                 </dl>
               </article>
-              <article class="contract-card" aria-label="確認項目">
-                <p class="contract-card-title">確認項目</p>
-                <dl>
-                  <dt>仕様</dt>
-                  <dd>
-                    <ul class="cell-list">
-                      <li>
-                        実機確認ではレイヤー数・名称・表示状態、16
-                        bit、色とアルファ、ID 色と深度の保持、Photoshop
-                        での開き直しを確認する。
-                      </li>
-                      <li>ライブラリの合成プレビューの制約も確認する。</li>
-                    </ul>
-                  </dd>
-                </dl>
-              </article>
             </div>
+            <ul class="spec-list">
+              <li class="spec-list-item" data-spec-title="変換処理">
+                <span class="spec-list-label">変換処理</span>
+                <ul class="spec-list-details">
+                  <li>
+                    2026-10-31の<a
+                      href="https://github.com/Kurarowa305/scene-craft/blob/main/docs/research/psd16-conversion-validation.md"
+                      rel="noopener noreferrer"
+                      target="_blank"
+                      >実EXR変換検証</a
+                    >に基づき、PhotoshopAPI 0.9.1でレイヤーを書き、psd-tools
+                    1.24.0で期待する名称を設定し直し、変換済みCombinedをmerged
+                    imageへ直接格納する方式を採用する。
+                  </li>
+                  <li>
+                    psd-toolsの内部APIを使うため版を固定し、更新時は再検証する。
+                  </li>
+                  <li>
+                    一時ファイルを再読込して全レイヤー・merged
+                    image・ICCを検証してから完成として公開する。
+                  </li>
+                  <li>
+                    小さなCycles実出力からの13種類の変換とPSD/PSBでの16bit値保持は確認済み。
+                  </li>
+                  <li>Photoshop実機の表示・編集、大容量の実動作は未確認。</li>
+                </ul>
+              </li>
+              <li class="spec-list-item" data-spec-title="確認項目">
+                <span class="spec-list-label">確認項目</span>
+                <ul class="spec-list-details">
+                  <li>
+                    実機確認ではレイヤー数・名称・表示状態、16
+                    bit、色とアルファ、ID 色と深度の保持、Photoshop
+                    での開き直しを確認する。
+                  </li>
+                  <li>ライブラリの合成プレビューの制約も確認する。</li>
+                </ul>
+              </li>
+            </ul>
             <p>
               根拠:
               <a
@@ -689,157 +587,120 @@
           </section>
           <section aria-labelledby="shadows-の採用方式" class="spec-subsection">
             <h3 id="shadows-の採用方式">3-2. Shadows の採用方式</h3>
-            <div class="contract-cards">
-              <article class="contract-card" aria-label="処理内容">
-                <p class="contract-card-title">処理内容</p>
-                <dl>
-                  <dt>仕様</dt>
-                  <dd>
-                    <ul class="cell-list">
-                      <li>利用者はCycles標準のShadow Catcherを選択した。</li>
-                      <li>
-                        Shadowsは指定した地面・壁などの受け面の出力に限定する。
-                      </li>
-                      <li>
-                        影あり／影なしレンダーの比率から近似マスクを作る案は不採用。
-                      </li>
-                      <li>
-                        調査結果は比較の根拠として
-                        <a
-                          href="https://github.com/Kurarowa305/scene-craft/blob/main/docs/research/blender-shadow-ratio-validation.md"
-                          rel="noopener noreferrer"
-                          target="_blank"
-                          >調査資料</a
-                        >
-                        に残す。
-                      </li>
-                    </ul>
-                    <div class="contract-detail">
-                      <ul class="cell-list">
-                        <li>
-                          <a
-                            href="https://github.com/Kurarowa305/scene-craft/blob/main/docs/research/blender-shadow-validation.md"
-                            rel="noopener noreferrer"
-                            target="_blank"
-                            >実機確認</a
-                          >では、指定した地面からShadow
-                          Catcherパスを生成できた。
-                        </li>
-                        <li>
-                          標準仕様に含まれる間接光との相互作用も踏まえ、PSD向け変換は後述の契約に従う。
-                        </li>
-                        <li>壁・複数受け面・実作品の確認は未完了。</li>
-                      </ul>
-                    </div>
-                    <div class="contract-detail">
-                      <ul class="cell-list">
-                        <li>
-                          受け面をShadow
-                          Catcherにすると同じレンダーのCombinedの見た目も変わるため、通常の統合画像を生成した制作データと、影用の作業コピーを分ける。
-                        </li>
-                        <li>
-                          受け面の指定・追加・削除と未指定時の扱いは、下記の出力契約に従う。
-                        </li>
-                      </ul>
-                    </div>
-                  </dd>
-                </dl>
-              </article>
-            </div>
+            <ul class="spec-list">
+              <li class="spec-list-item" data-spec-title="処理内容">
+                <span class="spec-list-label">処理内容</span>
+                <ul class="spec-list-details">
+                  <li>利用者はCycles標準のShadow Catcherを選択した。</li>
+                  <li>
+                    Shadowsは指定した地面・壁などの受け面の出力に限定する。
+                  </li>
+                  <li>
+                    影あり／影なしレンダーの比率から近似マスクを作る案は不採用。
+                  </li>
+                  <li>
+                    調査結果は比較の根拠として
+                    <a
+                      href="https://github.com/Kurarowa305/scene-craft/blob/main/docs/research/blender-shadow-ratio-validation.md"
+                      rel="noopener noreferrer"
+                      target="_blank"
+                      >調査資料</a
+                    >
+                    に残す。
+                  </li>
+                  <li>
+                    <a
+                      href="https://github.com/Kurarowa305/scene-craft/blob/main/docs/research/blender-shadow-validation.md"
+                      rel="noopener noreferrer"
+                      target="_blank"
+                      >実機確認</a
+                    >では、指定した地面からShadow Catcherパスを生成できた。
+                  </li>
+                  <li>
+                    標準仕様に含まれる間接光との相互作用も踏まえ、PSD向け変換は後述の契約に従う。
+                  </li>
+                  <li>壁・複数受け面・実作品の確認は未完了。</li>
+                  <li>
+                    受け面をShadow
+                    Catcherにすると同じレンダーのCombinedの見た目も変わるため、通常の統合画像を生成した制作データと、影用の作業コピーを分ける。
+                  </li>
+                  <li>
+                    受け面の指定・追加・削除と未指定時の扱いは、下記の出力契約に従う。
+                  </li>
+                </ul>
+              </li>
+            </ul>
           </section>
         </section>
         <section aria-labelledby="入力編集可能性の契約" class="spec-section">
           <h2 id="入力編集可能性の契約">4. 入力・編集可能性の契約</h2>
-          <div class="contract-cards">
-            <article class="contract-card" aria-label="入力固定">
-              <p class="contract-card-title">入力固定</p>
-              <dl>
-                <dt>仕様</dt>
-                <dd>
-                  <ul class="cell-list">
-                    <li>人間はBlenderで手修正を保存してから依頼する。</li>
-                    <li>
-                      実行時に保存済み
-                      <code>.blend</code>
-                      と必要な依存素材をコピーし、入力の内容を固定する。
-                    </li>
-                    <li>画面に「保存済みデータが対象」と示す。</li>
-                    <li>元ファイルを保持する。</li>
-                  </ul>
-                </dd>
-              </dl>
-            </article>
-            <article class="contract-card" aria-label="事前検査">
-              <p class="contract-card-title">事前検査</p>
-              <dl>
-                <dt>仕様</dt>
-                <dd>
+          <ul class="spec-list">
+            <li class="spec-list-item" data-spec-title="入力固定">
+              <span class="spec-list-label">入力固定</span>
+              <ul class="spec-list-details">
+                <li>人間はBlenderで手修正を保存してから依頼する。</li>
+                <li>
+                  実行時に保存済み
+                  <code>.blend</code>
+                  と必要な依存素材をコピーし、入力の内容を固定する。
+                </li>
+                <li>画面に「保存済みデータが対象」と示す。</li>
+                <li>元ファイルを保持する。</li>
+              </ul>
+            </li>
+            <li class="spec-list-item" data-spec-title="事前検査">
+              <span class="spec-list-label">事前検査</span>
+              <ul class="spec-list-details">
+                <li>
                   操作前にBlenderの版、入力・外部素材の存在、カメラ・フレーム・解像度・出力先容量、使用するレンダー機能を検査する。
-                </dd>
-              </dl>
-            </article>
-            <article class="contract-card" aria-label="編集可能性">
-              <p class="contract-card-title">編集可能性</p>
-              <dl>
-                <dt>仕様</dt>
-                <dd>
-                  <ul class="cell-list">
-                    <li>
-                      仮形状は部品単位で選択・編集できるオブジェクトとして残す。
-                    </li>
-                    <li>UV、画像テクスチャへの接続、材質ノードを残す。</li>
-                    <li>
-                      空・海・照明・3D雲は、利用したオブジェクト・材質・ノード・主要パラメーターを
-                      <code>.blend</code>
-                      に残す。
-                    </li>
-                    <li>利用するアドオン等の依存は一覧に含める。</li>
-                  </ul>
-                </dd>
-              </dl>
-            </article>
-            <article class="contract-card" aria-label="配置条件">
-              <p class="contract-card-title">配置条件</p>
-              <dl>
-                <dt>仕様</dt>
-                <dd>
-                  <ul class="cell-list">
-                    <li>
-                      植物・小物は素材、分布範囲・除外範囲・密度・大きさのばらつき・seedを保存する。
-                    </li>
-                    <li>
-                      選んだ個体を独立して手修正する場合は、元の分布から除外して二重生成を防ぐ。
-                    </li>
-                    <li>
-                      具体的なGeometry Nodes等の構成は実装仕様で検証する。
-                    </li>
-                  </ul>
-                </dd>
-              </dl>
-            </article>
-            <article class="contract-card" aria-label="保護検査">
-              <p class="contract-card-title">保護検査</p>
-              <dl>
-                <dt>仕様</dt>
-                <dd>
-                  <ul class="cell-list">
-                    <li>工程の変更範囲と保護指定を操作要求に含める。</li>
-                    <li>
-                      編集案は実際の変更を検査し、変更範囲と保護指定に適合した結果を公開する。
-                    </li>
-                    <li>
-                      検査の項目・実現方法は「編集案の採用と保護指定の適用方法を決める」と接続する。
-                    </li>
-                  </ul>
-                </dd>
-              </dl>
-            </article>
-          </div>
+                </li>
+              </ul>
+            </li>
+            <li class="spec-list-item" data-spec-title="編集可能性">
+              <span class="spec-list-label">編集可能性</span>
+              <ul class="spec-list-details">
+                <li>
+                  仮形状は部品単位で選択・編集できるオブジェクトとして残す。
+                </li>
+                <li>UV、画像テクスチャへの接続、材質ノードを残す。</li>
+                <li>
+                  空・海・照明・3D雲は、利用したオブジェクト・材質・ノード・主要パラメーターを
+                  <code>.blend</code>
+                  に残す。
+                </li>
+                <li>利用するアドオン等の依存は一覧に含める。</li>
+              </ul>
+            </li>
+            <li class="spec-list-item" data-spec-title="配置条件">
+              <span class="spec-list-label">配置条件</span>
+              <ul class="spec-list-details">
+                <li>
+                  植物・小物は素材、分布範囲・除外範囲・密度・大きさのばらつき・seedを保存する。
+                </li>
+                <li>
+                  選んだ個体を独立して手修正する場合は、元の分布から除外して二重生成を防ぐ。
+                </li>
+                <li>具体的なGeometry Nodes等の構成は実装仕様で検証する。</li>
+              </ul>
+            </li>
+            <li class="spec-list-item" data-spec-title="保護検査">
+              <span class="spec-list-label">保護検査</span>
+              <ul class="spec-list-details">
+                <li>工程の変更範囲と保護指定を操作要求に含める。</li>
+                <li>
+                  編集案は実際の変更を検査し、変更範囲と保護指定に適合した結果を公開する。
+                </li>
+                <li>
+                  検査の項目・実現方法は「編集案の採用と保護指定の適用方法を決める」と接続する。
+                </li>
+              </ul>
+            </li>
+          </ul>
         </section>
         <section aria-labelledby="出力の契約" class="spec-section">
           <h2 id="出力の契約">5. 出力の契約</h2>
           <div class="contract-cards">
-            <article class="contract-card" aria-label="共通設定">
+            <article aria-label="共通設定" class="contract-card">
               <p class="contract-card-title">共通設定</p>
               <dl>
                 <dt>仕様</dt>
@@ -857,7 +718,7 @@
                 </dd>
               </dl>
             </article>
-            <article class="contract-card" aria-label="表示変換">
+            <article aria-label="表示変換" class="contract-card">
               <p class="contract-card-title">表示変換</p>
               <dl>
                 <dt>仕様</dt>
@@ -874,7 +735,7 @@
                 </dd>
               </dl>
             </article>
-            <article class="contract-card" aria-label="ID符号化">
+            <article aria-label="ID符号化" class="contract-card">
               <p class="contract-card-title">ID符号化</p>
               <dl>
                 <dt>仕様</dt>
@@ -892,7 +753,7 @@
                 </dd>
               </dl>
             </article>
-            <article class="contract-card" aria-label="対象の識別">
+            <article aria-label="対象の識別" class="contract-card">
               <p class="contract-card-title">対象の識別</p>
               <dl>
                 <dt>仕様</dt>
@@ -907,7 +768,7 @@
                 </dd>
               </dl>
             </article>
-            <article class="contract-card" aria-label="深度">
+            <article aria-label="深度" class="contract-card">
               <p class="contract-card-title">深度</p>
               <dl>
                 <dt>仕様</dt>
@@ -924,7 +785,7 @@
                 </dd>
               </dl>
             </article>
-            <article class="contract-card" aria-label="Alpha">
+            <article aria-label="Alpha" class="contract-card">
               <p class="contract-card-title">Alpha</p>
               <dl>
                 <dt>仕様</dt>
@@ -946,7 +807,7 @@
                 </dd>
               </dl>
             </article>
-            <article class="contract-card" aria-label="影の受け面">
+            <article aria-label="影の受け面" class="contract-card">
               <p class="contract-card-title">影の受け面</p>
               <dl>
                 <dt>仕様</dt>
@@ -965,7 +826,7 @@
                 </dd>
               </dl>
             </article>
-            <article class="contract-card" aria-label="影の符号化">
+            <article aria-label="影の符号化" class="contract-card">
               <p class="contract-card-title">影の符号化</p>
               <dl>
                 <dt>仕様</dt>
@@ -991,7 +852,7 @@
                 </dd>
               </dl>
             </article>
-            <article class="contract-card" aria-label="レイヤー初期状態">
+            <article aria-label="レイヤー初期状態" class="contract-card">
               <p class="contract-card-title">レイヤー初期状態</p>
               <dl>
                 <dt>仕様</dt>
@@ -1010,7 +871,7 @@
                 </dd>
               </dl>
             </article>
-            <article class="contract-card" aria-label="保持データ">
+            <article aria-label="保持データ" class="contract-card">
               <p class="contract-card-title">保持データ</p>
               <dl>
                 <dt>仕様</dt>
@@ -1029,7 +890,7 @@
           <section aria-labelledby="メタデータ" class="spec-subsection">
             <h3 id="メタデータ">5-1. メタデータ</h3>
             <div class="contract-cards">
-              <article class="contract-card" aria-label="出力の記録">
+              <article aria-label="出力の記録" class="contract-card">
                 <p class="contract-card-title">出力の記録</p>
                 <dl>
                   <dt>仕様</dt>
@@ -1053,7 +914,7 @@
                   </dd>
                 </dl>
               </article>
-              <article class="contract-card" aria-label="操作スクリプト">
+              <article aria-label="操作スクリプト" class="contract-card">
                 <p class="contract-card-title">操作スクリプト</p>
                 <dl>
                   <dt>仕様</dt>
@@ -1062,14 +923,15 @@
                   </dd>
                 </dl>
               </article>
-              <article class="contract-card" aria-label="保存構造">
-                <p class="contract-card-title">保存構造</p>
-                <dl>
-                  <dt>仕様</dt>
-                  <dd>具体的な保存構造はデータモデル・保存設計へ引き継ぐ。</dd>
-                </dl>
-              </article>
             </div>
+            <ul class="spec-list">
+              <li class="spec-list-item" data-spec-title="保存構造">
+                <span class="spec-list-label">保存構造</span>
+                <ul class="spec-list-details">
+                  <li>具体的な保存構造はデータモデル・保存設計へ引き継ぐ。</li>
+                </ul>
+              </li>
+            </ul>
           </section>
           <section aria-labelledby="容量とメモリの判定" class="spec-subsection">
             <h3 id="容量とメモリの判定">5-2. 出力容量の判定</h3>
@@ -1085,35 +947,32 @@
           <h2 id="blender操作moduleのinterface">
             6. Blender操作ModuleのInterface
           </h2>
-          <div class="contract-cards">
-            <article class="contract-card" aria-label="アダプター">
-              <p class="contract-card-title">アダプター</p>
-              <dl>
-                <dt>仕様</dt>
-                <dd>
+          <ul class="spec-list">
+            <li class="spec-list-item" data-spec-title="アダプター">
+              <span class="spec-list-label">アダプター</span>
+              <ul class="spec-list-details">
+                <li>
                   Blender操作アダプターがPython・Windowsプロセス・OSパス・PSDライブラリを扱う。
-                </dd>
-              </dl>
-            </article>
-            <article class="contract-card" aria-label="Windows実行">
-              <p class="contract-card-title">Windows実行</p>
-              <dl>
-                <dt>仕様</dt>
-                <dd>
+                </li>
+              </ul>
+            </li>
+            <li class="spec-list-item" data-spec-title="Windows実行">
+              <span class="spec-list-label">Windows実行</span>
+              <ul class="spec-list-details">
+                <li>
                   Windows Blenderを操作するAdapterがその違いを引き受ける。
-                </dd>
-              </dl>
-            </article>
-            <article class="contract-card" aria-label="制作管理">
-              <p class="contract-card-title">制作管理</p>
-              <dl>
-                <dt>仕様</dt>
-                <dd>
+                </li>
+              </ul>
+            </li>
+            <li class="spec-list-item" data-spec-title="制作管理">
+              <span class="spec-list-label">制作管理</span>
+              <ul class="spec-list-details">
+                <li>
                   工程の採否・依頼の順序・自動再実行予算は外側の制作管理・実行管理に残す。
-                </dd>
-              </dl>
-            </article>
-          </div>
+                </li>
+              </ul>
+            </li>
+          </ul>
           <div
             aria-label="Blender操作ModuleのInterface"
             class="table-scroll"
@@ -1187,187 +1046,134 @@
         </section>
         <section aria-labelledby="接続と状態" class="spec-section">
           <h2 id="接続と状態">7. 実行の管理</h2>
-          <div class="contract-cards">
-            <article class="contract-card" aria-label="接続">
-              <p class="contract-card-title">接続</p>
-              <dl>
-                <dt>仕様</dt>
-                <dd>
-                  <ul class="cell-list">
-                    <li>
-                      WSLからWindows側の補助プロセスを起動し、Windows
-                      Blenderをbackgroundで動かす。
-                    </li>
-                    <li>
-                      読み取り／編集／レンダーの入力をファイルで渡し、ログ・進捗・完了記録を取得する。
-                    </li>
-                  </ul>
-                </dd>
-              </dl>
-            </article>
-            <article class="contract-card" aria-label="所有権">
-              <p class="contract-card-title">所有権</p>
-              <dl>
-                <dt>仕様</dt>
-                <dd>
-                  <ul class="cell-list">
-                    <li>
-                      Windows側で実行ID・PID・起動時刻・実行ファイル・実行用ディレクトリを対応付ける。
-                    </li>
-                    <li>
-                      実行ID・PID・起動時刻・実行ファイル・実行用ディレクトリで所有権を照合して終了対象を決める。
-                    </li>
-                    <li>
-                      補助プロセスの具体的な実装とWindows側の生存管理は全体設計・実行状態設計で検証する。
-                    </li>
-                  </ul>
-                </dd>
-              </dl>
-            </article>
-            <article class="contract-card" aria-label="内部フェーズ">
-              <p class="contract-card-title">内部フェーズ</p>
-              <dl>
-                <dt>仕様</dt>
-                <dd>
-                  <ul class="cell-list">
-                    <li>
-                      内部フェーズは準備、編集、保存、レンダー、PSD生成、検証に分け、完成したチェックポイントと出力だけを確定する。
-                    </li>
-                    <li>
-                      実行中・停止待ち・成功・失敗・停止・状態不明を区別する。
-                    </li>
-                    <li>全体の状態機械とDB更新は実行状態設計へ統合する。</li>
-                  </ul>
-                </dd>
-              </dl>
-            </article>
-            <article class="contract-card" aria-label="完了条件">
-              <p class="contract-card-title">完了条件</p>
-              <dl>
-                <dt>仕様</dt>
-                <dd>
-                  <ul class="cell-list">
-                    <li>
-                      読み取りの完了には固定入力の読み取りと要約の検証を、編集の完了には出力
-                      <code>.blend</code>
-                      の保存完了と再読み取り確認を、レンダー出力の完了には必要なパスとPSD/PSBの仕様検証を必要とする。
-                    </li>
-                    <li>
-                      終了コードと成果物の検証結果を照合して成功を判定する。
-                    </li>
-                    <li>
-                      非0、必須ファイル欠落、破損・ハッシュ不一致、想定外のレイヤーやbit
-                      depthは失敗とする。
-                    </li>
-                  </ul>
-                </dd>
-              </dl>
-            </article>
-            <article class="contract-card" aria-label="出力確定">
-              <p class="contract-card-title">出力確定</p>
-              <dl>
-                <dt>仕様</dt>
-                <dd>
-                  <ul class="cell-list">
-                    <li>書き込み中は完成先と区別した領域へ出力する。</li>
-                    <li>ファイル検証後に完成記録を確定し、公開する。</li>
-                    <li>再起動時に整合性を照合する。</li>
-                  </ul>
-                </dd>
-              </dl>
-            </article>
-          </div>
+          <ul class="spec-list">
+            <li class="spec-list-item" data-spec-title="接続">
+              <span class="spec-list-label">接続</span>
+              <ul class="spec-list-details">
+                <li>
+                  WSLからWindows側の補助プロセスを起動し、Windows
+                  Blenderをbackgroundで動かす。
+                </li>
+                <li>
+                  読み取り／編集／レンダーの入力をファイルで渡し、ログ・進捗・完了記録を取得する。
+                </li>
+              </ul>
+            </li>
+            <li class="spec-list-item" data-spec-title="所有権">
+              <span class="spec-list-label">所有権</span>
+              <ul class="spec-list-details">
+                <li>
+                  Windows側で実行ID・PID・起動時刻・実行ファイル・実行用ディレクトリを対応付ける。
+                </li>
+                <li>
+                  実行ID・PID・起動時刻・実行ファイル・実行用ディレクトリで所有権を照合して終了対象を決める。
+                </li>
+                <li>
+                  補助プロセスの具体的な実装とWindows側の生存管理は全体設計・実行状態設計で検証する。
+                </li>
+              </ul>
+            </li>
+            <li class="spec-list-item" data-spec-title="内部フェーズ">
+              <span class="spec-list-label">内部フェーズ</span>
+              <ul class="spec-list-details">
+                <li>
+                  内部フェーズは準備、編集、保存、レンダー、PSD生成、検証に分け、完成したチェックポイントと出力だけを確定する。
+                </li>
+                <li>
+                  実行中・停止待ち・成功・失敗・停止・状態不明を区別する。
+                </li>
+                <li>全体の状態機械とDB更新は実行状態設計へ統合する。</li>
+              </ul>
+            </li>
+            <li class="spec-list-item" data-spec-title="完了条件">
+              <span class="spec-list-label">完了条件</span>
+              <ul class="spec-list-details">
+                <li>
+                  読み取りの完了には固定入力の読み取りと要約の検証を、編集の完了には出力
+                  <code>.blend</code>
+                  の保存完了と再読み取り確認を、レンダー出力の完了には必要なパスとPSD/PSBの仕様検証を必要とする。
+                </li>
+                <li>終了コードと成果物の検証結果を照合して成功を判定する。</li>
+                <li>
+                  非0、必須ファイル欠落、破損・ハッシュ不一致、想定外のレイヤーやbit
+                  depthは失敗とする。
+                </li>
+              </ul>
+            </li>
+            <li class="spec-list-item" data-spec-title="出力確定">
+              <span class="spec-list-label">出力確定</span>
+              <ul class="spec-list-details">
+                <li>書き込み中は完成先と区別した領域へ出力する。</li>
+                <li>ファイル検証後に完成記録を確定し、公開する。</li>
+                <li>再起動時に整合性を照合する。</li>
+              </ul>
+            </li>
+          </ul>
 
           <section aria-labelledby="停止失敗再開" class="spec-subsection">
             <h3 id="停止失敗再開">7-1. 停止・失敗・再開</h3>
-            <div class="contract-cards">
-              <article class="contract-card" aria-label="編集の停止">
-                <p class="contract-card-title">編集の停止</p>
-                <dl>
-                  <dt>仕様</dt>
-                  <dd>
-                    <ul class="cell-list">
-                      <li>人間の停止要求を保存する。</li>
-                      <li>
-                        編集と保存は安全に止められる境目で止め、完了済みの保存状態を残す。
-                      </li>
-                      <li>保存処理は安全な境目まで進めて停止する。</li>
-                    </ul>
-                  </dd>
-                </dl>
-              </article>
-              <article class="contract-card" aria-label="レンダーの停止">
-                <p class="contract-card-title">レンダーの停止</p>
-                <dl>
-                  <dt>仕様</dt>
-                  <dd>
-                    <ul class="cell-list">
-                      <li>
-                        レンダーは直前の
-                        <code>.blend</code>
-                        が保存済みの専用プロセスで行う。
-                      </li>
-                      <li>
-                        停止要求時は所有するレンダープロセスを終了して、未完成の画像を不採用とする。
-                      </li>
-                      <li>OS側の終了を確認して停止済みとする。</li>
-                      <li>アプリが所有するプロセスを対象に終了する。</li>
-                    </ul>
-                  </dd>
-                </dl>
-              </article>
-              <article class="contract-card" aria-label="強制終了">
-                <p class="contract-card-title">強制終了</p>
-                <dl>
-                  <dt>仕様</dt>
-                  <dd>
+            <ul class="spec-list">
+              <li class="spec-list-item" data-spec-title="編集の停止">
+                <span class="spec-list-label">編集の停止</span>
+                <ul class="spec-list-details">
+                  <li>人間の停止要求を保存する。</li>
+                  <li>
+                    編集と保存は安全に止められる境目で止め、完了済みの保存状態を残す。
+                  </li>
+                  <li>保存処理は安全な境目まで進めて停止する。</li>
+                </ul>
+              </li>
+              <li class="spec-list-item" data-spec-title="レンダーの停止">
+                <span class="spec-list-label">レンダーの停止</span>
+                <ul class="spec-list-details">
+                  <li>
+                    レンダーは直前の
+                    <code>.blend</code>
+                    が保存済みの専用プロセスで行う。
+                  </li>
+                  <li>
+                    停止要求時は所有するレンダープロセスを終了して、未完成の画像を不採用とする。
+                  </li>
+                  <li>OS側の終了を確認して停止済みとする。</li>
+                  <li>アプリが所有するプロセスを対象に終了する。</li>
+                </ul>
+              </li>
+              <li class="spec-list-item" data-spec-title="強制終了">
+                <span class="spec-list-label">強制終了</span>
+                <ul class="spec-list-details">
+                  <li>
                     最後の操作を失う強制終了は人間が明示した場合に限定する。
-                  </dd>
-                </dl>
-              </article>
-              <article class="contract-card" aria-label="途中成果">
-                <p class="contract-card-title">途中成果</p>
-                <dl>
-                  <dt>仕様</dt>
-                  <dd>
-                    <ul class="cell-list">
-                      <li>
-                        検証済みの途中成果を記録し、13種類が揃ったPSDを完成として渡す。
-                      </li>
-                      <li>
-                        PSD生成だけの失敗なら検証済み中間出力を利用できる。
-                      </li>
-                    </ul>
-                  </dd>
-                </dl>
-              </article>
-              <article class="contract-card" aria-label="手動再開">
-                <p class="contract-card-title">手動再開</p>
-                <dl>
-                  <dt>仕様</dt>
-                  <dd>
-                    <ul class="cell-list">
-                      <li>人間が止めた依頼は、明示的な再開指示を待つ。</li>
-                      <li>
-                        手動再開時に入力・チェックポイント・完成出力を再照合する。
-                      </li>
-                      <li>
-                        デザインを変える復旧は既存要件どおり人間に確認する。
-                      </li>
-                    </ul>
-                  </dd>
-                </dl>
-              </article>
-              <article class="contract-card" aria-label="障害時の照合">
-                <p class="contract-card-title">障害時の照合</p>
-                <dl>
-                  <dt>仕様</dt>
-                  <dd>
+                  </li>
+                </ul>
+              </li>
+              <li class="spec-list-item" data-spec-title="途中成果">
+                <span class="spec-list-label">途中成果</span>
+                <ul class="spec-list-details">
+                  <li>
+                    検証済みの途中成果を記録し、13種類が揃ったPSDを完成として渡す。
+                  </li>
+                  <li>PSD生成だけの失敗なら検証済み中間出力を利用できる。</li>
+                </ul>
+              </li>
+              <li class="spec-list-item" data-spec-title="手動再開">
+                <span class="spec-list-label">手動再開</span>
+                <ul class="spec-list-details">
+                  <li>人間が止めた依頼は、明示的な再開指示を待つ。</li>
+                  <li>
+                    手動再開時に入力・チェックポイント・完成出力を再照合する。
+                  </li>
+                  <li>デザインを変える復旧は既存要件どおり人間に確認する。</li>
+                </ul>
+              </li>
+              <li class="spec-list-item" data-spec-title="障害時の照合">
+                <span class="spec-list-label">障害時の照合</span>
+                <ul class="spec-list-details">
+                  <li>
                     WSLや補助プロセスが落ちた場合、Windows側プロセスの生存と完了記録を照合する。
-                  </dd>
-                </dl>
-              </article>
-            </div>
+                  </li>
+                </ul>
+              </li>
+            </ul>
           </section>
         </section>
         <section class="sources">

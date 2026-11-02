@@ -87,143 +87,101 @@
         </nav>
         <section aria-labelledby="責務と前提" class="spec-section">
           <h2 id="責務と前提">1. 責務</h2>
-          <div class="contract-cards">
-            <article class="contract-card" aria-label="保護指定">
-              <p class="contract-card-title">保護指定</p>
-              <dl>
-                <dt>仕様</dt>
-                <dd>
-                  <ul class="cell-list">
-                    <li>
-                      制作管理が、編集案の基準・変更範囲・保護指定・依存関係・採否・組合せを管理する。
-                    </li>
-                    <li>
-                      実行管理は作品単位の順序・停止・再実行予算、保存モジュールは固定実体・依存素材・保存の確定を担当する。
-                    </li>
-                  </ul>
-                </dd>
-              </dl>
-            </article>
-            <article class="contract-card" aria-label="モデル">
-              <p class="contract-card-title">モデル</p>
-              <dl>
-                <dt>仕様</dt>
-                <dd>
-                  <ul class="cell-list">
-                    <li>
-                      根拠は<a
-                        href="https://github.com/Kurarowa305/scene-craft/blob/main/docs/requirements/initial-scope.md#edits"
-                        rel="noopener noreferrer"
-                        target="_blank"
-                        >初期要件</a
-                      >、<a href="domain-data-model.html">データモデル</a>、<a
-                        href="execution-lifecycle.html"
-                        >実行状態</a
-                      >、<a href="artifact-storage.html">保存設計</a>、<a
-                        href="blender-integration.html"
-                        >Blender連携</a
-                      >、<a
-                        href="https://github.com/Kurarowa305/scene-craft/blob/main/GLOSSARY.md"
-                        rel="noopener noreferrer"
-                        target="_blank"
-                        >用語集</a
-                      >。
-                    </li>
-                    <li>既存の論理ID・保存・実行契約を用いる。</li>
-                  </ul>
-                </dd>
-              </dl>
-            </article>
-            <article class="contract-card" aria-label="処理内容">
-              <p class="contract-card-title">処理内容</p>
-              <dl>
-                <dt>仕様</dt>
-                <dd>
-                  <ul class="cell-list">
-                    <li>AIは保存済み入力の作業用コピーを編集する。</li>
-                    <li>同じ作品の編集・採用・組合せ・復元は直列に扱う。</li>
-                  </ul>
-                </dd>
-              </dl>
-            </article>
-          </div>
+          <ul class="spec-list">
+            <li class="spec-list-item" data-spec-title="保護指定">
+              <span class="spec-list-label">保護指定</span>
+              <ul class="spec-list-details">
+                <li>
+                  制作管理が、編集案の基準・変更範囲・保護指定・依存関係・採否・組合せを管理する。
+                </li>
+                <li>
+                  実行管理は作品単位の順序・停止・再実行予算、保存モジュールは固定実体・依存素材・保存の確定を担当する。
+                </li>
+              </ul>
+            </li>
+            <li class="spec-list-item" data-spec-title="モデル">
+              <span class="spec-list-label">モデル</span>
+              <ul class="spec-list-details">
+                <li>
+                  根拠は<a
+                    href="https://github.com/Kurarowa305/scene-craft/blob/main/docs/requirements/initial-scope.md#edits"
+                    rel="noopener noreferrer"
+                    target="_blank"
+                    >初期要件</a
+                  >、<a href="domain-data-model.html">データモデル</a>、<a
+                    href="execution-lifecycle.html"
+                    >実行状態</a
+                  >、<a href="artifact-storage.html">保存設計</a>、<a
+                    href="blender-integration.html"
+                    >Blender連携</a
+                  >、<a
+                    href="https://github.com/Kurarowa305/scene-craft/blob/main/GLOSSARY.md"
+                    rel="noopener noreferrer"
+                    target="_blank"
+                    >用語集</a
+                  >。
+                </li>
+                <li>既存の論理ID・保存・実行契約を用いる。</li>
+              </ul>
+            </li>
+            <li class="spec-list-item" data-spec-title="処理内容">
+              <span class="spec-list-label">処理内容</span>
+              <ul class="spec-list-details">
+                <li>AIは保存済み入力の作業用コピーを編集する。</li>
+                <li>同じ作品の編集・採用・組合せ・復元は直列に扱う。</li>
+              </ul>
+            </li>
+          </ul>
         </section>
         <section aria-labelledby="編集案の作成と採否" class="spec-section">
           <h2 id="編集案の作成と採否">2. 編集案の作成と採否</h2>
-          <div class="contract-cards">
-            <article class="contract-card" aria-label="保護指定">
-              <p class="contract-card-title">保護指定</p>
-              <dl>
-                <dt>仕様</dt>
-                <dd>
-                  <ul class="cell-list">
-                    <li>
-                      依頼について、目的、対象、変更してよい項目、独立した変更の単位、保護指定・依頼限定許可を明確にする。
-                    </li>
-                    <li>曖昧な指定は具体的な対象・項目を示して確認する。</li>
-                  </ul>
-                  <div class="contract-detail">
-                    <ul class="cell-list">
-                      <li>
-                        入力の可用性、対象の同一性、変更範囲・最新の保護指定と許可、同時編集の有無を確認する。
-                      </li>
-                      <li>
-                        前提が変わって依頼や確認回答が合わなければ確認待ちにする。
-                      </li>
-                    </ul>
-                  </div>
-                  <div class="contract-detail">
-                    <ul class="cell-list">
-                      <li>
-                        作業用コピーで変更し、変更範囲と保護の検査、ファイル・依存素材の保存検証を行う。
-                      </li>
-                      <li>検査済みの編集案だけを採用可能として提示する。</li>
-                    </ul>
-                  </div>
-                  <div class="contract-detail">
-                    <ul class="cell-list">
-                      <li>
-                        適用前に、現在状態と判断対象、最新の保護指定・許可を再照合する。
-                      </li>
-                      <li>組合せが必要なら次節に従う。</li>
-                      <li>
-                        結果を固定・検証し、採否の適用結果と現在状態の更新を保存契約に従って確定する。
-                      </li>
-                    </ul>
-                  </div>
-                </dd>
-              </dl>
-            </article>
-            <article class="contract-card" aria-label="依頼">
-              <p class="contract-card-title">依頼</p>
-              <dl>
-                <dt>仕様</dt>
-                <dd>
-                  <ul class="cell-list">
-                    <li>
-                      現在状態を起点にする依頼は実行直前に最新状態を固定する。
-                    </li>
-                    <li>候補の修正は明示した保存状態を起点に固定する。</li>
-                  </ul>
-                </dd>
-              </dl>
-            </article>
-            <article class="contract-card" aria-label="採用判断">
-              <p class="contract-card-title">採用判断</p>
-              <dl>
-                <dt>仕様</dt>
-                <dd>
-                  <ul class="cell-list">
-                    <li>
-                      人間は、特定の編集案・保存状態・範囲について採用／修正して採用／不採用を判断する。
-                    </li>
-                    <li>理由は任意で、入力された内容を保存する。</li>
-                    <li>代替案で選ばれなかった案は未選択として残す。</li>
-                  </ul>
-                </dd>
-              </dl>
-            </article>
-          </div>
+          <ul class="spec-list">
+            <li class="spec-list-item" data-spec-title="保護指定">
+              <span class="spec-list-label">保護指定</span>
+              <ul class="spec-list-details">
+                <li>
+                  依頼について、目的、対象、変更してよい項目、独立した変更の単位、保護指定・依頼限定許可を明確にする。
+                </li>
+                <li>曖昧な指定は具体的な対象・項目を示して確認する。</li>
+                <li>
+                  入力の可用性、対象の同一性、変更範囲・最新の保護指定と許可、同時編集の有無を確認する。
+                </li>
+                <li>
+                  前提が変わって依頼や確認回答が合わなければ確認待ちにする。
+                </li>
+                <li>
+                  作業用コピーで変更し、変更範囲と保護の検査、ファイル・依存素材の保存検証を行う。
+                </li>
+                <li>検査済みの編集案だけを採用可能として提示する。</li>
+                <li>
+                  適用前に、現在状態と判断対象、最新の保護指定・許可を再照合する。
+                </li>
+                <li>組合せが必要なら次節に従う。</li>
+                <li>
+                  結果を固定・検証し、採否の適用結果と現在状態の更新を保存契約に従って確定する。
+                </li>
+              </ul>
+            </li>
+            <li class="spec-list-item" data-spec-title="依頼">
+              <span class="spec-list-label">依頼</span>
+              <ul class="spec-list-details">
+                <li>
+                  現在状態を起点にする依頼は実行直前に最新状態を固定する。
+                </li>
+                <li>候補の修正は明示した保存状態を起点に固定する。</li>
+              </ul>
+            </li>
+            <li class="spec-list-item" data-spec-title="採用判断">
+              <span class="spec-list-label">採用判断</span>
+              <ul class="spec-list-details">
+                <li>
+                  人間は、特定の編集案・保存状態・範囲について採用／修正して採用／不採用を判断する。
+                </li>
+                <li>理由は任意で、入力された内容を保存する。</li>
+                <li>代替案で選ばれなかった案は未選択として残す。</li>
+              </ul>
+            </li>
+          </ul>
           <p>
             同じ基準からの案全体をそのまま採用でき、内容の変更がなければ、既存の確定した保存状態を現在状態にできる。採用時は採否記録と現在状態を更新する。
           </p>
@@ -240,34 +198,28 @@
             <h3 id="独立した変更と依存する変更">
               2-1. 独立した変更と依存する変更
             </h3>
-            <div class="contract-cards">
-              <article class="contract-card" aria-label="処理内容">
-                <p class="contract-card-title">処理内容</p>
-                <dl>
-                  <dt>仕様</dt>
-                  <dd>
-                    <ul class="cell-list">
-                      <li>
-                        植物配置と照明調整など、単独で結果を確認・検証でき、他方なしで成立する変更は、作成時から別々に採否を判断できる単位にする。
-                      </li>
-                      <li>一つの依頼から複数の編集案を作ってよい。</li>
-                      <li>
-                        同じ目的の代替案は同じ基準状態から分岐し、一回の選択では一つを選ぶ。
-                      </li>
-                    </ul>
-                  </dd>
-                </dl>
-              </article>
-              <article class="contract-card" aria-label="設定">
-                <p class="contract-card-title">設定</p>
-                <dl>
-                  <dt>仕様</dt>
-                  <dd>
+            <ul class="spec-list">
+              <li class="spec-list-item" data-spec-title="処理内容">
+                <span class="spec-list-label">処理内容</span>
+                <ul class="spec-list-details">
+                  <li>
+                    植物配置と照明調整など、単独で結果を確認・検証でき、他方なしで成立する変更は、作成時から別々に採否を判断できる単位にする。
+                  </li>
+                  <li>一つの依頼から複数の編集案を作ってよい。</li>
+                  <li>
+                    同じ目的の代替案は同じ基準状態から分岐し、一回の選択では一つを選ぶ。
+                  </li>
+                </ul>
+              </li>
+              <li class="spec-list-item" data-spec-title="設定">
+                <span class="spec-list-label">設定</span>
+                <ul class="spec-list-details">
+                  <li>
                     共有材質・生成設定・配置条件等を通じて一方が他方を必要とする場合は、その依存を明示して一組で確認する。
-                  </dd>
-                </dl>
-              </article>
-            </div>
+                  </li>
+                </ul>
+              </li>
+            </ul>
           </section>
           <section
             aria-labelledby="基準が古い案複数の案の組合せ"
@@ -276,146 +228,113 @@
             <h3 id="基準が古い案複数の案の組合せ">
               2-2. 基準が古い案、複数の案の組合せ
             </h3>
-            <div class="contract-cards">
-              <article class="contract-card" aria-label="処理内容">
-                <p class="contract-card-title">処理内容</p>
-                <dl>
-                  <dt>仕様</dt>
-                  <dd>
-                    <ul class="cell-list">
-                      <li>
-                        案の基準と現在状態を照合し、適用後の組合せ結果を確認する。
-                      </li>
-                      <li>
-                        現在状態を起点に選択した変更を取り込む結果を別に準備し、人間が確認してから採用する。
-                      </li>
-                      <li>
-                        独立した複数の案を組み合わせる場合も、実際の組合せ結果を確認対象にする。
-                      </li>
-                    </ul>
-                    <div class="contract-detail">
-                      <ul class="cell-list">
-                        <li>組合せの変更前は、その時点の現在状態とする。</li>
-                        <li>
-                          取り込んだ編集案・採否・保存状態・採用範囲は寄与元として残す。
-                        </li>
-                        <li>元の案は保持する。</li>
-                        <li>
-                          結果の確認後に現在状態等が再度変わった場合は再照合する。
-                        </li>
-                      </ul>
-                    </div>
-                  </dd>
-                </dl>
-              </article>
-              <article class="contract-card" aria-label="保護指定">
-                <p class="contract-card-title">保護指定</p>
-                <dl>
-                  <dt>仕様</dt>
-                  <dd>
-                    <ul class="cell-list">
-                      <li>
-                        取り込み前に、変更対象と参照先、共有データ、保護、対象の存在・同一性を比較する。
-                      </li>
-                      <li>
-                        対象の削除・置換、同じ項目の変更、依存する設定の変更等があれば競合として扱う。
-                      </li>
-                      <li>
-                        配置や材質等のデザイン変更、残す手修正の判断が必要なら作業前に確認する。
-                      </li>
-                    </ul>
-                  </dd>
-                </dl>
-              </article>
-              <article class="contract-card" aria-label="適用条件">
-                <p class="contract-card-title">適用条件</p>
-                <dl>
-                  <dt>仕様</dt>
-                  <dd>
-                    <ul class="cell-list">
-                      <li>
-                        組合せをプログラムで正確に構成できる場合も、現在状態への適用前に結果を確認する。
-                      </li>
-                      <li>
-                        AIによる修正が必要なら新しい制作依頼・編集案として記録する。
-                      </li>
-                      <li>
-                        単なる通知再送や照合と、制作操作のやり直しは<a
-                          href="execution-lifecycle.html"
-                          >実行状態設計</a
-                        >に従って区別する。
-                      </li>
-                    </ul>
-                  </dd>
-                </dl>
-              </article>
-            </div>
+            <ul class="spec-list">
+              <li class="spec-list-item" data-spec-title="処理内容">
+                <span class="spec-list-label">処理内容</span>
+                <ul class="spec-list-details">
+                  <li>
+                    案の基準と現在状態を照合し、適用後の組合せ結果を確認する。
+                  </li>
+                  <li>
+                    現在状態を起点に選択した変更を取り込む結果を別に準備し、人間が確認してから採用する。
+                  </li>
+                  <li>
+                    独立した複数の案を組み合わせる場合も、実際の組合せ結果を確認対象にする。
+                  </li>
+                  <li>組合せの変更前は、その時点の現在状態とする。</li>
+                  <li>
+                    取り込んだ編集案・採否・保存状態・採用範囲は寄与元として残す。
+                  </li>
+                  <li>元の案は保持する。</li>
+                  <li>
+                    結果の確認後に現在状態等が再度変わった場合は再照合する。
+                  </li>
+                </ul>
+              </li>
+              <li class="spec-list-item" data-spec-title="保護指定">
+                <span class="spec-list-label">保護指定</span>
+                <ul class="spec-list-details">
+                  <li>
+                    取り込み前に、変更対象と参照先、共有データ、保護、対象の存在・同一性を比較する。
+                  </li>
+                  <li>
+                    対象の削除・置換、同じ項目の変更、依存する設定の変更等があれば競合として扱う。
+                  </li>
+                  <li>
+                    配置や材質等のデザイン変更、残す手修正の判断が必要なら作業前に確認する。
+                  </li>
+                </ul>
+              </li>
+              <li class="spec-list-item" data-spec-title="適用条件">
+                <span class="spec-list-label">適用条件</span>
+                <ul class="spec-list-details">
+                  <li>
+                    組合せをプログラムで正確に構成できる場合も、現在状態への適用前に結果を確認する。
+                  </li>
+                  <li>
+                    AIによる修正が必要なら新しい制作依頼・編集案として記録する。
+                  </li>
+                  <li>
+                    単なる通知再送や照合と、制作操作のやり直しは<a
+                      href="execution-lifecycle.html"
+                      >実行状態設計</a
+                    >に従って区別する。
+                  </li>
+                </ul>
+              </li>
+            </ul>
           </section>
           <section
             aria-labelledby="候補の修正と採用の切替"
             class="spec-subsection"
           >
             <h3 id="候補の修正と採用の切替">2-3. 候補の修正</h3>
-            <div class="contract-cards">
-              <article class="contract-card" aria-label="採用判断">
-                <p class="contract-card-title">採用判断</p>
-                <dl>
-                  <dt>仕様</dt>
-                  <dd>
-                    <ul class="cell-list">
-                      <li>
-                        未採用の案に手修正を登録し、その状態を指定してAIへ追加修正を依頼できる。
-                      </li>
-                      <li>
-                        手修正とAI修正を交互に続けても、採用前は現在状態を維持する。
-                      </li>
-                      <li>
-                        AI修正は新しい依頼・編集案・保存状態を作り、修正元の案と起点へ結び付ける。
-                      </li>
-                      <li>
-                        手修正は変更記録として、その対象案と前後の状態を保持する。
-                      </li>
-                    </ul>
-                    <div class="contract-detail">
-                      <ul class="cell-list">
-                        <li>
-                          採用済み案Aから別案Bへ切り替えたい場合は、現在状態を起点にBを取り込む修正案を作る。
-                        </li>
-                        <li>
-                          A採用後の手修正と競合すれば、残す部分・置き換える部分を確認する。
-                        </li>
-                        <li>
-                          過去状態へ丸ごと戻したい場合は、直前の状態を残す<a
-                            href="artifact-storage.html#過去の保存状態へ戻す"
-                            >復元手順</a
-                          >を使う。
-                        </li>
-                        <li>過去の採用判断・理由は履歴として保持する。</li>
-                      </ul>
-                    </div>
-                  </dd>
-                </dl>
-              </article>
-              <article class="contract-card" aria-label="保存状態">
-                <p class="contract-card-title">保存状態</p>
-                <dl>
-                  <dt>仕様</dt>
-                  <dd>
-                    <ul class="cell-list">
-                      <li>
-                        各段階の指示者と変更者、指示原文、理由、保存状態を区別する。
-                      </li>
-                      <li>
-                        最後に確認した具体的な案・状態へ「修正して採用」を記録する。
-                      </li>
-                      <li>
-                        Photoshopの編集は人間が行い、保存したPSD/PSBとプレビューを登録する。
-                      </li>
-                    </ul>
-                  </dd>
-                </dl>
-              </article>
-            </div>
+            <ul class="spec-list">
+              <li class="spec-list-item" data-spec-title="採用判断">
+                <span class="spec-list-label">採用判断</span>
+                <ul class="spec-list-details">
+                  <li>
+                    未採用の案に手修正を登録し、その状態を指定してAIへ追加修正を依頼できる。
+                  </li>
+                  <li>
+                    手修正とAI修正を交互に続けても、採用前は現在状態を維持する。
+                  </li>
+                  <li>
+                    AI修正は新しい依頼・編集案・保存状態を作り、修正元の案と起点へ結び付ける。
+                  </li>
+                  <li>
+                    手修正は変更記録として、その対象案と前後の状態を保持する。
+                  </li>
+                  <li>
+                    採用済み案Aから別案Bへ切り替えたい場合は、現在状態を起点にBを取り込む修正案を作る。
+                  </li>
+                  <li>
+                    A採用後の手修正と競合すれば、残す部分・置き換える部分を確認する。
+                  </li>
+                  <li>
+                    過去状態へ丸ごと戻したい場合は、直前の状態を残す<a
+                      href="artifact-storage.html#過去の保存状態へ戻す"
+                      >復元手順</a
+                    >を使う。
+                  </li>
+                  <li>過去の採用判断・理由は履歴として保持する。</li>
+                </ul>
+              </li>
+              <li class="spec-list-item" data-spec-title="保存状態">
+                <span class="spec-list-label">保存状態</span>
+                <ul class="spec-list-details">
+                  <li>
+                    各段階の指示者と変更者、指示原文、理由、保存状態を区別する。
+                  </li>
+                  <li>
+                    最後に確認した具体的な案・状態へ「修正して採用」を記録する。
+                  </li>
+                  <li>
+                    Photoshopの編集は人間が行い、保存したPSD/PSBとプレビューを登録する。
+                  </li>
+                </ul>
+              </li>
+            </ul>
           </section>
         </section>
         <section aria-labelledby="保護指定の対象と項目" class="spec-section">
@@ -491,57 +410,43 @@
               </tbody>
             </table>
           </div>
-          <div class="contract-cards">
-            <article class="contract-card" aria-label="処理内容">
-              <p class="contract-card-title">処理内容</p>
-              <dl>
-                <dt>仕様</dt>
-                <dd>
-                  <ul class="cell-list">
-                    <li>
-                      共有データ・親子関係・制約等を介した間接変更も検査する。
-                    </li>
-                    <li>名前変更後も同一性を追跡できる識別子を使う。</li>
-                    <li>
-                      識別子が欠落・重複する、参照先を同定できない等の場合は、対応付けを確認する。
-                    </li>
-                    <li>
-                      識別子の具体的な埋め込み・継承方法は実装仕様で検証する。
-                    </li>
-                  </ul>
-                </dd>
-              </dl>
-            </article>
-            <article class="contract-card" aria-label="保護指定">
-              <p class="contract-card-title">保護指定</p>
-              <dl>
-                <dt>仕様</dt>
-                <dd>
-                  <ul class="cell-list">
-                    <li>
-                      共有材質等を編集すると保護対象にも変更が伝わる場合、必要に応じて編集対象側を分離し、保護対象を維持する。
-                    </li>
-                    <li>
-                      分離によって見た目や構造が変わる場合、または維持を検証できない場合は事前に確認する。
-                    </li>
-                  </ul>
-                  <div class="contract-detail">
-                    <ul class="cell-list">
-                      <li>
-                        カメラ保護は撮影位置・向き・設定等を維持する契約とする。
-                      </li>
-                      <li>
-                        植物の追加による遮蔽等は依頼の変更範囲に沿って判断する。
-                      </li>
-                      <li>
-                        「この部分を隠さない」等の条件があれば別途明示し、検証方法を含めて合意する。
-                      </li>
-                    </ul>
-                  </div>
-                </dd>
-              </dl>
-            </article>
-          </div>
+          <ul class="spec-list">
+            <li class="spec-list-item" data-spec-title="処理内容">
+              <span class="spec-list-label">処理内容</span>
+              <ul class="spec-list-details">
+                <li>
+                  共有データ・親子関係・制約等を介した間接変更も検査する。
+                </li>
+                <li>名前変更後も同一性を追跡できる識別子を使う。</li>
+                <li>
+                  識別子が欠落・重複する、参照先を同定できない等の場合は、対応付けを確認する。
+                </li>
+                <li>
+                  識別子の具体的な埋め込み・継承方法は実装仕様で検証する。
+                </li>
+              </ul>
+            </li>
+            <li class="spec-list-item" data-spec-title="保護指定">
+              <span class="spec-list-label">保護指定</span>
+              <ul class="spec-list-details">
+                <li>
+                  共有材質等を編集すると保護対象にも変更が伝わる場合、必要に応じて編集対象側を分離し、保護対象を維持する。
+                </li>
+                <li>
+                  分離によって見た目や構造が変わる場合、または維持を検証できない場合は事前に確認する。
+                </li>
+                <li>
+                  カメラ保護は撮影位置・向き・設定等を維持する契約とする。
+                </li>
+                <li>
+                  植物の追加による遮蔽等は依頼の変更範囲に沿って判断する。
+                </li>
+                <li>
+                  「この部分を隠さない」等の条件があれば別途明示し、検証方法を含めて合意する。
+                </li>
+              </ul>
+            </li>
+          </ul>
 
           <section
             aria-labelledby="依頼限定許可継続的な解除手修正"
@@ -550,104 +455,75 @@
             <h3 id="依頼限定許可継続的な解除手修正">
               3-1. 依頼限定許可・継続的な解除・手修正
             </h3>
-            <div class="contract-cards">
-              <article class="contract-card" aria-label="保護指定">
-                <p class="contract-card-title">保護指定</p>
-                <dl>
-                  <dt>仕様</dt>
-                  <dd>
-                    <ul class="cell-list">
-                      <li>
-                        保護と依頼が競合した場合は、必要な対象・項目・変更と理由を示して確認する。
-                      </li>
-                      <li>
-                        依頼限定許可は依頼ID・対象・項目・許可範囲・指示原文・判断者・時刻に結び付ける。
-                      </li>
-                      <li>許可は指定した対象・項目へ限定する。</li>
-                      <li>継続的な解除は別の明示的な判断として記録する。</li>
-                    </ul>
-                    <div class="contract-detail">
-                      <ul class="cell-list">
-                        <li>
-                          人間がBlenderで保護項目を変更した場合も手修正として登録でき、保護指定は維持する。
-                        </li>
-                        <li>AIは手修正後の状態を基準に保護項目を維持する。</li>
-                        <li>手修正として登録し、変更者と由来を保持する。</li>
-                      </ul>
-                    </div>
-                  </dd>
-                </dl>
-              </article>
-              <article class="contract-card" aria-label="再実行">
-                <p class="contract-card-title">再実行</p>
-                <dl>
-                  <dt>仕様</dt>
-                  <dd>
-                    <ul class="cell-list">
-                      <li>
-                        同じ依頼の再実行には許可を引き継ぐが、目的・対象・範囲や最新の保護と整合していることを確認する。
-                      </li>
-                      <li>追加修正依頼では許可を改めて確認する。</li>
-                      <li>
-                        許可を使って変更した候補を起点にすることはできるが、そこから同じ保護項目をさらに変更するには新しい許可が必要となる。
-                      </li>
-                    </ul>
-                  </dd>
-                </dl>
-              </article>
-              <article class="contract-card" aria-label="採用判断">
-                <p class="contract-card-title">採用判断</p>
-                <dl>
-                  <dt>仕様</dt>
-                  <dd>
-                    <ul class="cell-list">
-                      <li>
-                        許可済みの案を採用する際は、その案を作った依頼・許可と実際の変更を照合する。
-                      </li>
-                      <li>
-                        生成後に保護が変更された場合や、組合せで許可範囲を超える変更が必要な場合は再確認する。
-                      </li>
-                    </ul>
-                  </dd>
-                </dl>
-              </article>
-            </div>
+            <ul class="spec-list">
+              <li class="spec-list-item" data-spec-title="保護指定">
+                <span class="spec-list-label">保護指定</span>
+                <ul class="spec-list-details">
+                  <li>
+                    保護と依頼が競合した場合は、必要な対象・項目・変更と理由を示して確認する。
+                  </li>
+                  <li>
+                    依頼限定許可は依頼ID・対象・項目・許可範囲・指示原文・判断者・時刻に結び付ける。
+                  </li>
+                  <li>許可は指定した対象・項目へ限定する。</li>
+                  <li>継続的な解除は別の明示的な判断として記録する。</li>
+                  <li>
+                    人間がBlenderで保護項目を変更した場合も手修正として登録でき、保護指定は維持する。
+                  </li>
+                  <li>AIは手修正後の状態を基準に保護項目を維持する。</li>
+                  <li>手修正として登録し、変更者と由来を保持する。</li>
+                </ul>
+              </li>
+              <li class="spec-list-item" data-spec-title="再実行">
+                <span class="spec-list-label">再実行</span>
+                <ul class="spec-list-details">
+                  <li>
+                    同じ依頼の再実行には許可を引き継ぐが、目的・対象・範囲や最新の保護と整合していることを確認する。
+                  </li>
+                  <li>追加修正依頼では許可を改めて確認する。</li>
+                  <li>
+                    許可を使って変更した候補を起点にすることはできるが、そこから同じ保護項目をさらに変更するには新しい許可が必要となる。
+                  </li>
+                </ul>
+              </li>
+              <li class="spec-list-item" data-spec-title="採用判断">
+                <span class="spec-list-label">採用判断</span>
+                <ul class="spec-list-details">
+                  <li>
+                    許可済みの案を採用する際は、その案を作った依頼・許可と実際の変更を照合する。
+                  </li>
+                  <li>
+                    生成後に保護が変更された場合や、組合せで許可範囲を超える変更が必要な場合は再確認する。
+                  </li>
+                </ul>
+              </li>
+            </ul>
           </section>
         </section>
         <section aria-labelledby="実行前後の検査" class="spec-section">
           <h2 id="実行前後の検査">4. 実行前後の検査</h2>
-          <div class="contract-cards">
-            <article class="contract-card" aria-label="処理内容">
-              <p class="contract-card-title">処理内容</p>
-              <dl>
-                <dt>仕様</dt>
-                <dd>
-                  <ul class="cell-list">
-                    <li>
-                      実行前に対象・項目・許可を解決し、許された操作に制限する。
-                    </li>
-                    <li>
-                      実行前後の差分を検査し、変更範囲・保護指定との一致を確認する。
-                    </li>
-                  </ul>
-                </dd>
-              </dl>
-            </article>
-            <article class="contract-card" aria-label="保存状態">
-              <p class="contract-card-title">保存状態</p>
-              <dl>
-                <dt>仕様</dt>
-                <dd>
-                  <ul class="cell-list">
-                    <li>
-                      検査は、対象ID・設定・参照先・共有関係等、対応する比較情報を保存状態に結び付け、検査対象・方法・結果・検証不能な項目を記録する。
-                    </li>
-                    <li>生成スクリプトも同じ制約と検査を通す。</li>
-                  </ul>
-                </dd>
-              </dl>
-            </article>
-          </div>
+          <ul class="spec-list">
+            <li class="spec-list-item" data-spec-title="処理内容">
+              <span class="spec-list-label">処理内容</span>
+              <ul class="spec-list-details">
+                <li>
+                  実行前に対象・項目・許可を解決し、許された操作に制限する。
+                </li>
+                <li>
+                  実行前後の差分を検査し、変更範囲・保護指定との一致を確認する。
+                </li>
+              </ul>
+            </li>
+            <li class="spec-list-item" data-spec-title="保存状態">
+              <span class="spec-list-label">保存状態</span>
+              <ul class="spec-list-details">
+                <li>
+                  検査は、対象ID・設定・参照先・共有関係等、対応する比較情報を保存状態に結び付け、検査対象・方法・結果・検証不能な項目を記録する。
+                </li>
+                <li>生成スクリプトも同じ制約と検査を通す。</li>
+              </ul>
+            </li>
+          </ul>
           <div
             aria-label="実行前後の検査"
             class="table-scroll"
@@ -692,51 +568,35 @@
         </section>
         <section aria-labelledby="採用失敗と結果不明" class="spec-section">
           <h2 id="採用失敗と結果不明">5. 採用時の照合</h2>
-          <div class="contract-cards">
-            <article class="contract-card" aria-label="採用判断">
-              <p class="contract-card-title">採用判断</p>
-              <dl>
-                <dt>仕様</dt>
-                <dd>
-                  <ul class="cell-list">
-                    <li>
-                      採用指示は採否記録として保持し、適用結果を未適用／適用済み／失敗／不明で区別する。
-                    </li>
-                    <li>制作ファイルと依存の検証。</li>
-                    <li>
-                      現在状態の更新と更新記録はDB内で一体として確定する。
-                    </li>
-                  </ul>
-                  <div class="contract-detail">
-                    <ul class="cell-list">
-                      <li>
-                        確認済みの同じ結果を確定するだけなら採用の再確認は不要とする。
-                      </li>
-                      <li>
-                        ただし、入力・現在状態・保護・許可等の前提を再検査する。
-                      </li>
-                      <li>内容や前提が変わる場合は確認を取り直す。</li>
-                      <li>再開・再実行は実行状態設計の許可条件に従う。</li>
-                    </ul>
-                  </div>
-                </dd>
-              </dl>
-            </article>
-            <article class="contract-card" aria-label="処理内容">
-              <p class="contract-card-title">処理内容</p>
-              <dl>
-                <dt>仕様</dt>
-                <dd>
-                  <ul class="cell-list">
-                    <li>失敗時は直前の現在状態と案を維持する。</li>
-                    <li>
-                      結果不明なら操作ID・入力・結果ハッシュ・完成記録・DBを照合する。
-                    </li>
-                  </ul>
-                </dd>
-              </dl>
-            </article>
-          </div>
+          <ul class="spec-list">
+            <li class="spec-list-item" data-spec-title="採用判断">
+              <span class="spec-list-label">採用判断</span>
+              <ul class="spec-list-details">
+                <li>
+                  採用指示は採否記録として保持し、適用結果を未適用／適用済み／失敗／不明で区別する。
+                </li>
+                <li>制作ファイルと依存の検証。</li>
+                <li>現在状態の更新と更新記録はDB内で一体として確定する。</li>
+                <li>
+                  確認済みの同じ結果を確定するだけなら採用の再確認は不要とする。
+                </li>
+                <li>
+                  ただし、入力・現在状態・保護・許可等の前提を再検査する。
+                </li>
+                <li>内容や前提が変わる場合は確認を取り直す。</li>
+                <li>再開・再実行は実行状態設計の許可条件に従う。</li>
+              </ul>
+            </li>
+            <li class="spec-list-item" data-spec-title="処理内容">
+              <span class="spec-list-label">処理内容</span>
+              <ul class="spec-list-details">
+                <li>失敗時は直前の現在状態と案を維持する。</li>
+                <li>
+                  結果不明なら操作ID・入力・結果ハッシュ・完成記録・DBを照合する。
+                </li>
+              </ul>
+            </li>
+          </ul>
         </section>
         <section aria-labelledby="具体例と受け入れ観点" class="spec-section">
           <h2 id="具体例と受け入れ観点">6. 具体例</h2>
