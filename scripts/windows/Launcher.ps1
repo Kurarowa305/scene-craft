@@ -1,8 +1,9 @@
 param([Parameter(Mandatory=$true)][string]$Config, [switch]$Manager)
 $ErrorActionPreference = 'Stop'
-# Windows PowerShell 5.1: quote individual native arguments, never build a shell command.
+# Quote only when needed: wsl.exe treats quoted option names as Linux commands.
 function Quote-Argument([string]$Value) {
   if ($Value -match '["\r\n\x00]' -or $Value.EndsWith('\')) { throw 'INVALID_CONFIGURATION' }
+  if ($Value -notmatch '\s' -and $Value.Length -gt 0) { return $Value }
   return '"' + $Value + '"'
 }
 if (-not $Manager) {
