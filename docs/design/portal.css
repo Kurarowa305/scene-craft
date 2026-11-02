@@ -66,6 +66,7 @@ h3 {
   margin-bottom: 10px;
 }
 ul {
+  list-style-type: disc;
   padding-left: 1.4em;
 }
 li + li {
@@ -717,9 +718,6 @@ a.area-card:focus-visible {
   font-size: inherit;
   line-height: inherit;
 }
-.spec-table .cell-list > li::marker {
-  content: "・ ";
-}
 .spec-table .cell-list > li + li {
   margin-top: 0.3em;
 }
@@ -872,9 +870,6 @@ main h2 {
 .contract-card .cell-list {
   padding-left: 1.2em;
 }
-.contract-card .cell-list > li::marker {
-  content: "・ ";
-}
 
 /* Native prototype captures accompany each UI contract and comparison table. */
 .prototype-shot {
@@ -967,10 +962,6 @@ main h2 {
 .spec-list ul > li + li {
   margin-top: 0.5em;
 }
-.spec-list > li::marker,
-.spec-list ul > li::marker {
-  content: "・ ";
-}
 .spec-list .prototype-shot {
   margin-top: 12px;
 }
@@ -979,4 +970,15 @@ main h2 {
 }
 .spec-list-item > .spec-list-details {
   overflow-wrap: anywhere;
+}
+
+/* Indented unordered lists use native hollow circles at every nested depth. */
+li ul {
+  list-style-type: circle;
+}
+li ul > li::marker,
+.spec-table .cell-list li ul > li::marker,
+.contract-card .cell-list li ul > li::marker,
+.spec-list ul > li::marker {
+  content: normal;
 }
