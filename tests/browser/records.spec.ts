@@ -121,3 +121,32 @@ test("別作品の＋から直接空のチャットを開き、チャットご�
   await expect(page.getByLabel("記録する本文")).toHaveValue("Aの未送信本文");
   await expect(page.locator(".record-body")).toHaveCount(0);
 });
+
+test("初期作品一覧の遅延中は作成を待ち、古い一覧で作成結果を消さない", async ({
+  page,
+}) => {
+  let release!: () => void;
+  const released = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  await page.route("**/api/works", async (route) => {
+    if (route.request().method() === "GET") {
+      const response = await route.fetch();
+      await released;
+      await route.fulfill({ response });
+    } else await route.continue();
+  });
+  await page.goto("/");
+  await page.getByLabel("作品名").fill("一覧取得後の作品");
+  await expect(
+    page.getByRole("button", { name: "作品を作成", exact: true }),
+  ).toBeDisabled();
+  release();
+  await page.getByRole("button", { name: "作品を作成", exact: true }).click();
+  await expect(
+    page.getByRole("button", { name: "一覧取得後の作品", exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "一覧取得後の作品", exact: true }),
+  ).toBeVisible();
+});

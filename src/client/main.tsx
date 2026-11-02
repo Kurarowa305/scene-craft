@@ -6,6 +6,7 @@ import "./style.css";
 
 function App() {
   const [works, setWorks] = useState<Work[]>([]);
+  const [worksLoaded, setWorksLoaded] = useState(false);
   const [workId, setWorkId] = useState("");
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [conversationId, setConversationId] = useState("");
@@ -26,7 +27,10 @@ function App() {
     let active = true;
     read<Work[]>("/api/works")
       .then((result) => {
-        if (active) setWorks(result);
+        if (active) {
+          setWorks(result);
+          setWorksLoaded(true);
+        }
       })
       .catch((failure) => {
         if (active) setError(failure.message);
@@ -251,7 +255,10 @@ function App() {
               />
             </label>
             <p className="hint">作風なし</p>
-            <button className="primary" disabled={busy || !name.trim()}>
+            <button
+              className="primary"
+              disabled={busy || !worksLoaded || !name.trim()}
+            >
               作品を作成
             </button>
           </form>

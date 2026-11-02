@@ -7,22 +7,22 @@ function Quote-Argument([string]$Value) {
 }
 if (-not $Manager) {
   $arguments = '-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File ' + (Quote-Argument $PSCommandPath) + ' -Config ' + (Quote-Argument $Config) + ' -Manager'
-  Start-Process -FilePath (Join-Path $PSHOME 'powershell.exe') -ArgumentList $arguments -WindowStyle Hidden | Out-Null
+  Start-Process -FilePath (Join-Path $env:WINDIR 'System32\WindowsPowerShell\v1.0\powershell.exe') -ArgumentList $arguments -WindowStyle Hidden | Out-Null
   exit
 }
 $logDirectory = Join-Path $env:LOCALAPPDATA 'scene-craft\logs'
-New-Item -ItemType Directory -Force -Path $logDirectory | Out-Null
-# Diagnostic logs contain fixed codes only. Keep 30 days and at most 1 GiB.
-Get-ChildItem $logDirectory -Filter '*.log' | Where-Object LastWriteTime -lt (Get-Date).AddDays(-30) | Remove-Item
-$logs = @(Get-ChildItem $logDirectory -Filter '*.log' | Sort-Object LastWriteTime -Descending)
-[long]$total = 0
-foreach ($log in $logs) { $total += $log.Length; if ($total -gt 1073740800) { Remove-Item $log.FullName } }
 $logPath = Join-Path $logDirectory ((Get-Date -Format 'yyyyMMdd-HHmmss') + '-' + $PID + '.log')
 $process = $null
 $processStarted = $false
 $mutex = $null
 $ownsMutex = $false
 try {
+  New-Item -ItemType Directory -Force -Path $logDirectory | Out-Null
+  # Diagnostic logs contain fixed codes only. Keep 30 days and at most 1 GiB.
+  Get-ChildItem $logDirectory -Filter '*.log' | Where-Object LastWriteTime -lt (Get-Date).AddDays(-30) | Remove-Item -ErrorAction SilentlyContinue
+  $logs = @(Get-ChildItem $logDirectory -Filter '*.log' | Sort-Object LastWriteTime -Descending)
+  [long]$total = 0
+  foreach ($log in $logs) { $total += $log.Length; if ($total -gt 1073740800) { Remove-Item $log.FullName -ErrorAction SilentlyContinue } }
   $settings = Get-Content -Raw -Encoding UTF8 $Config | ConvertFrom-Json
   if ($settings.repository -notmatch '^/' -or $settings.node -notmatch '^/' -or $settings.dataDirectory -notmatch '^/' -or $settings.port -lt 1024 -or $settings.port -gt 65535) { throw 'INVALID_CONFIGURATION' }
   $sha = [Security.Cryptography.SHA256]::Create()
@@ -66,12 +66,13 @@ try {
 } catch {
   $code = [string]$_.Exception.Message
   if ($code -notin @('PORT_IN_USE','OWNER_NOT_READY','START_TIMEOUT','INVALID_CONFIGURATION','INVALID_READINESS','BACKEND_EXITED')) { $code = 'START_FAILED' }
-  Add-Content $logPath ((Get-Date -Format o) + ' ' + $code)
+  try { Add-Content $logPath ((Get-Date -Format o) + ' ' + $code) } catch {}
   Add-Type -AssemblyName System.Windows.Forms
   [System.Windows.Forms.MessageBox]::Show("scene-craft: $code`nLog: $logPath", 'scene-craft') | Out-Null
 } finally {
   # Retain wsl.exe even if readiness times out. Never kill unrelated applications.
   if ($processStarted -and -not $process.HasExited) {
+    if ($null -ne $ready -and -not $ready.IsCompleted) { $ready.Wait() | Out-Null }
     $remaining = $process.StandardOutput.ReadToEndAsync()
     $process.WaitForExit()
   }

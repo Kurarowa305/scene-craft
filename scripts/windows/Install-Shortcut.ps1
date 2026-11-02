@@ -13,7 +13,7 @@ $config = Join-Path $install 'launcher.json'
 @{ distribution=$Distribution; node=$WslNode; repository=$WslRepository; dataDirectory=$DataDirectory; port=$Port } | ConvertTo-Json | Set-Content -Encoding UTF8 $config
 $shell = New-Object -ComObject WScript.Shell
 $shortcut = $shell.CreateShortcut((Join-Path ([Environment]::GetFolderPath('Desktop')) 'scene-craft.lnk'))
-$shortcut.TargetPath = Join-Path $PSHOME 'powershell.exe'
+$shortcut.TargetPath = Join-Path $env:WINDIR 'System32\WindowsPowerShell\v1.0\powershell.exe'
 $shortcut.Arguments = '-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File "' + (Join-Path $install 'Launcher.ps1') + '" -Config "' + $config + '"'
 $shortcut.WorkingDirectory = $install
 $shortcut.Description = 'scene-craft - local production notes'
