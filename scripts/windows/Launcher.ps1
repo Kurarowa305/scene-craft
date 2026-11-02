@@ -33,6 +33,7 @@ try {
   $mutex = New-Object System.Threading.Mutex($false, $mutexName)
   try { $ownsMutex = $mutex.WaitOne(0) } catch [System.Threading.AbandonedMutexException] { $ownsMutex = $true }
   $argsList = @('--distribution', $settings.distribution, '--exec', $settings.node, '--disable-warning=ExperimentalWarning', ($settings.repository.TrimEnd('/') + '/dist/server/cli.js'), '--data-dir', $settings.dataDirectory, '--port', [string]$settings.port)
+  if ($settings.fileRoots) { $argsList += @('--file-roots', [string]$settings.fileRoots) }
   if (-not $ownsMutex) { $argsList += '--probe-only' }
   $info = New-Object System.Diagnostics.ProcessStartInfo
   $info.FileName = Join-Path $env:WINDIR 'System32\wsl.exe'

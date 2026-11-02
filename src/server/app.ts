@@ -1,11 +1,21 @@
 import Fastify, { type FastifyError } from "fastify";
 import staticFiles from "@fastify/static";
 import { randomBytes, createHmac } from "node:crypto";
-import { mkdir } from "node:fs/promises";
+import { createReadStream } from "node:fs";
+import type { FileRoots, ImportInput } from "../shared/files.js";
+import {
+  fileService,
+  validateFileRoots,
+  type DependencyInspector,
+} from "./files.js";
+import { mkdir, open } from "node:fs/promises";
 import { openStore, OperationError } from "./store.js";
 
 interface AppOptions {
   directory: string;
+  fileRoots?: FileRoots;
+  dependencyInspector?: DependencyInspector;
+  publishFiles?: typeof import("node:fs/promises").rename;
   port: number;
   staticRoot?: string;
   instanceSecret?: string;
@@ -35,6 +45,7 @@ const idParams = {
 };
 
 export async function createApp(options: AppOptions) {
+  if (options.fileRoots) validateFileRoots(options.fileRoots);
   await mkdir(options.directory, { recursive: true, mode: 0o700 });
   const store = openStore(options.directory);
   const app = Fastify({
@@ -42,6 +53,14 @@ export async function createApp(options: AppOptions) {
     bodyLimit: 1024 * 1024,
     ajv: { customOptions: { removeAdditional: false, coerceTypes: false } },
   });
+  const files = options.fileRoots
+    ? fileService(
+        store,
+        options.fileRoots,
+        options.dependencyInspector,
+        options.publishFiles,
+      )
+    : null;
   const origin = `http://localhost:${options.port}`;
   const csrfToken = randomBytes(32).toString("hex");
   const session = randomBytes(32).toString("hex");
@@ -169,6 +188,143 @@ export async function createApp(options: AppOptions) {
         request.params.id,
         request.body.body,
       ),
+  );
+  app.get("/api/file-roots", async () => ({
+    sources: options.fileRoots?.sources.map((root) => ({ id: root.id })) ?? [],
+    configured: Boolean(files),
+  }));
+  app.get<{ Params: { id: string } }>(
+    "/api/works/:id/states",
+    { schema: { params: idParams } },
+    async (request) => store.states(request.params.id),
+  );
+  app.get<{ Params: { id: string } }>(
+    "/api/works/:id/imports",
+    { schema: { params: idParams } },
+    async (request) => store.operations(request.params.id),
+  );
+  app.post<{ Params: { id: string }; Body: { requestKey: string } }>(
+    "/api/imports/:id/abandon",
+    { schema: { params: idParams, body: bodySchema({}, []) } },
+    async (request) => {
+      if (!files) throw new OperationError(409, "FILE_STORAGE_NOT_CONFIGURED");
+      return files.abandon(request.body.requestKey, request.params.id);
+    },
+  );
+  const sourceSchema = {
+    type: "object",
+    additionalProperties: false,
+    required: ["rootId", "relativePath", "role"],
+    properties: {
+      rootId: { ...text, maxLength: 100 },
+      relativePath: { ...text, maxLength: 2000 },
+      role: { enum: ["blend", "psd", "preview", "render"] },
+    },
+  };
+  app.post<{ Params: { id: string }; Body: ImportInput }>(
+    "/api/conversations/:id/imports",
+    {
+      schema: {
+        params: idParams,
+        body: bodySchema(
+          {
+            body: { ...text, maxLength: 200000, pattern: "\\S" },
+            application: { enum: ["Blender", "Photoshop", "Other"] },
+            beforeStateId: {
+              anyOf: [{ type: "null" }, { type: "string", format: "uuid" }],
+            },
+            reason: { type: "string", maxLength: 20000 },
+            render: {
+              type: "object",
+              additionalProperties: false,
+              required: ["stateId", "fileId"],
+              properties: {
+                stateId: { type: "string", format: "uuid" },
+                fileId: { type: "string", format: "uuid" },
+              },
+            },
+            files: {
+              type: "array",
+              minItems: 1,
+              maxItems: 100,
+              items: sourceSchema,
+            },
+          },
+          ["body", "application", "beforeStateId", "files"],
+        ),
+      },
+    },
+    async (request) => {
+      if (!files) throw new OperationError(409, "FILE_STORAGE_NOT_CONFIGURED");
+      const extensions: Record<string, RegExp> = {
+        blend: /\.blend$/i,
+        psd: /\.ps[db]$/i,
+        preview: /\.(png|jpe?g|webp)$/i,
+        render: /\.(png|jpe?g|webp|exr|tiff?)$/i,
+      };
+      const sources = request.body.files.map((file) =>
+        JSON.stringify([file.rootId, file.relativePath]),
+      );
+      if (new Set(sources).size !== sources.length)
+        throw new OperationError(400, "DUPLICATE_FILE");
+      for (const file of request.body.files)
+        if (!extensions[file.role]?.test(file.relativePath))
+          throw new OperationError(400, "INVALID_FILE_TYPE");
+      return files.import(request.params.id, request.body);
+    },
+  );
+  app.get<{
+    Params: { id: string; fileId: string };
+    Querystring: { inline?: string };
+  }>(
+    "/api/states/:id/files/:fileId",
+    {
+      schema: {
+        params: {
+          ...idParams,
+          required: ["id", "fileId"],
+          properties: {
+            ...idParams.properties,
+            fileId: { type: "string", format: "uuid" },
+          },
+        },
+      },
+    },
+    async (request, reply) => {
+      if (!files) throw new OperationError(409, "FILE_STORAGE_NOT_CONFIGURED");
+      const result = await files.download(
+        store.state(request.params.id),
+        request.params.fileId,
+      );
+      if (request.query.inline === "1") {
+        const handle = await open(result.path, "r");
+        const signature = Buffer.alloc(12);
+        try {
+          await handle.read(signature, 0, 12, 0);
+        } finally {
+          await handle.close();
+        }
+        const mime = signature
+          .subarray(0, 8)
+          .equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]))
+          ? "image/png"
+          : signature[0] === 255 && signature[1] === 216 && signature[2] === 255
+            ? "image/jpeg"
+            : signature.toString("ascii", 0, 4) === "RIFF" &&
+                signature.toString("ascii", 8, 12) === "WEBP"
+              ? "image/webp"
+              : null;
+        if (!mime) throw new OperationError(415, "PREVIEW_UNAVAILABLE");
+        return reply.type(mime).send(createReadStream(result.path));
+      }
+      return reply
+        .type("application/octet-stream")
+        .header(
+          "content-disposition",
+          `attachment; filename="${result.file.id}"`,
+        )
+        .send(createReadStream(result.path));
+    },
   );
   app.post(
     "/api/shutdown",

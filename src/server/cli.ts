@@ -12,6 +12,7 @@ import { homedir } from "node:os";
 import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { parseArgs } from "node:util";
+import type { FileRoots } from "../shared/files.js";
 import { createApp } from "./app.js";
 
 interface Instance {
@@ -56,6 +57,7 @@ async function main() {
   const { values } = parseArgs({
     options: {
       "data-dir": { type: "string" },
+      "file-roots": { type: "string" },
       "probe-only": { type: "boolean" },
       port: { type: "string", default: "4317" },
     },
@@ -108,6 +110,14 @@ async function main() {
       directory,
       port,
       instanceSecret: secret,
+      fileRoots: values["file-roots"]
+        ? (JSON.parse(
+            (await readFile(values["file-roots"], "utf8")).replace(
+              /^\uFEFF/,
+              "",
+            ),
+          ) as FileRoots)
+        : undefined,
       staticRoot: fileURLToPath(new URL("../client", import.meta.url)),
       onShutdown: () => {
         void stop();
