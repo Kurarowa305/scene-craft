@@ -1,0 +1,240 @@
+[
+  {
+    "file": "overview.png",
+    "title": "作品一覧・メインチャット・成果物タブ",
+    "width": 1512,
+    "height": 960,
+    "source_commit": "5298534c2939aa44683baa6ebd3ced8285801466"
+  },
+  {
+    "file": "tab-chooser.png",
+    "title": "新しいタブの種類選択",
+    "width": 672,
+    "height": 913,
+    "source_commit": "5298534c2939aa44683baa6ebd3ced8285801466"
+  },
+  {
+    "file": "new-work.png",
+    "title": "作品名・制作意図・作風版・既存ファイルの指定",
+    "width": 580,
+    "height": 512,
+    "source_commit": "5298534c2939aa44683baa6ebd3ced8285801466"
+  },
+  {
+    "file": "new-chat.png",
+    "title": "新しいチャットとエージェント・モデルの選択",
+    "width": 601,
+    "height": 913,
+    "source_commit": "5298534c2939aa44683baa6ebd3ced8285801466"
+  },
+  {
+    "file": "composer.png",
+    "title": "成果物を選択した入力欄と送信設定",
+    "width": 601,
+    "height": 192,
+    "source_commit": "5298534c2939aa44683baa6ebd3ced8285801466"
+  },
+  {
+    "file": "attachments.png",
+    "title": "成果物の選択とコンピューターからの添付",
+    "width": 601,
+    "height": 913,
+    "source_commit": "5298534c2939aa44683baa6ebd3ced8285801466"
+  },
+  {
+    "file": "preview.png",
+    "title": "保存状態に対応する成果物のプレビュー",
+    "width": 672,
+    "height": 865,
+    "source_commit": "5298534c2939aa44683baa6ebd3ced8285801466"
+  },
+  {
+    "file": "adoption.png",
+    "title": "具体的な案を採用する会話",
+    "width": 601,
+    "height": 913,
+    "source_commit": "5298534c2939aa44683baa6ebd3ced8285801466"
+  },
+  {
+    "file": "manual-record.png",
+    "title": "制作ファイルと作業内容を登録する会話",
+    "width": 601,
+    "height": 913,
+    "source_commit": "5298534c2939aa44683baa6ebd3ced8285801466"
+  },
+  {
+    "file": "side-chat.png",
+    "title": "相談専用のサイドチャット",
+    "width": 672,
+    "height": 913,
+    "source_commit": "5298534c2939aa44683baa6ebd3ced8285801466"
+  },
+  {
+    "file": "side-stop.png",
+    "title": "相談の回答中に表示する停止操作",
+    "width": 672,
+    "height": 913,
+    "source_commit": "5298534c2939aa44683baa6ebd3ced8285801466"
+  },
+  {
+    "file": "history.png",
+    "title": "保存状態の分岐と理由を表示する制作履歴",
+    "width": 672,
+    "height": 913,
+    "source_commit": "5298534c2939aa44683baa6ebd3ced8285801466"
+  },
+  {
+    "file": "restore.png",
+    "title": "履歴の保存状態を参照した復元の確認",
+    "width": 1277,
+    "height": 913,
+    "source_commit": "5298534c2939aa44683baa6ebd3ced8285801466"
+  },
+  {
+    "file": "derive.png",
+    "title": "保存状態を起点にした派生作品の作成",
+    "width": 1512,
+    "height": 960,
+    "source_commit": "5298534c2939aa44683baa6ebd3ced8285801466"
+  },
+  {
+    "file": "guards.png",
+    "title": "保護対象・項目と継続的な解除",
+    "width": 672,
+    "height": 913,
+    "source_commit": "5298534c2939aa44683baa6ebd3ced8285801466"
+  },
+  {
+    "file": "protection-conflict.png",
+    "title": "保護一覧と依頼限定許可を確認する会話",
+    "width": 1277,
+    "height": 913,
+    "source_commit": "5298534c2939aa44683baa6ebd3ced8285801466"
+  },
+  {
+    "file": "running.png",
+    "title": "チャットの処理中アイコンと入力欄の停止ボタン",
+    "width": 1512,
+    "height": 960,
+    "source_commit": "5298534c2939aa44683baa6ebd3ced8285801466"
+  },
+  {
+    "file": "stopped.png",
+    "title": "停止完了と明示的な再開を待つ会話",
+    "width": 1277,
+    "height": 913,
+    "source_commit": "5298534c2939aa44683baa6ebd3ced8285801466"
+  },
+  {
+    "file": "unknown.png",
+    "title": "状態確認が必要なチャットと照合の案内",
+    "width": 1512,
+    "height": 960,
+    "source_commit": "5298534c2939aa44683baa6ebd3ced8285801466"
+  },
+  {
+    "file": "offline.png",
+    "title": "LLM利用不可時の記録として送信",
+    "width": 1277,
+    "height": 913,
+    "source_commit": "5298534c2939aa44683baa6ebd3ced8285801466"
+  },
+  {
+    "file": "missing-preview.png",
+    "title": "プレビュー未取得でも保持する本文と制作ファイル",
+    "width": 1277,
+    "height": 913,
+    "source_commit": "5298534c2939aa44683baa6ebd3ced8285801466"
+  },
+  {
+    "file": "style.png",
+    "title": "制作意図・作風の版・採用方針の確認",
+    "width": 672,
+    "height": 913,
+    "source_commit": "5298534c2939aa44683baa6ebd3ced8285801466"
+  },
+  {
+    "file": "versions.png",
+    "title": "エージェント定義の版とGit保存先",
+    "width": 580,
+    "height": 524,
+    "source_commit": "5298534c2939aa44683baa6ebd3ced8285801466"
+  },
+  {
+    "file": "reflection-picker.png",
+    "title": "全履歴を振り返る対象作品の選択",
+    "width": 580,
+    "height": 244,
+    "source_commit": "5298534c2939aa44683baa6ebd3ced8285801466"
+  },
+  {
+    "file": "reflection-result.png",
+    "title": "根拠付きの振り返りと方針の検討",
+    "width": 601,
+    "height": 913,
+    "source_commit": "5298534c2939aa44683baa6ebd3ced8285801466"
+  },
+  {
+    "file": "backup.png",
+    "title": "全体バックアップとバックアップからの復元",
+    "width": 580,
+    "height": 404,
+    "source_commit": "5298534c2939aa44683baa6ebd3ced8285801466"
+  },
+  {
+    "file": "backup-result.png",
+    "title": "バックアップ操作の結果表示",
+    "width": 580,
+    "height": 500,
+    "source_commit": "5298534c2939aa44683baa6ebd3ced8285801466"
+  },
+  {
+    "file": "backup-busy.png",
+    "title": "安全な停止と照合が必要なバックアップ",
+    "width": 580,
+    "height": 482,
+    "source_commit": "5298534c2939aa44683baa6ebd3ced8285801466"
+  },
+  {
+    "file": "backup-restore.png",
+    "title": "空の保存先への復元と別途認証の案内",
+    "width": 580,
+    "height": 500,
+    "source_commit": "5298534c2939aa44683baa6ebd3ced8285801466"
+  },
+  {
+    "file": "saved-data.png",
+    "title": "採用中の保護と未採用の制作実体の管理",
+    "width": 580,
+    "height": 464,
+    "source_commit": "5298534c2939aa44683baa6ebd3ced8285801466"
+  },
+  {
+    "file": "delete-confirm.png",
+    "title": "制作実体の削除対象と復元への影響の確認",
+    "width": 580,
+    "height": 204,
+    "source_commit": "5298534c2939aa44683baa6ebd3ced8285801466"
+  },
+  {
+    "file": "deleted-preview.png",
+    "title": "削除した制作実体の可用性表示",
+    "width": 672,
+    "height": 865,
+    "source_commit": "5298534c2939aa44683baa6ebd3ced8285801466"
+  },
+  {
+    "file": "migration.png",
+    "title": "保存形式の移行前に示す退避と容量の確認",
+    "width": 580,
+    "height": 602,
+    "source_commit": "5298534c2939aa44683baa6ebd3ced8285801466"
+  },
+  {
+    "file": "amend-reason.png",
+    "title": "理由の補記・訂正を受け付ける会話",
+    "width": 601,
+    "height": 913,
+    "source_commit": "5298534c2939aa44683baa6ebd3ced8285801466"
+  }
+]

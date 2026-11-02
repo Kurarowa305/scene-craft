@@ -92,8 +92,13 @@
         <section aria-labelledby="対象と責務" class="spec-section">
           <h2 id="対象と責務">1. データモデルの責務</h2>
           <div class="contract-cards">
-            <article class="contract-card" aria-label="記録">
-              <p class="contract-card-title">記録</p>
+            <article
+              class="contract-card"
+              aria-label="記録DBと制作実体を結び付ける論理モデル"
+            >
+              <p class="contract-card-title">
+                記録DBと制作実体を結び付ける論理モデル
+              </p>
               <dl>
                 <dt>仕様</dt>
                 <dd>
@@ -108,8 +113,13 @@
                 </dd>
               </dl>
             </article>
-            <article class="contract-card" aria-label="保存状態">
-              <p class="contract-card-title">保存状態</p>
+            <article
+              class="contract-card"
+              aria-label="保存状態・変更・採否で表す制作履歴"
+            >
+              <p class="contract-card-title">
+                保存状態・変更・採否で表す制作履歴
+              </p>
               <dl>
                 <dt>仕様</dt>
                 <dd>
@@ -132,8 +142,13 @@
           <section aria-labelledby="識別と共通契約" class="spec-subsection">
             <h3 id="識別と共通契約">1-1. 識別子の契約</h3>
             <div class="contract-cards">
-              <article class="contract-card" aria-label="永続ID">
-                <p class="contract-card-title">永続ID</p>
+              <article
+                class="contract-card"
+                aria-label="表示名や保存場所から独立した永続ID"
+              >
+                <p class="contract-card-title">
+                  表示名や保存場所から独立した永続ID
+                </p>
                 <dl>
                   <dt>仕様</dt>
                   <dd>
@@ -151,8 +166,11 @@
                   </dd>
                 </dl>
               </article>
-              <article class="contract-card" aria-label="時刻">
-                <p class="contract-card-title">時刻</p>
+              <article
+                class="contract-card"
+                aria-label="記録時刻と実作業時刻の区別"
+              >
+                <p class="contract-card-title">記録時刻と実作業時刻の区別</p>
                 <dl>
                   <dt>仕様</dt>
                   <dd>
@@ -167,8 +185,13 @@
                   </dd>
                 </dl>
               </article>
-              <article class="contract-card" aria-label="所属">
-                <p class="contract-card-title">所属</p>
+              <article
+                class="contract-card"
+                aria-label="作品への所属と振り返りの対象作品集合"
+              >
+                <p class="contract-card-title">
+                  作品への所属と振り返りの対象作品集合
+                </p>
                 <dl>
                   <dt>仕様</dt>
                   <dd>
@@ -181,8 +204,13 @@
                   </dd>
                 </dl>
               </article>
-              <article class="contract-card" aria-label="履歴の保持">
-                <p class="contract-card-title">履歴の保持</p>
+              <article
+                class="contract-card"
+                aria-label="確定済み状態と訂正前の記録の保持"
+              >
+                <p class="contract-card-title">
+                  確定済み状態と訂正前の記録の保持
+                </p>
                 <dl>
                   <dt>仕様</dt>
                   <dd>
@@ -198,8 +226,13 @@
                   </dd>
                 </dl>
               </article>
-              <article class="contract-card" aria-label="Git参照">
-                <p class="contract-card-title">Git参照</p>
+              <article
+                class="contract-card"
+                aria-label="リポジトリとフルコミットによるGit参照"
+              >
+                <p class="contract-card-title">
+                  リポジトリとフルコミットによるGit参照
+                </p>
                 <dl>
                   <dt>仕様</dt>
                   <dd>
@@ -399,8 +432,13 @@
         <section aria-labelledby="主要データの契約" class="spec-section">
           <h2 id="主要データの契約">3. 主要データの契約</h2>
           <div class="contract-cards">
-            <article class="contract-card" aria-label="参照">
-              <p class="contract-card-title">参照</p>
+            <article
+              class="contract-card"
+              aria-label="独立したIDで識別する各データ概念"
+            >
+              <p class="contract-card-title">
+                独立したIDで識別する各データ概念
+              </p>
               <dl>
                 <dt>仕様</dt>
                 <dd>
@@ -416,15 +454,23 @@
                 </dd>
               </dl>
             </article>
-            <article class="contract-card" aria-label="処理内容">
-              <p class="contract-card-title">処理内容</p>
+            <article
+              class="contract-card"
+              aria-label="必須・任意・条件付き情報の区別"
+            >
+              <p class="contract-card-title">必須・任意・条件付き情報の区別</p>
               <dl>
                 <dt>仕様</dt>
                 <dd>必須情報と任意・条件付き情報を区別する。</dd>
               </dl>
             </article>
-            <article class="contract-card" aria-label="作品">
-              <p class="contract-card-title">作品</p>
+            <article
+              class="contract-card"
+              aria-label="完成した一枚を目指す作品のデータ"
+            >
+              <p class="contract-card-title">
+                完成した一枚を目指す作品のデータ
+              </p>
               <dl>
                 <dt>必須情報・条件付き情報</dt>
                 <dd>
@@ -443,8 +489,13 @@
                 <dd>完成した一枚を目指す単位。会話間の共有情報の所属先</dd>
               </dl>
             </article>
-            <article class="contract-card" aria-label="会話">
-              <p class="contract-card-title">会話</p>
+            <article
+              class="contract-card"
+              aria-label="原文と依頼の入口となる会話のデータ"
+            >
+              <p class="contract-card-title">
+                原文と依頼の入口となる会話のデータ
+              </p>
               <dl>
                 <dt>必須情報・条件付き情報</dt>
                 <dd>
@@ -463,8 +514,13 @@
                 </dd>
               </dl>
             </article>
-            <article class="contract-card" aria-label="原文メッセージ">
-              <p class="contract-card-title">原文メッセージ</p>
+            <article
+              class="contract-card"
+              aria-label="原文メッセージの本文・添付・受信状態"
+            >
+              <p class="contract-card-title">
+                原文メッセージの本文・添付・受信状態
+              </p>
               <dl>
                 <dt>必須情報・条件付き情報</dt>
                 <dd>
@@ -483,8 +539,13 @@
                 <dd>原文を保持する。訂正や要約と分けて原文を保持する</dd>
               </dl>
             </article>
-            <article class="contract-card" aria-label="依頼">
-              <p class="contract-card-title">依頼</p>
+            <article
+              class="contract-card"
+              aria-label="目的と変更範囲を記録する依頼のデータ"
+            >
+              <p class="contract-card-title">
+                目的と変更範囲を記録する依頼のデータ
+              </p>
               <dl>
                 <dt>必須情報・条件付き情報</dt>
                 <dd>
@@ -510,8 +571,13 @@
                 <dd>一つの目的と停止・再実行予算の単位</dd>
               </dl>
             </article>
-            <article class="contract-card" aria-label="実行">
-              <p class="contract-card-title">実行</p>
+            <article
+              class="contract-card"
+              aria-label="入力・設定・結果を結び付ける実行のデータ"
+            >
+              <p class="contract-card-title">
+                入力・設定・結果を結び付ける実行のデータ
+              </p>
               <dl>
                 <dt>必須情報・条件付き情報</dt>
                 <dd>
@@ -535,8 +601,13 @@
                 </dd>
               </dl>
             </article>
-            <article class="contract-card" aria-label="再実行の記録">
-              <p class="contract-card-title">再実行の記録</p>
+            <article
+              class="contract-card"
+              aria-label="原因と累積回数を残す再実行のデータ"
+            >
+              <p class="contract-card-title">
+                原因と累積回数を残す再実行のデータ
+              </p>
               <dl>
                 <dt>必須情報・条件付き情報</dt>
                 <dd>
@@ -559,8 +630,13 @@
                 </dd>
               </dl>
             </article>
-            <article class="contract-card" aria-label="ファイル参照">
-              <p class="contract-card-title">ファイル参照</p>
+            <article
+              class="contract-card"
+              aria-label="固定内容と可用性を追跡するファイル参照"
+            >
+              <p class="contract-card-title">
+                固定内容と可用性を追跡するファイル参照
+              </p>
               <dl>
                 <dt>必須情報・条件付き情報</dt>
                 <dd>
@@ -579,8 +655,13 @@
                 <dd>保存済みの特定の実体を識別する</dd>
               </dl>
             </article>
-            <article class="contract-card" aria-label="生成物">
-              <p class="contract-card-title">生成物</p>
+            <article
+              class="contract-card"
+              aria-label="実行の成果と完成判定を残す生成物"
+            >
+              <p class="contract-card-title">
+                実行の成果と完成判定を残す生成物
+              </p>
               <dl>
                 <dt>必須情報・条件付き情報</dt>
                 <dd>
@@ -606,8 +687,13 @@
                 </dd>
               </dl>
             </article>
-            <article class="contract-card" aria-label="保存状態">
-              <p class="contract-card-title">保存状態</p>
+            <article
+              class="contract-card"
+              aria-label="制作実体と依存を固定する保存状態"
+            >
+              <p class="contract-card-title">
+                制作実体と依存を固定する保存状態
+              </p>
               <dl>
                 <dt>必須情報・条件付き情報</dt>
                 <dd>
@@ -629,8 +715,13 @@
                 </dd>
               </dl>
             </article>
-            <article class="contract-card" aria-label="変更記録">
-              <p class="contract-card-title">変更記録</p>
+            <article
+              class="contract-card"
+              aria-label="変更前後と由来を結び付ける変更記録"
+            >
+              <p class="contract-card-title">
+                変更前後と由来を結び付ける変更記録
+              </p>
               <dl>
                 <dt>必須情報・条件付き情報</dt>
                 <dd>
@@ -664,8 +755,13 @@
                 </dd>
               </dl>
             </article>
-            <article class="contract-card" aria-label="編集案">
-              <p class="contract-card-title">編集案</p>
+            <article
+              class="contract-card"
+              aria-label="基準・修正元・検査結果を持つ編集案"
+            >
+              <p class="contract-card-title">
+                基準・修正元・検査結果を持つ編集案
+              </p>
               <dl>
                 <dt>必須情報・条件付き情報</dt>
                 <dd>
@@ -689,8 +785,13 @@
                 </dd>
               </dl>
             </article>
-            <article class="contract-card" aria-label="採否記録">
-              <p class="contract-card-title">採否記録</p>
+            <article
+              class="contract-card"
+              aria-label="判断対象と適用結果を分ける採否記録"
+            >
+              <p class="contract-card-title">
+                判断対象と適用結果を分ける採否記録
+              </p>
               <dl>
                 <dt>必須情報・条件付き情報</dt>
                 <dd>
@@ -723,8 +824,13 @@
                 </dd>
               </dl>
             </article>
-            <article class="contract-card" aria-label="現在状態の更新記録">
-              <p class="contract-card-title">現在状態の更新記録</p>
+            <article
+              class="contract-card"
+              aria-label="現在状態の切替根拠となる更新記録"
+            >
+              <p class="contract-card-title">
+                現在状態の切替根拠となる更新記録
+              </p>
               <dl>
                 <dt>必須情報・条件付き情報</dt>
                 <dd>
@@ -742,8 +848,13 @@
                 <dd>どの状態を次の制作の出発点にしたかを保持する</dd>
               </dl>
             </article>
-            <article class="contract-card" aria-label="文章記録">
-              <p class="contract-card-title">文章記録</p>
+            <article
+              class="contract-card"
+              aria-label="理由・要約・制作意図を保持する文章記録"
+            >
+              <p class="contract-card-title">
+                理由・要約・制作意図を保持する文章記録
+              </p>
               <dl>
                 <dt>必須情報・条件付き情報</dt>
                 <dd>
@@ -764,8 +875,13 @@
                 </dd>
               </dl>
             </article>
-            <article class="contract-card" aria-label="振り返りの参照記録">
-              <p class="contract-card-title">振り返りの参照記録</p>
+            <article
+              class="contract-card"
+              aria-label="分析で使用した根拠を固定する参照記録"
+            >
+              <p class="contract-card-title">
+                分析で使用した根拠を固定する参照記録
+              </p>
               <dl>
                 <dt>必須情報・条件付き情報</dt>
                 <dd>
@@ -788,8 +904,13 @@
         <section aria-labelledby="保存状態の内容と成立" class="spec-section">
           <h2 id="保存状態の内容と成立">4. 保存状態の契約</h2>
           <div class="contract-cards">
-            <article class="contract-card" aria-label="保存状態">
-              <p class="contract-card-title">保存状態</p>
+            <article
+              class="contract-card"
+              aria-label="制作ファイルと依存素材への固定参照"
+            >
+              <p class="contract-card-title">
+                制作ファイルと依存素材への固定参照
+              </p>
               <dl>
                 <dt>仕様</dt>
                 <dd>
@@ -818,8 +939,13 @@
                 </dd>
               </dl>
             </article>
-            <article class="contract-card" aria-label="処理内容">
-              <p class="contract-card-title">処理内容</p>
+            <article
+              class="contract-card"
+              aria-label="新規・取り込み・手修正による状態の作成"
+            >
+              <p class="contract-card-title">
+                新規・取り込み・手修正による状態の作成
+              </p>
               <dl>
                 <dt>仕様</dt>
                 <dd>
@@ -862,8 +988,13 @@
             未採用の編集案へのAI修正と手修正
           </h4>
           <div class="contract-cards">
-            <article class="contract-card" aria-label="採用判断">
-              <p class="contract-card-title">採用判断</p>
+            <article
+              class="contract-card"
+              aria-label="採用対象にできる確定済みの候補状態"
+            >
+              <p class="contract-card-title">
+                採用対象にできる確定済みの候補状態
+              </p>
               <dl>
                 <dt>仕様</dt>
                 <dd>
@@ -882,8 +1013,13 @@
                 </dd>
               </dl>
             </article>
-            <article class="contract-card" aria-label="保護指定">
-              <p class="contract-card-title">保護指定</p>
+            <article
+              class="contract-card"
+              aria-label="追加修正の指示と変更範囲を持つ新しい依頼"
+            >
+              <p class="contract-card-title">
+                追加修正の指示と変更範囲を持つ新しい依頼
+              </p>
               <dl>
                 <dt>仕様</dt>
                 <dd>
@@ -901,8 +1037,13 @@
                 </dd>
               </dl>
             </article>
-            <article class="contract-card" aria-label="保存状態">
-              <p class="contract-card-title">保存状態</p>
+            <article
+              class="contract-card"
+              aria-label="修正元から派生する新しい案と保存状態"
+            >
+              <p class="contract-card-title">
+                修正元から派生する新しい案と保存状態
+              </p>
               <dl>
                 <dt>仕様</dt>
                 <dd>
@@ -939,8 +1080,13 @@
                 </dd>
               </dl>
             </article>
-            <article class="contract-card" aria-label="依頼">
-              <p class="contract-card-title">依頼</p>
+            <article
+              class="contract-card"
+              aria-label="手修正とAI修正を交互につなぐ記録例"
+            >
+              <p class="contract-card-title">
+                手修正とAI修正を交互につなぐ記録例
+              </p>
               <dl>
                 <dt>仕様</dt>
                 <dd>
@@ -957,8 +1103,13 @@
                 </dd>
               </dl>
             </article>
-            <article class="contract-card" aria-label="停止">
-              <p class="contract-card-title">停止</p>
+            <article
+              class="contract-card"
+              aria-label="新しい修正指示と失敗操作の再実行の区別"
+            >
+              <p class="contract-card-title">
+                新しい修正指示と失敗操作の再実行の区別
+              </p>
               <dl>
                 <dt>仕様</dt>
                 <dd>
@@ -983,8 +1134,13 @@
           </div>
           <h4 id="選択と組合せ">選択と組合せ</h4>
           <div class="contract-cards">
-            <article class="contract-card" aria-label="処理内容">
-              <p class="contract-card-title">処理内容</p>
+            <article
+              class="contract-card"
+              aria-label="代替案の選択と独立した変更の組合せ"
+            >
+              <p class="contract-card-title">
+                代替案の選択と独立した変更の組合せ
+              </p>
               <dl>
                 <dt>仕様</dt>
                 <dd>
@@ -1011,8 +1167,13 @@
                 </dd>
               </dl>
             </article>
-            <article class="contract-card" aria-label="採用判断">
-              <p class="contract-card-title">採用判断</p>
+            <article
+              class="contract-card"
+              aria-label="部分採用・競合・案の切替に関する契約"
+            >
+              <p class="contract-card-title">
+                部分採用・競合・案の切替に関する契約
+              </p>
               <dl>
                 <dt>仕様</dt>
                 <dd>
@@ -1034,8 +1195,13 @@
         <section aria-labelledby="派生作品のデータ" class="spec-section">
           <h2 id="派生作品のデータ">7. 派生作品</h2>
           <div class="contract-cards">
-            <article class="contract-card" aria-label="派生">
-              <p class="contract-card-title">派生</p>
+            <article
+              class="contract-card"
+              aria-label="起点を共有し編集を分離する派生作品"
+            >
+              <p class="contract-card-title">
+                起点を共有し編集を分離する派生作品
+              </p>
               <dl>
                 <dt>仕様</dt>
                 <dd>
@@ -1055,8 +1221,11 @@
                 </dd>
               </dl>
             </article>
-            <article class="contract-card" aria-label="復元">
-              <p class="contract-card-title">復元</p>
+            <article
+              class="contract-card"
+              aria-label="由来の役割と現在採用状態の参照"
+            >
+              <p class="contract-card-title">由来の役割と現在採用状態の参照</p>
               <dl>
                 <dt>仕様</dt>
                 <dd>
@@ -1075,15 +1244,23 @@
         <section aria-labelledby="会話共有情報原文と要約" class="spec-section">
           <h2 id="会話共有情報原文と要約">8. 会話の共有情報</h2>
           <div class="contract-cards">
-            <article class="contract-card" aria-label="所属">
-              <p class="contract-card-title">所属</p>
+            <article
+              class="contract-card"
+              aria-label="一作品に所属する制作会話"
+            >
+              <p class="contract-card-title">一作品に所属する制作会話</p>
               <dl>
                 <dt>仕様</dt>
                 <dd>制作会話は一作品に所属する。</dd>
               </dl>
             </article>
-            <article class="contract-card" aria-label="共有情報">
-              <p class="contract-card-title">共有情報</p>
+            <article
+              class="contract-card"
+              aria-label="複数の会話で共有する作品の制作情報"
+            >
+              <p class="contract-card-title">
+                複数の会話で共有する作品の制作情報
+              </p>
               <dl>
                 <dt>仕様</dt>
                 <dd>
@@ -1091,8 +1268,13 @@
                 </dd>
               </dl>
             </article>
-            <article class="contract-card" aria-label="実行参照">
-              <p class="contract-card-title">実行参照</p>
+            <article
+              class="contract-card"
+              aria-label="実際に実行へ渡した共有情報の固定"
+            >
+              <p class="contract-card-title">
+                実際に実行へ渡した共有情報の固定
+              </p>
               <dl>
                 <dt>仕様</dt>
                 <dd>
@@ -1100,8 +1282,13 @@
                 </dd>
               </dl>
             </article>
-            <article class="contract-card" aria-label="現在状態の起点">
-              <p class="contract-card-title">現在状態の起点</p>
+            <article
+              class="contract-card"
+              aria-label="着手直前に固定する現在状態の起点"
+            >
+              <p class="contract-card-title">
+                着手直前に固定する現在状態の起点
+              </p>
               <dl>
                 <dt>仕様</dt>
                 <dd>
@@ -1109,8 +1296,13 @@
                 </dd>
               </dl>
             </article>
-            <article class="contract-card" aria-label="候補の起点">
-              <p class="contract-card-title">候補の起点</p>
+            <article
+              class="contract-card"
+              aria-label="明示した候補の起点と最新の保護の確認"
+            >
+              <p class="contract-card-title">
+                明示した候補の起点と最新の保護の確認
+              </p>
               <dl>
                 <dt>仕様</dt>
                 <dd>
@@ -1118,8 +1310,11 @@
                 </dd>
               </dl>
             </article>
-            <article class="contract-card" aria-label="前提確認">
-              <p class="contract-card-title">前提確認</p>
+            <article
+              class="contract-card"
+              aria-label="実行前の前提変更に対する確認"
+            >
+              <p class="contract-card-title">実行前の前提変更に対する確認</p>
               <dl>
                 <dt>仕様</dt>
                 <dd>前提が変わった場合の確認は実行状態設計で具体化する。</dd>
@@ -1130,8 +1325,13 @@
           <section aria-labelledby="会話の要約記録" class="spec-subsection">
             <h3 id="会話の要約記録">8-1. 会話の要約記録</h3>
             <div class="contract-cards">
-              <article class="contract-card" aria-label="対象範囲">
-                <p class="contract-card-title">対象範囲</p>
+              <article
+                class="contract-card"
+                aria-label="対象メッセージ範囲を持つ会話要約"
+              >
+                <p class="contract-card-title">
+                  対象メッセージ範囲を持つ会話要約
+                </p>
                 <dl>
                   <dt>仕様</dt>
                   <dd>
@@ -1140,15 +1340,23 @@
                   </dd>
                 </dl>
               </article>
-              <article class="contract-card" aria-label="訂正">
-                <p class="contract-card-title">訂正</p>
+              <article
+                class="contract-card"
+                aria-label="新しい文章IDによる要約の訂正"
+              >
+                <p class="contract-card-title">新しい文章IDによる要約の訂正</p>
                 <dl>
                   <dt>仕様</dt>
                   <dd>訂正時は新しい文章 ID を持つ。</dd>
                 </dl>
               </article>
-              <article class="contract-card" aria-label="Codexとの対応">
-                <p class="contract-card-title">Codexとの対応</p>
+              <article
+                class="contract-card"
+                aria-label="複数turnと制作のやり直しを記録する対応"
+              >
+                <p class="contract-card-title">
+                  複数turnと制作のやり直しを記録する対応
+                </p>
                 <dl>
                   <dt>仕様</dt>
                   <dd>
@@ -1163,8 +1371,13 @@
         <section aria-labelledby="振り返りのデータ" class="spec-section">
           <h2 id="振り返りのデータ">9. 振り返りの記録</h2>
           <div class="contract-cards">
-            <article class="contract-card" aria-label="複数作品">
-              <p class="contract-card-title">複数作品</p>
+            <article
+              class="contract-card"
+              aria-label="対象作品集合を固定する横断的な振り返り"
+            >
+              <p class="contract-card-title">
+                対象作品集合を固定する横断的な振り返り
+              </p>
               <dl>
                 <dt>仕様</dt>
                 <dd>
@@ -1172,15 +1385,25 @@
                 </dd>
               </dl>
             </article>
-            <article class="contract-card" aria-label="単作品">
-              <p class="contract-card-title">単作品</p>
+            <article
+              class="contract-card"
+              aria-label="単作品の振り返りにも使う分析参照記録"
+            >
+              <p class="contract-card-title">
+                単作品の振り返りにも使う分析参照記録
+              </p>
               <dl>
                 <dt>仕様</dt>
                 <dd>一作品の振り返りにも同じ参照記録を使う。</dd>
               </dl>
             </article>
-            <article class="contract-card" aria-label="仮説と制作方針">
-              <p class="contract-card-title">仮説と制作方針</p>
+            <article
+              class="contract-card"
+              aria-label="作風の仮説と採用済みの制作方針の識別"
+            >
+              <p class="contract-card-title">
+                作風の仮説と採用済みの制作方針の識別
+              </p>
               <dl>
                 <dt>仕様</dt>
                 <dd>
@@ -1188,8 +1411,11 @@
                 </dd>
               </dl>
             </article>
-            <article class="contract-card" aria-label="分析根拠">
-              <p class="contract-card-title">分析根拠</p>
+            <article
+              class="contract-card"
+              aria-label="分析根拠とGitへ保存した採用内容"
+            >
+              <p class="contract-card-title">分析根拠とGitへ保存した採用内容</p>
               <dl>
                 <dt>仕様</dt>
                 <dd>
@@ -1198,15 +1424,23 @@
                 </dd>
               </dl>
             </article>
-            <article class="contract-card" aria-label="作風更新">
-              <p class="contract-card-title">作風更新</p>
+            <article
+              class="contract-card"
+              aria-label="人間が選ぶ作風更新の旧参照と新参照"
+            >
+              <p class="contract-card-title">
+                人間が選ぶ作風更新の旧参照と新参照
+              </p>
               <dl>
                 <dt>仕様</dt>
                 <dd>作品への作風更新は人間が選び、旧参照と新参照を残す。</dd>
               </dl>
             </article>
-            <article class="contract-card" aria-label="文脈取得">
-              <p class="contract-card-title">文脈取得</p>
+            <article
+              class="contract-card"
+              aria-label="文脈設計に従う分析用の記録取得"
+            >
+              <p class="contract-card-title">文脈設計に従う分析用の記録取得</p>
               <dl>
                 <dt>仕様</dt>
                 <dd>
@@ -1227,8 +1461,13 @@
         >
           <h2 id="実行windows-の記録エージェント改訂履歴">10. 実行記録</h2>
           <div class="contract-cards">
-            <article class="contract-card" aria-label="モデル">
-              <p class="contract-card-title">モデル</p>
+            <article
+              class="contract-card"
+              aria-label="実行で使った定義・モデル・入力の記録"
+            >
+              <p class="contract-card-title">
+                実行で使った定義・モデル・入力の記録
+              </p>
               <dl>
                 <dt>仕様</dt>
                 <dd>
@@ -1245,8 +1484,13 @@
                 </dd>
               </dl>
             </article>
-            <article class="contract-card" aria-label="再実行">
-              <p class="contract-card-title">再実行</p>
+            <article
+              class="contract-card"
+              aria-label="依頼全体で維持する再実行予算と再開条件"
+            >
+              <p class="contract-card-title">
+                依頼全体で維持する再実行予算と再開条件
+              </p>
               <dl>
                 <dt>仕様</dt>
                 <dd>
@@ -1262,8 +1506,11 @@
                 </dd>
               </dl>
             </article>
-            <article class="contract-card" aria-label="停止">
-              <p class="contract-card-title">停止</p>
+            <article
+              class="contract-card"
+              aria-label="AI実行とWindows実行の親子関係"
+            >
+              <p class="contract-card-title">AI実行とWindows実行の親子関係</p>
               <dl>
                 <dt>仕様</dt>
                 <dd>
@@ -1278,8 +1525,13 @@
                 </dd>
               </dl>
             </article>
-            <article class="contract-card" aria-label="整合性">
-              <p class="contract-card-title">整合性</p>
+            <article
+              class="contract-card"
+              aria-label="入力・出力ハッシュとレンダー条件の記録"
+            >
+              <p class="contract-card-title">
+                入力・出力ハッシュとレンダー条件の記録
+              </p>
               <dl>
                 <dt>仕様</dt>
                 <dd>
@@ -1316,8 +1568,13 @@
         >
           <h2 id="記録が成立する単位と不変条件">11. 記録の成立条件</h2>
           <div class="contract-cards">
-            <article class="contract-card" aria-label="保存状態の確定">
-              <p class="contract-card-title">保存状態の確定</p>
+            <article
+              class="contract-card"
+              aria-label="構成・変更・ファイルが揃う保存状態の確定"
+            >
+              <p class="contract-card-title">
+                構成・変更・ファイルが揃う保存状態の確定
+              </p>
               <dl>
                 <dt>仕様</dt>
                 <dd>
@@ -1333,8 +1590,13 @@
                 </dd>
               </dl>
             </article>
-            <article class="contract-card" aria-label="案の参照整合性">
-              <p class="contract-card-title">案の参照整合性</p>
+            <article
+              class="contract-card"
+              aria-label="編集案の基準・修正元・入力の参照整合性"
+            >
+              <p class="contract-card-title">
+                編集案の基準・修正元・入力の参照整合性
+              </p>
               <dl>
                 <dt>仕様</dt>
                 <dd>
@@ -1353,8 +1615,13 @@
                 </dd>
               </dl>
             </article>
-            <article class="contract-card" aria-label="採用の適用">
-              <p class="contract-card-title">採用の適用</p>
+            <article
+              class="contract-card"
+              aria-label="採用判断と制作状態への適用成功の区別"
+            >
+              <p class="contract-card-title">
+                採用判断と制作状態への適用成功の区別
+              </p>
               <dl>
                 <dt>仕様</dt>
                 <dd>
@@ -1367,8 +1634,13 @@
                 </dd>
               </dl>
             </article>
-            <article class="contract-card" aria-label="DB更新">
-              <p class="contract-card-title">DB更新</p>
+            <article
+              class="contract-card"
+              aria-label="現在状態と更新記録の一体的なDB確定"
+            >
+              <p class="contract-card-title">
+                現在状態と更新記録の一体的なDB確定
+              </p>
               <dl>
                 <dt>仕様</dt>
                 <dd>
@@ -1385,8 +1657,13 @@
                 </dd>
               </dl>
             </article>
-            <article class="contract-card" aria-label="理由の補記">
-              <p class="contract-card-title">理由の補記</p>
+            <article
+              class="contract-card"
+              aria-label="任意の理由入力と後日の補記・訂正"
+            >
+              <p class="contract-card-title">
+                任意の理由入力と後日の補記・訂正
+              </p>
               <dl>
                 <dt>仕様</dt>
                 <dd>
@@ -1397,8 +1674,13 @@
                 </dd>
               </dl>
             </article>
-            <article class="contract-card" aria-label="実体の可用性">
-              <p class="contract-card-title">実体の可用性</p>
+            <article
+              class="contract-card"
+              aria-label="制作実体が失われた後も残す履歴の参照"
+            >
+              <p class="contract-card-title">
+                制作実体が失われた後も残す履歴の参照
+              </p>
               <dl>
                 <dt>仕様</dt>
                 <dd>
@@ -1413,8 +1695,11 @@
                 </dd>
               </dl>
             </article>
-            <article class="contract-card" aria-label="再送の照合">
-              <p class="contract-card-title">再送の照合</p>
+            <article
+              class="contract-card"
+              aria-label="再送を同じ記録へ対応付ける照合"
+            >
+              <p class="contract-card-title">再送を同じ記録へ対応付ける照合</p>
               <dl>
                 <dt>仕様</dt>
                 <dd>
@@ -1507,8 +1792,13 @@
             </figcaption>
           </figure>
           <div class="contract-cards">
-            <article class="contract-card" aria-label="採用判断">
-              <p class="contract-card-title">採用判断</p>
+            <article
+              class="contract-card"
+              aria-label="採用・修正の判断と変更者を追跡する履歴"
+            >
+              <p class="contract-card-title">
+                採用・修正の判断と変更者を追跡する履歴
+              </p>
               <dl>
                 <dt>仕様</dt>
                 <dd>
