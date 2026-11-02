@@ -13,6 +13,7 @@ import { openStore, OperationError } from "./store.js";
 import { gitVersions } from "./versions.js";
 import { registerChat } from "./chat.js";
 import { connectCodex, type CodexConnection } from "./codex.js";
+import { text, bodySchema, idParams } from "./http-schema.js";
 
 interface AppOptions {
   directory: string;
@@ -27,28 +28,6 @@ interface AppOptions {
   instanceSecret?: string;
   onShutdown?: () => void;
 }
-const text = { type: "string", minLength: 1 } as const;
-const key = {
-  type: "string",
-  minLength: 8,
-  maxLength: 128,
-  pattern: "^[a-zA-Z0-9_-]+$",
-} as const;
-const bodySchema = (
-  properties: Record<string, unknown>,
-  required: string[],
-) => ({
-  type: "object",
-  additionalProperties: false,
-  properties: { requestKey: key, ...properties },
-  required: ["requestKey", ...required],
-});
-const idParams = {
-  type: "object",
-  properties: { id: { type: "string", format: "uuid" } },
-  required: ["id"],
-  additionalProperties: false,
-};
 
 export async function createApp(options: AppOptions) {
   if (options.fileRoots) validateFileRoots(options.fileRoots);

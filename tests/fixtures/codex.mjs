@@ -9,6 +9,10 @@ createInterface({ input: process.stdin }).on("line", (line) => {
   const p = m.params ?? {};
   if (!m.id) return;
   let result = {};
+  if (m.method === "test/exit") {
+    process.kill(process.pid, "SIGKILL");
+    return;
+  }
   if (m.method === "initialize") result = { userAgent: "codex-fixture/1" };
   if (m.method === "account/read") result = { account: { type: "chatgpt" } };
   if (m.method === "model/list")

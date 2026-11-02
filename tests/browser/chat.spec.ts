@@ -41,5 +41,24 @@ test("モデル選択・SSE再接続・会話継続・停止を画面から行�
   await page.getByRole("button", { name: "Codexへ送信", exact: true }).click();
   await page.getByRole("button", { name: "停止", exact: true }).click();
   await expect(page.getByText("停止しました", { exact: true })).toBeVisible();
+  // A slow catalog response must not roll a newer SSE terminal back to running.
+  let releaseStatus: () => void = () => {};
+  const heldStatus = new Promise<void>((resolve) => (releaseStatus = resolve));
+  await page.route(
+    "**/api/codex",
+    async (route) => {
+      await heldStatus;
+      await route.continue();
+    },
+    { times: 1 },
+  );
+  await page.getByLabel("Codexへのメッセージ").fill("接続状態が遅い間の会話");
+  await page.getByRole("button", { name: "Codexへ送信", exact: true }).click();
+  await expect(page.getByText("完了", { exact: true })).toHaveCount(2);
+  releaseStatus();
+  await expect(
+    page.getByRole("button", { name: "接続状態を更新" }),
+  ).toBeEnabled();
+  await expect(page.getByText("完了", { exact: true })).toHaveCount(2);
   await page.screenshot({ path: "test-results/chat.png", fullPage: true });
 });

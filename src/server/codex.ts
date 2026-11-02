@@ -43,6 +43,7 @@ export async function connectCodex(
   );
   child.stderr.resume(); // May contain credentials or paths. Never log it.
   let sequence = 0;
+  let exited = false;
   const listeners = new Set<(method: string, params: any) => void>();
   const pending = new Map<
     number,
@@ -61,8 +62,14 @@ export async function connectCodex(
     pending.clear();
     for (const listener of listeners) listener("connection/lost", {});
   }
-  child.once("error", lost);
-  child.once("exit", lost);
+  child.once("error", () => {
+    exited = true;
+    lost();
+  });
+  child.once("exit", () => {
+    exited = true;
+    lost();
+  });
   child.stdin.on("error", () => {});
   const lines = createInterface({ input: child.stdout });
   lines.on("line", (line) => {
@@ -97,7 +104,13 @@ export async function connectCodex(
     available: true,
     runtime: null,
     rpc(method, params) {
-      if (child.exitCode !== null || child.killed)
+      if (
+        exited ||
+        child.exitCode !== null ||
+        child.signalCode !== null ||
+        child.killed ||
+        connection.available === false
+      )
         return Promise.reject(new OperationError(409, "CODEX_DISCONNECTED"));
       const id = ++sequence;
       return new Promise((resolve, reject) => {
@@ -119,7 +132,8 @@ export async function connectCodex(
       listeners.clear();
       lost();
       lines.close();
-      if (child.exitCode !== null) return;
+      if (exited || child.exitCode !== null || child.signalCode !== null)
+        return;
       await new Promise<void>((resolve) => {
         const timer = setTimeout(() => child.kill("SIGKILL"), 2000);
         child.once("exit", () => {

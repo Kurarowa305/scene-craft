@@ -38,7 +38,7 @@ Windows側の`%LOCALAPPDATA%\scene-craft\Launcher.ps1`は今回の最新版を�
 | `chat_sessions` | `conversation_id` PK/FK, `data` TEXT | 会話とCodex thread、次の依頼用のモデル選択 |
 | `chat_selections` | `sequence` INTEGER PK AUTOINCREMENT, `data` TEXT | 選択順のモデル・推論強度・速度。新しい会話へ継承 |
 | `chat_requests` | `sequence` INTEGER PK AUTOINCREMENT, `id` UNIQUE, `conversation_id` FK, `work_id` FK, `data` TEXT | 依頼原文、固定版、実行設定、途中/終端、停止、再開履歴 |
-| `chat_events` | `sequence` INTEGER PK AUTOINCREMENT, `conversation_id` FK, `request_id` FK | SSE用の永続更新順。本文は依頼の`data`に保持 |
+| `chat_events` | `sequence` INTEGER PK AUTOINCREMENT, `conversation_id` FK, `request_id` nullable FK | SSE用の永続更新順。選択・thread更新はrequest_idなし。本文は依頼の`data`に保持 |
 
 `chat_sessions.data`: `conversationId`, `threadId`, `selection {model, effort, speed}`。
 

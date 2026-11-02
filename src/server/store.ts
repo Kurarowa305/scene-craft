@@ -174,7 +174,7 @@ export function openStore(directory: string) {
       CREATE TABLE chat_sessions (conversation_id TEXT PRIMARY KEY REFERENCES conversations(id), data TEXT NOT NULL);
       CREATE TABLE chat_selections (sequence INTEGER PRIMARY KEY AUTOINCREMENT, data TEXT NOT NULL);
       CREATE TABLE chat_requests (sequence INTEGER PRIMARY KEY AUTOINCREMENT, id TEXT NOT NULL UNIQUE, conversation_id TEXT NOT NULL REFERENCES conversations(id), work_id TEXT NOT NULL REFERENCES works(id), data TEXT NOT NULL);
-      CREATE TABLE chat_events (sequence INTEGER PRIMARY KEY AUTOINCREMENT, conversation_id TEXT NOT NULL REFERENCES conversations(id), request_id TEXT NOT NULL REFERENCES chat_requests(id));
+      CREATE TABLE chat_events (sequence INTEGER PRIMARY KEY AUTOINCREMENT, conversation_id TEXT NOT NULL REFERENCES conversations(id), request_id TEXT REFERENCES chat_requests(id));
       COMMIT;`);
   }
   const chat = chatStore(db, once);

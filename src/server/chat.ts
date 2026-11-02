@@ -8,6 +8,14 @@ import type {
 import type { VersionPlan } from "../shared/versions.js";
 import type { CodexConnection } from "./codex.js";
 import { OperationError, type openStore } from "./store.js";
+import { idParams as params, bodySchema as body } from "./http-schema.js";
+const blockingErrors = new Set([
+  "MODEL_REROUTED",
+  "USAGE_LIMIT",
+  "AUTH_REQUIRED",
+  "MODEL_UNAVAILABLE",
+  "PERMISSION_DENIED",
+]);
 
 export function registerChat(
   app: FastifyInstance,
@@ -69,13 +77,7 @@ export function registerChat(
     if (
       ["completed", "interrupted"].includes(turn.status) &&
       r.error &&
-      ![
-        "MODEL_REROUTED",
-        "USAGE_LIMIT",
-        "AUTH_REQUIRED",
-        "MODEL_UNAVAILABLE",
-        "PERMISSION_DENIED",
-      ].includes(r.error)
+      !blockingErrors.has(r.error)
     )
       r.error = null;
     if (turn.error) r.error = classify(turn.error.codexErrorInfo);
@@ -204,6 +206,7 @@ export function registerChat(
     if (executing.has(id) || chat.get(id).phase !== "accepted") return;
     executing.add(id);
     let startIssued = false;
+    let createdThread = false;
     try {
       const c = await authenticate();
       let r = chat.get(id);
@@ -219,6 +222,7 @@ export function registerChat(
       // Revalidate fixed versions before touching an external runtime. No HEAD resolution.
       validate(r.plan);
       const s = chat.session(r.conversationId);
+      createdThread = !s.threadId;
       const settings = {
         model: r.selection.model,
         modelProvider: "openai",
@@ -254,6 +258,10 @@ export function registerChat(
       )
         throw new OperationError(409, "MODEL_REROUTED");
       if (r.stopRequested) {
+        if (createdThread) {
+          latestSession.threadId = null;
+          chat.saveSession(latestSession);
+        }
         r.phase = "interrupted";
         r.terminal = "notStarted";
         save(r);
@@ -283,6 +291,11 @@ export function registerChat(
     } catch (error) {
       const r = chat.get(id);
       if (!r.terminal) {
+        if (createdThread && !startIssued) {
+          const s = chat.session(r.conversationId);
+          s.threadId = null;
+          chat.saveSession(s);
+        }
         r.error = error instanceof OperationError ? error.code : "CODEX_FAILED";
         r.phase = startIssued ? "unknown" : "blocked";
         if (!startIssued) r.terminal = "notStarted";
@@ -294,6 +307,7 @@ export function registerChat(
   }
   async function reconcile(id: string) {
     const r = chat.get(id);
+    if (r.terminal === "notStarted") return r;
     if (!r.threadId) return r;
     const c = await runtime();
     const turns: any[] = [];
@@ -316,10 +330,18 @@ export function registerChat(
     // Only an acknowledged turn ID can settle this request; matching text is insufficient.
     const turn = turns.find((t) => t.id === r.turnId);
     if (!turn) {
-      r.phase = "unknown";
-      r.error = "ACCEPTANCE_UNKNOWN";
-      save(r);
-      return r;
+      const latest = chat.get(id);
+      if (
+        latest.terminal ||
+        latest.turnId !== r.turnId ||
+        latest.retryCount !== r.retryCount
+      )
+        return latest;
+      latest.phase = "unknown";
+      if (!blockingErrors.has(latest.error ?? ""))
+        latest.error = "ACCEPTANCE_UNKNOWN";
+      save(latest);
+      return latest;
     }
     let itemCursor: string | null = null;
     const items: any[] = [];
@@ -345,29 +367,16 @@ export function registerChat(
     const latest = chat.get(id);
     if (latest.turnId !== r.turnId || latest.retryCount !== r.retryCount)
       throw new OperationError(409, "STALE_RECONCILIATION");
+    if (
+      latest.terminal &&
+      !["completed", "interrupted", "failed"].includes(turn.status)
+    )
+      return latest;
     terminal(latest, { ...turn, items });
     save(latest);
     if (latest.stopRequested && !latest.terminal) await interrupt(latest);
     return latest;
   }
-  const params = {
-    type: "object",
-    additionalProperties: false,
-    required: ["id"],
-    properties: { id: { type: "string", format: "uuid" } },
-  };
-  const key = {
-    type: "string",
-    minLength: 8,
-    maxLength: 128,
-    pattern: "^[a-zA-Z0-9_-]+$",
-  };
-  const body = (properties: Record<string, unknown>, required: string[]) => ({
-    type: "object",
-    additionalProperties: false,
-    required: ["requestKey", ...required],
-    properties: { requestKey: key, ...properties },
-  });
   app.get("/api/codex", async () => {
     try {
       const c = await runtime();

@@ -33,6 +33,11 @@ interface Status {
 }
 export function Chat({ conversationId }: { conversationId: string }) {
   const [view, setView] = useState<ChatView>();
+  function applyView(next: ChatView) {
+    setView((previous) =>
+      previous && previous.revision > next.revision ? previous : next,
+    );
+  }
   const [status, setStatus] = useState<Status>();
   const [draft, setDraft] = useState("");
   const [error, setError] = useState("");
@@ -48,7 +53,7 @@ export function Chat({ conversationId }: { conversationId: string }) {
       read<ChatView>(`/api/conversations/${conversationId}/chat`),
     ]);
     setStatus(s);
-    setView(v);
+    applyView(v);
   }
   useEffect(() => {
     let current = true;
@@ -60,10 +65,10 @@ export function Chat({ conversationId }: { conversationId: string }) {
       .then(([s, v]) => {
         if (!current) return;
         setStatus(s);
-        setView(v);
+        applyView(v);
         source = new EventSource(`/api/conversations/${conversationId}/events`);
         source.addEventListener("chat", (event) => {
-          if (current) setView(JSON.parse((event as MessageEvent).data));
+          if (current) applyView(JSON.parse((event as MessageEvent).data));
         });
         source.onerror = () => {
           if (current)

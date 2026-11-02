@@ -35,6 +35,9 @@ export function chatStore(
     db.prepare(
       "UPDATE chat_sessions SET data = ? WHERE conversation_id = ?",
     ).run(JSON.stringify(value), value.conversationId);
+    db.prepare(
+      "INSERT INTO chat_events (conversation_id, request_id) VALUES (?, NULL)",
+    ).run(value.conversationId);
   }
   function requests(id?: string): ChatRequest[] {
     return db
@@ -170,6 +173,7 @@ export function chatStore(
           throw new OperationError(409, "CHAT_RECONCILIATION_REQUIRED");
         const s = session(r.conversationId);
         r.attempts.push({
+          stopRequested: r.stopRequested,
           turnId: r.turnId,
           selection: r.selection,
           actualModel: r.actualModel,

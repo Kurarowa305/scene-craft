@@ -7,6 +7,99 @@ import { createApp } from "../src/server/app.js";
 import { gitFixture, cleanGitFixture } from "./git-fixture.js";
 import { chatFixture } from "./chat-fixture.js";
 
+test("遅い空の履歴ページでも新しい終端を消さず、確定した未開始を結果不明にしない", async () => {
+  const f = await chatFixture();
+  try {
+    const r = await f.send();
+    let release: (value: any) => void = () => {};
+    let entered: () => void = () => {};
+    const waiting = new Promise<void>((resolve) => (entered = resolve));
+    f.setHook((method) => {
+      if (method === "thread/turns/list") {
+        entered();
+        return new Promise((resolve) => (release = resolve));
+      }
+    });
+    const checking = f.post(`/api/chat-requests/${r.id}/reconcile`);
+    await waiting;
+    f.notify("turn/completed", {
+      turn: { id: "turn-1", status: "completed", items: [] },
+    });
+    release({ data: [], nextCursor: null });
+    await checking;
+    assert.equal((await f.view()).requests[0].phase, "completed");
+    f.setHook(undefined);
+    f.setAuthenticated(false);
+    const second = await f.send();
+    assert.equal((await f.view()).requests[1].terminal, "notStarted");
+    await f.post(`/api/chat-requests/${second.id}/reconcile`);
+    assert.equal((await f.view()).requests[1].terminal, "notStarted");
+    assert.equal((await f.view()).requests[1].phase, "blocked");
+  } finally {
+    await f.close();
+  }
+});
+
+test("履歴照合の途中に到着した完了通知を古い履歴で実行中へ戻さない", async () => {
+  const f = await chatFixture();
+  try {
+    const r = await f.send();
+    let release: (value: any) => void = () => {};
+    let entered: () => void = () => {};
+    const waiting = new Promise<void>((resolve) => (entered = resolve));
+    f.setHook((method) => {
+      if (method === "thread/turns/list")
+        return {
+          data: [{ id: "turn-1", status: "inProgress", items: [] }],
+          nextCursor: null,
+        };
+      if (method === "thread/items/list") {
+        entered();
+        return new Promise((resolve) => (release = resolve));
+      }
+    });
+    const reconciling = f.post(`/api/chat-requests/${r.id}/reconcile`);
+    await waiting;
+    f.notify("turn/completed", {
+      turn: { id: "turn-1", status: "completed", items: [] },
+    });
+    release({ data: [], nextCursor: null });
+    await reconciling;
+    assert.equal((await f.view()).requests[0].phase, "completed");
+  } finally {
+    await f.close();
+  }
+});
+
+test("初回thread作成中の停止後は、未送信の空threadをresumeせず明示再開できる", async () => {
+  const f = await chatFixture();
+  try {
+    let release: (value: any) => void = () => {};
+    f.setHook((method) => {
+      if (method === "thread/start")
+        return new Promise((resolve) => (release = resolve));
+      if (method === "thread/resume")
+        throw new Error("Empty thread cannot resume");
+    });
+    const r = await f.send();
+    await f.post(`/api/chat-requests/${r.id}/stop`);
+    release({
+      thread: { id: "empty-thread" },
+      model: "a",
+      modelProvider: "openai",
+    });
+    await new Promise((resolve) => setTimeout(resolve, 20));
+    assert.equal((await f.view()).requests[0].terminal, "notStarted");
+    f.setHook(undefined);
+    await f.post(`/api/chat-requests/${r.id}/resume`);
+    await new Promise((resolve) => setTimeout(resolve, 30));
+    assert.equal(f.calls.filter((c) => c.method === "thread/resume").length, 0);
+    assert.equal(f.calls.filter((c) => c.method === "turn/start").length, 1);
+  } finally {
+    await f.close();
+  }
+});
+
 test("Codex会話を公開操作で開始し、同じ受付は一度だけ実行して原文と終端を開き直す", async () => {
   const directory = await mkdtemp(join(tmpdir(), "scene-chat-"));
   const git = await gitFixture(directory);
@@ -196,6 +289,7 @@ test("停止を先に保存し、停止中の新規送信を拒否してinterrup
     await new Promise((resolve) => setTimeout(resolve, 30));
     const value = (await f.view()).requests[0];
     assert.equal(value.retryCount, 1);
+    assert.equal(value.attempts[0].stopRequested, true);
     assert.equal(value.attempts[0].items[0].text, "途中");
     assert.equal(value.body, "保持する原文");
   } finally {

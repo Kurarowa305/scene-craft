@@ -25,6 +25,7 @@ export interface ChatItem {
 }
 export interface ChatRequest {
   attempts: {
+    stopRequested: boolean;
     turnId: string | null;
     selection: ModelChoice;
     actualModel: string | null;
