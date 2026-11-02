@@ -269,8 +269,13 @@
         <section aria-labelledby="技術とプロセス" class="spec-section">
           <h2 id="技術とプロセス">3. 採用技術</h2>
           <div class="contract-cards">
-            <article class="contract-card" aria-label="画面">
-              <p class="contract-card-title">画面</p>
+            <article
+              class="contract-card"
+              aria-label="React・TypeScript・Viteによる画面配信"
+            >
+              <p class="contract-card-title">
+                React・TypeScript・Viteによる画面配信
+              </p>
               <dl>
                 <dt>仕様</dt>
                 <dd>
@@ -284,8 +289,13 @@
                 </dd>
               </dl>
             </article>
-            <article class="contract-card" aria-label="バックエンド">
-              <p class="contract-card-title">バックエンド</p>
+            <article
+              class="contract-card"
+              aria-label="Node.js・FastifyによるWSLバックエンド"
+            >
+              <p class="contract-card-title">
+                Node.js・FastifyによるWSLバックエンド
+              </p>
               <dl>
                 <dt>仕様</dt>
                 <dd>
@@ -294,8 +304,11 @@
                 </dd>
               </dl>
             </article>
-            <article class="contract-card" aria-label="データベース">
-              <p class="contract-card-title">データベース</p>
+            <article
+              class="contract-card"
+              aria-label="WSL側SQLiteによる制作記録の保存"
+            >
+              <p class="contract-card-title">WSL側SQLiteによる制作記録の保存</p>
               <dl>
                 <dt>仕様</dt>
                 <dd>
@@ -311,8 +324,11 @@
                 </dd>
               </dl>
             </article>
-            <article class="contract-card" aria-label="通信分離">
-              <p class="contract-card-title">通信分離</p>
+            <article
+              class="contract-card"
+              aria-label="指示と進捗を分けるHTTP・SSE通信"
+            >
+              <p class="contract-card-title">指示と進捗を分けるHTTP・SSE通信</p>
               <dl>
                 <dt>仕様</dt>
                 <dd>
@@ -441,15 +457,25 @@
         <section aria-labelledby="通信とモジュールの責務" class="spec-section">
           <h2 id="通信とモジュールの責務">5. 通信とモジュールの責務</h2>
           <div class="contract-cards">
-            <article class="contract-card" aria-label="通信方式">
-              <p class="contract-card-title">通信方式</p>
+            <article
+              class="contract-card"
+              aria-label="ブラウザとバックエンドの通信方式"
+            >
+              <p class="contract-card-title">
+                ブラウザとバックエンドの通信方式
+              </p>
               <dl>
                 <dt>仕様</dt>
                 <dd>ブラウザからの指示は HTTP、進捗配信は SSE を採用する。</dd>
               </dl>
             </article>
-            <article class="contract-card" aria-label="受付範囲">
-              <p class="contract-card-title">受付範囲</p>
+            <article
+              class="contract-card"
+              aria-label="同一originとlocalhostに限定する受付"
+            >
+              <p class="contract-card-title">
+                同一originとlocalhostに限定する受付
+              </p>
               <dl>
                 <dt>仕様</dt>
                 <dd>
@@ -458,8 +484,13 @@
                 </dd>
               </dl>
             </article>
-            <article class="contract-card" aria-label="再接続">
-              <p class="contract-card-title">再接続</p>
+            <article
+              class="contract-card"
+              aria-label="再接続時の保存状態とイベントの照合"
+            >
+              <p class="contract-card-title">
+                再接続時の保存状態とイベントの照合
+              </p>
               <dl>
                 <dt>仕様</dt>
                 <dd>
@@ -556,15 +587,14 @@
             class="anchor-alias"
             id="保存と実装構成"
           ></span>
-          <div class="contract-cards">
-            <article
-              class="contract-card"
-              aria-label="制作データと管理データの配置"
+          <figure class="process-diagram">
+            <ol
+              aria-label="保存先の解決から表示・書き出しまで"
+              class="process-flow"
             >
-              <p class="contract-card-title">制作データと管理データの配置</p>
-              <dl>
-                <dt>仕様</dt>
-                <dd>
+              <li>
+                <strong>制作データと管理データの配置を確定する</strong>
+                <div class="process-detail">
                   <ul class="cell-list">
                     <li>Windows の制作ルートと WSL の管理データを分ける。</li>
                     <li>
@@ -572,17 +602,11 @@
                       ファイルシステム上の別ディレクトリとする。
                     </li>
                   </ul>
-                </dd>
-              </dl>
-            </article>
-            <article
-              class="contract-card"
-              aria-label="制作ファイルの参照とパス変換"
-            >
-              <p class="contract-card-title">制作ファイルの参照とパス変換</p>
-              <dl>
-                <dt>仕様</dt>
-                <dd>
+                </div>
+              </li>
+              <li>
+                <strong>制作ファイルの参照とパスを解決する</strong>
+                <div class="process-detail">
                   <ul class="cell-list">
                     <li>
                       制作ファイルは保存ルート ID と相対パスで参照し、実際の
@@ -593,31 +617,11 @@
                       パス変換、リンク先・ルート逸脱の検査は保存モジュールが担う。
                     </li>
                   </ul>
-                </dd>
-              </dl>
-            </article>
-            <article
-              class="contract-card"
-              aria-label="ブラウザからの表示・取得"
-            >
-              <p class="contract-card-title">ブラウザからの表示・取得</p>
-              <dl>
-                <dt>仕様</dt>
-                <dd>
-                  <ul class="cell-list">
-                    <li>
-                      ブラウザには作品・生成物の ID
-                      を渡し、ローカルファイルの表示・取得はバックエンドを通す。
-                    </li>
-                  </ul>
-                </dd>
-              </dl>
-            </article>
-            <article class="contract-card" aria-label="記録と実体の照合">
-              <p class="contract-card-title">記録と実体の照合</p>
-              <dl>
-                <dt>仕様</dt>
-                <dd>
+                </div>
+              </li>
+              <li>
+                <strong>ファイルと完成記録を照合して作品へ反映する</strong>
+                <div class="process-detail">
                   <ul class="cell-list">
                     <li>
                       記録 DB、Codex の内部状態、Windows
@@ -627,24 +631,35 @@
                       検証済みファイルと完成記録を照合して作品へ反映する。
                     </li>
                   </ul>
-                </dd>
-              </dl>
-            </article>
-            <article class="contract-card" aria-label="制作データの書き出し">
-              <p class="contract-card-title">制作データの書き出し</p>
-              <dl>
-                <dt>仕様</dt>
-                <dd>
+                </div>
+              </li>
+              <li>
+                <strong>確定した制作データを表示・取得する</strong>
+                <div class="process-detail">
+                  <ul class="cell-list">
+                    <li>
+                      ブラウザには作品・生成物の ID
+                      を渡し、ローカルファイルの表示・取得はバックエンドを通す。
+                    </li>
+                  </ul>
+                </div>
+              </li>
+              <li>
+                <strong>必要に応じて制作データを書き出す</strong>
+                <div class="process-detail">
                   <ul class="cell-list">
                     <li>
                       scene-craft
                       の制作データ書き出しは含める項目を選ぶ方式とする。
                     </li>
                   </ul>
-                </dd>
-              </dl>
-            </article>
-          </div>
+                </div>
+              </li>
+            </ol>
+            <figcaption>
+              矢印は保存先・参照の解決、照合、表示・取得の順序。制作データの書き出しは、必要な項目を選んだときに行う追加の処理。
+            </figcaption>
+          </figure>
         </section>
         <section aria-labelledby="起動終了再接続" class="spec-section">
           <h2 id="起動終了再接続">7. 起動・終了・再接続</h2>
@@ -862,8 +877,11 @@
         <section aria-labelledby="認証" class="spec-section">
           <h2 id="認証">8. 認証</h2>
           <div class="contract-cards">
-            <article class="contract-card" aria-label="Codex専用領域とログイン">
-              <p class="contract-card-title">Codex専用領域とログイン</p>
+            <article
+              class="contract-card"
+              aria-label="Codex専用領域での初回ログイン"
+            >
+              <p class="contract-card-title">Codex専用領域での初回ログイン</p>
               <dl>
                 <dt>仕様</dt>
                 <dd>
@@ -880,8 +898,13 @@
                 </dd>
               </dl>
             </article>
-            <article aria-label="認証情報の保管と更新" class="contract-card">
-              <p class="contract-card-title">認証情報の保管と更新</p>
+            <article
+              aria-label="認証ファイルの保管とCodexによる更新"
+              class="contract-card"
+            >
+              <p class="contract-card-title">
+                認証ファイルの保管とCodexによる更新
+              </p>
               <dl>
                 <dt>仕様</dt>
                 <dd>
@@ -903,8 +926,13 @@
         <section aria-labelledby="設定" class="spec-section">
           <h2 id="設定">9. 設定</h2>
           <div class="contract-cards">
-            <article class="contract-card" aria-label="制作ルートの登録">
-              <p class="contract-card-title">制作ルートの登録</p>
+            <article
+              class="contract-card"
+              aria-label="ローカルディスク上の制作ルートの登録"
+            >
+              <p class="contract-card-title">
+                ローカルディスク上の制作ルートの登録
+              </p>
               <dl>
                 <dt>仕様</dt>
                 <dd>
@@ -918,8 +946,13 @@
                 </dd>
               </dl>
             </article>
-            <article class="contract-card" aria-label="接続時の設定確認">
-              <p class="contract-card-title">接続時の設定確認</p>
+            <article
+              class="contract-card"
+              aria-label="接続時のツール権限と実行設定の確認"
+            >
+              <p class="contract-card-title">
+                接続時のツール権限と実行設定の確認
+              </p>
               <dl>
                 <dt>仕様</dt>
                 <dd>
@@ -940,9 +973,9 @@
           <div class="contract-cards">
             <article
               class="contract-card"
-              aria-label="整合性・復元・バックアップ"
+              aria-label="保存データの整合性と復元の確認"
             >
-              <p class="contract-card-title">整合性・復元・バックアップ</p>
+              <p class="contract-card-title">保存データの整合性と復元の確認</p>
               <dl>
                 <dt>仕様</dt>
                 <dd>
@@ -962,9 +995,11 @@
             </article>
             <article
               class="contract-card"
-              aria-label="Codexデータと制作記録の移行"
+              aria-label="Codexデータと制作記録を分けた移行"
             >
-              <p class="contract-card-title">Codexデータと制作記録の移行</p>
+              <p class="contract-card-title">
+                Codexデータと制作記録を分けた移行
+              </p>
               <dl>
                 <dt>仕様</dt>
                 <dd>
