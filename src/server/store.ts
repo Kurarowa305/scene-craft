@@ -1,5 +1,11 @@
 import { DatabaseSync } from "node:sqlite";
 import { randomUUID } from "node:crypto";
+import { existsSync } from "node:fs";
+import type {
+  ImportInput,
+  ImportOperation,
+  SavedState,
+} from "../shared/files.js";
 import { join } from "node:path";
 import type { Work, Conversation, BodyRecord } from "../shared/contracts.js";
 
@@ -39,6 +45,46 @@ export function openStore(directory: string) {
     throw error;
   }
 
+  // Preserve the initial records DB before adding the import schema. No existing rows change.
+  if (
+    !db
+      .prepare(
+        "SELECT name FROM sqlite_master WHERE name = 'import_operations'",
+      )
+      .get()
+  ) {
+    const backup = join(directory, "records.before-imports.sqlite");
+    if (!existsSync(backup)) db.prepare("VACUUM INTO ?").run(backup);
+    db.exec(`BEGIN IMMEDIATE;
+      CREATE TABLE import_operations (id TEXT PRIMARY KEY, request_key TEXT NOT NULL UNIQUE, work_id TEXT NOT NULL REFERENCES works(id), data TEXT NOT NULL);
+      CREATE TABLE saved_states (sequence INTEGER PRIMARY KEY AUTOINCREMENT, id TEXT NOT NULL UNIQUE, work_id TEXT NOT NULL REFERENCES works(id), data TEXT NOT NULL);
+      CREATE TABLE current_states (work_id TEXT PRIMARY KEY REFERENCES works(id), state_id TEXT NOT NULL REFERENCES saved_states(id));
+      CREATE TABLE current_state_updates (sequence INTEGER PRIMARY KEY AUTOINCREMENT, work_id TEXT NOT NULL REFERENCES works(id), before_id TEXT, after_id TEXT NOT NULL REFERENCES saved_states(id), operation_id TEXT NOT NULL UNIQUE REFERENCES import_operations(id));
+      COMMIT;`);
+  }
+  function readState(id: string): SavedState {
+    const row = db
+      .prepare("SELECT data FROM saved_states WHERE id = ?")
+      .get(id) as { data: string } | undefined;
+    if (!row) throw new OperationError(404, "STATE_NOT_FOUND");
+    return JSON.parse(row.data);
+  }
+  function operation(id: string): ImportOperation {
+    const row = db
+      .prepare("SELECT data FROM import_operations WHERE id = ?")
+      .get(id) as { data: string } | undefined;
+    if (!row) throw new OperationError(404, "OPERATION_NOT_FOUND");
+    return JSON.parse(row.data);
+  }
+  function current(workId: string): string | null {
+    return (
+      (
+        db
+          .prepare("SELECT state_id FROM current_states WHERE work_id = ?")
+          .get(workId) as { state_id: string } | undefined
+      )?.state_id ?? null
+    );
+  }
   function requireEntity(table: "works" | "conversations", id: string) {
     if (!db.prepare(`SELECT id FROM ${table} WHERE id = ?`).get(id))
       throw new OperationError(404, "NOT_FOUND");
@@ -77,6 +123,162 @@ export function openStore(directory: string) {
     "id, sequence, conversation_id AS conversationId, body, 'record' AS kind, 'human' AS author, created_at AS createdAt";
   return {
     close: () => db.close(),
+    state: readState,
+    operation,
+    operations: (workId: string) => {
+      requireEntity("works", workId);
+      return db
+        .prepare(
+          "SELECT data FROM import_operations WHERE work_id = ? ORDER BY rowid",
+        )
+        .all(workId)
+        .map((row) => JSON.parse(row.data as string) as ImportOperation);
+    },
+    states: (workId: string) => {
+      requireEntity("works", workId);
+      return {
+        currentStateId: current(workId),
+        states: db
+          .prepare(
+            "SELECT data FROM saved_states WHERE work_id = ? ORDER BY sequence",
+          )
+          .all(workId)
+          .map((row) => JSON.parse(row.data as string) as SavedState),
+      };
+    },
+    planImport: (conversationId: string, input: ImportInput) => {
+      const planned = once(
+        input.requestKey,
+        ["import", conversationId, input],
+        () => {
+          requireEntity("conversations", conversationId);
+          const workId = (
+            db
+              .prepare("SELECT work_id FROM conversations WHERE id = ?")
+              .get(conversationId) as { work_id: string }
+          ).work_id;
+          const pending = db
+            .prepare("SELECT data FROM import_operations WHERE work_id = ?")
+            .all(workId)
+            .some(
+              (row) =>
+                (JSON.parse(row.data as string) as ImportOperation).phase !==
+                  "committed" &&
+                (JSON.parse(row.data as string) as ImportOperation).phase !==
+                  "abandoned",
+            );
+          if (pending) throw new OperationError(409, "IMPORT_PENDING");
+          if (current(workId) !== input.beforeStateId)
+            throw new OperationError(409, "STALE_STATE");
+          if (
+            input.beforeStateId &&
+            readState(input.beforeStateId).workId !== workId
+          )
+            throw new OperationError(409, "WRONG_WORK");
+          if (input.render) {
+            const renderState = readState(input.render.stateId);
+            if (
+              renderState.workId !== workId ||
+              !renderState.files.some(
+                (file) =>
+                  file.id === input.render!.fileId && file.role === "render",
+              )
+            )
+              throw new OperationError(400, "INVALID_RENDER");
+          }
+          const op: ImportOperation = {
+            id: randomUUID(),
+            requestKey: input.requestKey,
+            workId,
+            conversationId,
+            stateId: randomUUID(),
+            input,
+            phase: "planned",
+            error: null,
+            createdAt: new Date().toISOString(),
+          };
+          db.prepare("INSERT INTO import_operations VALUES (?, ?, ?, ?)").run(
+            op.id,
+            op.requestKey,
+            workId,
+            JSON.stringify(op),
+          );
+          return op;
+        },
+      );
+      return operation(planned.id);
+    },
+    abandonImport: (key: string, id: string) =>
+      once(key, ["abandon-import", id], () => {
+        const op = operation(id);
+        if (op.phase !== "incomplete" && op.phase !== "abandoned")
+          throw new OperationError(409, "RECONCILIATION_REQUIRED");
+        op.phase = "abandoned";
+        db.prepare("UPDATE import_operations SET data = ? WHERE id = ?").run(
+          JSON.stringify(op),
+          id,
+        );
+        return { operationId: id, status: "abandoned" };
+      }),
+    markImport: (
+      id: string,
+      phase: ImportOperation["phase"],
+      error: string | null,
+    ) => {
+      const op = operation(id);
+      if (op.phase === "committed") return;
+      op.phase = phase;
+      op.error = error;
+      db.prepare("UPDATE import_operations SET data = ? WHERE id = ?").run(
+        JSON.stringify(op),
+        id,
+      );
+    },
+    importResult: (id: string) => {
+      const op = operation(id);
+      const state = readState(op.stateId);
+      const record = db
+        .prepare(`SELECT ${recordColumns} FROM records WHERE id = ?`)
+        .get(state.recordId) as unknown as BodyRecord;
+      return { operationId: id, state, record };
+    },
+    commitImport: (id: string, state: SavedState) => {
+      db.exec("BEGIN IMMEDIATE");
+      try {
+        const op = operation(id);
+        if (op.phase !== "committed") {
+          if (current(op.workId) !== op.input.beforeStateId)
+            throw new OperationError(409, "STALE_STATE");
+          db.prepare(
+            "INSERT INTO records (id, conversation_id, body, created_at) VALUES (?, ?, ?, ?)",
+          ).run(
+            state.recordId,
+            op.conversationId,
+            op.input.body,
+            state.createdAt,
+          );
+          db.prepare(
+            "INSERT INTO saved_states (id, work_id, data) VALUES (?, ?, ?)",
+          ).run(state.id, op.workId, JSON.stringify(state));
+          db.prepare(
+            "INSERT INTO current_states VALUES (?, ?) ON CONFLICT(work_id) DO UPDATE SET state_id = excluded.state_id",
+          ).run(op.workId, state.id);
+          db.prepare(
+            "INSERT INTO current_state_updates (work_id, before_id, after_id, operation_id) VALUES (?, ?, ?, ?)",
+          ).run(op.workId, op.input.beforeStateId, state.id, op.id);
+          op.phase = "committed";
+          op.error = null;
+          db.prepare("UPDATE import_operations SET data = ? WHERE id = ?").run(
+            JSON.stringify(op),
+            op.id,
+          );
+        }
+        db.exec("COMMIT");
+      } catch (error) {
+        db.exec("ROLLBACK");
+        throw error;
+      }
+    },
     works: () =>
       db
         .prepare(`SELECT ${workColumns} FROM works ORDER BY sequence`)

@@ -2,6 +2,7 @@ import { StrictMode, useEffect, useState, type FormEvent } from "react";
 import { createRoot } from "react-dom/client";
 import type { Work, Conversation, BodyRecord } from "../shared/contracts";
 import { read, write } from "./api";
+import { FileRecords } from "./file-records";
 import "./style.css";
 
 function App() {
@@ -314,6 +315,20 @@ function App() {
                       ))
                     )}
                   </div>
+                  <FileRecords
+                    onBusy={setBusy}
+                    key={conversationId}
+                    workId={workId}
+                    conversationId={conversationId}
+                    disabled={busy || loading}
+                    onRecord={(record) =>
+                      setRecords((previous) =>
+                        previous.some((item) => item.id === record.id)
+                          ? previous
+                          : [...previous, record],
+                      )
+                    }
+                  />
                   <form className="composer" onSubmit={submitRecord}>
                     <label htmlFor="record-body">記録する本文</label>
                     <textarea

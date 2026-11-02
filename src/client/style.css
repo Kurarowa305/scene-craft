@@ -359,3 +359,45 @@ p {
     gap: 5px;
   }
 }
+
+.file-records {
+  margin: 1.5rem 0;
+  padding: 1rem;
+  border: 1px solid #dedbd3;
+  border-radius: 12px;
+}
+.file-records summary {
+  cursor: pointer;
+  padding: 0.6rem 0;
+}
+.file-records label {
+  display: grid;
+  gap: 0.4rem;
+  margin: 0.8rem 0;
+}
+.file-records fieldset {
+  border: 0;
+  padding: 0;
+  min-width: 0;
+}
+.file-records select {
+  padding: 0.6rem;
+  font: inherit;
+  max-width: 100%;
+}
+.saved-state {
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #dedbd3;
+  overflow-wrap: anywhere;
+}
+.saved-state p,
+.saved-state li {
+  font-size: 0.875rem;
+}
+.state-preview {
+  display: block;
+  max-width: 100%;
+  max-height: 320px;
+  object-fit: contain;
+  margin: 1rem 0;
+}

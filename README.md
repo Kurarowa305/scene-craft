@@ -17,3 +17,7 @@ Blender と Photoshop を使った背景イラスト制作を支援する基盤�
 設計ポータルは `docs/design/index.html` をブラウザで直接開いてください。ビルド・サーバー・外部CDNは不要です。GitHubではHTMLがソース表示になるため、取得したリポジトリから開きます。既存Markdownはすべて維持し、現在の詳細設計はMarkdown、合意と経緯は設計Issue、全体像から厳密な仕様まではHTMLで確認できます。
 
 GitHub Pagesは `main` ブランチの `docs` フォルダーから公開します。`docs/index.html` が設計ポータルへ案内します。設計HTML・CSS・JavaScriptを更新してmainへ反映すると公開内容も更新されます。`.nojekyll`で静的ファイルをそのまま配信し、詳細MarkdownへのリンクはGitHub上のmainの資料を参照します。
+
+## 制作ファイルを取り込む
+
+保存済みのblend・PSD/PSB・プレビューを登録して、初回の保存状態と手修正の前後を記録できます。起動時の保存ルート設定、依存宣言、未完成・照合待ちの扱いは [取り込み実装の運用](docs/implementation-59.md) を参照してください。Blenderによる内容検査と制作実行は後続実装です。
