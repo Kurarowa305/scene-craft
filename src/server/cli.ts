@@ -58,6 +58,7 @@ async function main() {
     options: {
       "data-dir": { type: "string" },
       "file-roots": { type: "string" },
+      "git-repository": { type: "string" },
       "probe-only": { type: "boolean" },
       port: { type: "string", default: "4317" },
     },
@@ -110,6 +111,7 @@ async function main() {
       directory,
       port,
       instanceSecret: secret,
+      gitRepository: values["git-repository"],
       fileRoots: values["file-roots"]
         ? (JSON.parse(
             (await readFile(values["file-roots"], "utf8")).replace(

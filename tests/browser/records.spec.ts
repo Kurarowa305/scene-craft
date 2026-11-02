@@ -23,8 +23,8 @@ test("作品内に空の会話を作り、本文を記録して開き直す", as
     .click();
   await expect(page.locator(".record-body")).toHaveText(original);
   await expect(
-    page.getByText("作風なし", { exact: true }).first(),
-  ).toBeVisible();
+    page.getByRole("combobox", { name: "作品の作風", exact: true }),
+  ).toHaveValue("none");
   await page.screenshot({ path: "test-results/records.png", fullPage: true });
 });
 

@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client";
 import type { Work, Conversation, BodyRecord } from "../shared/contracts";
 import { read, write } from "./api";
 import { FileRecords } from "./file-records";
+import { VersionSettings, WorkVersions } from "./versions";
 import "./style.css";
 
 function App() {
@@ -15,6 +16,9 @@ function App() {
   const [recordsLoaded, setRecordsLoaded] = useState(false);
   const [name, setName] = useState("");
   const [intent, setIntent] = useState("");
+  const [styleChoice, setStyleChoice] = useState("none");
+  const [styleCommit, setStyleCommit] = useState("");
+  const [versionRevision, setVersionRevision] = useState(0);
   const [drafts, setDrafts] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState(false);
   const [loadingChats, setLoadingChats] = useState(false);
@@ -100,6 +104,7 @@ function App() {
     void action(async () => {
       const created = await write<Work>("/api/works", {
         name,
+        styleCommit: styleChoice === "none" ? null : styleCommit,
         ...(intent ? { intent } : {}),
       });
       setWorks((previous) =>
@@ -255,7 +260,30 @@ function App() {
                 placeholder="この作品で表現したいこと"
               />
             </label>
-            <p className="hint">作風なし</p>
+            <label>
+              作品の作風
+              <select
+                aria-label="作品の作風"
+                value={styleChoice}
+                disabled={busy}
+                onChange={(e) => setStyleChoice(e.target.value)}
+              >
+                <option value="none">作風なし</option>
+                <option value="commit">Gitコミットを指定</option>
+              </select>
+            </label>
+            {styleChoice === "commit" && (
+              <label>
+                作風のフルコミット
+                <input
+                  required
+                  pattern="([a-f0-9]{40}|[a-f0-9]{64})"
+                  value={styleCommit}
+                  onChange={(e) => setStyleCommit(e.target.value)}
+                  disabled={busy}
+                />
+              </label>
+            )}
             <button
               className="primary"
               disabled={busy || !worksLoaded || !name.trim()}
@@ -263,6 +291,9 @@ function App() {
               作品を作成
             </button>
           </form>
+          <VersionSettings
+            onChange={() => setVersionRevision((value) => value + 1)}
+          />
         </aside>
         <main className="main">
           {error && (
@@ -273,10 +304,17 @@ function App() {
           {work ? (
             <>
               <div className="work-header">
-                <div className="eyebrow">作品 / 作風なし</div>
+                <div className="eyebrow">
+                  作品 / {work.style ? `作風 ${work.style.commit}` : "作風なし"}
+                </div>
                 <h1>{work.name}</h1>
                 {work.intent && <p className="intent">{work.intent}</p>}
               </div>
+              <WorkVersions
+                key={workId}
+                workId={workId}
+                revision={versionRevision}
+              />
               {conversationId ? (
                 <>
                   <div className="conversation-heading">

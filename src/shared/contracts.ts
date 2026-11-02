@@ -1,9 +1,11 @@
+import type { GitReference } from "./versions.js";
 export interface Work {
   id: string;
   sequence: number;
   name: string;
   intent: string | null;
-  style: null;
+  style: GitReference | null;
+  plannedDefinition: GitReference | null;
   createdAt: string;
 }
 export interface Conversation {

@@ -401,3 +401,37 @@ p {
   object-fit: contain;
   margin: 1rem 0;
 }
+/* Fixed Git references remain readable without widening the work area. */
+.version-settings {
+  border-top: 1px solid #d6d9dc;
+  padding: 16px;
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+.version-settings label {
+  display: grid;
+  gap: 6px;
+  margin: 10px 0;
+}
+.version-settings input {
+  width: 100%;
+  min-width: 0;
+}
+.work-versions {
+  padding: 12px 24px;
+  border-bottom: 1px solid #d6d9dc;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+.work-versions details {
+  margin: 8px 0;
+}
+.work-versions button {
+  margin: 4px;
+}
+.fixed-content {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  max-height: 320px;
+  overflow: auto;
+}
