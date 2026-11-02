@@ -967,8 +967,7 @@ main h2 {
 .spec-list ul > li + li {
   margin-top: 0.5em;
 }
-.spec-list > li::marker,
-.spec-list ul > li::marker {
+.spec-list > li::marker {
   content: "・ ";
 }
 .spec-list .prototype-shot {
@@ -979,4 +978,15 @@ main h2 {
 }
 .spec-list-item > .spec-list-details {
   overflow-wrap: anywhere;
+}
+
+/* Indented unordered lists use native hollow circles at every nested depth. */
+li ul {
+  list-style-type: circle;
+}
+li ul > li::marker,
+.spec-table .cell-list li ul > li::marker,
+.contract-card .cell-list li ul > li::marker,
+.spec-list ul > li::marker {
+  content: normal;
 }
