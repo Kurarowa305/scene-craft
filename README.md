@@ -1,6 +1,6 @@
 # scene-craft
 
-Blender と Photoshop を使った背景イラスト制作を支援する基盤。現在は初期要件の合意が完了し、実装前の設計を進める段階です。
+Blender と Photoshop を使った背景イラスト制作を支援する基盤。初期版を実装中です。作品・空のチャット・LLMなしの本文記録から利用できます。起動・検証と未確認事項は[Issue #58 の実装と確認](docs/verification/issue-58.md)を参照してください。
 
 - [初期要件](docs/requirements/initial-scope.md)
 - [公開中の設計ポータル（GitHub Pages）](https://kurarowa305.github.io/scene-craft/)

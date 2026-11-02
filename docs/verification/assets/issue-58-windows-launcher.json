@@ -1,0 +1,50 @@
+﻿{
+    "commit":  "0b8e301eab8e3ce755b42799f5a13db2069ee160",
+    "timestamp":  "2026-11-02T19:14:46.3182932+09:00",
+    "windows":  "Microsoft Windows NT 10.0.26300.0",
+    "distribution":  "Ubuntu",
+    "node":  "v24.19.0",
+    "automatic":  [
+                      {
+                          "expected":  "one unchanged original with same ID",
+                          "status":  "passed",
+                          "evidence":  {
+                                           "workId":  "0aee65b3-aebf-4338-b085-29a71b408cbf",
+                                           "conversationId":  "d386e557-87bf-4aab-a57a-5cbae7e609dd",
+                                           "recordId":  "ffb6b54f-b7d6-40fc-b77b-9076c432a48d"
+                                       },
+                          "name":  "public operations and retransmission",
+                          "actual":  "matched"
+                      }
+                  ],
+    "manual":  [
+                   {
+                       "expected":  "scene-craft opens in the default browser",
+                       "status":  "not_run",
+                       "evidence":  "",
+                       "name":  "shortcut opens browser",
+                       "actual":  ""
+                   },
+                   {
+                       "expected":  "manager retains wsl.exe; reopen and read same IDs",
+                       "status":  "not_run",
+                       "evidence":  "",
+                       "name":  "browser and invoking terminal closed",
+                       "actual":  ""
+                   },
+                   {
+                       "expected":  "existing instance opens; no second writer",
+                       "status":  "not_run",
+                       "evidence":  "",
+                       "name":  "duplicate shortcut",
+                       "actual":  ""
+                   },
+                   {
+                       "expected":  "PORT_IN_USE and log location shown; foreign process stays alive",
+                       "status":  "not_run",
+                       "evidence":  "",
+                       "name":  "foreign application occupies port",
+                       "actual":  ""
+                   }
+               ]
+}
