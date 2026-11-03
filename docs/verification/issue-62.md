@@ -34,6 +34,6 @@ Node 24.19.0、Codex CLI 0.166.0。`generate-json-schema --experimental`でTurnS
 
 ## ローカル最終確認と配置
 
-Node 24.19.0、Playwright 1.64.1。型検査、自動試験44件、画面試験9件、ビルド、Windowsスクリプト3件の構文検査を実行する。PRのCIでも同じ確認を毎回実行する。
+Node 24.19.0、Playwright 1.64.1。型検査、自動試験44件、画面試験9件、ビルド、Windowsスクリプト3件の構文検査がすべて成功。最終Spec再レビューで残るブロッカー0件。Standardsの同梱skills指摘は解消し、残るブロッカー0件。PRのCIでも同じ確認を毎回実行する。
 
 Windowsの`%LOCALAPPDATA%\scene-craft`へ`Launcher.ps1`と`Test-Local.ps1`を配置し、ソースとのSHA-256一致を確認した。既存ファイルは日時付きで退避し、`launcher.json`は変更していない。ランチャーは`0EB24306D0894EB5EAB93CD0DFB8355C1AE9B033A27F8A86F96542E3E6B97A2E`、確認スクリプトは`1A9404A8A924CB6404A03C43279F4AA4E2E9DD2BF441DCBA360623D0723CBCED`。ブラウザ試験の画面も目視確認した。実Windows受け入れは未実施。
