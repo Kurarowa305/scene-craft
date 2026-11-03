@@ -1,3 +1,4 @@
+import { attachmentRootId } from "./attachments.js";
 import { constants } from "node:fs";
 import {
   open,
@@ -82,7 +83,10 @@ export async function resolveSource(
   const path = await realpath(resolve(base, source.relativePath));
   if (!inside(base, path)) throw new OperationError(400, "OUTSIDE_ROOT");
   const managed = await realpath(roots.managed.path);
-  if (path === managed || inside(managed, path))
+  if (
+    root.id !== attachmentRootId &&
+    (path === managed || inside(managed, path))
+  )
     throw new OperationError(400, "FIXED_SOURCE");
   return path;
 }

@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { chatFixture } from "../chat-fixture";
 import { mcp, waitFor } from "../mcp-fixture";
-import { createApp } from "../../src/server/app";
+import { choosePanel } from "./ui-helpers";
 import { resolve } from "node:path";
 
 test("チャットの参考リンクと右タブに出典・画像未保持・選択原文を再表示する", async ({
@@ -17,9 +17,9 @@ test("チャットの参考リンクと右タブに出典・画像未保持・�
       bytes: Buffer.from("Harbor reference text"),
     }),
     4520,
+    resolve("dist/client"),
   );
   let client: Awaited<ReturnType<typeof mcp>> | undefined;
-  let viewer: Awaited<ReturnType<typeof createApp>> | undefined;
   try {
     await f.post(`/api/conversations/${f.chat.id}/messages`, {
       body: "参考資料を探して",
@@ -47,6 +47,34 @@ test("チャットの参考リンクと右タブに出典・画像未保持・�
     await waitFor(async () =>
       Boolean((await f.view()).requests.at(-1).terminal),
     );
+    await f.listen();
+    await page.goto("http://localhost:4520/");
+    await page.getByRole("button", { name: "試験作品", exact: true }).click();
+    await page
+      .getByRole("button", { name: "未命名のチャット 1", exact: true })
+      .click();
+    await expect(
+      page
+        .getByRole("region", { name: "参考資料のリンク" })
+        .getByRole("button", { name: "港の資料", exact: true }),
+    ).toBeVisible();
+    await page
+      .getByRole("region", { name: "参考資料のリンク" })
+      .getByRole("button", { name: "港の資料", exact: true })
+      .click();
+    await expect(
+      page.getByRole("tab", { name: "港の資料", exact: true }),
+    ).toHaveAttribute("aria-selected", "true");
+    const panel = page.getByRole("region", { name: "参考資料の詳細" });
+    await expect(
+      panel.getByText("参考要素: 岸壁の構造", { exact: true }),
+    ).toBeVisible();
+    await expect(
+      panel.getByText("画像: 画像未保持（保存条件未確認）", { exact: true }),
+    ).toBeVisible();
+    await expect(
+      panel.getByText("未選択（不採用ではありません）", { exact: true }),
+    ).toBeVisible();
     const r = await f.post(`/api/conversations/${f.chat.id}/messages`, {
       body: "「港の資料」を参考として選んで。静けさを表現するため。",
     });
@@ -60,34 +88,6 @@ test("チャットの参考リンクと右タブに出典・画像未保持・�
         })
       ).result.complete,
     ).toBe(true);
-    // Close the writer before reopening the same data with static files enabled.
-    client.close();
-    await f.closeRuntime();
-    viewer = await createApp({
-      directory: f.directory,
-      port: 4520,
-      gitRepository: f.git.repository,
-      staticRoot: resolve("dist/client"),
-    });
-    await viewer.listen({ host: "127.0.0.1", port: 4520 });
-    await page.goto("http://localhost:4520/");
-    await page.getByRole("button", { name: "試験作品", exact: true }).click();
-    await page
-      .getByRole("button", { name: "未命名のチャット 1", exact: true })
-      .click();
-    await expect(
-      page
-        .getByRole("region", { name: "参考資料のリンク" })
-        .getByRole("link", { name: "港の資料", exact: true }),
-    ).toBeVisible();
-    await page.getByRole("tab", { name: "参考資料", exact: true }).click();
-    const panel = page.getByRole("region", { name: "参考資料の詳細" });
-    await expect(
-      panel.getByText("参考要素: 岸壁の構造", { exact: true }),
-    ).toBeVisible();
-    await expect(
-      panel.getByText("画像: 画像未保持（保存条件未確認）", { exact: true }),
-    ).toBeVisible();
     await expect(
       panel.getByText(
         "「港の資料」を参考として選んで。静けさを表現するため。",
@@ -98,12 +98,29 @@ test("チャットの参考リンクと右タブに出典・画像未保持・�
     await expect(
       panel.getByText("Harbor reference text", { exact: true }),
     ).toBeVisible();
+    await page
+      .getByRole("button", { name: "港の資料を閉じる", exact: true })
+      .click();
+    await expect(
+      page.getByRole("tab", { name: "港の資料", exact: true }),
+    ).toHaveCount(0);
+    await page
+      .getByRole("region", { name: "参考資料のリンク" })
+      .getByRole("button", { name: "港の資料", exact: true })
+      .click();
+    await expect(
+      panel.getByText("参考として選択済み", { exact: true }),
+    ).toBeVisible();
     await page.reload();
     await page.getByRole("button", { name: "試験作品", exact: true }).click();
     await page
       .getByRole("button", { name: "未命名のチャット 1", exact: true })
       .click();
-    await page.getByRole("tab", { name: "参考資料", exact: true }).click();
+    await choosePanel(page, "参考資料");
+    await page
+      .getByRole("region", { name: "参考資料の一覧" })
+      .getByRole("button", { name: "港の資料", exact: true })
+      .click();
     await expect(
       panel.getByText("参考として選択済み", { exact: true }),
     ).toBeVisible();
@@ -113,7 +130,6 @@ test("チャットの参考リンクと右タブに出典・画像未保持・�
     });
   } finally {
     client?.close();
-    await viewer?.close();
     await f.close();
   }
 });

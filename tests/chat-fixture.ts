@@ -10,6 +10,7 @@ export async function chatFixture(
   withFiles = false,
   referenceFetcher?: import("../src/server/reference-fetch.js").ReferenceFetcher,
   port = 4317,
+  staticRoot?: string,
 ) {
   const directory = await mkdtemp(join(tmpdir(), "chat-fault-"));
   const git = await gitFixture(directory);
@@ -75,6 +76,7 @@ export async function chatFixture(
   };
   let app = await createApp({
     directory,
+    staticRoot,
     referenceFetcher,
     fileRoots,
     port,
@@ -121,7 +123,7 @@ export async function chatFixture(
   return {
     directory,
     closeRuntime: () => app.close(),
-    response: (url: string) => app.inject({ url, headers }),
+    listen: () => app.listen({ host: "127.0.0.1", port }),
     git,
     work,
     chat,
@@ -130,6 +132,14 @@ export async function chatFixture(
     post,
     read,
     raw,
+    upload: (url: string, bytes: Buffer) =>
+      app.inject({
+        method: "POST",
+        url,
+        headers: { ...headers, "content-type": "application/octet-stream" },
+        payload: bytes,
+      }),
+    response: (url: string) => app.inject({ url, headers }),
     setHook(fn: typeof hook) {
       hook = fn;
     },
@@ -152,6 +162,7 @@ export async function chatFixture(
       await app.close();
       app = await createApp({
         directory,
+        staticRoot,
         referenceFetcher,
         fileRoots,
         port,

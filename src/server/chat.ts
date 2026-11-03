@@ -1,3 +1,4 @@
+import type { registerChatImages } from "./chat-images.js";
 import type { FastifyInstance } from "fastify";
 import type {
   ChatRequest,
@@ -56,6 +57,7 @@ export function registerChat(
     plan: VersionPlan,
     role: string,
   ) => { snapshot: unknown; instructions: string },
+  images: Awaited<ReturnType<typeof registerChatImages>>,
 ) {
   const chat = store.chat;
   const view = (id: string) => ({
@@ -647,7 +649,12 @@ export function registerChat(
       const contextRef = contextRpc.issue(r);
       const result = await c.rpc("turn/start", {
         threadId: r.threadId,
-        input: [{ type: "text", text: r.body, text_elements: [] }],
+        input: [
+          ...(r.body
+            ? [{ type: "text", text: r.body, text_elements: [] }]
+            : []),
+          ...(await images.inputs(r.conversationId, r.images ?? [])),
+        ],
         additionalContext: {
           "scene-craft": {
             kind: "application",
@@ -969,7 +976,12 @@ export function registerChat(
   );
   app.post<{
     Params: { id: string };
-    Body: { requestKey: string; body: string; role?: string };
+    Body: {
+      requestKey: string;
+      body: string;
+      role?: string;
+      imageIds?: string[];
+    };
   }>(
     "/api/conversations/:id/messages",
     {
@@ -977,12 +989,16 @@ export function registerChat(
         params,
         body: body(
           {
+            imageIds: {
+              type: "array",
+              maxItems: 5,
+              uniqueItems: true,
+              items: { type: "string", format: "uuid" },
+            },
             role: { type: "string", minLength: 1, maxLength: 100 },
             body: {
               type: "string",
-              minLength: 1,
               maxLength: 200000,
-              pattern: "\\S",
             },
           },
           ["body"],
@@ -993,28 +1009,36 @@ export function registerChat(
       const side = store.sides.get(req.params.id);
       if (side && req.body.role && req.body.role !== "consultation")
         throw new OperationError(403, "SIDE_CHAT_READ_ONLY");
-      const r = chat.accept(
-        req.body.requestKey,
+      if (!req.body.body.trim() && !req.body.imageIds?.length)
+        throw new OperationError(400, "EMPTY_MESSAGE");
+      const r = await images.accept(
         req.params.id,
-        req.body.body,
-        (workId) => {
-          return {
-            id: crypto.randomUUID(),
-            workId,
-            ...(side
-              ? { definition: side.plan.definition, style: side.plan.style }
-              : prepare(workId)),
-            createdAt: new Date().toISOString(),
-          };
-        },
-        side ? "consultation" : (req.body.role ?? "none"),
-        (workId, plan) =>
-          side
-            ? {
-                snapshot: sideReference(side),
-                instructions: consultationInstructions,
-              }
-            : fixedContext(workId, plan, req.body.role ?? "none"),
+        req.body.imageIds ?? [],
+        (attachments) =>
+          chat.accept(
+            req.body.requestKey,
+            req.params.id,
+            req.body.body,
+            (workId) => {
+              return {
+                id: crypto.randomUUID(),
+                workId,
+                ...(side
+                  ? { definition: side.plan.definition, style: side.plan.style }
+                  : prepare(workId)),
+                createdAt: new Date().toISOString(),
+              };
+            },
+            side ? "consultation" : (req.body.role ?? "none"),
+            (workId, plan) =>
+              side
+                ? {
+                    snapshot: sideReference(side),
+                    instructions: consultationInstructions,
+                  }
+                : fixedContext(workId, plan, req.body.role ?? "none"),
+            attachments,
+          ),
       );
       schedule(r, "name");
       void dispatch(r.id);

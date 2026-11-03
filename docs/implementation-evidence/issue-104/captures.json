@@ -1,0 +1,23 @@
+{
+  "environment": "WSL Linux, Node 24.19.0, Playwright Chromium; Codex protocol fixture",
+  "captures": [
+    {
+      "file": "draft.png",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "sourceCommit": "1b604252350013d625590942536e5c5c83ff8305",
+      "test": "tests/browser/prototype-ui.spec.ts"
+    },
+    {
+      "file": "sent.png",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "sourceCommit": "1b604252350013d625590942536e5c5c83ff8305",
+      "test": "tests/browser/prototype-ui.spec.ts"
+    }
+  ]
+}

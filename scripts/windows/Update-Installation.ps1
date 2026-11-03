@@ -1,7 +1,7 @@
-param()
+param([string]$Config = (Join-Path $env:LOCALAPPDATA 'scene-craft\launcher.json'))
 $ErrorActionPreference = 'Stop'
-$install = Join-Path $env:LOCALAPPDATA 'scene-craft'
-$config = Join-Path $install 'launcher.json'
+$config = [IO.Path]::GetFullPath($Config)
+$install = Split-Path -Parent $config
 if (-not (Test-Path -LiteralPath $config)) { throw 'Run Install-Shortcut.ps1 first.' }
 $sourceRoot = $PSScriptRoot
 if ([IO.Path]::GetFullPath($PSScriptRoot) -eq [IO.Path]::GetFullPath($install)) {

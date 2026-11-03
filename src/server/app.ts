@@ -1,3 +1,9 @@
+import { registerChatImages, chatImageRoute } from "./chat-images.js";
+import {
+  attachmentRoute,
+  attachmentRootId,
+  registerAttachments,
+} from "./attachments.js";
 import Fastify, { type FastifyError } from "fastify";
 import staticFiles from "@fastify/static";
 import { randomBytes, createHmac } from "node:crypto";
@@ -35,6 +41,14 @@ interface AppOptions {
 
 export async function createApp(options: AppOptions) {
   if (options.fileRoots) validateFileRoots(options.fileRoots);
+  if (
+    options.fileRoots &&
+    [...options.fileRoots.sources, options.fileRoots.managed].some(
+      (r) => r.id === attachmentRootId,
+    )
+  )
+    throw new Error("RESERVED_FILE_ROOT");
+
   await mkdir(options.directory, { recursive: true, mode: 0o700 });
   const store = openStore(options.directory, options.fileRoots?.managed.path);
   function versions() {
@@ -47,10 +61,35 @@ export async function createApp(options: AppOptions) {
     bodyLimit: 1024 * 1024,
     ajv: { customOptions: { removeAdditional: false, coerceTypes: false } },
   });
+  const attachments = options.fileRoots
+    ? await registerAttachments(app, options.directory, (id) => {
+        store.sides.requireMain(id);
+        store.records(id);
+      })
+    : null;
+  const chatImages = await registerChatImages(
+    app,
+    options.directory,
+    (id) => {
+      store.chat.session(id);
+    },
+    (id, imageId) =>
+      store.chat
+        .requests(id)
+        .some((request) =>
+          request.images?.some((image) => image.id === imageId),
+        ),
+  );
   const files = options.fileRoots
     ? fileService(
         store,
-        options.fileRoots,
+        {
+          ...options.fileRoots,
+          sources: [
+            ...options.fileRoots.sources,
+            { id: attachmentRootId, path: attachments!.root },
+          ],
+        },
         options.dependencyInspector,
         options.publishFiles,
       )
@@ -134,6 +173,7 @@ export async function createApp(options: AppOptions) {
         instructions,
       };
     },
+    chatImages,
   );
   app.get<{ Params: { id: string } }>(
     "/api/works/:id/references",
@@ -218,8 +258,18 @@ export async function createApp(options: AppOptions) {
       ) {
         return reply.code(403).send({ error: "INVALID_SESSION" });
       }
-      if (request.headers["content-type"]?.split(";")[0] !== "application/json")
-        return reply.code(415).send({ error: "JSON_REQUIRED" });
+      const expectedType = [attachmentRoute, chatImageRoute].includes(
+        request.routeOptions.url ?? "",
+      )
+        ? "application/octet-stream"
+        : "application/json";
+      if (request.headers["content-type"]?.split(";")[0] !== expectedType)
+        return reply.code(415).send({
+          error:
+            expectedType === "application/json"
+              ? "JSON_REQUIRED"
+              : "BINARY_REQUIRED",
+        });
     }
   });
   app.setErrorHandler((error, _request, reply) => {
@@ -512,7 +562,10 @@ export async function createApp(options: AppOptions) {
       for (const file of request.body.files)
         if (!extensions[file.role]?.test(file.relativePath))
           throw new OperationError(400, "INVALID_FILE_TYPE");
-      return files.import(request.params.id, request.body);
+      await attachments!.authorize(request.params.id, request.body.files);
+      const result = await files.import(request.params.id, request.body);
+      await attachments!.release(request.body.files);
+      return result;
     },
   );
   app.get<{

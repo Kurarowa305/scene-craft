@@ -1,3 +1,12 @@
+import {
+  openWorkDialog,
+  openSettings,
+  openArtifacts,
+  openConnectionSettings,
+  closeSettings,
+  recordBodies,
+  choosePanel,
+} from "./ui-helpers";
 import { test, expect } from "@playwright/test";
 import { readFileSync } from "node:fs";
 test("モデル選択・SSE再接続・会話継続・停止を画面から行う", async ({
@@ -5,6 +14,7 @@ test("モデル選択・SSE再接続・会話継続・停止を画面から行�
 }) => {
   const git = JSON.parse(readFileSync("test-results/git-fixture.json", "utf8"));
   await page.goto("/");
+  await openSettings(page);
   await page.getByLabel("定義のフルコミット").fill(git.definition);
   await page
     .getByRole("button", { name: "既定定義を保存", exact: true })
@@ -12,14 +22,22 @@ test("モデル選択・SSE再接続・会話継続・停止を画面から行�
   await expect(
     page.getByText(`新規依頼の既定定義: ${git.definition}`, { exact: true }),
   ).toBeVisible();
+  await openWorkDialog(page);
   await page.getByLabel("作品名", { exact: true }).fill("Codex確認");
-  await page.getByRole("button", { name: "作品を作成", exact: true }).click();
-  await page.getByRole("button", { name: "Codex確認に新しいチャット" }).click();
+  await page
+    .getByRole("dialog", { name: "作品を作成" })
+    .getByRole("button", { name: "作品を作成", exact: true })
+    .click();
+  await page
+    .getByRole("button", { name: "Codex確認に新しいチャット", exact: true })
+    .click();
   await expect(page.getByLabel("会話モデル", { exact: true })).toHaveValue(
     "fixture-a",
   );
-  await page.getByLabel("工程", { exact: true }).selectOption("reference");
-  await page.getByLabel("Codexへのメッセージ").fill("港について相談");
+  await page
+    .getByLabel("エージェント", { exact: true })
+    .selectOption("reference");
+  await page.getByLabel("メッセージ", { exact: true }).fill("港について相談");
   await page.getByRole("button", { name: "Codexへ送信", exact: true }).click();
   await expect(page.getByText("応答中", { exact: true })).toBeVisible();
   await page.reload();
@@ -32,19 +50,20 @@ test("モデル選択・SSE再接続・会話継続・停止を画面から行�
   await expect(page.getByText("港について相談", { exact: true })).toHaveCount(
     1,
   );
+  await page.getByText("実行の詳細", { exact: true }).first().click();
   await expect(
     page.getByText("工程: reference", { exact: true }),
   ).toBeVisible();
-  await page.getByLabel("工程", { exact: true }).selectOption("none");
+  await page.getByLabel("エージェント", { exact: true }).selectOption("none");
   await page
     .getByLabel("会話モデル", { exact: true })
     .selectOption("fixture-b");
-  await expect(
-    page.getByRole("button", { name: "接続状態を更新" }),
-  ).toBeEnabled();
-  await page.getByLabel("Codexへのメッセージ").fill("続きの相談");
+  await expect(page.getByLabel("会話モデル", { exact: true })).toBeEnabled();
+  await page.getByLabel("メッセージ", { exact: true }).fill("続きの相談");
   await page.getByRole("button", { name: "Codexへ送信", exact: true }).click();
-  await page.getByRole("button", { name: "停止", exact: true }).click();
+  await page
+    .getByRole("button", { name: "現在の作業を停止", exact: true })
+    .click();
   await expect(page.getByText("停止しました", { exact: true })).toBeVisible();
   // A slow catalog response must not roll a newer SSE terminal back to running.
   let releaseStatus: () => void = () => {};
@@ -57,13 +76,13 @@ test("モデル選択・SSE再接続・会話継続・停止を画面から行�
     },
     { times: 1 },
   );
-  await page.getByLabel("Codexへのメッセージ").fill("接続状態が遅い間の会話");
+  await page
+    .getByLabel("メッセージ", { exact: true })
+    .fill("接続状態が遅い間の会話");
   await page.getByRole("button", { name: "Codexへ送信", exact: true }).click();
   await expect(page.getByText("完了", { exact: true })).toHaveCount(2);
   releaseStatus();
-  await expect(
-    page.getByRole("button", { name: "接続状態を更新" }),
-  ).toBeEnabled();
+  await expect(page.getByLabel("会話モデル", { exact: true })).toBeEnabled();
   await expect(page.getByText("完了", { exact: true })).toHaveCount(2);
   let releaseContext: () => void = () => {};
   let returnedContext: () => void = () => {};
@@ -84,20 +103,20 @@ test("モデル選択・SSE再接続・会話継続・停止を画面から行�
     { times: 1 },
   );
   await page
-    .getByLabel("Codexへのメッセージ")
+    .getByLabel("メッセージ", { exact: true })
     .fill("制作意図を更新: 夕暮れの静かな港");
   await page.getByRole("button", { name: "Codexへ送信", exact: true }).click();
   await expect(
     page.getByText("明示した内容を記録しました", { exact: true }),
   ).toBeVisible();
-  await page.getByText("共有情報と更新履歴", { exact: true }).click();
+  await choosePanel(page, "作風・制作方針");
   await expect(
-    page.getByText("現在の制作意図: 夕暮れの静かな港", { exact: true }),
+    page.getByText("夕暮れの静かな港", { exact: true }),
   ).toBeVisible();
   releaseContext();
   await contextReturned;
   await expect(
-    page.getByText("現在の制作意図: 夕暮れの静かな港", { exact: true }),
+    page.getByText("夕暮れの静かな港", { exact: true }),
   ).toBeVisible();
   const works = await (await page.request.get("/api/works")).json();
   const work = works.find((w: { name: string }) => w.name === "Codex確認");
@@ -157,51 +176,64 @@ test("モデル選択・SSE再接続・会話継続・停止を画面から行�
     .getByRole("button", { name: "未命名のチャット 1", exact: true })
     .click();
   await page
-    .getByLabel("Codexへのメッセージ")
+    .getByLabel("メッセージ", { exact: true })
     .fill(`記録を訂正: ${imported.state.recordId} body 訂正後の手作業本文`);
   await page.getByRole("button", { name: "Codexへ送信", exact: true }).click();
-  await expect(
-    page.locator(".record-body").filter({ hasText: /^訂正後の手作業本文/ }),
-  ).toBeVisible();
+  await expect
+    .poll(async () =>
+      (await recordBodies(page, "Codex確認")).some((body) =>
+        body.startsWith("訂正後の手作業本文"),
+      ),
+    )
+    .toBe(true);
   await page
-    .getByLabel("Codexへのメッセージ")
+    .getByLabel("メッセージ", { exact: true })
     .fill(`記録を訂正: ${imported.state.recordId} reason 明暗差を整えるため`);
   await page.getByRole("button", { name: "Codexへ送信", exact: true }).click();
-  await expect(
-    page.locator(".saved-state-text").filter({ hasText: "明暗差を整えるため" }),
-  ).toBeVisible();
+  await openArtifacts(page);
+  await expect
+    .poll(async () =>
+      (await recordBodies(page, "Codex確認")).some((body) =>
+        body.includes("明暗差を整えるため"),
+      ),
+    )
+    .toBe(true);
   releaseInitial();
   await Promise.all(returned);
-  await expect(
-    page.locator(".record-body").filter({ hasText: /^訂正後の手作業本文/ }),
-  ).toBeVisible();
-  await expect(
-    page.locator(".saved-state-text").filter({ hasText: "明暗差を整えるため" }),
-  ).toBeVisible();
+  await expect
+    .poll(async () =>
+      (await recordBodies(page, "Codex確認")).some((body) =>
+        body.startsWith("訂正後の手作業本文"),
+      ),
+    )
+    .toBe(true);
+  await expect
+    .poll(async () =>
+      (await recordBodies(page, "Codex確認")).some((body) =>
+        body.includes("明暗差を整えるため"),
+      ),
+    )
+    .toBe(true);
   await page
-    .getByLabel("Codexへのメッセージ")
+    .getByLabel("メッセージ", { exact: true })
     .fill("手作業で「Photoshopで空の色を調整した」を記録して");
   await page.getByRole("button", { name: "Codexへ送信", exact: true }).click();
-  await expect(
-    page.getByText("Photoshopで空の色を調整した", { exact: true }).first(),
-  ).toBeVisible();
+  await expect
+    .poll(() => recordBodies(page, "Codex確認"))
+    .toContain("Photoshopで空の色を調整した");
   await page
-    .getByLabel("Codexへのメッセージ")
+    .getByLabel("メッセージ", { exact: true })
     .fill("直前の記録に「静けさを出すため」を追記して");
   await page.getByRole("button", { name: "Codexへ送信", exact: true }).click();
-  await expect(
-    page
-      .locator(".record-body")
-      .filter({ hasText: "Photoshopで空の色を調整した\n静けさを出すため" }),
-  ).toBeVisible();
+  await expect
+    .poll(() => recordBodies(page, "Codex確認"))
+    .toContain("Photoshopで空の色を調整した\n静けさを出すため");
   await page
-    .getByLabel("Codexへのメッセージ")
+    .getByLabel("メッセージ", { exact: true })
     .fill("直前の記録の「空」を「海」に変更して");
   await page.getByRole("button", { name: "Codexへ送信", exact: true }).click();
-  await expect(
-    page
-      .locator(".record-body")
-      .filter({ hasText: "Photoshopで海の色を調整した\n静けさを出すため" }),
-  ).toBeVisible();
+  await expect
+    .poll(() => recordBodies(page, "Codex確認"))
+    .toContain("Photoshopで海の色を調整した\n静けさを出すため");
   await page.screenshot({ path: "test-results/chat.png", fullPage: true });
 });

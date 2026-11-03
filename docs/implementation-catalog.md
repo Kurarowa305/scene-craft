@@ -1,6 +1,6 @@
 # 現実装のMCP・HTTP API・DB一覧
 
-更新日: 2026-11-03。現在の実装を確認する一覧。追加・変更・削除時は[開発フロー](agents/development-workflow.md#実装一覧の更新)に従い、実装と同じコミットまたはPRで更新する。設計上の将来機能は設計資料を参照する。
+更新日: 2026-11-04。現在の実装を確認する一覧。追加・変更・削除時は[開発フロー](agents/development-workflow.md#実装一覧の更新)に従い、実装と同じコミットまたはPRで更新する。設計上の将来機能は設計資料を参照する。
 
 - [MCPツール](#mcpツール)
 - [バックエンドHTTP API](#バックエンドhttp-api)
@@ -55,9 +55,9 @@
 
 ## バックエンドHTTP API
 
-明示登録は43操作。表はパスの辞書順、同一パスはメソッド順（GET→POST）で並べる。追加時も該当パスの位置へ行を挿入する。[基本・作品・ファイル・Git API](../src/server/app.ts)、[Codex・会話・実行API](../src/server/chat.ts)、[共通schema](../src/server/http-schema.ts)。
+明示登録は47操作。表はパスの辞書順、同一パスはメソッド順（GET→POST）で並べる。追加時も該当パスの位置へ行を挿入する。[基本・作品・ファイル・Git API](../src/server/app.ts)、[Codex・会話・実行API](../src/server/chat.ts)、[共通schema](../src/server/http-schema.ts)、[ブラウザー制作ファイル添付](../src/server/attachments.ts)、[会話画像](../src/server/chat-images.ts)。
 
-同一localhost originを使用する。GET/HEAD以外はOrigin・HttpOnlyセッションcookie・`x-csrf-token`・`application/json`が必要。本文上限は1MiB。POSTは`/api/shutdown`を除き`requestKey`（8〜128文字、英数字・`_`・`-`）を必須とし、表はそれ以外の入力を記載する。`:id`と`:fileId`はUUID。追加本文プロパティは拒否する。業務エラーはHTTP状態コードと`{error:コード}`を返す。`reconcile`等、schema上のrequestKeyを処理の冪等キーとして使わない操作もある。
+同一localhost originを使用する。GET/HEAD以外はOrigin・HttpOnlyセッションcookie・`x-csrf-token`が必要。通常は`application/json`、本文上限1MiB。制作ファイル受け渡しと会話画像アップロードは`application/octet-stream`。前者は最大8GiB、後者は最大20MiB。POSTは`/api/shutdown`と制作ファイル／会話画像のアップロードを除き`requestKey`（8〜128文字、英数字・`_`・`-`）を必須とし、表はそれ以外の入力を記載する。`:id`・`:fileId`・`:imageId`はUUID。追加本文プロパティは拒否する。業務エラーはHTTP状態コードと`{error:コード}`を返す。`reconcile`等、schema上のrequestKeyを処理の冪等キーとして使わない操作もある。
 
 | メソッド | パス | 入力 | 結果・副作用 |
 | --- | --- | --- | --- |
@@ -67,11 +67,15 @@
 | POST | `/api/chat-requests/:id/stop` | 依頼ID、追加本文項目なし | 停止要求を保存し、非同期で実行turnを中断 |
 | GET | `/api/codex` | なし | `{configured,authenticated,runtime,models}`。未接続時も利用可否を返す |
 | POST | `/api/codex/login` | 追加本文項目なし | ChatGPT専用ログインの `{authUrl}` |
+| POST | `/api/conversations/:id/attachments/:fileId` | メイン会話ID・添付UUID、query `name`（最大240文字かつUTF-8 240 bytes、区切り・制御文字・非対応拡張子拒否）、binary本文（1 byte〜8GiB）。requestKeyなし、添付UUIDが再送識別子 | ファイル領域設定時だけ登録。`{file:SourceFile,size,sha256}`。DB変更なし、会話の存在と相談専用制限を検査。同じID・名前・bytesは同じ応答、異内容409、処理中の同じIDは409。部分受信は公開しない。絶対パスは受け付けず返さない |
 | POST | `/api/conversations/:id/auxiliary/resume` | 会話ID、追加本文項目なし | 通常完了した最新依頼で、失敗等の命名・未要約分を明示再実行。停止・エラー・未確定の依頼では拒否。同一requestKeyの再送は重複起動しない。停止した制作依頼は既存resumeまたは新しい依頼で再開 |
 | GET | `/api/conversations/:id/chat` | 会話ID | `ChatView {session,requests,revision,auxiliary,sideNames}`。補助モデル設定・会話名・処理履歴・根拠付き要約・未要約原文を含む。`sideNames`は配下サイドの会話ID→現在名/nullの表示用辞書。未選択なら利用可能な既定モデルを初期選択 |
 | GET | `/api/conversations/:id/events` | 会話ID、任意header `Last-Event-ID` | SSE `event: chat`、`id: revision`、`data: ChatView`。15秒ごとkeepalive。サイドの命名等でもメインのrevisionを進めて`sideNames`を配信し、閉じたサイドごとの接続を作らず一覧名を更新 |
-| POST | `/api/conversations/:id/imports` | 会話ID、`body,application,beforeStateId,files`。任意`render,reason`（旧互換） | `{operationId,id,state,record}`。制作ファイルを管理下へ固定し保存状態・記録を確定。サイド会話では403 |
-| POST | `/api/conversations/:id/messages` | 会話ID、`body`（1〜200000文字・空白のみ不可）、任意`role`（1〜100文字、既定none） | `ChatRequest`を受付。固定文脈・版・工程で非同期実行。サイドは工程consultationのみ（省略時自動適用）、開始時の版・文脈を継続しメインとは別thread。メインと並行受付可能、同じサイド内の未確定依頼は拒否 |
+| GET | `/api/conversations/:id/images/:imageId` | 会話ID・画像UUID | 会話内に固定されたPNG/JPEG/WebP画像の原本を正しいMIMEでinline返却。メタデータとSHA-256を照合。別会話・不存在404、変更検出409。絶対パスは返さない |
+| POST | `/api/conversations/:id/images/:imageId` | 会話ID・画像UUID、query `name`（最大240文字・UTF-8 240 bytes、区切り／制御文字禁止、.png/.jpg/.jpeg/.webp）、binary本文最大20MiB、requestKeyなし | `ChatImage {id,name,mime,size,sha256,width,height}`。sharpでデコード・実形式・拡張子一致・20,000,000画素以下・静止画を検査（APNGはacTLチャンクで明示拒否）。空・破損・非対応400、容量超過413。同じID／内容は同じ応答、異内容409。全体4アップロードまで、同ID処理中409。制作ファイル領域未設定でも登録し、records/saved_statesを増やさない |
+| POST | `/api/conversations/:id/images/:imageId/remove` | 会話ID・画像UUID、追加本文項目なし | 未送信画像の原本とreceiptを削除し`{removed:true}`。不存在404。受付処理中・メッセージ参照済みは409。requestKeyはschema必須だが削除の冪等キーには使わない |
+| POST | `/api/conversations/:id/imports` | 会話ID、`body,application,beforeStateId,files`。任意`render,reason`（旧互換） | `{operationId,id,state,record}`。制作ファイルを管理下へ固定し保存状態・記録を確定。サイド会話では403。`browser_uploads`参照は当該会話の受け渡し済み添付だけ許可し、確定後に受け渡し用実体を除去 |
+| POST | `/api/conversations/:id/messages` | 会話ID、`body`（0〜200000文字）、任意`role`（1〜100文字、既定none）・`imageIds`（重複なしの画像UUID配列、最大5件） | `ChatRequest`を受付。本文に空白以外があるか画像1枚以上が必要。会話内画像を参照し、合計40MiB以下を検査して画像メタデータを受付時に固定。Codex turn/startに本文textと画像localImageを渡し、再開でも原本／SHA-256を照合。固定文脈・版・工程で非同期実行。サイドは工程consultationのみ（省略時自動適用）、開始時の版・文脈を継続しメインとは別thread。メインと並行受付可能、同じサイド内の未確定依頼は拒否 |
 | POST | `/api/conversations/:id/model` | 会話ID、`model`（最大200文字）、`effort`（最大30文字）、`speed: standard/fast` | 利用可能なモデル・強度を検査して選択を保存 |
 | POST | `/api/conversations/:id/name` | 会話ID、`name`（1〜100文字・空白のみ不可） | 人間の会話名を保存。後着の自動命名では上書きしない |
 | GET | `/api/conversations/:id/records` | 会話ID | 最新表示の `BodyRecord[]`。元本文・旧理由を保持し現在本文を返す |
@@ -106,6 +110,18 @@
 | GET | `/api/works/:id/versions` | 作品ID | 新規依頼用の既定定義・作品の固定作風と利用可否 |
 
 GETにはFastifyによるHEADも自動登録される。`staticRoot`設定時の静的ファイル配信もFastify pluginが登録する。これらは表の明示HTTP APIとは分けて扱う。内部Codex app-serverのJSON-RPCメソッドは、本バックエンドのHTTP APIではない。
+
+### ブラウザーからの添付受け渡し
+
+受け渡し用の実体と再送照合用receiptは`dataDirectory/browser-uploads/<conversation-id>/<attachment-id>/`へ固定する。`receipt.json`は`file {rootId,relativePath,role}`・size・sha256を保持し、DBテーブルは追加しない。`browser_uploads`は予約ルートIDで、設定された取り込み元一覧には追加表示しない。対応形式は.blend、.psd/.psb、.png/.jpg/.jpeg/.webp、.exr/.tif/.tiff。依存ファイルの自動探索・プレビュー生成を受け渡し完了とは扱わない。
+
+受信中は同じ会話配下の一時ディレクトリへ書き、size/hashとreceiptを確定してから公開する。中断・失敗の一時領域は当該要求の終了時に除去する。取り込みのDB確定後に受け渡し用の実体を削除し、再送の照合に使うreceiptは保持する。取り込み前に画面を閉じた添付・実行プロセスの強制終了で残った一時領域は自動削除しない。これらを制作の保存状態として表示しない。バックアップ・全体削除の運用は後続Issueの範囲とする。
+
+### 会話用の画像添付
+
+画像は`dataDirectory/chat-images/<conversation-id>/<image-id>/original.<png|jpeg|webp>`と`receipt.json`へ、デコード検査後に一時ディレクトリから原子的に公開する。receiptは`ChatImage`の項目を保持する。実体とreceiptは0400、ディレクトリは0700。新規DBテーブルはなく、受付後の画像参照は`chat_requests.data.images[]`に固定する。送信済み画像は会話履歴・再開に必要なため削除APIでは削除できない。入力欄で取り外した未送信画像は削除する。受信失敗・通常終了時の一時領域は除去する。ブラウザを閉じて放棄された未送信画像と強制終了で残った一時領域の自動整理は追加していない。
+
+クライアントは選択直後に入力欄へ画像プレビューを表示し、送信受付後はユーザー発言本文の直上に画像リンク付きプレビューを表示する。画像だけでも送信できる。アップロード失敗時は同じ画像ID・Fileを保持して再試行でき、アプリ内の会話切替でも未送信画像を保持する。未送信画像はブラウザメモリ保持であり、ページ再読み込みで入力欄へ復元しない。確定した画像履歴は再読み込み・サーバー再起動後も読み出せる。LLMの推論とは独立した原本アップロードで、成果物登録・採用状態・手作業記録を変更しない。
 
 ### ファイル取り込みの入力詳細
 
@@ -225,7 +241,8 @@ JSON保存項目は、対応する物理カラム表の直下に記載する。`
 
 | 保存場所 | 保存項目・構造 | 根拠 |
 | --- | --- | --- |
-| `chat_requests.data` | `id,conversationId,workId,body,selection,actualModel,runtime,threadId,turnId,phase,stopRequested,error,terminal,items,plan,createdAt,retryCount,previousAttempt,attempts`、任意`role,contextSnapshot,instructions,recordInterpretation` | ChatRequest |
+| `chat_requests.data` | `id,conversationId,workId,body,selection,actualModel,runtime,threadId,turnId,phase,stopRequested,error,terminal,items,plan,createdAt,retryCount,previousAttempt,attempts`、任意`role,contextSnapshot,instructions,recordInterpretation,images` | ChatRequest |
+| `chat_requests.data.images[]` | 任意。`id,name,mime,size,sha256,width,height`。会話内の不変な原本を参照し、依頼の再開・再試行でも同じ配列を使う。絶対パス・表示URLは保存しない | shared/chat-image.ts / ChatImage |
 | `chat_requests.data.attempts[]` | `stopRequested,turnId,selection,actualModel,runtime,terminal,error,items`。itemsは`id,type,text,complete` | ChatRequest / ChatItem |
 | `chat_requests.data.recordInterpretation` | `sourceHash,model,runtime,threadId,turnId,status,instruction,question`。statusはupdate/not_requested/clarification | shared/record-instruction.ts |
 | `chat_requests.data.recordInterpretation.instruction` | `tool,field,body`、任意`action,mode,baseText,targetId`。actionはcreate/update、modeはreplace/append/edit。自然文UPDATEはbaseTextで編集元全文を固定 | RecordInstruction |
@@ -590,3 +607,7 @@ GitReferenceの構造は[git_settings](#git_settings)を参照。`Work.style/pla
 2. HTTP：app.tsとchat.tsの全ルートを照合する。ループ生成のstop/reconcile/resume、条件付きinstance、SSE、schemaと応答を確認する。
 3. DB：store.tsの全CREATE/ALTER・移行を確認し、新規の隔離保存先で生成したDBのsqlite_master、PRAGMA table_info / foreign_key_list / index_listと照合する。既存の制作DBを検証用に変更しない。
 4. JSON：sharedの型と各保存処理を照合し、保存項目と表示時だけ付加する項目を区別する。APIレスポンスだけから物理カラムを推定しない。
+
+## 参考資料の画面接続（2026-11-04）
+
+mainの3領域UIへ接続した。メイン返答内の参考候補リンクは要求元requestIdで対応付け、同じ作品の候補IDを固定した右詳細タブを開く。右タブの「＋→参考資料」は一覧を開き、タイトルから詳細タブへ進む。参考資料一覧・詳細は既存GET `/api/works/:id/references`を会話SSEのrevision変更で再取得し、文章改訂の件数が変わらない保存・選択も反映する。詳細タブの閉鎖で参照や選択を削除せず、再表示/再読込で保持する。画像添付は会話専用画像APIのまま維持し、参考候補や制作素材の取り込みと混同しない。MCP・HTTP・DBの参考操作は既存契約を維持し、main由来の画像添付APIと合わせて47 HTTP操作・27テーブル・101物理カラムを管理する。

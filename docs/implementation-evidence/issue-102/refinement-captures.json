@@ -1,0 +1,77 @@
+{
+  "environment": "WSL Linux, Node 24.19.0, Playwright Chromium; Codex protocol fixture",
+  "captures": [
+    {
+      "file": "chat-name.png",
+      "sourceCommit": "6d6ae42a5ea0205797c84811bc3b029187ba7e7b",
+      "viewport": {
+        "width": 1512,
+        "height": 960
+      },
+      "test": "tests/browser/ui-refinements.spec.ts"
+    },
+    {
+      "file": "chat-settings.png",
+      "sourceCommit": "6d6ae42a5ea0205797c84811bc3b029187ba7e7b",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "test": "tests/browser/auxiliary.spec.ts"
+    },
+    {
+      "file": "side-settings.png",
+      "sourceCommit": "6d6ae42a5ea0205797c84811bc3b029187ba7e7b",
+      "viewport": {
+        "width": 1512,
+        "height": 960
+      },
+      "test": "tests/browser/ui-refinements.spec.ts"
+    },
+    {
+      "file": "pane-layout.png",
+      "sourceCommit": "ab3d7123cbae133c5b0722f004f4bd35e3359d4d",
+      "viewport": {
+        "width": 2200,
+        "height": 960
+      },
+      "test": "tests/browser/pane-layout.spec.ts"
+    },
+    {
+      "file": "collapsed-pane.png",
+      "sourceCommit": "ab3d7123cbae133c5b0722f004f4bd35e3359d4d",
+      "viewport": {
+        "width": 1512,
+        "height": 960
+      },
+      "test": "tests/browser/pane-layout.spec.ts"
+    },
+    {
+      "file": "create-work-file.png",
+      "sourceCommit": "6df55889013c9b2e8f447986a3339462bbdee235",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "test": "tests/browser/imports.spec.ts"
+    },
+    {
+      "file": "ui-polish.png",
+      "viewport": {
+        "width": 1512,
+        "height": 960
+      },
+      "sourceCommit": "1b604252350013d625590942536e5c5c83ff8305",
+      "test": "tests/browser/ui-polish.spec.ts"
+    },
+    {
+      "file": "image-submenu.png",
+      "viewport": {
+        "width": 1512,
+        "height": 960
+      },
+      "sourceCommit": "1b604252350013d625590942536e5c5c83ff8305",
+      "test": "tests/browser/ui-polish.spec.ts"
+    }
+  ]
+}
