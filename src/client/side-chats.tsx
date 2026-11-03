@@ -2,6 +2,8 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import type { SideChat } from "../shared/side-chat";
 import type { SavedState, FixedFile } from "../shared/files";
 import { read, write } from "./api";
+import { ImagePreview } from "./image-preview";
+import { References } from "./references";
 import { Chat } from "./chat";
 import { Icon, Unavailable } from "./ui";
 
@@ -13,11 +15,13 @@ type Kind =
   | "guards"
   | "style"
   | "reference"
-  | "artifact";
+  | "artifact"
+  | "reference-detail";
 interface Tab {
   id: string;
   kind: Kind;
   title: string;
+  referenceId?: string;
   sideId?: string;
   state?: SavedState;
   file?: FixedFile;
@@ -28,7 +32,7 @@ const choices = [
   ["history", "history", "制作履歴", "分岐と手修正のつながりを見る"],
   ["guards", "shield", "保護一覧", "変更させない対象と項目を管理"],
   ["style", "leaf", "作風・制作方針", "作品で使う方針と版を確認"],
-  ["reference", "image", "参考資料", "参考資料の検索・選択（未実装）"],
+  ["reference", "image", "参考資料", "出典付きの参考資料・選択した要素を確認"],
 ] as const;
 
 export function SideChats({
@@ -39,6 +43,7 @@ export function SideChats({
   names,
   styleContent,
   onMobileBack,
+  onReveal,
 }: {
   mainId: string;
   connectionRevision: number;
@@ -47,6 +52,7 @@ export function SideChats({
   names: Record<string, string | null>;
   styleContent?: ReactNode;
   onMobileBack: () => void;
+  onReveal: () => void;
 }) {
   const [sideTitles, setSideTitles] = useState<Record<string, string | null>>(
     {},
@@ -84,6 +90,23 @@ export function SideChats({
     document.addEventListener("open-artifacts", catalog);
     return () => document.removeEventListener("open-artifacts", catalog);
   }, []);
+  useEffect(() => {
+    function open(event: Event) {
+      const detail = (
+        event as CustomEvent<{ id: string; title: string; workId: string }>
+      ).detail;
+      if (!detail || detail.workId !== workId) return;
+      show({
+        id: `reference-${detail.id}`,
+        kind: "reference-detail",
+        title: detail.title,
+        referenceId: detail.id,
+      });
+      onReveal();
+    }
+    document.addEventListener("open-reference", open);
+    return () => document.removeEventListener("open-reference", open);
+  }, [workId, onReveal]);
   function sideTitle(id: string) {
     return names[id] ?? sideTitles[id] ?? "未命名のサイドチャット";
   }
@@ -345,19 +368,12 @@ export function SideChats({
                 </button>
               </div>
             )}
-            {t.kind === "reference" && (
-              <div className="panel-page">
-                <h2>参考資料</h2>
-                <p className="intro">表現や構造を検討する根拠を探します。</p>
-                <label className="field">
-                  検索語
-                  <input placeholder="探したい参考資料" disabled />
-                </label>
-                <button className="secondary" disabled>
-                  検索
-                </button>
-                <Unavailable>参考資料の検索・保存・選択</Unavailable>
-              </div>
+            {(t.kind === "reference" || t.kind === "reference-detail") && (
+              <References
+                workId={workId}
+                revision={recordRevision}
+                referenceId={t.referenceId}
+              />
             )}
           </section>
         ))}
@@ -371,84 +387,17 @@ export function SideChats({
   );
 }
 function Preview({ state, file }: { state: SavedState; file: FixedFile }) {
-  const [zoom, setZoom] = useState(1);
-  const [pan, setPan] = useState({ x: 0, y: 0 });
-  const [failed, setFailed] = useState(false);
-  const image = /\.(png|jpe?g|webp)$/i.test(file.source.relativePath);
   const url = `/api/states/${state.id}/files/${file.id}`;
   return (
-    <div className="preview-wrap">
-      <div className="panel-top">
-        <div>
-          <h2>{file.source.relativePath}</h2>
-          <span className="muted">
-            保存済みの状態 · {new Date(state.createdAt).toLocaleString("ja-JP")}
-          </span>
-        </div>
-      </div>
-      {image && !failed ? (
-        <div
-          className="preview-canvas"
-          onWheel={(e) =>
-            setZoom((z) =>
-              Math.max(0.2, Math.min(5, z * (e.deltaY < 0 ? 1.1 : 0.9))),
-            )
-          }
-          onPointerDown={(e) => e.currentTarget.setPointerCapture(e.pointerId)}
-          onPointerMove={(e) => {
-            if (e.currentTarget.hasPointerCapture(e.pointerId))
-              setPan((p) => ({ x: p.x + e.movementX, y: p.y + e.movementY }));
-          }}
-          onPointerUp={(e) =>
-            e.currentTarget.releasePointerCapture(e.pointerId)
-          }
-        >
-          <img
-            src={`${url}?inline=1`}
-            onError={() => setFailed(true)}
-            draggable={false}
-            alt={`${file.source.relativePath}のプレビュー`}
-            style={{
-              transform: `translate(${pan.x}px,${pan.y}px) scale(${zoom})`,
-            }}
-          />
-        </div>
-      ) : (
-        <div className="empty">
-          <p>
-            {failed
-              ? "画像を取得できません。実体の欠落・破損や接続を確認してください。"
-              : "このファイルの画像プレビューは未取得です。"}
-          </p>
-          <p>制作ファイルと本文の記録は残っています。</p>
-        </div>
-      )}
-      <div className="preview-toolbar">
-        <a href={url}>ファイルを開く</a>
-        <div className="row">
-          <button
-            aria-label="縮小"
-            onClick={() => setZoom((z) => Math.max(0.2, z / 1.2))}
-          >
-            −
-          </button>
-          <span>{Math.round(zoom * 100)}%</span>
-          <button
-            aria-label="拡大"
-            onClick={() => setZoom((z) => Math.min(5, z * 1.2))}
-          >
-            ＋
-          </button>
-          <button
-            onClick={() => {
-              setZoom(1);
-              setPan({ x: 0, y: 0 });
-            }}
-          >
-            フィット
-          </button>
-        </div>
-      </div>
-    </div>
+    <ImagePreview
+      title={file.source.relativePath}
+      subtitle={`保存済みの状態 · ${new Date(state.createdAt).toLocaleString("ja-JP")}`}
+      url={url}
+      imageUrl={
+        /\.(png|jpe?g|webp)$/i.test(file.source.relativePath)
+          ? `${url}?inline=1`
+          : undefined
+      }
+    />
   );
 }

@@ -563,6 +563,10 @@ function App() {
               recordRevision={recordRevision + records.length}
               names={sideNames}
               onMobileBack={() => setShowPanel(false)}
+              onReveal={() => {
+                setShowPanel(true);
+                if (panes.collapsed[2] && panes.canRestore(2)) panes.restore(2);
+              }}
               styleContent={
                 work ? (
                   <>

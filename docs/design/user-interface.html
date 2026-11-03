@@ -51,7 +51,12 @@
             <li>
               <a href="#メインチャットと成果物">3. メインチャット</a>
               <ol>
-                <li><a href="#採否と追加修正">3-1. 編集案の操作</a></li>
+                <li>
+                  <a href="#参考資料の画像グリッド"
+                    >3-1. 参考資料の画像グリッド</a
+                  >
+                </li>
+                <li><a href="#採否と追加修正">3-2. 編集案の操作</a></li>
               </ol>
             </li>
             <li>
@@ -464,8 +469,36 @@
             </li>
           </ul>
 
+          <section
+            class="spec-subsection"
+            aria-labelledby="参考資料の画像グリッド"
+          >
+            <h3 id="参考資料の画像グリッド">3-1. 参考資料の画像グリッド</h3>
+            <figure class="prototype-shot">
+              <a
+                href="../implementation-evidence/issue-65-grid/reference-grid.png"
+                ><img
+                  src="../implementation-evidence/issue-65-grid/reference-grid.png"
+                  width="1280"
+                  height="720"
+                  alt="参考資料タブに画像候補をグリッド表示した実装画面"
+              /></a>
+              <figcaption>
+                参考資料タブのグリッド。合成試験画像で表示と導線を確認した画面。
+              </figcaption>
+            </figure>
+            <p>
+              参考資料を画像検索をイメージしたグリッドで並べ、クリックで候補IDを固定した大きな画像タブを開く。成果物と共通の拡大・縮小・移動・フィット操作を使う。メイン返答の候補リンクも同じタブを開く。
+            </p>
+            <p>
+              件数未指定時は20件を目標とし、明示された件数を優先する。取得した実件数と不足を示す。画像取得失敗や欠落では理由を示し、出典・利用条件・本文・選択履歴を保持する。
+            </p>
+            <p>
+              趣味の参考調査として画像を保存し、保存条件の調査は省く。利用条件の内容・根拠・確認日を情報として保存し、不明なら不明と記録する。画像の下で参考要素・制作意図との関係・人間の選択原文も確認する。
+            </p>
+          </section>
           <section aria-labelledby="採否と追加修正" class="spec-subsection">
-            <h3 id="採否と追加修正">3-1. 編集案の操作</h3>
+            <h3 id="採否と追加修正">3-2. 編集案の操作</h3>
             <ul class="spec-list">
               <li
                 class="spec-list-item"

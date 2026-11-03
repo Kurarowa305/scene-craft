@@ -21,9 +21,11 @@ import { registerChat } from "./chat.js";
 import { connectCodex, type CodexConnection } from "./codex.js";
 import { text, bodySchema, idParams } from "./http-schema.js";
 import { startContextRpc } from "./context-rpc.js";
+import type { ReferenceFetcher } from "./reference-fetch.js";
 import type { DefinitionManifest } from "../shared/versions.js";
 
 interface AppOptions {
+  referenceFetcher?: ReferenceFetcher;
   directory: string;
   gitRepository?: string;
   codex?: CodexConnection;
@@ -48,7 +50,7 @@ export async function createApp(options: AppOptions) {
     throw new Error("RESERVED_FILE_ROOT");
 
   await mkdir(options.directory, { recursive: true, mode: 0o700 });
-  const store = openStore(options.directory);
+  const store = openStore(options.directory, options.fileRoots?.managed.path);
   function versions() {
     if (!options.gitRepository)
       throw new OperationError(409, "GIT_NOT_CONFIGURED");
@@ -96,7 +98,7 @@ export async function createApp(options: AppOptions) {
   const csrfToken = randomBytes(32).toString("hex");
   const session = randomBytes(32).toString("hex");
   let codexPromise: Promise<CodexConnection> | undefined;
-  const contextRpc = await startContextRpc(store);
+  const contextRpc = await startContextRpc(store, options.referenceFetcher);
   function definition(plan: {
     definition: import("../shared/versions.js").GitReference;
   }) {
@@ -159,6 +161,7 @@ export async function createApp(options: AppOptions) {
           ...store.context.context(workId),
           conversationSummaries: store.auxiliary.context(workId),
           states: store.states(workId),
+          references: store.references.context(workId),
           plan,
           style: plan.style
             ? JSON.parse(
@@ -171,6 +174,38 @@ export async function createApp(options: AppOptions) {
       };
     },
     chatImages,
+  );
+  app.get<{ Params: { id: string } }>(
+    "/api/works/:id/references",
+    { schema: { params: idParams } },
+    async (req) => {
+      store.context.context(req.params.id);
+      return store.references.view(req.params.id);
+    },
+  );
+  app.get<{ Params: { id: string } }>(
+    "/api/references/:id",
+    { schema: { params: idParams } },
+    async (req) => {
+      const candidate = store.references.find(req.params.id);
+      return {
+        candidate,
+        page: store.references.page(candidate.workId, candidate.pageId),
+        selections: store.references
+          .view(candidate.workId)
+          .selections.filter((s) => s.referenceId === candidate.id),
+      };
+    },
+  );
+  app.get<{ Params: { id: string } }>(
+    "/api/references/:id/image",
+    { schema: { params: idParams } },
+    async (req, reply) => {
+      const c = store.references.find(req.params.id);
+      return reply
+        .type(c.image.mime ?? "application/octet-stream")
+        .send(store.references.image(c));
+    },
   );
   app.get("/api/roles", async () => {
     const ref = store.defaultDefinition();

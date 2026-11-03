@@ -7,6 +7,9 @@ import { OperationError, type openStore } from "./store.js";
 import type { ChatRequest } from "../shared/chat.js";
 import { explicitInstruction } from "./context-store.js";
 import type { RecordInterpretation } from "../shared/record-instruction.js";
+import { referenceService } from "./references.js";
+import { referenceToolProperties } from "../shared/reference-tools.js";
+import type { ReferenceFetcher } from "./reference-fetch.js";
 import { sideReference } from "./side-store.js";
 
 export const writeContextTools = [
@@ -24,6 +27,9 @@ export const contextTools = [
   ...readContextTools,
   ...writeContextTools,
   "record_human_decision",
+  "fetch_reference_page",
+  "save_reference",
+  "select_reference",
 ] as const;
 export interface McpEndpoint {
   socketPath: string;
@@ -31,13 +37,27 @@ export interface McpEndpoint {
 }
 
 /** Short private path avoids Unix socket length limits. Nothing is exposed over HTTP. */
-export async function startContextRpc(store: ReturnType<typeof openStore>) {
+export async function startContextRpc(
+  store: ReturnType<typeof openStore>,
+  fetcher?: ReferenceFetcher,
+) {
   const directory = await mkdtemp(join(tmpdir(), "scene-rpc-"));
   await chmod(directory, 0o700);
   const endpoint: McpEndpoint = {
     socketPath: join(directory, "rpc"),
     credential: randomBytes(32).toString("hex"),
   };
+  let referenceInterpreter:
+    import("./references.js").ReferenceInterpreter | undefined;
+  const references = referenceService(store, fetcher, (r, id, current) => {
+    if (!referenceInterpreter)
+      throw new OperationError(409, "REFERENCE_INTERPRETATION_FAILED");
+    return referenceInterpreter(r, id, current);
+  });
+  const fetching = new Map<
+    string,
+    { input: string; promise: Promise<unknown> }
+  >();
   const bindings = new Map<
     string,
     {
@@ -105,6 +125,43 @@ export async function startContextRpc(store: ReturnType<typeof openStore>) {
       !/^[a-zA-Z0-9-]{8,100}$/.test(args.operationId)
     )
       throw new OperationError(400, "INVALID_OPERATION_ID");
+    if (tool in referenceToolProperties) {
+      const fixedRequest = r;
+      const current = () => {
+        const latest = authorize(input);
+        if (
+          latest.retryCount !== fixedRequest.retryCount ||
+          latest.turnId !== fixedRequest.turnId
+        )
+          throw new OperationError(403, "STALE_CONTEXT");
+        return latest;
+      };
+      const serialized = JSON.stringify([r.id, { tool, args }]);
+      const cached = store.cachedContextOperation(args.operationId, serialized);
+      if (cached) return cached.result;
+      const pending = fetching.get(args.operationId);
+      if (pending) {
+        if (pending.input !== serialized)
+          throw new OperationError(409, "REQUEST_KEY_CONFLICT");
+        return pending.promise;
+      }
+      const promise = (async () => {
+        const commit = await references(r, tool, args, current);
+        current();
+        return store.contextOperation(
+          args.operationId,
+          r.id,
+          { tool, args },
+          commit,
+        );
+      })();
+      fetching.set(args.operationId, { input: serialized, promise });
+      try {
+        return await promise;
+      } finally {
+        fetching.delete(args.operationId);
+      }
+    }
     if (writeContextTools.includes(tool)) {
       // Validate the acting model's narrow arguments BEFORE any interpretation.
       if (args.sourceRequestId !== r.id)
@@ -207,6 +264,10 @@ export async function startContextRpc(store: ReturnType<typeof openStore>) {
               current: store.context.context(r.workId),
               conversationSummaries: store.auxiliary.context(r.workId),
               plan: r.plan,
+              references: store.references.context(r.workId),
+              ...(r.role === "reference"
+                ? { referenceCandidates: store.references.view(r.workId) }
+                : {}),
               remainingRetries: 2 - r.retryCount,
               unavailable: [
                 "production",
@@ -263,6 +324,11 @@ export async function startContextRpc(store: ReturnType<typeof openStore>) {
   await chmod(endpoint.socketPath, 0o600);
   return {
     endpoint,
+    setReferenceInterpreter(
+      value: import("./references.js").ReferenceInterpreter,
+    ) {
+      referenceInterpreter = value;
+    },
     setInterpreter(value: NonNullable<typeof interpret>) {
       interpret = value;
     },

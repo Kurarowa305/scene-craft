@@ -10,6 +10,7 @@ import {
 import type { BodyRecord } from "../shared/contracts";
 import type { ChatModel, ChatView, ModelChoice } from "../shared/chat";
 import { read, write } from "./api";
+import { ReferenceLinks, useReferences } from "./references";
 import { Icon, Popup } from "./ui";
 
 const phases: Record<string, string> = {
@@ -89,6 +90,10 @@ export function Chat({
   const contextFetch = useRef(0);
   const contextRevision = useRef(-1);
   const [view, setView] = useState<ChatView>();
+  const references = useReferences(
+    side ? undefined : view?.requests[0]?.workId,
+    view?.revision ?? 0,
+  );
   useEffect(() => {
     if (view) onNameChanged(view.auxiliary.name);
   }, [view?.auxiliary.name]);
@@ -124,7 +129,7 @@ export function Chat({
           read<BodyRecord[]>(`/api/conversations/${conversationId}/records`),
         ]);
         if (alive.current && sequence === contextFetch.current) {
-          onRecordsChanged(records, next.work.intent, next.revisions.length);
+          onRecordsChanged(records, next.work.intent, v.revision);
         }
       } catch {
         if (alive.current)
@@ -326,6 +331,15 @@ export function Chat({
                     {!i.complete && "（途中）"}
                   </p>
                 ))}
+              {!side && (
+                <ReferenceLinks
+                  candidates={
+                    references.view?.candidates.filter(
+                      (c) => c.requestId === r.id,
+                    ) ?? []
+                  }
+                />
+              )}
               {r.error && (
                 <p>
                   {reasons[r.error] ??

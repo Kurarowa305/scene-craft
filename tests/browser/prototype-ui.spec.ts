@@ -119,7 +119,7 @@ test("入力欄の＋で画像をLLMに添付し、送信前と発言直上に�
   await page.screenshot({ path: "test-results/chat-image-previews.png" });
 });
 
-test("未実装の参考資料検索は外観のみで、検索APIを呼ばない", async ({
+test("作品未選択の参考資料タブは選択を案内し、検索や保存を開始しない", async ({
   page,
 }) => {
   const requests: string[] = [];
@@ -127,15 +127,11 @@ test("未実装の参考資料検索は外観のみで、検索APIを呼ばな�
     if (r.url().includes("reference")) requests.push(r.url());
   });
   await page.goto("/");
-  await page.getByRole("button", { name: /参考資料.*参考資料の検索/ }).click();
+  await page.getByRole("button", { name: /^参考資料 / }).click();
   await expect(
-    page.getByRole("button", { name: "検索", exact: true }),
-  ).toBeDisabled();
-  await expect(
-    page.getByText(
-      "参考資料の検索・保存・選択は未実装です。現在は画面の外観のみ確認できます。",
-      { exact: true },
-    ),
+    page
+      .getByRole("region", { name: "参考資料の一覧" })
+      .getByText("作品を選択してください。", { exact: true }),
   ).toBeVisible();
   expect(requests).toEqual([]);
 });
@@ -182,6 +178,11 @@ test("画像の送信受付応答を失っても本文と画像を保持し、�
   await expect(page.getByLabel("メッセージ", { exact: true })).toHaveValue(
     "画像を一度だけ送る",
   );
+  // The accepted first send is still running after its response was lost.
+  // Wait for its visible terminal state before interacting with the shared send/stop control.
+  await expect(page.getByText("完了", { exact: true })).toBeVisible({
+    timeout: 15000,
+  });
   await expect(send).toBeEnabled({ timeout: 15000 });
   await send.click();
   await expect(page.locator(".draft-images img")).toHaveCount(0);

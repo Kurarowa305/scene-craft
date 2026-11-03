@@ -1,6 +1,11 @@
 import { createInterface } from "node:readline";
 import { createConnection } from "node:net";
 import { contextTools, readContextTools } from "./context-rpc.js";
+import {
+  referenceToolProperties,
+  referenceToolRequired,
+  referenceToolDescriptions,
+} from "../shared/reference-tools.js";
 const availableTools: readonly string[] =
   process.env.SCENE_CRAFT_READ_ONLY === "1" ? readContextTools : contextTools;
 
@@ -59,31 +64,37 @@ lines.on("line", async (line) => {
         tools: availableTools.map((name) => ({
           name,
           description:
-            name === "record_human_decision"
+            referenceToolDescriptions[name] ??
+            (name === "record_human_decision"
               ? "Unavailable: downstream decision handling is not implemented."
-              : `${name}. ${name.startsWith("create_") ? "CREATE: new complete text, or replace the complete text of an explicitly identified existing target." : name.startsWith("update_") ? "UPDATE: start from existing text and append or edit according to the human instruction." : ""} Use the current contextRef. Writes require the current sourceRequestId and an explicit human instruction, including ordinary natural language; the backend resolves it from the original message. Never provide a replacement text or target as tool arguments. If needsClarification is returned, ask its question without claiming a save. Production/protection changes are unavailable.`,
+              : `${name}. ${name.startsWith("create_") ? "CREATE: new complete text, or replace the complete text of an explicitly identified existing target." : name.startsWith("update_") ? "UPDATE: start from existing text and append or edit according to the human instruction." : ""} Use the current contextRef. Writes require the current sourceRequestId and an explicit human instruction, including ordinary natural language; the backend resolves it from the original message. Never provide a replacement text or target as tool arguments. If needsClarification is returned, ask its question without claiming a save. Production/protection changes are unavailable.`),
           inputSchema: {
             type: "object",
             additionalProperties: false,
-            required: ["contextRef", "operationId"],
+            required: [
+              "contextRef",
+              "operationId",
+              ...(referenceToolRequired[name] ?? []),
+            ],
             properties: {
               contextRef: { type: "string" },
               operationId: {
                 type: "string",
                 description: "Stable UUID for retransmission",
               },
-              ...([
-                "get_execution_context",
-                "find_records",
-                "read_records",
-              ].includes(name)
-                ? name === "get_execution_context"
-                  ? {}
-                  : {
-                      after: { type: "integer", minimum: 0 },
-                      afterRequests: { type: "integer", minimum: 0 },
-                    }
-                : { sourceRequestId: { type: "string" } }),
+              ...(referenceToolProperties[name] ??
+                ([
+                  "get_execution_context",
+                  "find_records",
+                  "read_records",
+                ].includes(name)
+                  ? name === "get_execution_context"
+                    ? {}
+                    : {
+                        after: { type: "integer", minimum: 0 },
+                        afterRequests: { type: "integer", minimum: 0 },
+                      }
+                  : { sourceRequestId: { type: "string" } })),
             },
           },
         })),

@@ -12,6 +12,7 @@ import type { GitReference, VersionPlan } from "../shared/versions.js";
 import { chatStore } from "./chat-store.js";
 import { contextStore } from "./context-store.js";
 import { auxiliaryStore } from "./auxiliary-store.js";
+import { referenceStore } from "./reference-store.js";
 import { sideStore } from "./side-store.js";
 
 export class OperationError extends Error {
@@ -24,7 +25,7 @@ export class OperationError extends Error {
 }
 
 /** Owns the SQLite transaction: the result and receipt are committed together. */
-export function openStore(directory: string) {
+export function openStore(directory: string, referenceImageRoot?: string) {
   const db = new DatabaseSync(join(directory, "records.sqlite"));
   try {
     db.exec("PRAGMA foreign_keys = ON; PRAGMA busy_timeout = 3000;");
@@ -205,6 +206,7 @@ export function openStore(directory: string) {
   }
   const sides = sideStore(db, directory, once);
   const context = contextStore(db);
+  const references = referenceStore(db, directory, referenceImageRoot);
   function stateView(state: SavedState): SavedState {
     const text = context.recordText(state.recordId);
     return {
@@ -225,8 +227,21 @@ export function openStore(directory: string) {
     chat.session(row.id as string);
   return {
     sides,
+    references,
     context,
     auxiliary,
+    cachedContextOperation(
+      key: string,
+      content: string,
+    ): { result: unknown } | null {
+      const row = db
+        .prepare("SELECT content,result FROM receipts WHERE request_key=?")
+        .get(`tool:${key}`);
+      if (!row) return null;
+      if (row.content !== content)
+        throw new OperationError(409, "REQUEST_KEY_CONFLICT");
+      return { result: JSON.parse(row.result as string) };
+    },
     contextOperation: (
       key: string,
       requestId: string,

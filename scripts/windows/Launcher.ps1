@@ -32,6 +32,11 @@ try {
   $sha.Dispose()
   $mutex = New-Object System.Threading.Mutex($false, $mutexName)
   try { $ownsMutex = $mutex.WaitOne(0) } catch [System.Threading.AbandonedMutexException] { $ownsMutex = $true }
+  if ($ownsMutex) {
+    # Build source using the configured Node. Never start a stale dist checkout.
+    & (Join-Path $env:WINDIR 'System32\wsl.exe') --distribution $settings.distribution --cd $settings.repository --exec $settings.node ($settings.repository.TrimEnd('/') + '/scripts/prepare-launch.mjs') 2>$null
+    if ($LASTEXITCODE -ne 0) { throw 'BUILD_FAILED' }
+  }
   $argsList = @('--distribution', $settings.distribution, '--cd', $settings.repository, '--exec', $settings.node, '--disable-warning=ExperimentalWarning', ($settings.repository.TrimEnd('/') + '/dist/server/cli.js'), '--data-dir', $settings.dataDirectory, '--port', [string]$settings.port)
   if ($settings.fileRoots) { $argsList += @('--file-roots', [string]$settings.fileRoots) }
   if ($settings.gitRepository) { $argsList += @('--git-repository', [string]$settings.gitRepository) }
@@ -69,7 +74,7 @@ try {
   Add-Content $logPath ((Get-Date -Format o) + ' stopped')
 } catch {
   $code = [string]$_.Exception.Message
-  if ($code -notin @('PORT_IN_USE','OWNER_NOT_READY','START_TIMEOUT','INVALID_CONFIGURATION','INVALID_READINESS','BACKEND_EXITED')) { $code = 'START_FAILED' }
+  if ($code -notin @('PORT_IN_USE','OWNER_NOT_READY','START_TIMEOUT','INVALID_CONFIGURATION','INVALID_READINESS','BACKEND_EXITED','BUILD_FAILED')) { $code = 'START_FAILED' }
   try { Add-Content $logPath ((Get-Date -Format o) + ' ' + $code) } catch {}
   Add-Type -AssemblyName System.Windows.Forms
   [System.Windows.Forms.MessageBox]::Show("scene-craft: $code`nLog: $logPath", 'scene-craft') | Out-Null

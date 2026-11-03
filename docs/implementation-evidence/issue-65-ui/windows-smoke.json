@@ -1,0 +1,20 @@
+{
+  "timestamp": "2026-11-03T16:50:31.4990637Z",
+  "commit": "82a521a",
+  "upstreamMain": "791b169",
+  "environment": "Microsoft Windows NT 10.0.26300.0",
+  "entry": "Windows PowerShell Invoke-WebRequest -> localhost -> WSL Node",
+  "expected": "HTTP 200 for integrated UI, reference event/list and existing image composer present; isolated works empty",
+  "actual": {
+    "referenceNavigation": true,
+    "htmlStatus": 200,
+    "isolatedWorks": 0,
+    "referenceList": true,
+    "assetStatus": 200,
+    "assetPath": "/assets/index-Sa2Rp2YF.js",
+    "imageAttachment": true
+  },
+  "status": "passed",
+  "realCodex": "not_run",
+  "humanBrowserOperations": "not_run"
+}
