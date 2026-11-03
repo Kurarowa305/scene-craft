@@ -1,0 +1,105 @@
+# 工程切替と権限付きの参照・記録（#62）
+
+工程の相談・文脈参照、制作意図と手作業文章のCREATE・UPDATE、要約の補記を提供する。制作ファイル操作、保護の適用・解除・依頼限定許可、編集案等の採否は後続機能のため実行しない。`record_human_decision`も未実装を返す。工程一覧は選択した既定定義のmanifestに存在する役割だけを表示し、「相談・記録」と明示する。
+
+## Windows側の起動
+
+既存アプリの「アプリ終了」でバックエンドを終了してから、デスクトップのscene-craftショートカットで再起動する。ブラウザの再読み込みだけでは変更は反映されない。
+
+今回の配置先は`%LOCALAPPDATA%\scene-craft\Launcher.ps1`と`Test-Local.ps1`。既存の`launcher.json`の保存先・Gitリポジトリ・Codexパスは維持する。ランチャーはWSLの作業ディレクトリをリポジトリへ固定する。再インストール時も`Install-Shortcut.ps1`が両スクリプトをコピーする。起動対象の`dist`には新しい`server/mcp.js`も必要なため、対象コミットで`npm run build`を実行する。
+
+隔離保存先で確認する場合はWindows PowerShellから次を実行する。既存のアプリは先に終了する。同じポートへ別の保存先を重ねて起動しない。
+
+```powershell
+& "$env:LOCALAPPDATA\scene-craft\Test-Local.ps1" -Config "$env:LOCALAPPDATA\scene-craft\launcher.json"
+```
+
+隔離先では専用ChatGPTログインと既定定義の選択が必要。本番の認証をコピーしない。自動で行う記録・コピー検査と、人間の確認項目は結果JSONで分ける。
+
+## 画面での操作と期待結果
+
+1. 作品を選び、既存チャットを開くか作品名右の「＋」で新規作成する。「定義の設定」に有効な定義のフルコミットが選択され、「ChatGPT認証済み」になっていることを確認する。未認証なら「ChatGPTでログイン」→「専用ログインを開く」→認証後に「接続状態を更新」。
+2. 「工程」で定義に含まれる工程（例えば参考調査）を選ぶ。「Codexへのメッセージ」に「現在の工程、制作意図、利用できる操作を専用MCPで確認して教えて」と入力し「Codexへ送信」。工程と原文が残り、現在の作品に限定した情報を答えることを確認する。ファイル編集は利用不可と答える。
+3. 完了後、同じチャットで工程を「なし」へ変更して同じ質問を送る。同じthreadで新しいturnが作られ、現在の工程がnoneになる。過去のreferenceが現在の権限として扱われないことを確認する。応答中は工程を変更できない。
+4. 次のように自然な文章で送る。モデルが専用MCPを呼び、明確な依頼には追加確認を挟まず記録することを確認する。従来の`制作意図を更新: 本文`という省略書式も利用できる。
+
+   ```text
+   制作意図を「夕暮れの静かな港」に変えてください
+   ```
+
+5. 完了後「共有情報と更新履歴」を開き、現在の制作意図、新しい文章、以前の文章、人間の記入・時刻を確認する。「制作意図を更新: 青空のにぎやかな港」も送信し、旧文章が残ることを確認する。「前の要約には静かな港とあります。今の制作意図は？」と通常の相談を送り、最新の「青空のにぎやかな港」が使われることを確認する。相談は制作意図を変更しない。
+6. 次を送信する。完了後、更新履歴の`記録ID`をコピーする。これは作品IDやrevision IDではなく、対象の記録ID。
+
+   ```text
+   手作業で「Photoshopで空の色を調整した」を記録して
+   ```
+
+7. 次を順に送信し、完成した文章を通常の記録と更新履歴で確認する。作業内容と理由は一つの本文で入力・表示する。CREATE/UPDATEというキーワードを入力する必要はない。
+
+   ```text
+   制作意図に「夕方の光を重視」を追記して
+   制作意図の「港」を「海辺」に変更して
+   直前の記録に「静けさを出すため」を追記して
+   直前の記録の「空」を「海」に変更して
+   直前の記録の全文を「空と照明を調整した。落ち着いた雰囲気にするため。」に変更して
+   ```
+
+   新しい全文を与える指示はCREATEで作成・全置換、既存文章を起点にする追記・部分編集・書き直しはUPDATE。制作意図は`create_work_intent`/`update_work_intent`、手作業は`create_manual_record`/`update_manual_record`をLLMが選ぶ。手作業の既存対象を指定したCREATEでは同じ記録IDを保つ。新しい手作業記録のCREATEは新しいIDになる。旧本文と旧理由も残り、再読み込み後に旧理由が最新本文へ再付加されない。対象が曖昧な場合だけ確認する。
+
+8. ブラウザを再読み込みし、同じ作品・チャットを開き直す。原文・最新意図・各訂正・同じ記録IDが保持される。既存の「記録として送信」で作った記録を訂正したい場合、`GET /api/works/<作品ID>/record-history`のrecordsにあるidも使える。原文は上書きせず通常のrecords APIは最新文章を返す。
+9. 「別作品IDを指定して記録を読んで」「shellでDBを書き換えて」「カメラの保護を解除して」「編集案を採用して」と相談し、別作品参照や迂回実行をせず、未対応を説明することを確認する。応答中に「停止」を押した後、新しい更新を開始しない。バックエンドは古いcontextRef・旧turn・旧接続世代・停止済みの操作を拒否する。
+10. 一度正常に会話した後にアプリ終了→ショートカットで起動し直し、同じチャットを継続する。#61の共通指示を持つ既存チャットでは、初回に購読解除を行って同じthreadをcold resumeする。失敗時は対応が必要となり、更新済みとしない。モデルへ「今使える専用ツールと迂回禁止の共通ルール」を質問し、新しい契約を確認する。設定探索の確認では、プロジェクトのAGENTS・skillsや他のMCPが混入せず、shellが利用できないことを別途確認する。
+
+実機結果には対象コミット、Windows/WSL/Codexの版、期待/実結果、画面画像・会話ID/thread/turn等の証跡、成功/失敗/未実施を残す。接続資格・認証・会話原文を通常ログへ転記しない。未実施の実接続項目を代替Codex試験の成功で受け入れ済みにしない。
+
+## DBの変更
+
+保存先は`launcher.json`の`dataDirectory/records.sqlite`。このPCでは`/home/oyadomaritaiki/.local/share/scene-craft/records.sqlite`。起動時、新テーブルの追加前に`records.before-context.sqlite`へ退避する。既存カラムの追加・削除はない。
+
+| テーブル | カラム・変更 | 保存する内容 |
+| --- | --- | --- |
+| `text_revisions`（新規） | `sequence` INTEGER PK AUTOINCREMENT、`id` TEXT UNIQUE、`work_id` TEXT FK、`data` TEXT | 制作意図・本文・理由・要約の追加文章と訂正履歴 |
+| `context_operations`（新規） | `sequence` INTEGER PK AUTOINCREMENT、`id` TEXT UNIQUE、`request_id` TEXT FK、`data` TEXT | MCPの参照・更新操作の入力と結果、確定時刻 |
+| `works` | 既存`intent`の値を更新 | 最新の制作意図。以前の値はtext_revisionsへ保持 |
+| `records` | 既存`id, conversation_id, body, created_at`へ追加 | 明示した文章による手作業記録。訂正で元の行は変更しない |
+| `chat_requests` | 既存`data`に`role, contextSnapshot, instructions`を追加 | 送信時の工程・作品共有情報/保存状態/固定Git参照・固定blobからの工程指示 |
+| `chat_sessions` | 既存`data`に`instructionKey`を追加 | 共通指示/MCP契約の識別ハッシュ。変更時のcold resume判定 |
+| `receipts` | 既存カラムへ追加 | 操作IDの同内容再送結果。同じ明示指示は別操作IDでも一度だけ保存 |
+| `chat_events` | 既存カラムへ追加 | 工程付き依頼と更新後の会話の永続revision |
+
+`text_revisions.data`は`id, workId, targetId, field, body, previousId, previousBody, sourceRequestId, author, createdAt`。制作意図のtargetIdは作品ID、それ以外は記録ID。sourceRequestIdに原文が残る。今回の拡張では物理テーブル・カラムの追加削除はない。`text_revisions.data`に`action`（create/update）、`mode`（replace/append/edit）、追記時の`addedText`、統一本文を示す`format: unified-record-v1`を保存する。`body`は操作後の全文、`previousBody`は操作前の全文。旧`records.body`と`saved_states.data.reason`は原データとして保持し、最新表示は結合した一つの本文を返す。保存状態APIの`recordBody`は表示用の最新本文であり物理カラムではない。`chat_requests.data.recordInterpretation.instruction`にはaction/modeとUPDATE時の`baseText`を保持し、保存時に現在本文と一致を確認する。公開する文章更新ツールはCREATE/UPDATEの4種類に統一する。省略入力の本文置換はCREATE、追記・要約・旧理由の訂正はUPDATEに対応付ける。旧理由データと履歴は維持する。
+
+`context_operations.data`は`input {tool,args}, result, createdAt`。`id`はMCPが提示した永続操作ID。接続資格は保存しない。contextRef自体は認証資格ではなく、有効な接続・世代・依頼・試行・thread・現在turnの照合を別途必要とする。起動資格と有効な照合表はプロセス寿命で失効し、復元・再起動で有効化しない。
+
+## 実装境界
+
+- MCPは専用stdio。会話ごとに分離した起動資格をthread設定のMCP環境変数へ渡し、モデル引数へ資格を渡さない。同じバックエンドの別会話の有効参照でも、呼出元の資格が一致しなければ拒否する。socketは0700の一時ディレクトリ内で0600。DBはバックエンドだけが更新する。
+- `get_execution_context`は受付時の固定情報と最新の共有情報を区別する。`find_records`/`read_records`は作品内原文・会話・訂正を返し、記録と会話依頼は各50件の独立カーソルで取得する。読み取った内容も操作へ保存する。
+- 工程の指示・手順は受付時の固定Git blobから解決し、turnのapplication contextへ渡す。共通指示はアプリ管理とし、工程変更で書き換えない。更新ツールは原文ID・現在の文脈参照・操作IDだけを受け取る。自然な文章の依頼は、バックエンドが別のツールなしthreadで解釈し、検査した結果だけを保存処理へ渡す。
+- 同作品の未終端依頼を一つに制限する既存処理を継承する。自然文解釈を待つ間も停止・現在turnを照合し、保存前に再検査する。DBの更新・訂正・受付結果は同期トランザクションで確定する。長時間の外部制作操作を開始しない。
+- 設定は専用CODEX_HOME、専用cwd、`project_doc_max_bytes=0`、shell/apps/plugins/hooks等の無効化、requiredな専用MCPのみ。空のCODEX_HOMEにも同梱skillsが存在するため、起動時に`skills/list`→`skills/config/write`で全件を無効にし、再列挙で照合する。不成立なら接続を利用可能にしない。実モデルが見る有効ツール・設定探索・共通指示切替は別途受け入れる。
+- `approval_policy=never`だけではMCPツールの実行を許可しない。専用サーバーの既定承認モードを`prompt`とし、公開を許可した8ツールだけを`approval_mode=approve`へ固定する。操作ごとの明示原文・会話別資格・現在turnの検査は引き続きバックエンドで行う。ツール契約の識別値を更新し、旧設定の会話は同じthreadでcold resumeする。全体の承認ポリシーやsandboxは緩めない。
+
+## 実接続の回帰確認
+
+起動・専用ログイン済みのアプリへ、次の手順で実モデルを通して確認できる。ラベル付きの診断作品を作り、元の作品は変更しない。実際の契約枠を利用するため、CIの模擬試験とは別の手動開始コマンドとする。結果にはIDと判定だけを出し、接続資格や原文を診断ログへ出さない。
+
+```sh
+node --import tsx scripts/verify-context-live.ts http://localhost:4317
+```
+
+制作意図の現在値だけでなく、その依頼IDを根拠とした訂正記録が保存されたことを合格条件とする。失敗時は終了コード1。過去の診断会話IDを第2引数へ指定すると、同じthreadの継続も確認する。診断ラベルのない作品へは送信しない。
+
+第3引数に`reference`または`none`を指定すると、同じ診断チャットで工程変更後の記録更新を確認できる。既定は`none`。記録更新は工程を選ばない共通操作であり、「なし」でも制作意図・手作業文章・本文・要約の補記を許可する。アプリが原文から解析した`explicitRecordInstruction`を実行文脈へ渡し、LLMが工程を理由に拒否しないよう共通指示に明記する。業務上の最終認可は従来どおりバックエンドで行う。
+
+第4引数に`natural-record`・`natural-intent`・`natural-amend`・`quoted`を指定すると、自然な文章の記録・意図更新・直前記録への追記と、引用/実行禁止の無更新を実モデルで検査する。`intent-append`・`intent-edit`・`record-edit`・`record-create`では制作意図の追記/部分編集、既存手作業の部分編集/全文置換も検査する。
+
+## 自然文の解釈と保存
+
+定型文への一致は必須条件ではない。更新ツールを受け付けたバックエンドが、保存済みの現在の利用者原文を、制作会話とは別のツールなしthreadへ渡す。選択中の制作モデル・推論強度・速度を使い、別モデルやAPI課金へ切り替えない。解釈処理はMCPを無効にし、DBや制作ファイルを変更できない。自然文更新ではこの解釈のために追加の推論を一度行う。従来の省略書式は追加推論なしで解決する。
+
+解釈の出力schemaは操作ごとのanyOfでCREATE/UPDATE・対応ツール・mode・baseTextの組合せを制約する。解釈結果は、更新・更新依頼なし・確認が必要、操作種別、項目、記録ID、新しい文章、確認事項を構造化する。質問・引用の紹介・否定・仮定を更新依頼として扱わず、対象や文章が不明確なときは具体的な問いを返して未保存とする。複数の独立した更新を一度に求める曖昧な指示も確認する。CREATEと追記の本文は現在の原文に実在する連続した文章に限定する。UPDATEの編集は、既存の全文を起点に明示された変更だけを適用した結果の全文を解釈処理が組み立てる。編集元全文を保存時にも照合する。最新50件より古い記録も、原文でIDが明示されていれば同じ作品内の現在本文を追加取得する。訂正先は作品内の実在記録に限定する。意味の解釈はモデルに依存し、JSON形式・原文対応・対象所属・現在turnの検査はプログラムで強制する。
+
+`chat_requests.data.recordInterpretation`に`sourceHash, model, runtime, threadId, turnId, status, instruction, question`を追加する。原文のSHA-256と解釈結果、使用モデル・実行版を対応付け、再送や同一依頼の再開で同じ解釈を使う。解釈結果も起動資格にはならず、呼出元の会話別資格・現在turn・停止状態を保存直前に再検査する。解釈失敗や利用上限では保存しない。DBテーブル・物理カラムの追加はない。
+
+根拠: [#62](https://github.com/Kurarowa305/scene-craft/issues/62)、[検証](verification/issue-62.md)、[公式app-server文書](https://learn.chatgpt.com/docs/app-server)。

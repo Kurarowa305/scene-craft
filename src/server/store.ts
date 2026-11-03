@@ -10,6 +10,7 @@ import { join } from "node:path";
 import type { Work, Conversation, BodyRecord } from "../shared/contracts.js";
 import type { GitReference, VersionPlan } from "../shared/versions.js";
 import { chatStore } from "./chat-store.js";
+import { contextStore } from "./context-store.js";
 
 export class OperationError extends Error {
   constructor(
@@ -178,12 +179,61 @@ export function openStore(directory: string) {
       COMMIT;`);
   }
   const chat = chatStore(db, once);
+  if (
+    !db
+      .prepare("SELECT name FROM sqlite_master WHERE name = 'text_revisions'")
+      .get()
+  ) {
+    const backup = join(directory, "records.before-context.sqlite");
+    if (!existsSync(backup)) db.prepare("VACUUM INTO ?").run(backup);
+    db.exec(`BEGIN IMMEDIATE;
+      CREATE TABLE text_revisions (sequence INTEGER PRIMARY KEY AUTOINCREMENT, id TEXT NOT NULL UNIQUE, work_id TEXT NOT NULL REFERENCES works(id), data TEXT NOT NULL);
+      CREATE INDEX text_revisions_work ON text_revisions(work_id, sequence);
+      CREATE TABLE context_operations (sequence INTEGER PRIMARY KEY AUTOINCREMENT, id TEXT NOT NULL UNIQUE, request_id TEXT NOT NULL REFERENCES chat_requests(id), data TEXT NOT NULL);
+      COMMIT;`);
+  }
+  const context = contextStore(db);
+  function stateView(state: SavedState): SavedState {
+    const text = context.recordText(state.recordId);
+    return {
+      ...state,
+      recordBody: text.body,
+      reason:
+        "reason" in text
+          ? typeof text.reason === "string"
+            ? text.reason
+            : null
+          : state.reason,
+    };
+  }
   // Existing chats receive their inherited selection before a later choice changes it.
   for (const row of db
     .prepare("SELECT id FROM conversations ORDER BY sequence")
     .all())
     chat.session(row.id as string);
   return {
+    context,
+    contextOperation: (
+      key: string,
+      requestId: string,
+      input: unknown,
+      execute: () => unknown,
+    ) =>
+      once(`tool:${key}`, [requestId, input], () => {
+        const result = execute();
+        db.prepare(
+          "INSERT INTO context_operations (id, request_id, data) VALUES (?, ?, ?)",
+        ).run(
+          key,
+          requestId,
+          JSON.stringify({
+            input,
+            result,
+            createdAt: new Date().toISOString(),
+          }),
+        );
+        return result;
+      }),
     chat,
     close: () => db.close(),
     defaultDefinition,
@@ -247,7 +297,9 @@ export function openStore(directory: string) {
             "SELECT data FROM saved_states WHERE work_id = ? ORDER BY sequence",
           )
           .all(workId)
-          .map((row) => JSON.parse(row.data as string) as SavedState),
+          .map((row) =>
+            stateView(JSON.parse(row.data as string) as SavedState),
+          ),
       };
     },
     planImport: (conversationId: string, input: ImportInput) => {
@@ -365,7 +417,11 @@ export function openStore(directory: string) {
       const record = db
         .prepare(`SELECT ${recordColumns} FROM records WHERE id = ?`)
         .get(state.recordId) as unknown as BodyRecord;
-      return { operationId: id, state, record };
+      return {
+        operationId: id,
+        state: stateView(state),
+        record: { ...record, ...context.latest(record) },
+      };
     },
     commitImport: (id: string, state: SavedState) => {
       db.exec("BEGIN IMMEDIATE");
@@ -464,11 +520,15 @@ export function openStore(directory: string) {
       }),
     records: (conversationId: string) => {
       requireEntity("conversations", conversationId);
-      return db
+      const records = db
         .prepare(
           `SELECT ${recordColumns} FROM records WHERE conversation_id = ? ORDER BY sequence`,
         )
         .all(conversationId) as unknown as BodyRecord[];
+      return records.map((record) => ({
+        ...record,
+        ...context.latest(record),
+      }));
     },
     createRecord: (key: string, conversationId: string, body: string) =>
       once(key, ["record", conversationId, body], () => {

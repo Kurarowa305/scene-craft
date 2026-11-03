@@ -111,8 +111,13 @@ export function chatStore(
       id: string,
       body: string,
       plan: (workId: string) => VersionPlan,
+      role = "none",
+      context?: (
+        workId: string,
+        plan: VersionPlan,
+      ) => { snapshot: unknown; instructions: string },
     ) {
-      const saved = once(key, ["chat-send", id, body], () => {
+      const saved = once(key, ["chat-send", id, body, role], () => {
         const s = session(id);
         if (!s.selection) throw new OperationError(409, "MODEL_REQUIRED");
         const workId = db
@@ -121,6 +126,7 @@ export function chatStore(
         if (requests().some((r) => r.workId === workId && unsettled(r)))
           throw new OperationError(409, "CHAT_RECONCILIATION_REQUIRED");
         const r: ChatRequest = {
+          role,
           attempts: [],
           id: randomUUID(),
           conversationId: id,
@@ -141,6 +147,11 @@ export function chatStore(
           retryCount: 0,
           previousAttempt: null,
         };
+        if (context) {
+          const fixed = context(workId, r.plan);
+          r.contextSnapshot = fixed.snapshot;
+          r.instructions = fixed.instructions;
+        }
         db.prepare(
           "INSERT INTO chat_requests (id, conversation_id, work_id, data) VALUES (?, ?, ?, ?)",
         ).run(r.id, id, workId, JSON.stringify(r));

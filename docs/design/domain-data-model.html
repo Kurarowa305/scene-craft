@@ -980,6 +980,37 @@
         </section>
         <section aria-labelledby="会話共有情報原文と要約" class="spec-section">
           <h2 id="会話共有情報原文と要約">8. 会話の共有情報</h2>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>操作</th>
+                  <th>自然言語の意図</th>
+                  <th>保存結果</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">CREATE</th>
+                  <td>新しい全文を指定して作成・置換</td>
+                  <td>
+                    新規の文章を作成。既存対象を指定した場合は、その全文を置き換える
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">UPDATE</th>
+                  <td>既存文章を起点に追記・部分編集・書き直し</td>
+                  <td>指示された変更を反映し、無関係な内容を保持する</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>
+            制作意図と手作業の文章について、LLMが自然言語の明示指示から操作と対象を解釈する。対象や指示が曖昧なら具体的に確認する。手作業は作業内容と任意の理由を一つの本文で入力・表示する。変更前後の全文・指示原文・記入者・時刻を保持し、通常は最新の文章を表示する。
+          </p>
+          <p>
+            旧データの手作業理由は本文に結合して最新表示し、元の保存データを保持する。全文置換後は旧理由を再付加しない。UPDATEの解釈時と保存時の本文が不一致なら停止し、最新内容から指示し直す。
+          </p>
           <div class="contract-cards">
             <article aria-label="所属" class="contract-card">
               <p class="contract-card-title">所属</p>

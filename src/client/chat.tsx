@@ -1,4 +1,5 @@
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
+import type { BodyRecord } from "../shared/contracts";
 import type { ChatModel, ChatView, ModelChoice } from "../shared/chat";
 import { read, write } from "./api";
 
@@ -31,7 +32,20 @@ interface Status {
   runtime: string | null;
   models: ChatModel[];
 }
-export function Chat({ conversationId }: { conversationId: string }) {
+export function Chat({
+  conversationId,
+  onRecordsChanged,
+}: {
+  conversationId: string;
+  onRecordsChanged: (
+    records: BodyRecord[],
+    intent: string | null,
+    revision: number,
+  ) => void;
+}) {
+  const alive = useRef(false);
+  const contextFetch = useRef(0);
+  const contextRevision = useRef(-1);
   const [view, setView] = useState<ChatView>();
   function applyView(next: ChatView) {
     setView((previous) =>
@@ -43,6 +57,40 @@ export function Chat({ conversationId }: { conversationId: string }) {
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const [authUrl, setAuthUrl] = useState("");
+  const [roles, setRoles] = useState<{ id: string; description: string }[]>([]);
+  const [role, setRole] = useState("none");
+  const [context, setContext] = useState<{
+    work: { intent: string | null };
+    revisions: {
+      id: string;
+      targetId: string;
+      field: string;
+      body: string;
+      previousBody: string | null;
+      createdAt: string;
+    }[];
+  }>();
+  async function refreshContext(v: ChatView) {
+    if (!alive.current || v.revision < contextRevision.current) return;
+    contextRevision.current = v.revision;
+    const sequence = ++contextFetch.current;
+    const workId = v.requests[0]?.workId;
+    if (workId) {
+      try {
+        const [next, records] = await Promise.all([
+          read<NonNullable<typeof context>>(`/api/works/${workId}/context`),
+          read<BodyRecord[]>(`/api/conversations/${conversationId}/records`),
+        ]);
+        if (alive.current && sequence === contextFetch.current) {
+          setContext(next);
+          onRecordsChanged(records, next.work.intent, next.revisions.length);
+        }
+      } catch {
+        if (alive.current)
+          setError("共有情報を取得できません。接続状態を更新してください。");
+      }
+    }
+  }
   const selection = view?.session.selection;
   const active = view?.requests.find((r) =>
     ["accepted", "running", "stopping", "unknown"].includes(r.phase),
@@ -54,10 +102,15 @@ export function Chat({ conversationId }: { conversationId: string }) {
     ]);
     setStatus(s);
     applyView(v);
+    await refreshContext(v);
   }
   useEffect(() => {
+    alive.current = true;
     let current = true;
     let source: EventSource | undefined;
+    void read<{ id: string; description: string }[]>("/api/roles")
+      .then(setRoles)
+      .catch(() => setRoles([]));
     void Promise.all([
       read<Status>("/api/codex"),
       read<ChatView>(`/api/conversations/${conversationId}/chat`),
@@ -66,9 +119,14 @@ export function Chat({ conversationId }: { conversationId: string }) {
         if (!current) return;
         setStatus(s);
         applyView(v);
+        void refreshContext(v);
         source = new EventSource(`/api/conversations/${conversationId}/events`);
         source.addEventListener("chat", (event) => {
-          if (current) applyView(JSON.parse((event as MessageEvent).data));
+          if (current) {
+            const next = JSON.parse((event as MessageEvent).data);
+            applyView(next);
+            void refreshContext(next);
+          }
         });
         source.onerror = () => {
           if (current)
@@ -84,6 +142,8 @@ export function Chat({ conversationId }: { conversationId: string }) {
         if (current) setError("会話を取得できません。再読み込みしてください。");
       });
     return () => {
+      alive.current = false;
+      ++contextFetch.current;
       current = false;
       source?.close();
     };
@@ -111,6 +171,7 @@ export function Chat({ conversationId }: { conversationId: string }) {
     void action(async () => {
       await write(`/api/conversations/${conversationId}/messages`, {
         body: draft,
+        role,
       });
       setDraft("");
       await refresh();
@@ -130,7 +191,7 @@ export function Chat({ conversationId }: { conversationId: string }) {
         </span>
       </div>
       <p className="hint">
-        テキスト会話を利用できます。制作操作・工程別エージェントは準備中です。
+        工程ごとの相談・文脈参照と、明示した文章の記録ができます。制作ファイル操作・保護の適用・採否は準備中です。
       </p>
       <button
         type="button"
@@ -158,6 +219,22 @@ export function Chat({ conversationId }: { conversationId: string }) {
       </button>
       {error && <p role="alert">{error}</p>}
       <div className="chat-settings">
+        <label>
+          工程
+          <select
+            aria-label="工程"
+            value={role}
+            disabled={busy || !!active}
+            onChange={(e) => setRole(e.target.value)}
+          >
+            <option value="none">なし</option>
+            {roles.map((r) => (
+              <option key={r.id} value={r.id}>
+                {r.description}（相談・記録）
+              </option>
+            ))}
+          </select>
+        </label>
         <label>
           会話モデル
           <select
@@ -228,10 +305,51 @@ export function Chat({ conversationId }: { conversationId: string }) {
         </label>
       </div>
       <p className="hint">選択の変更は次の依頼から適用します。</p>
+      <details>
+        <summary>記録の指示方法</summary>
+        <p>
+          自然な文章から全文の作成・置き換え（CREATE）か、既存内容への追記・編集（UPDATE）を判断します。対象や内容が曖昧なときは確認します。引用の紹介や通常の相談だけでは更新しません。
+        </p>
+        <p>制作意図を「夕暮れの静かな港」に変えてください</p>
+        <p>制作意図に「夕方の光を重視」を追記して</p>
+        <p>制作意図の「夕暮れ」を「夜明け」に変更して</p>
+        <p>手作業で「Photoshopで空の色を調整した」を記録して</p>
+        <p>直前の記録に「静けさを出すため、照明も調整した」を追記して</p>
+        <p>
+          直前の記録の全文を「空と照明を調整した。落ち着いた雰囲気にするため。」に変更して
+        </p>
+        <p>直前の記録の「空」を「海」に変更して</p>
+        <p>従来の省略書式も利用できます。</p>
+        <p>記録を訂正: 記録ID body 変更後の全文</p>
+        <p>
+          訂正項目は
+          body（手作業の文章）・summary（要約）です。理由も手作業の文章へ含めて記録できます。追記は「記録に追記:
+          記録ID 追加文」とも指示できます。記録IDは下の更新履歴で確認できます。
+        </p>
+      </details>
+      {context && (
+        <details>
+          <summary>共有情報と更新履歴</summary>
+          <p>現在の制作意図: {context.work.intent ?? "未入力"}</p>
+          {context.revisions.map((v) => (
+            <article key={v.id}>
+              <p>
+                記録ID: {v.targetId} / {v.field}
+              </p>
+              <p>{v.body}</p>
+              <p>
+                以前: {v.previousBody ?? "未入力"} / 記入者: 人間 /{" "}
+                {v.createdAt}
+              </p>
+            </article>
+          ))}
+        </details>
+      )}
       <div aria-live="polite">
         {view?.requests.map((r) => (
           <article className="record" key={r.id}>
             <strong>あなた</strong>
+            <p className="hint">工程: {r.role ?? "none"}</p>
             <p className="record-body">{r.body}</p>
             <strong>{phases[r.phase]}</strong>
             <p className="hint">

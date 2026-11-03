@@ -20,12 +20,14 @@ export function FileRecords({
   onRecord,
   disabled,
   onBusy,
+  recordRevision,
 }: {
   workId: string;
   conversationId: string;
   onRecord: (record: BodyRecord) => void;
   disabled: boolean;
   onBusy: (busy: boolean) => void;
+  recordRevision: number;
 }) {
   const [roots, setRoots] = useState<{
     sources: { id: string }[];
@@ -34,13 +36,14 @@ export function FileRecords({
   const [states, setStates] = useState<SavedState[]>([]);
   const [current, setCurrent] = useState<string | null>(null);
   const [operations, setOperations] = useState<ImportOperation[]>([]);
-  const [loaded, setLoaded] = useState(false);
+  const [rootsLoaded, setRootsLoaded] = useState(false);
+  const [statesLoaded, setStatesLoaded] = useState(false);
+  const loaded = rootsLoaded && statesLoaded;
   const [sourceRoot, setSourceRoot] = useState("");
   const [paths, setPaths] = useState<Record<string, string>>({});
   const [application, setApplication] =
     useState<ImportInput["application"]>("Blender");
   const [body, setBody] = useState("");
-  const [reason, setReason] = useState("");
   const [render, setRender] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
@@ -48,23 +51,39 @@ export function FileRecords({
   const [pending, setPending] = useState<ImportInput | null>(null);
   useEffect(() => {
     let active = true;
+    setStatesLoaded(false);
+    void read<{ states: SavedState[]; currentStateId: string | null }>(
+      `/api/works/${workId}/states`,
+    )
+      .then((result) => {
+        if (active) {
+          setStates(result.states);
+          setCurrent(result.currentStateId);
+          setStatesLoaded(true);
+        }
+      })
+      .catch(() => {
+        if (active)
+          setError("保存状態を取得できません。再読み込みしてください。");
+      });
+    return () => {
+      active = false;
+    };
+  }, [workId, recordRevision]);
+  useEffect(() => {
+    let active = true;
     Promise.all([
       read<{ sources: { id: string }[]; configured: boolean }>(
         "/api/file-roots",
       ),
-      read<{ states: SavedState[]; currentStateId: string | null }>(
-        `/api/works/${workId}/states`,
-      ),
       read<ImportOperation[]>(`/api/works/${workId}/imports`),
     ])
-      .then(([rootInfo, result, ops]) => {
+      .then(([rootInfo, ops]) => {
         if (!active) return;
         setRoots(rootInfo);
         setSourceRoot(rootInfo.sources[0]?.id ?? "");
-        setStates(result.states);
-        setCurrent(result.currentStateId);
         setOperations(ops);
-        setLoaded(true);
+        setRootsLoaded(true);
         const previous = ops.find(
           (op) =>
             op.conversationId === conversationId &&
@@ -73,8 +92,11 @@ export function FileRecords({
         );
         if (previous) {
           setPending(previous.input);
-          setBody(previous.input.body);
-          setReason(previous.input.reason ?? "");
+          setBody(
+            [previous.input.body, previous.input.reason]
+              .filter(Boolean)
+              .join("\n"),
+          );
           setApplication(previous.input.application);
           setSourceRoot(previous.input.files[0]?.rootId ?? "");
           setPaths(
@@ -112,7 +134,6 @@ export function FileRecords({
       application,
       beforeStateId: current,
       files,
-      ...(reason ? { reason } : {}),
       ...(render ? { render: JSON.parse(render) } : {}),
     };
     setPending(input);
@@ -126,7 +147,7 @@ export function FileRecords({
       setStates((previous) =>
         previous.some((item) => item.id === result.state.id)
           ? previous
-          : [...previous, result.state],
+          : [...previous, { ...result.state, recordBody: result.record.body }],
       );
       setCurrent(result.state.id);
       setOperations((previous) =>
@@ -135,7 +156,6 @@ export function FileRecords({
       setPending(null);
       setPaths({});
       setBody("");
-      setReason("");
       setRender("");
     } catch (failure) {
       setError((failure as Error).message);
@@ -180,9 +200,10 @@ export function FileRecords({
               : "なし（取り込み前の経緯は不明）"}{" "}
             → 変更後：保存状態 {index + 1}
           </p>
-          <p>
-            {state.application} / 理由：{state.reason ?? "未入力"}
-          </p>
+          <p>{state.application}</p>
+          {state.recordBody && (
+            <p className="saved-state-text">{state.recordBody}</p>
+          )}
           <p>
             元レンダー：
             {state.render
@@ -340,14 +361,9 @@ export function FileRecords({
                   onChange={(e) => setBody(e.target.value)}
                 />
               </label>
-              <label>
-                手修正の理由（任意）
-                <textarea
-                  value={reason}
-                  maxLength={20000}
-                  onChange={(e) => setReason(e.target.value)}
-                />
-              </label>
+              <p className="hint">
+                作業内容と理由は、この本文にまとめて書けます。
+              </p>
               <label>
                 参照した元レンダー
                 <select

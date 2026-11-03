@@ -1,4 +1,4 @@
-import { StrictMode, useEffect, useState, type FormEvent } from "react";
+import { StrictMode, useEffect, useRef, useState, type FormEvent } from "react";
 import { createRoot } from "react-dom/client";
 import type { Work, Conversation, BodyRecord } from "../shared/contracts";
 import { read, write } from "./api";
@@ -15,11 +15,13 @@ function App() {
   const [conversationId, setConversationId] = useState("");
   const [records, setRecords] = useState<BodyRecord[]>([]);
   const [recordsLoaded, setRecordsLoaded] = useState(false);
+  const recordsFetch = useRef(0);
   const [name, setName] = useState("");
   const [intent, setIntent] = useState("");
   const [styleChoice, setStyleChoice] = useState("none");
   const [styleCommit, setStyleCommit] = useState("");
   const [versionRevision, setVersionRevision] = useState(0);
+  const [recordRevision, setRecordRevision] = useState(0);
   const [drafts, setDrafts] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState(false);
   const [loadingChats, setLoadingChats] = useState(false);
@@ -67,22 +69,25 @@ function App() {
   }, [workId]);
   useEffect(() => {
     let active = true;
+    const sequence = ++recordsFetch.current;
     setRecords([]);
     setRecordsLoaded(false);
     setLoadingRecords(Boolean(conversationId));
     if (conversationId) {
       read<BodyRecord[]>(`/api/conversations/${conversationId}/records`)
         .then((result) => {
-          if (active) {
+          if (active && sequence === recordsFetch.current) {
             setRecords(result);
             setRecordsLoaded(true);
           }
         })
         .catch((failure) => {
-          if (active) setError(failure.message);
+          if (active && sequence === recordsFetch.current)
+            setError(failure.message);
         })
         .finally(() => {
-          if (active) setLoadingRecords(false);
+          if (active && sequence === recordsFetch.current)
+            setLoadingRecords(false);
         });
     }
     return () => {
@@ -350,6 +355,7 @@ function App() {
                             </time>
                           </div>
                           <p className="record-body">{record.body}</p>
+                          {record.summary && <p>要約: {record.summary}</p>}
                         </article>
                       ))
                     )}
@@ -357,8 +363,21 @@ function App() {
                   <Chat
                     key={`chat-${conversationId}`}
                     conversationId={conversationId}
+                    onRecordsChanged={(items, nextIntent, revision) => {
+                      ++recordsFetch.current;
+                      setRecords(items);
+                      setRecordsLoaded(true);
+                      setLoadingRecords(false);
+                      setRecordRevision(revision);
+                      setWorks((previous) =>
+                        previous.map((w) =>
+                          w.id === workId ? { ...w, intent: nextIntent } : w,
+                        ),
+                      );
+                    }}
                   />
                   <FileRecords
+                    recordRevision={recordRevision}
                     onBusy={setBusy}
                     key={conversationId}
                     workId={workId}

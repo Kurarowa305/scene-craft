@@ -1,12 +1,25 @@
-import { mkdtemp } from "node:fs/promises";
+import { mkdtemp, mkdir, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 import { createApp } from "../src/server/app.js";
 import { gitFixture, cleanGitFixture } from "./git-fixture.js";
 import type { CodexConnection } from "../src/server/codex.js";
-export async function chatFixture() {
+import type { FileRoots } from "../src/shared/files.js";
+export async function chatFixture(external = false, withFiles = false) {
   const directory = await mkdtemp(join(tmpdir(), "chat-fault-"));
   const git = await gitFixture(directory);
+  let fileRoots: FileRoots | undefined;
+  if (withFiles) {
+    const source = join(directory, "source");
+    const managed = join(directory, "managed");
+    await mkdir(source);
+    await mkdir(managed);
+    await writeFile(join(source, "drawing.psd"), "saved Photoshop fixture");
+    fileRoots = {
+      sources: [{ id: "source", path: source }],
+      managed: { id: "managed", path: managed },
+    };
+  }
   const calls: { method: string; params: any }[] = [];
   let listener: (method: string, params: any) => void = () => {};
   let hook: ((method: string, params: any) => any) | undefined;
@@ -55,9 +68,12 @@ export async function chatFixture() {
   };
   let app = await createApp({
     directory,
+    fileRoots,
     port: 4317,
     gitRepository: git.repository,
-    codex,
+    ...(external
+      ? { codexBinary: resolve("tests/fixtures/codex.mjs") }
+      : { codex }),
   });
   let headers: Record<string, string> = { host: "localhost:4317" };
   async function login() {
@@ -90,7 +106,7 @@ export async function chatFixture() {
   const work = await post("/api/works", { name: "試験作品" });
   const chat = await post(`/api/works/${work.id}/conversations`);
   await post(`/api/conversations/${chat.id}/model`, {
-    model: "a",
+    model: external ? "fixture-a" : "a",
     effort: "low",
     speed: "standard",
   });
@@ -125,9 +141,12 @@ export async function chatFixture() {
       await app.close();
       app = await createApp({
         directory,
+        fileRoots,
         port: 4317,
         gitRepository: git.repository,
-        codex,
+        ...(external
+          ? { codexBinary: resolve("tests/fixtures/codex.mjs") }
+          : { codex }),
       });
       await login();
     },

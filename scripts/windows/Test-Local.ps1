@@ -31,7 +31,11 @@ $report = [ordered]@{
   commit=$commit; timestamp=(Get-Date -Format o); windows=[Environment]::OSVersion.VersionString
   distribution=$settings.distribution; node=$nodeVersion
   codex=$(if ($settings.codexBinary) { (& wsl.exe --distribution $settings.distribution --exec $settings.codexBinary --version) -join '' } else { 'not configured' })
+  launcherSha256=(Get-FileHash (Join-Path $PSScriptRoot 'Launcher.ps1') -Algorithm SHA256).Hash
   automatic=@(); manual=@(
+    @{name='issue 62 role switching and dedicated MCP'; expected='same thread switches selected role to none; current context is read using dedicated scene_craft MCP; old role does not grant production access'; actual=''; status='not_run'; evidence=''},
+    @{name='issue 62 explicit intent, manual record and amendment'; expected='natural instructions choose CREATE (whole text) or UPDATE (append and edit existing text) tools; manual body includes rationale; old notes can be edited by ID; commit once; original and previous text survive reload; old summary never replaces current intent'; actual=''; status='not_run'; evidence=''},
+    @{name='issue 62 restricted configuration and common instruction cold resume'; expected='no project AGENTS/skills/external MCP/shell tools; after common instruction update same idle thread resumes with new common policy; failed resume is not success'; actual=''; status='not_run'; evidence=''},
     @{name='dedicated ChatGPT login and model selection'; expected='login uses isolated file credentials; first default or previous selection appears; no API key path'; actual=''; status='not_run'; evidence=''},
     @{name='Codex conversation and browser reconnect'; expected='original text and final response reopen once; same thread continues; actual/requested model and runtime recorded'; actual=''; status='not_run'; evidence=''},
     @{name='Codex stop and explicit resume'; expected='stop is saved immediately; no new turn while stopping; terminal verified before explicit resume'; actual=''; status='not_run'; evidence=''},

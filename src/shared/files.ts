@@ -23,6 +23,7 @@ export interface ImportInput {
   files: SourceFile[];
 }
 export interface SavedState {
+  recordBody?: string;
   id: string;
   workId: string;
   recordId: string;

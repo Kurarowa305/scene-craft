@@ -12,6 +12,7 @@ $ErrorActionPreference = 'Stop'
 $install = Join-Path $env:LOCALAPPDATA 'scene-craft'
 New-Item -ItemType Directory -Force -Path $install | Out-Null
 Copy-Item (Join-Path $PSScriptRoot 'Launcher.ps1') (Join-Path $install 'Launcher.ps1') -Force
+Copy-Item (Join-Path $PSScriptRoot 'Test-Local.ps1') (Join-Path $install 'Test-Local.ps1') -Force
 $config = Join-Path $install 'launcher.json'
 # Keep optional settings when refreshing an existing shortcut.
 $settings = @{}

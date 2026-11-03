@@ -6,6 +6,7 @@ Blender と Photoshop を使った背景イラスト制作を支援する基盤�
 - [公開中の設計ポータル（GitHub Pages）](https://kurarowa305.github.io/scene-craft/)
 - [設計ポータルのソース（HTML）](docs/design/index.html)
 - [詳細設計の一覧と設計 Issue（Markdown）](docs/design/README.md)
+- [現実装のMCPツール・バックエンドAPI・DB一覧](docs/implementation-catalog.md)
 - [開発の進め方と使用スキル](docs/agents/development-workflow.md)
 - [用語集](GLOSSARY.md)
 - [確定した画面・制作導線の設計](docs/design/user-interface.md)

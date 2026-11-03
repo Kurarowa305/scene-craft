@@ -25,8 +25,8 @@ test("制作ファイルを取り込み、手修正の変更前後と任意理�
   await page
     .getByLabel("PSD / PSBファイル（フォルダー内の相対パス）")
     .fill("after.psb");
-  await page.getByLabel("ファイル記録の本文").fill("色を調整");
-  await page.getByLabel("手修正の理由（任意）").fill("暖かくしたい");
+  await page.getByLabel("ファイル記録の本文").fill("色を調整\n暖かくしたい");
+  await expect(page.getByLabel("手修正の理由（任意）")).toHaveCount(0);
   await page
     .getByRole("button", { name: "ファイルと本文を記録", exact: true })
     .click();
@@ -46,7 +46,7 @@ test("制作ファイルを取り込み、手修正の変更前後と任意理�
   );
   await expect(page.locator(".record-body")).toHaveText([
     "最初の取り込み",
-    "色を調整",
+    "色を調整\n暖かくしたい",
   ]);
   await page.screenshot({ path: "test-results/imports.png", fullPage: true });
 });

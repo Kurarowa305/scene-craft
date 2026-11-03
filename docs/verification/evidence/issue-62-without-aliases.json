@@ -1,0 +1,38 @@
+{
+  "checkedAt": "2026-11-03T05:36:33.365Z",
+  "runtime": "scene_craft/0.166.0 (Ubuntu 22.4.0; x86_64) unknown (scene_craft; 0.1.0)",
+  "instructionSourceCount": 0,
+  "toolApprovalModes": {
+    "get_execution_context": "approve",
+    "find_records": "approve",
+    "read_records": "approve",
+    "create_work_intent": "approve",
+    "update_work_intent": "approve",
+    "create_manual_record": "approve",
+    "update_manual_record": "approve",
+    "record_human_decision": "approve"
+  },
+  "skillCounts": [
+    {
+      "count": 5,
+      "enabled": 0
+    }
+  ],
+  "mcp": [
+    {
+      "name": "scene_craft",
+      "tools": [
+        "update_work_intent",
+        "get_execution_context",
+        "update_manual_record",
+        "read_records",
+        "find_records",
+        "create_manual_record",
+        "create_work_intent",
+        "record_human_decision"
+      ]
+    }
+  ],
+  "inference": "not run",
+  "roleSwitchAndColdResume": "Windows manual verification pending"
+}
