@@ -47,10 +47,7 @@ test("画像のサブメニューが右に開き、成果物はタイトルと�
     `/api/conversations/${conversation.id}/attachments/${crypto.randomUUID()}?name=reference.png`,
     {
       headers: { ...headers, "content-type": "application/octet-stream" },
-      data: Buffer.from(
-        "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aT2kAAAAASUVORK5CYII=",
-        "base64",
-      ),
+      data: readFileSync("tests/fixtures/chat-reference.png"),
     },
   );
   expect(uploaded.ok()).toBe(true);
@@ -105,6 +102,22 @@ test("画像のサブメニューが右に開き、成果物はタイトルと�
     .getByRole("heading", { name: "未命名のチャット 1", exact: true })
     .click();
   await expect(page.getByRole("menu")).toHaveCount(0);
+  await page
+    .getByRole("button", { name: "成果物・ファイルを添付", exact: true })
+    .click();
+  await page
+    .getByRole("menuitem", { name: "保存済み成果物", exact: true })
+    .click();
+  await page
+    .getByRole("menu", { name: "添付する保存済み画像", exact: true })
+    .getByRole("menuitem", { name: "reference.png", exact: true })
+    .click();
+  await expect(page.locator(".main-chat .draft-images img")).toBeVisible();
+  await expect(page.getByRole("menu")).toHaveCount(0);
+  const unchanged = await (
+    await page.request.get(`/api/works/${work.id}/states`)
+  ).json();
+  expect(unchanged.states).toHaveLength(1);
   await openArtifacts(page);
   await expect(
     page.getByRole("button", { name: /reference.png/ }),
