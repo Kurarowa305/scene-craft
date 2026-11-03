@@ -45,6 +45,15 @@
         "height": 960
       },
       "test": "tests/browser/pane-layout.spec.ts"
+    },
+    {
+      "file": "create-work-file.png",
+      "sourceCommit": "6df55889013c9b2e8f447986a3339462bbdee235",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "test": "tests/browser/imports.spec.ts"
     }
   ]
 }
