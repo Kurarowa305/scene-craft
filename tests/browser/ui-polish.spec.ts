@@ -150,3 +150,37 @@ test("画像のサブメニューが右に開き、成果物はタイトルと�
   }
   await page.screenshot({ path: "test-results/issue-102-ui-polish.png" });
 });
+
+test("保存済み画像がなくてもEscapeは子メニューだけを閉じる", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await openWorkDialog(page);
+  await page.getByLabel("作品名", { exact: true }).fill("画像がない作品");
+  await page
+    .getByRole("dialog")
+    .getByRole("button", { name: "作品を作成", exact: true })
+    .click();
+  await page
+    .getByRole("button", {
+      name: "画像がない作品に新しいチャット",
+      exact: true,
+    })
+    .click();
+  await page
+    .getByRole("button", { name: "成果物・ファイルを添付", exact: true })
+    .click();
+  await page
+    .getByRole("menuitem", { name: "保存済み成果物", exact: true })
+    .click();
+  const submenu = page.getByRole("menu", {
+    name: "添付する保存済み画像",
+    exact: true,
+  });
+  await expect(submenu).toContainText("添付できる保存済み画像はありません。");
+  await page.keyboard.press("Escape");
+  await expect(submenu).toHaveCount(0);
+  await expect(
+    page.getByRole("menu", { name: "成果物・ファイルを添付", exact: true }),
+  ).toBeVisible();
+});
