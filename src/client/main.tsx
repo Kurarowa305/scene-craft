@@ -11,8 +11,17 @@ import { read, write, uploadFile, SaveError } from "./api";
 import { FileRecords } from "./file-records";
 import { VersionSettings, WorkVersions } from "./versions";
 import { Chat } from "./chat";
+import { ChatEntry } from "./chat-entry";
+import { ChatSettings } from "./chat-settings";
 import { SideChats } from "./side-chats";
-import { Icon, Modal, ResizeHandle, Unavailable, shellStyle } from "./ui";
+import {
+  Icon,
+  Modal,
+  Popup,
+  ResizeHandle,
+  Unavailable,
+  shellStyle,
+} from "./ui";
 import "./style.css";
 
 function App() {
@@ -44,7 +53,7 @@ function App() {
     setMainWidth((width) => Math.min(width, maxMainWidth));
   }, [maxMainWidth]);
   const [showPanel, setShowPanel] = useState(false);
-  const [attachOpen, setAttachOpen] = useState(false);
+  const [connectionRevision, setConnectionRevision] = useState(0);
   const [statuses, setStatuses] = useState<Record<string, string>>({});
   const [works, setWorks] = useState<Work[]>([]);
   const [worksLoaded, setWorksLoaded] = useState(false);
@@ -374,40 +383,26 @@ function App() {
               </div>
               {workId === item.id &&
                 conversations.map((chat, index) => (
-                  <button
-                    aria-label={chat.title ?? `未命名のチャット ${index + 1}`}
-                    className={`chat-link ${conversationId === chat.id ? "active" : ""}`}
+                  <ChatEntry
                     key={chat.id}
+                    chat={chat}
+                    title={chat.title ?? `未命名のチャット ${index + 1}`}
+                    selected={conversationId === chat.id}
+                    status={statuses[chat.id] ?? ""}
                     disabled={busy || loading || uploading || pendingImport}
-                    onClick={() => {
+                    onSelect={() => {
                       setError("");
                       setConversationId(chat.id);
-                      setAttachOpen(false);
                       setShowPanel(false);
                     }}
-                  >
-                    <span className="chat-title">
-                      {chat.title ?? `未命名のチャット ${index + 1}`}
-                    </span>
-                    <span
-                      className={`state-icon ${statuses[chat.id] ?? ""}`}
-                      aria-label={
-                        statuses[chat.id] === "running"
-                          ? "処理中"
-                          : statuses[chat.id] === "attention"
-                            ? "確認が必要"
-                            : statuses[chat.id] === "stopped"
-                              ? "停止中"
-                              : "通常"
-                      }
-                    >
-                      {statuses[chat.id] === "attention"
-                        ? "!"
-                        : statuses[chat.id] === "stopped"
-                          ? "Ⅱ"
-                          : ""}
-                    </span>
-                  </button>
+                    onRename={(name) =>
+                      setConversations((previous) =>
+                        previous.map((item) =>
+                          item.id === chat.id ? { ...item, title: name } : item,
+                        ),
+                      )
+                    }
+                  />
                 ))}
             </section>
           ))}
@@ -434,10 +429,6 @@ function App() {
             <span className="icon">⏻</span>
             <span>アプリ終了</span>
           </button>
-          <div className="profile">
-            <span className="avatar">S</span>
-            <span>制作ワークスペース</span>
-          </div>
         </div>
       </aside>
       <ResizeHandle
@@ -495,48 +486,45 @@ function App() {
                       [conversationId]: value,
                     }))
                   }
+                  connectionRevision={connectionRevision}
                   attachment={
-                    <div className="attachment-anchor">
-                      <button
-                        type="button"
-                        disabled={uploading || pendingImport}
-                        className="icon"
-                        aria-label="成果物・ファイルを添付"
-                        aria-expanded={attachOpen}
-                        onClick={() => setAttachOpen(!attachOpen)}
-                      >
-                        <Icon name="plus" />
-                      </button>
-                      {attachOpen && (
-                        <div className="attachment-menu">
+                    <Popup
+                      label="成果物・ファイルを添付"
+                      className="attachment-anchor"
+                      icon={<Icon name="plus" />}
+                      disabled={uploading || pendingImport}
+                    >
+                      {(close) => (
+                        <>
                           <div className="menu-heading">
                             制作ファイルと保存状態
                           </div>
                           <button
                             type="button"
+                            role="menuitem"
                             onClick={() => {
                               setShowPanel(true);
                               document.dispatchEvent(
                                 new CustomEvent("open-artifacts"),
                               );
-                              setAttachOpen(false);
+                              close();
                             }}
                           >
                             保存済み成果物を開く
                           </button>
                           <button
                             type="button"
-                            className="attach-computer"
+                            role="menuitem"
                             onClick={() => {
                               fileInput.current?.click();
-                              setAttachOpen(false);
+                              close();
                             }}
                           >
                             コンピューターからファイルを添付
                           </button>
-                        </div>
+                        </>
                       )}
-                    </div>
+                    </Popup>
                   }
                   composerExtra={
                     <>
@@ -642,30 +630,7 @@ function App() {
                       ),
                     );
                   }}
-                >
-                  {loading ? (
-                    <p className="empty">読み込み中…</p>
-                  ) : !recordsLoaded ? (
-                    <p className="empty">記録を取得できません。</p>
-                  ) : records.length === 0 ? (
-                    <p className="empty">まだ記録はありません。</p>
-                  ) : (
-                    records.map((record) => (
-                      <article className="message manual" key={record.id}>
-                        <div className="message-label">
-                          手作業の記録{" "}
-                          <time dateTime={record.createdAt}>
-                            {new Date(record.createdAt).toLocaleString("ja-JP")}
-                          </time>
-                        </div>
-                        <p className="record-body message-body">
-                          {record.body}
-                        </p>
-                        {record.summary && <p>要約: {record.summary}</p>}
-                      </article>
-                    ))
-                  )}
-                </Chat>
+                />
               </>
             ) : (
               <div className="new-chat-intro">
@@ -698,6 +663,7 @@ function App() {
           <SideChats
             key={conversationId || workId}
             mainId={conversationId}
+            connectionRevision={connectionRevision}
             workId={workId}
             recordRevision={recordRevision + records.length}
             names={sideNames}
@@ -878,6 +844,7 @@ function App() {
         <Modal title="設定・保存データ" close={() => setModal(null)}>
           <nav className="settings-nav">
             {[
+              ["chat", "ChatGPT・モデル"],
               ["backup", "バックアップ"],
               ["data", "保存データ"],
               ["version", "版とGit"],
@@ -891,7 +858,13 @@ function App() {
               </button>
             ))}
           </nav>
-          {settingsTab === "version" ? (
+          {settingsTab === "chat" ? (
+            <ChatSettings
+              conversationId={conversationId}
+              works={works}
+              onChange={() => setConnectionRevision((value) => value + 1)}
+            />
+          ) : settingsTab === "version" ? (
             <VersionSettings
               onChange={() => setVersionRevision((v) => v + 1)}
             />

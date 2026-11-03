@@ -1,9 +1,9 @@
+import { recordBodies } from "./ui-helpers";
 import { sendRecord } from "./ui-helpers";
 import {
   openWorkDialog,
   openSettings,
   openArtifacts,
-  openChatUtilities,
   choosePanel,
 } from "./ui-helpers";
 import { test, expect } from "@playwright/test";
@@ -21,17 +21,17 @@ test("作品内に空の会話を作り、本文を記録して開き直す", as
   await page
     .getByRole("button", { name: "夕暮れの港に新しいチャット", exact: true })
     .click();
-  await expect(page.getByText("まだ記録はありません。")).toBeVisible();
+  await expect(page.getByText("まだ記録はありません。")).toHaveCount(0);
   const original = "  手作業の記録\n<script>文字のまま</script>\n";
   await page.getByLabel("メッセージ", { exact: true }).fill(original);
   await sendRecord(page);
-  await expect(page.locator(".record-body")).toHaveText(original);
+  await expect.poll(() => recordBodies(page, "夕暮れの港")).toEqual([original]);
   await page.reload();
   await page.getByRole("button", { name: "夕暮れの港", exact: true }).click();
   await page
     .getByRole("button", { name: "未命名のチャット 1", exact: true })
     .click();
-  await expect(page.locator(".record-body")).toHaveText(original);
+  await expect.poll(() => recordBodies(page, "夕暮れの港")).toEqual([original]);
   await openWorkDialog(page);
   await expect(
     page.getByRole("combobox", { name: "作品の作風", exact: true }),
@@ -69,13 +69,17 @@ test("保存応答が失われても入力を保ち、同じ受付キーで再�
   await expect(page.locator(".record-body")).toHaveCount(0);
   await page.unrouteAll();
   await sendRecord(page);
-  await expect(page.locator(".record-body")).toHaveCount(1);
+  await expect
+    .poll(() => recordBodies(page, "再送の作品"))
+    .toEqual(["保存応答が失われた原文"]);
   await page.reload();
   await page.getByRole("button", { name: "再送の作品", exact: true }).click();
   await page
     .getByRole("button", { name: "未命名のチャット 1", exact: true })
     .click();
-  await expect(page.locator(".record-body")).toHaveCount(1);
+  await expect
+    .poll(() => recordBodies(page, "再送の作品"))
+    .toEqual(["保存応答が失われた原文"]);
 });
 
 test("作品の作成失敗では作品を追加せず、作品名・制作意図を保持する", async ({
@@ -136,7 +140,7 @@ test("別作品の＋から直接空のチャットを開き、チャットご�
   await expect(page.getByLabel("メッセージ", { exact: true })).toHaveValue("");
   await page.getByLabel("メッセージ", { exact: true }).fill("Bの記録");
   await sendRecord(page);
-  await expect(page.locator(".record-body")).toHaveText("Bの記録");
+  await expect.poll(() => recordBodies(page, "作品B")).toEqual(["Bの記録"]);
   await page.getByRole("button", { name: "作品A", exact: true }).click();
   await page
     .getByRole("button", { name: "未命名のチャット 1", exact: true })
@@ -231,12 +235,10 @@ test("本文の保存応答を待つ間は会話を切り替えず、別会話�
   } finally {
     release();
   }
-  await expect(page.locator(".record-body")).toHaveText(
-    "チャット2にだけ保存する本文",
-  );
+  await expect
+    .poll(() => recordBodies(page, "保存中の切替確認", 1))
+    .toEqual(["チャット2にだけ保存する本文"]);
   await first.click();
-  await expect(
-    page.getByText("まだ記録はありません。", { exact: true }),
-  ).toBeVisible();
+  await expect(page.getByLabel("メッセージ", { exact: true })).toBeEnabled();
   await expect(page.locator(".record-body")).toHaveCount(0);
 });

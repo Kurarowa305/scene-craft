@@ -9,7 +9,7 @@ import {
 import type { BodyRecord } from "../shared/contracts";
 import type { ChatModel, ChatView, ModelChoice } from "../shared/chat";
 import { read, write } from "./api";
-import { Auxiliary } from "./auxiliary";
+import { Icon, Popup } from "./ui";
 
 const phases: Record<string, string> = {
   accepted: "受付済み",
@@ -46,7 +46,6 @@ export function Chat({
   onRecordsChanged,
   side = false,
   onSideNamesChanged,
-  children,
   attachment,
   recordDraft,
   onDraftChange,
@@ -56,12 +55,13 @@ export function Chat({
   composerExtra,
   forceRecord,
   draftLocked,
+  connectionRevision = 0,
 }: {
   conversationId: string;
-  children?: ReactNode;
   composerExtra?: ReactNode;
   forceRecord?: boolean;
   draftLocked?: boolean;
+  connectionRevision?: number;
   attachment?: ReactNode;
   recordDraft?: string;
   onDraftChange?: (draft: string) => void;
@@ -100,20 +100,9 @@ export function Chat({
   const [sendMode, setSendMode] = useState("chat");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
-  const [authUrl, setAuthUrl] = useState("");
   const [roles, setRoles] = useState<{ id: string; description: string }[]>([]);
   const [role, setRole] = useState("none");
-  const [context, setContext] = useState<{
-    work: { intent: string | null };
-    revisions: {
-      id: string;
-      targetId: string;
-      field: string;
-      body: string;
-      previousBody: string | null;
-      createdAt: string;
-    }[];
-  }>();
+  type WorkContext = { work: { intent: string | null }; revisions: unknown[] };
   async function refreshContext(v: ChatView) {
     if (side) return;
     if (!alive.current || v.revision < contextRevision.current) return;
@@ -123,11 +112,10 @@ export function Chat({
     if (workId) {
       try {
         const [next, records] = await Promise.all([
-          read<NonNullable<typeof context>>(`/api/works/${workId}/context`),
+          read<WorkContext>(`/api/works/${workId}/context`),
           read<BodyRecord[]>(`/api/conversations/${conversationId}/records`),
         ]);
         if (alive.current && sequence === contextFetch.current) {
-          setContext(next);
           onRecordsChanged(records, next.work.intent, next.revisions.length);
         }
       } catch {
@@ -207,6 +195,12 @@ export function Chat({
       source?.close();
     };
   }, [conversationId]);
+  useEffect(() => {
+    if (!connectionRevision || !alive.current) return;
+    void refresh().catch(() => {
+      if (alive.current) setError("接続状態を取得できません。");
+    });
+  }, [connectionRevision]);
   async function action(fn: () => Promise<void>) {
     setBusy(true);
     setError("");
@@ -260,98 +254,6 @@ export function Chat({
             <span className="badge">相談専用</span>
           </div>
         )}
-        {children}
-        <details className="chat-utilities">
-          <summary>接続・会話の設定</summary>
-          <p className="hint">
-            {status?.authenticated
-              ? "ChatGPT認証済み"
-              : status?.configured
-                ? "ログインが必要"
-                : "Codex未接続"}
-          </p>
-          <button
-            type="button"
-            disabled={busy}
-            onClick={() =>
-              void action(async () => {
-                const r = await write<{ authUrl: string }>(
-                  "/api/codex/login",
-                  {},
-                );
-                setAuthUrl(r.authUrl);
-              })
-            }
-          >
-            ChatGPTでログイン
-          </button>
-          {authUrl && (
-            <a href={authUrl} target="_blank" rel="noreferrer">
-              専用ログインを開く
-            </a>
-          )}
-          <button
-            type="button"
-            disabled={busy}
-            onClick={() => void action(refresh)}
-          >
-            接続状態を更新
-          </button>
-
-          {view && !side && (
-            <Auxiliary
-              value={view.auxiliary}
-              models={status?.models ?? []}
-              conversationId={conversationId}
-              requestId={view.requests.at(-1)?.id}
-              refresh={refresh}
-              onError={setError}
-            />
-          )}
-          {!side && (
-            <details>
-              <summary>記録の指示方法</summary>
-              <p>
-                自然な文章から全文の作成・置き換え（CREATE）か、既存内容への追記・編集（UPDATE）を判断します。対象や内容が曖昧なときは確認します。引用の紹介や通常の相談だけでは更新しません。
-              </p>
-              <p>制作意図を「夕暮れの静かな港」に変えてください</p>
-              <p>制作意図に「夕方の光を重視」を追記して</p>
-              <p>制作意図の「夕暮れ」を「夜明け」に変更して</p>
-              <p>手作業で「Photoshopで空の色を調整した」を記録して</p>
-              <p>直前の記録に「静けさを出すため、照明も調整した」を追記して</p>
-              <p>
-                直前の記録の全文を「空と照明を調整した。落ち着いた雰囲気にするため。」に変更して
-              </p>
-              <p>直前の記録の「空」を「海」に変更して</p>
-              <p>従来の省略書式も利用できます。</p>
-              <p>記録を訂正: 記録ID body 変更後の全文</p>
-              <p>
-                訂正項目は
-                body（手作業の文章）・summary（要約）です。理由も手作業の文章へ含めて記録できます。追記は「記録に追記:
-                記録ID
-                追加文」とも指示できます。記録IDは下の更新履歴で確認できます。
-              </p>
-            </details>
-          )}
-          {context && (
-            <details>
-              <summary>共有情報と更新履歴</summary>
-              <p>現在の制作意図: {context.work.intent ?? "未入力"}</p>
-              {context.revisions.map((v) => (
-                <article key={v.id}>
-                  <p>
-                    記録ID: {v.targetId} / {v.field}
-                  </p>
-                  <p>{v.body}</p>
-                  <p>
-                    以前: {v.previousBody ?? "未入力"} / 記入者: 人間 /{" "}
-                    {v.createdAt}
-                  </p>
-                </article>
-              ))}
-            </details>
-          )}
-        </details>
         {error && (
           <p className="error" role="alert">
             {error}
@@ -400,20 +302,8 @@ export function Chat({
                 </p>
               )}
               {r.phase === "completed" && r.items.some((i) => !i.complete) && (
-                <p>本文に欠落の可能性があります。履歴を照合してください。</p>
+                <p>本文に欠落の可能性があります。</p>
               )}
-              <button
-                type="button"
-                disabled={busy}
-                onClick={() =>
-                  void action(async () => {
-                    await write(`/api/chat-requests/${r.id}/reconcile`, {});
-                    await refresh();
-                  })
-                }
-              >
-                履歴を照合
-              </button>
               {["interrupted", "blocked"].includes(r.phase) && r.terminal && (
                 <button
                   type="button"
@@ -443,6 +333,21 @@ export function Chat({
             rows={3}
             maxLength={200000}
             onChange={(e) => setDraft(e.target.value)}
+            onKeyDown={(event) => {
+              if (
+                event.key !== "Enter" ||
+                event.shiftKey ||
+                event.nativeEvent.isComposing ||
+                event.keyCode === 229
+              )
+                return;
+              event.preventDefault();
+              const form = event.currentTarget.form;
+              const submit = form?.querySelector<HTMLButtonElement>(
+                "button.send[type='submit']",
+              );
+              if (submit && !submit.disabled) form?.requestSubmit(submit);
+            }}
             disabled={busy || draftLocked}
             placeholder={
               side ? "操作方法や、気になることを相談…" : "メッセージを入力…"
@@ -516,50 +421,55 @@ export function Chat({
                     <option value="record">記録として送信</option>
                   </select>
                 )}
-                <details className="model-options">
-                  <summary aria-label="モデルの詳細設定">⚙</summary>
-                  <div className="model-options-content">
-                    <label>
-                      <span className="sr-only">推論強度</span>
-                      <select
-                        aria-label="推論強度"
-                        value={selection?.effort ?? ""}
-                        disabled={busy || !model}
-                        onChange={(e) =>
-                          void action(() =>
-                            choose({ ...selection!, effort: e.target.value }),
-                          )
-                        }
-                      >
-                        {model?.supportedReasoningEfforts.map((e) => (
-                          <option key={e.reasoningEffort}>
-                            {e.reasoningEffort}
-                          </option>
-                        ))}
-                      </select>
-                    </label>
-                    <label>
-                      <span className="sr-only">速度</span>
-                      <select
-                        aria-label="速度"
-                        value={selection?.speed ?? "standard"}
-                        disabled={busy || !selection}
-                        onChange={(e) =>
-                          void action(() =>
-                            choose({
-                              ...selection!,
-                              speed: e.target.value as ModelChoice["speed"],
-                            }),
-                          )
-                        }
-                      >
-                        <option value="standard">標準</option>
-                        <option value="fast">高速</option>
-                      </select>
-                    </label>
-                    <p className="hint">変更は次の依頼から適用します。</p>
-                  </div>
-                </details>
+                <Popup
+                  label="モデルの詳細設定"
+                  className="model-options"
+                  icon={<Icon name="settings" />}
+                >
+                  {() => (
+                    <div className="model-options-content">
+                      <label>
+                        <span>推論強度</span>
+                        <select
+                          aria-label="推論強度"
+                          value={selection?.effort ?? ""}
+                          disabled={busy || !model}
+                          onChange={(e) =>
+                            void action(() =>
+                              choose({ ...selection!, effort: e.target.value }),
+                            )
+                          }
+                        >
+                          {model?.supportedReasoningEfforts.map((e) => (
+                            <option key={e.reasoningEffort}>
+                              {e.reasoningEffort}
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+                      <label>
+                        <span>速度</span>
+                        <select
+                          aria-label="速度"
+                          value={selection?.speed ?? "standard"}
+                          disabled={busy || !selection}
+                          onChange={(e) =>
+                            void action(() =>
+                              choose({
+                                ...selection!,
+                                speed: e.target.value as ModelChoice["speed"],
+                              }),
+                            )
+                          }
+                        >
+                          <option value="standard">標準</option>
+                          <option value="fast">高速</option>
+                        </select>
+                      </label>
+                      <p className="hint">変更は次の依頼から適用します。</p>
+                    </div>
+                  )}
+                </Popup>
               </div>
             </div>
             {active ? (
@@ -580,6 +490,7 @@ export function Chat({
             ) : (
               <button
                 className="send"
+                type="submit"
                 aria-label={
                   side
                     ? "相談を送信"

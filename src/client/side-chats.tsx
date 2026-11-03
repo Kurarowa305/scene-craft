@@ -1,5 +1,5 @@
-import { useEffect, useState, type ReactNode } from "react";
-import type { SideChat, SideChatView } from "../shared/side-chat";
+import { useEffect, useRef, useState, type ReactNode } from "react";
+import type { SideChat } from "../shared/side-chat";
 import type { SavedState, FixedFile } from "../shared/files";
 import { read, write } from "./api";
 import { Chat } from "./chat";
@@ -33,6 +33,7 @@ const choices = [
 
 export function SideChats({
   mainId,
+  connectionRevision,
   workId,
   recordRevision,
   names,
@@ -41,6 +42,7 @@ export function SideChats({
   onMobileBack,
 }: {
   mainId: string;
+  connectionRevision: number;
   workId: string;
   recordRevision: number;
   names: Record<string, string | null>;
@@ -48,14 +50,17 @@ export function SideChats({
   styleContent?: ReactNode;
   onMobileBack: () => void;
 }) {
-  const [sides, setSides] = useState<SideChatView[]>([]);
+  const [sideTitles, setSideTitles] = useState<Record<string, string | null>>(
+    {},
+  );
+  const creating = useRef(new Set<string>());
+  const creationKeys = useRef(new Map<string, string>());
   const [states, setStates] = useState<SavedState[]>([]);
   const [tabs, setTabs] = useState<Tab[]>([
     { id: "new", kind: "new", title: "新しいタブ" },
   ]);
   const [active, setActive] = useState("new");
   const [error, setError] = useState("");
-  const [busy, setBusy] = useState(false);
   const [selectedState, setSelectedState] = useState<string | null>(null);
   const tab = tabs.find((t) => t.id === active);
   useEffect(() => {
@@ -67,19 +72,6 @@ export function SideChats({
         })
         .catch(() => {
           if (current) setError("保存済み成果物を取得できません。");
-        });
-    if (mainId)
-      read<SideChatView[]>(`/api/conversations/${mainId}/side-chats`)
-        .then((s) => {
-          if (current)
-            setSides((previous) => [
-              ...new Map(
-                [...s, ...previous].map((side) => [side.conversationId, side]),
-              ).values(),
-            ]);
-        })
-        .catch(() => {
-          if (current) setError("保存済みの相談を取得できません。");
         });
     return () => {
       current = false;
@@ -93,11 +85,7 @@ export function SideChats({
     return () => document.removeEventListener("open-artifacts", catalog);
   }, []);
   function sideTitle(id: string) {
-    return (
-      names[id] ??
-      sides.find((s) => s.conversationId === id)?.title ??
-      `未命名のサイドチャット ${sides.findIndex((s) => s.conversationId === id) + 1}`
-    );
+    return names[id] ?? sideTitles[id] ?? "未命名のサイドチャット";
   }
   function show(next: Tab) {
     setTabs((previous) =>
@@ -106,6 +94,7 @@ export function SideChats({
     setActive(next.id);
   }
   function choose(kind: Kind) {
+    const target = active;
     const existing =
       kind === "side"
         ? undefined
@@ -126,29 +115,30 @@ export function SideChats({
           : t,
       ),
     );
+    if (kind === "side") void createSide(target);
   }
-  async function createSide() {
-    setBusy(true);
+  async function createSide(target: string) {
+    if (!mainId || creating.current.has(target)) return;
+    creating.current.add(target);
     setError("");
     try {
+      const requestKey =
+        creationKeys.current.get(target) ?? crypto.randomUUID();
+      creationKeys.current.set(target, requestKey);
       const side = await write<SideChat>(
         `/api/conversations/${mainId}/side-chats`,
-        { selectedStateIds: selectedState ? [selectedState] : [] },
-      );
-      setSides((previous) =>
-        previous.some((s) => s.conversationId === side.conversationId)
-          ? previous
-          : [...previous, { ...side, title: null }],
+        { requestKey, selectedStateIds: selectedState ? [selectedState] : [] },
+        false,
       );
       setTabs((previous) =>
         previous.map((t) =>
-          t.id === active ? { ...t, sideId: side.conversationId } : t,
+          t.id === target ? { ...t, sideId: side.conversationId } : t,
         ),
       );
-    } catch (e) {
-      setError((e as Error).message);
+    } catch (failure) {
+      setError((failure as Error).message);
     } finally {
-      setBusy(false);
+      creating.current.delete(target);
     }
   }
   return (
@@ -218,7 +208,11 @@ export function SideChats({
                 <p className="muted">このタブで開く内容を選んでください。</p>
                 <div className="tab-type-list">
                   {choices.map(([kind, icon, title, description]) => (
-                    <button key={kind} onClick={() => choose(kind)}>
+                    <button
+                      key={kind}
+                      disabled={kind === "side" && !mainId}
+                      onClick={() => choose(kind)}
+                    >
                       <Icon name={icon} />
                       <span>
                         <strong>{title}</strong>
@@ -276,43 +270,31 @@ export function SideChats({
                 <Chat
                   conversationId={t.sideId}
                   side
-                  onNameChanged={() => {}}
+                  connectionRevision={connectionRevision}
+                  onNameChanged={(name) =>
+                    setSideTitles((previous) => ({
+                      ...previous,
+                      [t.sideId!]: name,
+                    }))
+                  }
                   onRecordsChanged={() => {}}
                 />
               ) : (
-                <div className="panel-page">
-                  <h2>サイドチャット</h2>
-                  <p className="intro">
-                    制作と並行して相談できます。開いた時点のメインの話題と選択成果物を引き継ぎます。
+                <div className="empty" role="status">
+                  <p>
+                    {error
+                      ? "相談を開けませんでした。"
+                      : "チャットを開いています…"}
                   </p>
-                  <button
-                    className="primary"
-                    disabled={busy || !mainId}
-                    onClick={() => void createSide()}
-                  >
-                    相談を開始
-                  </button>
-                  {!mainId && (
-                    <p className="note">先にメインチャットを開いてください。</p>
-                  )}
-                  <div className="rule" />
-                  <h3>保存済みの相談</h3>
-                  {sides.map((s) => (
+                  {error && (
                     <button
-                      className="list-row"
-                      key={s.conversationId}
-                      onClick={() =>
-                        show({
-                          id: `side-${s.conversationId}`,
-                          kind: "side",
-                          sideId: s.conversationId,
-                          title: "サイドチャット",
-                        })
-                      }
+                      type="button"
+                      className="secondary"
+                      onClick={() => void createSide(t.id)}
                     >
-                      相談を再表示: {sideTitle(s.conversationId)}
+                      再試行
                     </button>
-                  ))}
+                  )}
                 </div>
               ))}
             {t.kind === "style" && (

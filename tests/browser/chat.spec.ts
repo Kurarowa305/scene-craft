@@ -2,7 +2,9 @@ import {
   openWorkDialog,
   openSettings,
   openArtifacts,
-  openChatUtilities,
+  openConnectionSettings,
+  closeSettings,
+  recordBodies,
   choosePanel,
 } from "./ui-helpers";
 import { test, expect } from "@playwright/test";
@@ -56,10 +58,7 @@ test("モデル選択・SSE再接続・会話継続・停止を画面から行�
   await page
     .getByLabel("会話モデル", { exact: true })
     .selectOption("fixture-b");
-  await openChatUtilities(page);
-  await expect(
-    page.getByRole("button", { name: "接続状態を更新" }),
-  ).toBeEnabled();
+  await expect(page.getByLabel("会話モデル", { exact: true })).toBeEnabled();
   await page.getByLabel("メッセージ", { exact: true }).fill("続きの相談");
   await page.getByRole("button", { name: "Codexへ送信", exact: true }).click();
   await page
@@ -83,9 +82,7 @@ test("モデル選択・SSE再接続・会話継続・停止を画面から行�
   await page.getByRole("button", { name: "Codexへ送信", exact: true }).click();
   await expect(page.getByText("完了", { exact: true })).toHaveCount(2);
   releaseStatus();
-  await expect(
-    page.getByRole("button", { name: "接続状態を更新" }),
-  ).toBeEnabled();
+  await expect(page.getByLabel("会話モデル", { exact: true })).toBeEnabled();
   await expect(page.getByText("完了", { exact: true })).toHaveCount(2);
   let releaseContext: () => void = () => {};
   let returnedContext: () => void = () => {};
@@ -112,15 +109,14 @@ test("モデル選択・SSE再接続・会話継続・停止を画面から行�
   await expect(
     page.getByText("明示した内容を記録しました", { exact: true }),
   ).toBeVisible();
-  await openChatUtilities(page);
-  await page.getByText("共有情報と更新履歴", { exact: true }).click();
+  await choosePanel(page, "作風・制作方針");
   await expect(
-    page.getByText("現在の制作意図: 夕暮れの静かな港", { exact: true }),
+    page.getByText("夕暮れの静かな港", { exact: true }),
   ).toBeVisible();
   releaseContext();
   await contextReturned;
   await expect(
-    page.getByText("現在の制作意図: 夕暮れの静かな港", { exact: true }),
+    page.getByText("夕暮れの静かな港", { exact: true }),
   ).toBeVisible();
   const works = await (await page.request.get("/api/works")).json();
   const work = works.find((w: { name: string }) => w.name === "Codex確認");
@@ -183,9 +179,13 @@ test("モデル選択・SSE再接続・会話継続・停止を画面から行�
     .getByLabel("メッセージ", { exact: true })
     .fill(`記録を訂正: ${imported.state.recordId} body 訂正後の手作業本文`);
   await page.getByRole("button", { name: "Codexへ送信", exact: true }).click();
-  await expect(
-    page.locator(".record-body").filter({ hasText: /^訂正後の手作業本文/ }),
-  ).toBeVisible();
+  await expect
+    .poll(async () =>
+      (await recordBodies(page, "Codex確認")).some((body) =>
+        body.startsWith("訂正後の手作業本文"),
+      ),
+    )
+    .toBe(true);
   await page
     .getByLabel("メッセージ", { exact: true })
     .fill(`記録を訂正: ${imported.state.recordId} reason 明暗差を整えるため`);
@@ -196,9 +196,13 @@ test("モデル選択・SSE再接続・会話継続・停止を画面から行�
   ).toBeVisible();
   releaseInitial();
   await Promise.all(returned);
-  await expect(
-    page.locator(".record-body").filter({ hasText: /^訂正後の手作業本文/ }),
-  ).toBeVisible();
+  await expect
+    .poll(async () =>
+      (await recordBodies(page, "Codex確認")).some((body) =>
+        body.startsWith("訂正後の手作業本文"),
+      ),
+    )
+    .toBe(true);
   await expect(
     page.locator(".saved-state-text").filter({ hasText: "明暗差を整えるため" }),
   ).toBeVisible();
@@ -206,26 +210,22 @@ test("モデル選択・SSE再接続・会話継続・停止を画面から行�
     .getByLabel("メッセージ", { exact: true })
     .fill("手作業で「Photoshopで空の色を調整した」を記録して");
   await page.getByRole("button", { name: "Codexへ送信", exact: true }).click();
-  await expect(
-    page.getByText("Photoshopで空の色を調整した", { exact: true }).first(),
-  ).toBeVisible();
+  await expect
+    .poll(() => recordBodies(page, "Codex確認"))
+    .toContain("Photoshopで空の色を調整した");
   await page
     .getByLabel("メッセージ", { exact: true })
     .fill("直前の記録に「静けさを出すため」を追記して");
   await page.getByRole("button", { name: "Codexへ送信", exact: true }).click();
-  await expect(
-    page
-      .locator(".record-body")
-      .filter({ hasText: "Photoshopで空の色を調整した\n静けさを出すため" }),
-  ).toBeVisible();
+  await expect
+    .poll(() => recordBodies(page, "Codex確認"))
+    .toContain("Photoshopで空の色を調整した\n静けさを出すため");
   await page
     .getByLabel("メッセージ", { exact: true })
     .fill("直前の記録の「空」を「海」に変更して");
   await page.getByRole("button", { name: "Codexへ送信", exact: true }).click();
-  await expect(
-    page
-      .locator(".record-body")
-      .filter({ hasText: "Photoshopで海の色を調整した\n静けさを出すため" }),
-  ).toBeVisible();
+  await expect
+    .poll(() => recordBodies(page, "Codex確認"))
+    .toContain("Photoshopで海の色を調整した\n静けさを出すため");
   await page.screenshot({ path: "test-results/chat.png", fullPage: true });
 });

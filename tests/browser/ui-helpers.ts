@@ -21,13 +21,36 @@ export async function choosePanel(page: Page, title: string) {
 export async function openArtifacts(page: Page) {
   await choosePanel(page, "成果物");
 }
-export async function openChatUtilities(page: Page) {
-  const utilities = page
-    .getByRole("region", { name: "Codexとの会話", exact: true })
-    .locator(".chat-utilities");
-  await expect(utilities).toBeVisible();
-  if ((await utilities.getAttribute("open")) === null)
-    await utilities.locator("summary").first().click();
+export async function openConnectionSettings(page: Page) {
+  await openSettings(page);
+  await page
+    .getByRole("button", { name: "ChatGPT・モデル", exact: true })
+    .click();
+}
+export async function closeSettings(page: Page) {
+  await page
+    .getByRole("dialog", { name: "設定・保存データ" })
+    .getByRole("button", { name: "閉じる", exact: true })
+    .click();
+}
+export async function recordBodies(
+  page: Page,
+  workName: string,
+  index = 0,
+): Promise<string[]> {
+  const works = await (await page.request.get("/api/works")).json();
+  const work = works.find((work: { name: string }) => work.name === workName);
+  if (!work) return [];
+  const conversations = await (
+    await page.request.get(`/api/works/${work.id}/conversations`)
+  ).json();
+  if (!conversations[index]) return [];
+  const records = await (
+    await page.request.get(
+      `/api/conversations/${conversations[index].id}/records`,
+    )
+  ).json();
+  return records.map((record: { body: string }) => record.body);
 }
 
 export async function sendRecord(page: Page) {

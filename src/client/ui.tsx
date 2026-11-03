@@ -1,4 +1,12 @@
-import { useEffect, useRef, type ReactNode, type CSSProperties } from "react";
+import {
+  useEffect,
+  useLayoutEffect,
+  useState,
+  useRef,
+  type ReactNode,
+  type CSSProperties,
+} from "react";
+import { createPortal } from "react-dom";
 
 export function Icon({
   name,
@@ -149,4 +157,96 @@ export function shellStyle(sidebar: number, main: number): CSSProperties {
     "--sidebar": `${sidebar}px`,
     "--main": `${main}px`,
   } as CSSProperties;
+}
+
+/** Render above adjacent panes and dismiss on outside input without stealing editor focus. */
+export function Popup({
+  label,
+  icon,
+  children,
+  disabled,
+  className = "",
+}: {
+  label: string;
+  icon: ReactNode;
+  children: (close: () => void) => ReactNode;
+  disabled?: boolean;
+  className?: string;
+}) {
+  const [open, setOpen] = useState(false);
+  const [position, setPosition] = useState({ left: 0, top: 0, maxWidth: 240 });
+  const anchor = useRef<HTMLDivElement>(null);
+  const panel = useRef<HTMLDivElement>(null);
+  useLayoutEffect(() => {
+    if (!open || !anchor.current || !panel.current) return;
+    function place() {
+      if (!anchor.current || !panel.current) return;
+      const button = anchor.current.getBoundingClientRect();
+      const region = anchor.current
+        .closest(".inspector, .main-chat, .sidebar")
+        ?.getBoundingClientRect();
+      const leftEdge = Math.max(8, (region?.left ?? 0) + 8);
+      const rightEdge = Math.min(
+        window.innerWidth - 8,
+        (region?.right ?? window.innerWidth) - 8,
+      );
+      const width = Math.min(panel.current.offsetWidth, rightEdge - leftEdge);
+      const height = panel.current.offsetHeight;
+      setPosition({
+        left: Math.max(leftEdge, Math.min(button.left, rightEdge - width)),
+        top: Math.max(8, button.top - height - 8),
+        maxWidth: rightEdge - leftEdge,
+      });
+    }
+    function dismiss(event: Event) {
+      if (
+        event.target instanceof Node &&
+        !anchor.current?.contains(event.target) &&
+        !panel.current?.contains(event.target)
+      )
+        setOpen(false);
+    }
+    function escape(event: KeyboardEvent) {
+      if (event.key === "Escape") setOpen(false);
+    }
+    place();
+    window.addEventListener("resize", place);
+    document.addEventListener("pointerdown", dismiss, true);
+    document.addEventListener("focusin", dismiss);
+    document.addEventListener("keydown", escape);
+    return () => {
+      window.removeEventListener("resize", place);
+      document.removeEventListener("pointerdown", dismiss, true);
+      document.removeEventListener("focusin", dismiss);
+      document.removeEventListener("keydown", escape);
+    };
+  }, [open]);
+  return (
+    <div className={`popup-anchor ${className}`} ref={anchor}>
+      <button
+        type="button"
+        className="icon popup-trigger"
+        aria-label={label}
+        aria-haspopup="menu"
+        aria-expanded={open}
+        disabled={disabled}
+        onClick={() => setOpen((value) => !value)}
+      >
+        {icon}
+      </button>
+      {open &&
+        createPortal(
+          <div
+            className="floating-menu"
+            role="menu"
+            aria-label={label}
+            ref={panel}
+            style={position}
+          >
+            {children(() => setOpen(false))}
+          </div>,
+          document.body,
+        )}
+    </div>
+  );
 }

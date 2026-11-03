@@ -2,7 +2,6 @@ import {
   openWorkDialog,
   openSettings,
   openArtifacts,
-  openChatUtilities,
   choosePanel,
 } from "./ui-helpers";
 import { test, expect } from "@playwright/test";

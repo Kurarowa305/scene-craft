@@ -590,7 +590,7 @@ h3 {
   border-radius: 4px;
 }
 .tab-add {
-  margin-left: auto;
+  margin-left: 2px;
   flex: none;
 }
 .panel-content {
@@ -1473,16 +1473,7 @@ dialog .dialog-footer {
   color: var(--muted);
 }
 .model-options-content {
-  position: absolute;
-  bottom: 30px;
-  right: 0;
-  width: 220px;
-  padding: 14px;
-  background: #262c24;
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  z-index: 10;
-  box-shadow: 0 10px 45px #0007;
+  padding: 8px;
 }
 .model-options-content label {
   display: grid;
@@ -1493,4 +1484,95 @@ dialog .dialog-footer {
 }
 .composer textarea {
   min-height: 55px;
+}
+
+.floating-menu {
+  position: fixed;
+  width: max-content;
+  min-width: 170px;
+  max-height: calc(100dvh - 16px);
+  overflow: auto;
+  padding: 6px;
+  border: 1px solid #ffffff25;
+  background: #262c24;
+  border-radius: 10px;
+  box-shadow: 0 10px 45px #0007;
+  z-index: 1000;
+  font-size: 12px;
+}
+.floating-menu > button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 9px 12px;
+  border-radius: 6px;
+}
+.floating-menu .model-options-content {
+  width: 220px;
+  max-width: 100%;
+}
+.floating-menu .model-options-content label {
+  display: grid;
+  margin-bottom: 10px;
+}
+.popup-anchor {
+  position: relative;
+  flex: none;
+}
+.model-options .popup-trigger {
+  width: 32px;
+  height: 32px;
+}
+.model-options .icon svg {
+  width: 21px;
+  height: 21px;
+}
+.chat-entry-row {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+.chat-entry {
+  border-radius: 7px;
+  margin-left: 10px;
+}
+.chat-entry.active {
+  background: #2c302c;
+}
+.chat-entry .chat-link {
+  width: auto;
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  padding-right: 2px;
+}
+.chat-menu .popup-trigger {
+  width: 26px;
+  height: 28px;
+  font-size: 21px;
+}
+.chat-name-input {
+  width: 0;
+  flex: 1;
+  min-width: 0;
+  margin: 4px;
+  font-size: 12px;
+  padding: 5px 7px;
+}
+.chat-settings-page .secondary {
+  margin: 4px 6px 4px 0;
+}
+.chat-settings-page select {
+  width: 100%;
+}
+@media (max-width: 800px) {
+  .chat-entry {
+    margin-left: 0;
+  }
+  .chat-menu .popup-trigger {
+    width: 20px;
+  }
+  .chat-entry .chat-link {
+    padding: 10px 0;
+  }
 }

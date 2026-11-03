@@ -1,8 +1,8 @@
+import { recordBodies } from "./ui-helpers";
 import {
   openWorkDialog,
   openSettings,
   openArtifacts,
-  openChatUtilities,
   choosePanel,
 } from "./ui-helpers";
 import { test, expect } from "@playwright/test";
@@ -60,10 +60,9 @@ test("制作ファイルを取り込み、手修正の変更前後と任意理�
   await expect(page.locator(".saved-state").nth(1)).toContainText(
     "暖かくしたい",
   );
-  await expect(page.locator(".record-body")).toHaveText([
-    "最初の取り込み",
-    "色を調整\n暖かくしたい",
-  ]);
+  await expect
+    .poll(() => recordBodies(page, "ファイル取り込みの作品"))
+    .toEqual(["最初の取り込み", "色を調整\n暖かくしたい"]);
   await page.screenshot({ path: "test-results/imports.png", fullPage: true });
 });
 
@@ -107,5 +106,7 @@ test("失敗時は入力と未完成を保ち、中止後に修正したファ�
     .getByRole("button", { name: "ファイルと本文を記録", exact: true })
     .click();
   await expect(page.locator(".saved-state")).toHaveCount(1);
-  await expect(page.locator(".record-body")).toHaveText("保持する原文");
+  await expect
+    .poll(() => recordBodies(page, "取り込みの失敗"))
+    .toEqual(["保持する原文"]);
 });

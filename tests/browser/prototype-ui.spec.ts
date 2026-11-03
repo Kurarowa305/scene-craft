@@ -1,3 +1,4 @@
+import { recordBodies } from "./ui-helpers";
 import { sendRecord } from "./ui-helpers";
 import { test, expect } from "@playwright/test";
 
@@ -23,17 +24,17 @@ test("採用済みの3領域で作品を作り、記録を保存して開き直�
     .getByLabel("メッセージ", { exact: true })
     .fill("空の色を調整した。静けさを出すため。");
   await sendRecord(page);
-  await expect(page.locator(".record-body")).toHaveText(
-    "空の色を調整した。静けさを出すため。",
-  );
+  await expect
+    .poll(() => recordBodies(page, "UI導線の作品"))
+    .toEqual(["空の色を調整した。静けさを出すため。"]);
   await page.reload();
   await page.getByRole("button", { name: "UI導線の作品", exact: true }).click();
   await page
     .getByRole("button", { name: "未命名のチャット 1", exact: true })
     .click();
-  await expect(page.locator(".record-body")).toHaveText(
-    "空の色を調整した。静けさを出すため。",
-  );
+  await expect
+    .poll(() => recordBodies(page, "UI導線の作品"))
+    .toEqual(["空の色を調整した。静けさを出すため。"]);
   await expect(page.getByText("シナリオ選択", { exact: true })).toHaveCount(0);
 });
 
@@ -54,7 +55,7 @@ test("入力欄の＋でOSのファイルを選び、本文と一緒に記録す
   await page.getByRole("button", { name: "成果物・ファイルを添付" }).click();
   const chooserPromise = page.waitForEvent("filechooser");
   await page
-    .getByRole("button", {
+    .getByRole("menuitem", {
       name: "コンピューターからファイルを添付",
       exact: true,
     })
@@ -68,10 +69,12 @@ test("入力欄の＋でOSのファイルを選び、本文と一緒に記録す
   await expect(page.getByText("retouch.psd", { exact: true })).toBeVisible();
   await page.getByLabel("メッセージ", { exact: true }).fill("空の色を調整した");
   await sendRecord(page);
-  await expect(page.locator(".record-body")).toHaveText("空の色を調整した");
+  await expect
+    .poll(() => recordBodies(page, "添付導線の作品"))
+    .toEqual(["空の色を調整した"]);
   await page.getByRole("button", { name: "成果物・ファイルを添付" }).click();
   await page
-    .getByRole("button", { name: "保存済み成果物を開く", exact: true })
+    .getByRole("menuitem", { name: "保存済み成果物を開く", exact: true })
     .click();
   const artifact = page.getByRole("button", { name: /retouch.psd.*Photoshop/ });
   await expect(artifact).toBeVisible();
@@ -151,10 +154,12 @@ test("添付記録の応答が失われても同じ内容で再送し、保存�
     "一度だけ保存する記録",
   );
   await sendRecord(page);
-  await expect(page.locator(".record-body")).toHaveText("一度だけ保存する記録");
+  await expect
+    .poll(() => recordBodies(page, "添付再送の作品"))
+    .toEqual(["一度だけ保存する記録"]);
   await page.getByRole("button", { name: "成果物・ファイルを添付" }).click();
   await page
-    .getByRole("button", { name: "保存済み成果物を開く", exact: true })
+    .getByRole("menuitem", { name: "保存済み成果物を開く", exact: true })
     .click();
   await expect(page.locator(".saved-state")).toHaveCount(1);
 });
@@ -177,7 +182,7 @@ test("タブの追加・閉鎖と幅の調整、未実装画面を確認でき�
     .getByLabel("メッセージ", { exact: true })
     .fill("光の当たり方を調整した。視線を奥へ誘導するため。");
   await sendRecord(page);
-  await expect(page.locator(".record-body")).toHaveCount(1);
+  await expect.poll(() => recordBodies(page, "画面比較の作品")).toHaveLength(1);
   await page.screenshot({ path: "test-results/issue-102-workspace.png" });
   const separator = page.getByRole("separator", {
     name: "チャットと右タブの幅",
