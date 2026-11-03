@@ -86,3 +86,6 @@ Codexアダプター境界でnoneの明示更新指示が渡る回帰試験を�
 実接続で、解釈LLMがUPDATE/replaceという矛盾した組合せを返しRECORD_INTERPRETATION_FAILEDになることを診断依頼26a4080b-9aca-4b08-8e0b-327ab201cde3で検出した。mainはCREATEを選んでいた。独立enumでは関係を制約できていなかったため、解釈出力をresult内のanyOfに変更し、CREATEはcreate/replace/baseText null、UPDATEはupdate/appendまたはedit/baseText stringへ制約した。同じ原文の実app-server解釈がcreate_work_intent/create/replaceとして成功することを確認した。追加の実モデル解釈でも、制作意図の追記・部分編集、手作業の新規・追記・部分編集の操作選択を確認した。これは解釈処理の確認であり、再起動後のMCP保存確認とは区別する。
 
 最終ローカル確認は型検査・自動試験59件・画面9件・ビルド成功。Spec再レビューでも制約付きschemaと検査にブロッカーなし。Windows Test-Local.ps1の手動項目を自然文CREATE/UPDATE・統合本文・古いID指定へ更新し、構文検査と配置を実施した。
+
+
+最終の実接続では、制作意図のCREATE・追記UPDATE・部分編集UPDATE、手作業の新規CREATE・追記UPDATE・部分編集UPDATE・既存IDへの全文CREATE、引用/実行禁止の無更新が成功した。全操作で同じ診断チャット/threadを維持し、保存した依頼IDとの対応と、通常records APIの最終本文を検査した。部分編集の初回に不要な確認が返ったため、唯一の部分文字列はその部分だけ変更し他の文・理由・改行を保持する規則を明記し、実モデル解釈を反復確認した後、利用者の再起動後の保存も成功させた。対象commit・各依頼ID・tool/action/mode・失敗と修正の区別は[証跡](evidence/issue-62-create-update.json)。Windows全体の受け入れは別途継続する。
