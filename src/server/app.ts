@@ -120,6 +120,12 @@ export async function createApp(options: AppOptions) {
           ...store.context.context(workId),
           states: store.states(workId),
           plan,
+          style: plan.style
+            ? JSON.parse(
+                versions().content(plan.style, "style", plan.style.manifest)
+                  .content,
+              )
+            : null,
         },
         instructions,
       };

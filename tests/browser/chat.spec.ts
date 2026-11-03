@@ -65,6 +65,24 @@ test("モデル選択・SSE再接続・会話継続・停止を画面から行�
     page.getByRole("button", { name: "接続状態を更新" }),
   ).toBeEnabled();
   await expect(page.getByText("完了", { exact: true })).toHaveCount(2);
+  let releaseContext: () => void = () => {};
+  let returnedContext: () => void = () => {};
+  const contextReturned = new Promise<void>((resolve) => {
+    returnedContext = resolve;
+  });
+  const heldContext = new Promise<void>((resolve) => {
+    releaseContext = resolve;
+  });
+  await page.route(
+    "**/api/works/*/context",
+    async (route) => {
+      const response = await route.fetch();
+      await heldContext;
+      await route.fulfill({ response });
+      returnedContext();
+    },
+    { times: 1 },
+  );
   await page
     .getByLabel("Codexへのメッセージ")
     .fill("制作意図を更新: 夕暮れの静かな港");
@@ -73,6 +91,11 @@ test("モデル選択・SSE再接続・会話継続・停止を画面から行�
     page.getByText("明示した内容を記録しました", { exact: true }),
   ).toBeVisible();
   await page.getByText("共有情報と更新履歴", { exact: true }).click();
+  await expect(
+    page.getByText("現在の制作意図: 夕暮れの静かな港", { exact: true }),
+  ).toBeVisible();
+  releaseContext();
+  await contextReturned;
   await expect(
     page.getByText("現在の制作意図: 夕暮れの静かな港", { exact: true }),
   ).toBeVisible();

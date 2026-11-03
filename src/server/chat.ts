@@ -257,6 +257,7 @@ export function registerChat(
       }
       createdThread = !s.threadId;
       const settings = {
+        config: contextRpc.configuration(r.conversationId),
         model: r.selection.model,
         modelProvider: "openai",
         approvalPolicy: "never",

@@ -69,10 +69,10 @@
 
 ## 実装境界
 
-- MCPは専用stdio。起動時の環境変数にUnix socketと資格を渡し、モデル引数へ資格を渡さない。socketは0700の一時ディレクトリ内で0600。DBはバックエンドだけが更新する。
+- MCPは専用stdio。会話ごとに分離した起動資格をthread設定のMCP環境変数へ渡し、モデル引数へ資格を渡さない。同じバックエンドの別会話の有効参照でも、呼出元の資格が一致しなければ拒否する。socketは0700の一時ディレクトリ内で0600。DBはバックエンドだけが更新する。
 - `get_execution_context`は受付時の固定情報と最新の共有情報を区別する。`find_records`/`read_records`は作品内原文・会話・訂正を返し、記録と会話依頼は各50件の独立カーソルで取得する。読み取った内容も操作へ保存する。
 - 工程の指示・手順は受付時の固定Git blobから解決し、turnのapplication contextへ渡す。共通指示はアプリ管理とし、工程変更で書き換えない。更新は厳密なメッセージ全体の書式で原文から解決し、モデル生成の本文・対象・作品ID・役割を受け取らない。
 - 同作品の未終端依頼を一つに制限する既存処理を継承する。この範囲のMCP処理は同期トランザクションで終端し、長時間の外部制作操作を開始しない。次turnへ持ち越す制作操作は存在しない。
-- 設定は専用CODEX_HOME、専用cwd、`project_doc_max_bytes=0`、shell/apps/plugins/hooks等の無効化、requiredな専用MCPのみ。実接続での有効ツール・設定探索・共通指示切替は別途受け入れる。
+- 設定は専用CODEX_HOME、専用cwd、`project_doc_max_bytes=0`、shell/apps/plugins/hooks等の無効化、requiredな専用MCPのみ。空のCODEX_HOMEにも同梱skillsが存在するため、起動時に`skills/list`→`skills/config/write`で全件を無効にし、再列挙で照合する。不成立なら接続を利用可能にしない。実モデルが見る有効ツール・設定探索・共通指示切替は別途受け入れる。
 
 根拠: [#62](https://github.com/Kurarowa305/scene-craft/issues/62)、[検証](verification/issue-62.md)、[公式app-server文書](https://learn.chatgpt.com/docs/app-server)。

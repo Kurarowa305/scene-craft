@@ -15,6 +15,7 @@ const rpc = await startContextRpc(store);
 const connection = await connectCodex(binary, directory, rpc.endpoint);
 try {
   const thread = await connection.rpc("thread/start", {
+    config: rpc.configuration("probe-conversation"),
     baseInstructions: commonInstructions,
     sandbox: "read-only",
     approvalPolicy: "never",
@@ -28,10 +29,17 @@ try {
     threadId: thread.thread.id,
     limit: 50,
   });
+  const skills = await connection.rpc("skills/list", { forceReload: true });
   const result = {
     checkedAt: new Date().toISOString(),
     runtime: connection.runtime,
     instructionSourceCount: thread.instructionSources?.length ?? null,
+    skillCounts: skills.data.map((entry: any) => ({
+      count: entry.skills?.length ?? 0,
+      enabled:
+        entry.skills?.filter((skill: any) => skill.enabled !== false).length ??
+        0,
+    })),
     mcp: status.data.map((server: any) => ({
       name: server.name,
       tools: Object.keys(server.tools ?? {}),

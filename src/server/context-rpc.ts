@@ -39,6 +39,7 @@ export async function startContextRpc(store: ReturnType<typeof openStore>) {
       generation: string;
     }
   >();
+  const connections = new Map<string, string>();
   let generation = randomUUID();
   const sockets = new Set<Socket>();
   function authorize(input: any): ChatRequest {
@@ -46,16 +47,18 @@ export async function startContextRpc(store: ReturnType<typeof openStore>) {
       typeof input?.credential === "string"
         ? Buffer.from(input.credential)
         : Buffer.alloc(0);
-    const expected = Buffer.from(endpoint.credential);
+    const binding = bindings.get(input.args?.contextRef);
+    if (!binding || binding.generation !== generation)
+      throw new OperationError(403, "STALE_CONTEXT");
+    const r = store.chat.get(binding.requestId);
+    const expected = Buffer.from(
+      connections.get(r.conversationId) ?? endpoint.credential,
+    );
     if (
       credential.length !== expected.length ||
       !timingSafeEqual(credential, expected)
     )
       throw new OperationError(403, "INVALID_CONNECTION");
-    const binding = bindings.get(input.args?.contextRef);
-    if (!binding || binding.generation !== generation)
-      throw new OperationError(403, "STALE_CONTEXT");
-    const r = store.chat.get(binding.requestId);
     if (
       r.retryCount !== binding.attempt ||
       r.threadId !== binding.threadId ||
@@ -169,6 +172,19 @@ export async function startContextRpc(store: ReturnType<typeof openStore>) {
   await chmod(endpoint.socketPath, 0o600);
   return {
     endpoint,
+    configuration(conversationId: string) {
+      let credential = connections.get(conversationId);
+      if (!credential) {
+        credential = randomBytes(32).toString("hex");
+        connections.set(conversationId, credential);
+      }
+      return {
+        "mcp_servers.scene_craft.env": {
+          SCENE_CRAFT_RPC_SOCKET: endpoint.socketPath,
+          SCENE_CRAFT_RPC_CREDENTIAL: credential,
+        },
+      };
+    },
     issue(r: ChatRequest) {
       const ref = randomUUID();
       bindings.set(ref, {
@@ -193,6 +209,7 @@ export async function startContextRpc(store: ReturnType<typeof openStore>) {
     },
     revoke() {
       bindings.clear();
+      connections.clear();
       generation = randomUUID();
     },
     async close() {

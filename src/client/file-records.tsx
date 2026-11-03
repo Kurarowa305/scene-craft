@@ -20,12 +20,14 @@ export function FileRecords({
   onRecord,
   disabled,
   onBusy,
+  recordRevision,
 }: {
   workId: string;
   conversationId: string;
   onRecord: (record: BodyRecord) => void;
   disabled: boolean;
   onBusy: (busy: boolean) => void;
+  recordRevision: number;
 }) {
   const [roots, setRoots] = useState<{
     sources: { id: string }[];
@@ -46,6 +48,22 @@ export function FileRecords({
   const [busy, setBusy] = useState(false);
   // Keep exactly the same input and request key until its save is confirmed.
   const [pending, setPending] = useState<ImportInput | null>(null);
+  useEffect(() => {
+    let active = true;
+    void read<{ states: SavedState[]; currentStateId: string | null }>(
+      `/api/works/${workId}/states`,
+    )
+      .then((result) => {
+        if (active) {
+          setStates(result.states);
+          setCurrent(result.currentStateId);
+        }
+      })
+      .catch(() => {});
+    return () => {
+      active = false;
+    };
+  }, [workId, recordRevision]);
   useEffect(() => {
     let active = true;
     Promise.all([

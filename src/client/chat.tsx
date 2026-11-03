@@ -1,4 +1,5 @@
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
+import type { BodyRecord } from "../shared/contracts";
 import type { ChatModel, ChatView, ModelChoice } from "../shared/chat";
 import { read, write } from "./api";
 
@@ -31,7 +32,20 @@ interface Status {
   runtime: string | null;
   models: ChatModel[];
 }
-export function Chat({ conversationId }: { conversationId: string }) {
+export function Chat({
+  conversationId,
+  onRecordsChanged,
+}: {
+  conversationId: string;
+  onRecordsChanged: (
+    records: BodyRecord[],
+    intent: string | null,
+    revision: number,
+  ) => void;
+}) {
+  const alive = useRef(false);
+  const contextFetch = useRef(0);
+  const contextRevision = useRef(-1);
   const [view, setView] = useState<ChatView>();
   function applyView(next: ChatView) {
     setView((previous) =>
@@ -57,8 +71,25 @@ export function Chat({ conversationId }: { conversationId: string }) {
     }[];
   }>();
   async function refreshContext(v: ChatView) {
+    if (!alive.current || v.revision < contextRevision.current) return;
+    contextRevision.current = v.revision;
+    const sequence = ++contextFetch.current;
     const workId = v.requests[0]?.workId;
-    if (workId) setContext(await read(`/api/works/${workId}/context`));
+    if (workId) {
+      try {
+        const [next, records] = await Promise.all([
+          read<NonNullable<typeof context>>(`/api/works/${workId}/context`),
+          read<BodyRecord[]>(`/api/conversations/${conversationId}/records`),
+        ]);
+        if (alive.current && sequence === contextFetch.current) {
+          setContext(next);
+          onRecordsChanged(records, next.work.intent, next.revisions.length);
+        }
+      } catch {
+        if (alive.current)
+          setError("共有情報を取得できません。接続状態を更新してください。");
+      }
+    }
   }
   const selection = view?.session.selection;
   const active = view?.requests.find((r) =>
@@ -74,6 +105,7 @@ export function Chat({ conversationId }: { conversationId: string }) {
     await refreshContext(v);
   }
   useEffect(() => {
+    alive.current = true;
     let current = true;
     let source: EventSource | undefined;
     void read<{ id: string; description: string }[]>("/api/roles")
@@ -110,6 +142,8 @@ export function Chat({ conversationId }: { conversationId: string }) {
         if (current) setError("会話を取得できません。再読み込みしてください。");
       });
     return () => {
+      alive.current = false;
+      ++contextFetch.current;
       current = false;
       source?.close();
     };

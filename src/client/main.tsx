@@ -20,6 +20,7 @@ function App() {
   const [styleChoice, setStyleChoice] = useState("none");
   const [styleCommit, setStyleCommit] = useState("");
   const [versionRevision, setVersionRevision] = useState(0);
+  const [recordRevision, setRecordRevision] = useState(0);
   const [drafts, setDrafts] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState(false);
   const [loadingChats, setLoadingChats] = useState(false);
@@ -350,6 +351,8 @@ function App() {
                             </time>
                           </div>
                           <p className="record-body">{record.body}</p>
+                          {record.reason && <p>理由: {record.reason}</p>}
+                          {record.summary && <p>要約: {record.summary}</p>}
                         </article>
                       ))
                     )}
@@ -357,8 +360,18 @@ function App() {
                   <Chat
                     key={`chat-${conversationId}`}
                     conversationId={conversationId}
+                    onRecordsChanged={(items, nextIntent, revision) => {
+                      setRecords(items);
+                      setRecordRevision(revision);
+                      setWorks((previous) =>
+                        previous.map((w) =>
+                          w.id === workId ? { ...w, intent: nextIntent } : w,
+                        ),
+                      );
+                    }}
                   />
                   <FileRecords
+                    recordRevision={recordRevision}
                     onBusy={setBusy}
                     key={conversationId}
                     workId={workId}

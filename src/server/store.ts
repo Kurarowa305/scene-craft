@@ -179,7 +179,11 @@ export function openStore(directory: string) {
       COMMIT;`);
   }
   const chat = chatStore(db, once);
-  if (!db.prepare("SELECT name FROM sqlite_master WHERE name = 'text_revisions'").get()) {
+  if (
+    !db
+      .prepare("SELECT name FROM sqlite_master WHERE name = 'text_revisions'")
+      .get()
+  ) {
     const backup = join(directory, "records.before-context.sqlite");
     if (!existsSync(backup)) db.prepare("VACUUM INTO ?").run(backup);
     db.exec(`BEGIN IMMEDIATE;
@@ -196,11 +200,25 @@ export function openStore(directory: string) {
     chat.session(row.id as string);
   return {
     context,
-    contextOperation: (key: string, requestId: string, input: unknown, execute: () => unknown) =>
+    contextOperation: (
+      key: string,
+      requestId: string,
+      input: unknown,
+      execute: () => unknown,
+    ) =>
       once(`tool:${key}`, [requestId, input], () => {
         const result = execute();
-        db.prepare("INSERT INTO context_operations (id, request_id, data) VALUES (?, ?, ?)")
-          .run(key, requestId, JSON.stringify({ input, result, createdAt: new Date().toISOString() }));
+        db.prepare(
+          "INSERT INTO context_operations (id, request_id, data) VALUES (?, ?, ?)",
+        ).run(
+          key,
+          requestId,
+          JSON.stringify({
+            input,
+            result,
+            createdAt: new Date().toISOString(),
+          }),
+        );
         return result;
       }),
     chat,
@@ -266,7 +284,14 @@ export function openStore(directory: string) {
             "SELECT data FROM saved_states WHERE work_id = ? ORDER BY sequence",
           )
           .all(workId)
-          .map((row) => JSON.parse(row.data as string) as SavedState),
+          .map((row) => {
+            const state = JSON.parse(row.data as string) as SavedState;
+            const text = context.latest({ id: state.recordId, body: "" });
+            return {
+              ...state,
+              reason: "reason" in text ? text.reason : state.reason,
+            };
+          }),
       };
     },
     planImport: (conversationId: string, input: ImportInput) => {
@@ -488,7 +513,10 @@ export function openStore(directory: string) {
           `SELECT ${recordColumns} FROM records WHERE conversation_id = ? ORDER BY sequence`,
         )
         .all(conversationId) as unknown as BodyRecord[];
-      return records.map(record => ({ ...record, ...context.latest(record) }));
+      return records.map((record) => ({
+        ...record,
+        ...context.latest(record),
+      }));
     },
     createRecord: (key: string, conversationId: string, body: string) =>
       once(key, ["record", conversationId, body], () => {

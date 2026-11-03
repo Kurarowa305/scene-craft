@@ -6,6 +6,14 @@ import { readFile, stat } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import { createInterface } from "node:readline";
 
+async function waitFor(check: () => Promise<boolean>) {
+  for (let attempt = 0; attempt < 150; attempt++) {
+    if (await check()) return;
+    await new Promise((resolve) => setTimeout(resolve, 20));
+  }
+  throw new Error("Protocol fixture did not settle");
+}
+
 async function mcp(f: Awaited<ReturnType<typeof chatFixture>>) {
   const config = await readFile(join(f.directory, "codex/config.toml"), "utf8");
   const socketPath = JSON.parse(
@@ -13,8 +21,8 @@ async function mcp(f: Awaited<ReturnType<typeof chatFixture>>) {
   );
   assert.equal((await stat(socketPath)).mode & 0o777, 0o600);
   const credential = JSON.parse(
-    /^SCENE_CRAFT_RPC_CREDENTIAL = (.+)$/m.exec(config)![1],
-  );
+    await readFile(join(f.directory, "codex/fixture-mcp.json"), "utf8"),
+  ).SCENE_CRAFT_RPC_CREDENTIAL;
   const child = spawn(
     process.execPath,
     ["--import", "tsx", resolve("src/server/mcp.ts")],
@@ -59,14 +67,24 @@ async function mcp(f: Awaited<ReturnType<typeof chatFixture>>) {
       return JSON.parse(reply.result.content[0].text);
     },
     async current() {
-      return JSON.parse(
-        JSON.parse(
-          await readFile(
-            join(f.directory, "codex/fixture-context.json"),
-            "utf8",
-          ),
-        )["scene-craft"].value,
-      );
+      let context: any;
+      await waitFor(async () => {
+        try {
+          context = JSON.parse(
+            JSON.parse(
+              await readFile(
+                join(f.directory, "codex/fixture-context.json"),
+                "utf8",
+              ),
+            )["scene-craft"].value,
+          );
+        } catch {
+          return false;
+        }
+        const latest = (await f.view()).requests.at(-1);
+        return context.sourceRequestId === latest.id && Boolean(latest.turnId);
+      });
+      return context;
     },
     close: () => child.kill(),
   };
@@ -122,11 +140,29 @@ test(
       });
       assert.equal(contextRead.result.current.work.intent, "静かな港");
       assert.equal(contextRead.result.fixed.work.intent, null);
-      await new Promise((resolve) => setTimeout(resolve, 1300));
+      await waitFor(async () =>
+        Boolean((await f.view()).requests.at(-1).terminal),
+      );
       const stale = await client.call("get_execution_context", {
         contextRef: current.contextRef,
       });
       assert.equal(stale.error, "STALE_CONTEXT");
+      await f.post(`/api/conversations/${f.chat.id}/messages`, {
+        body: "制作意図を更新: 明るい港",
+      });
+      const revised = await client.current();
+      const revisedResult = await client.call("update_work_context", {
+        contextRef: revised.contextRef,
+        sourceRequestId: revised.sourceRequestId,
+      });
+      assert.equal(revisedResult.result.revision.previousBody, "静かな港");
+      assert.equal(
+        revisedResult.result.revision.previousId,
+        changed.result.revision.id,
+      );
+      await waitFor(async () =>
+        Boolean((await f.view()).requests.at(-1).terminal),
+      );
       await f.post(`/api/conversations/${f.chat.id}/messages`, {
         body: "手作業を記録: 空を調整した",
         role: "none",
@@ -146,7 +182,9 @@ test(
         sourceRequestId: manual.sourceRequestId,
       });
       const recordId = recorded.result.revision.targetId;
-      await new Promise((resolve) => setTimeout(resolve, 1300));
+      await waitFor(async () =>
+        Boolean((await f.view()).requests.at(-1).terminal),
+      );
       await f.post(`/api/conversations/${f.chat.id}/messages`, {
         body: `記録を訂正: ${recordId} reason 静けさを出すため`,
       });
@@ -169,8 +207,8 @@ test(
       );
       await f.restart();
       const context = await f.read(`/api/works/${f.work.id}/context`);
-      assert.equal(context.revisions.length, 3);
-      assert.equal(context.work.intent, "静かな港");
+      assert.equal(context.revisions.length, 4);
+      assert.equal(context.work.intent, "明るい港");
       const history = await f.read(`/api/works/${f.work.id}/record-history`);
       assert.equal(history.records[0].body, "空を調整した");
       assert.equal(
@@ -257,6 +295,30 @@ test(
         ).error,
         "REQUEST_KEY_CONFLICT",
       );
+      const foreign = await f.post(
+        `/api/conversations/${otherChat.id}/messages`,
+        { body: "別作品の相談" },
+      );
+      let foreignContext: any;
+      await waitFor(async () => {
+        foreignContext = JSON.parse(
+          JSON.parse(
+            await readFile(
+              join(f.directory, "codex/fixture-context.json"),
+              "utf8",
+            ),
+          )["scene-craft"].value,
+        );
+        return foreignContext.sourceRequestId === foreign.id;
+      });
+      assert.equal(
+        (
+          await client.call("get_execution_context", {
+            contextRef: foreignContext.contextRef,
+          })
+        ).error,
+        "INVALID_CONNECTION",
+      );
     } finally {
       client?.close();
       await f.close();
@@ -289,3 +351,77 @@ test("工程を受付時に固定し同じthreadでなしへ切り替える", as
     await f.close();
   }
 });
+
+test("固定した作風本文を、工程の文脈とともに参照できる", async () => {
+  const f = await chatFixture();
+  try {
+    const work = await f.post("/api/works", {
+      name: "作風参照",
+      styleCommit: f.git.style,
+    });
+    const chat = await f.post(`/api/works/${work.id}/conversations`);
+    await f.post(`/api/conversations/${chat.id}/messages`, {
+      body: "制作方針を参照して相談",
+      role: "reference",
+    });
+    await waitFor(async () => f.calls.some((c) => c.method === "turn/start"));
+    const turn = f.calls.find((c) => c.method === "turn/start")!;
+    const context = JSON.parse(
+      turn.params.additionalContext["scene-craft"].value,
+    );
+    assert.deepEqual(context.fixed.style.policies, ["余白を残す"]);
+    assert.equal(context.fixed.plan.style.commit, f.git.style);
+    assert.equal(context.instructions, "固定された指示");
+  } finally {
+    await f.close();
+  }
+});
+
+test(
+  "制作ファイル記録の理由を訂正し、元の理由と最新表示を再起動後も保持する",
+  { timeout: 10000 },
+  async () => {
+    const f = await chatFixture(true, true);
+    let client: Awaited<ReturnType<typeof mcp>> | undefined;
+    try {
+      const imported = await f.post(`/api/conversations/${f.chat.id}/imports`, {
+        body: "空を調整",
+        application: "Photoshop",
+        beforeStateId: null,
+        reason: "以前の理由",
+        files: [{ rootId: "source", relativePath: "drawing.psd", role: "psd" }],
+      });
+      const r = await f.post(`/api/conversations/${f.chat.id}/messages`, {
+        body: `記録を訂正: ${imported.state.recordId} reason 明暗差を整えるため`,
+      });
+      client = await mcp(f);
+      const current = await client.current();
+      const changed = await client.call("amend_record", {
+        contextRef: current.contextRef,
+        sourceRequestId: r.id,
+      });
+      assert.equal(changed.result.revision.previousBody, "以前の理由");
+      assert.equal(
+        (await f.read(`/api/works/${f.work.id}/states`)).states[0].reason,
+        "明暗差を整えるため",
+      );
+      assert.equal(
+        (await f.read(`/api/conversations/${f.chat.id}/records`))[0].reason,
+        "明暗差を整えるため",
+      );
+      await f.restart();
+      assert.equal(
+        (await f.read(`/api/works/${f.work.id}/states`)).states[0].reason,
+        "明暗差を整えるため",
+      );
+      assert.equal(
+        (await f.read(`/api/works/${f.work.id}/context`)).revisions[0]
+          .previousBody,
+        "以前の理由",
+      );
+    } finally {
+      client?.close();
+      await f.close();
+    }
+  },
+);

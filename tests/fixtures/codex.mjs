@@ -4,7 +4,7 @@ import { createInterface } from "node:readline";
 import { writeFileSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { spawn } from "node:child_process";
-async function recordInstruction(context, body) {
+async function recordInstruction(context, body, threadId) {
   const tool = body.startsWith("制作意図を更新: ")
     ? "update_work_context"
     : body.startsWith("手作業を記録: ")
@@ -22,8 +22,7 @@ async function recordInstruction(context, body) {
   const child = spawn(get("command"), get("args"), {
     env: {
       ...process.env,
-      SCENE_CRAFT_RPC_SOCKET: get("SCENE_CRAFT_RPC_SOCKET"),
-      SCENE_CRAFT_RPC_CREDENTIAL: get("SCENE_CRAFT_RPC_CREDENTIAL"),
+      ...threadEnvironments.get(threadId),
     },
     stdio: "pipe",
   });
@@ -77,6 +76,7 @@ async function recordInstruction(context, body) {
 }
 let next = 0;
 const threads = new Map();
+const threadEnvironments = new Map();
 const send = (v) => process.stdout.write(JSON.stringify(v) + "\n");
 createInterface({ input: process.stdin }).on("line", (line) => {
   const m = JSON.parse(line);
@@ -88,6 +88,8 @@ createInterface({ input: process.stdin }).on("line", (line) => {
     return;
   }
   if (m.method === "initialize") result = { userAgent: "codex-fixture/1" };
+  if (m.method === "skills/list")
+    result = { data: [{ skills: [], errors: [] }] };
   if (m.method === "account/read") result = { account: { type: "chatgpt" } };
   if (m.method === "model/list")
     result = {
@@ -107,6 +109,11 @@ createInterface({ input: process.stdin }).on("line", (line) => {
   if (m.method === "thread/start" || m.method === "thread/resume") {
     const id = p.threadId ?? `thread-${++next}`;
     if (!threads.has(id)) threads.set(id, []);
+    threadEnvironments.set(id, p.config?.["mcp_servers.scene_craft.env"]);
+    writeFileSync(
+      join(process.env.CODEX_HOME, "fixture-mcp.json"),
+      JSON.stringify(threadEnvironments.get(id) ?? {}),
+    );
     result = { thread: { id }, model: p.model, modelProvider: "openai" };
   }
   if (m.method === "thread/unsubscribe") result = { status: "unsubscribed" };
@@ -136,6 +143,7 @@ createInterface({ input: process.stdin }).on("line", (line) => {
       const text = await recordInstruction(
         JSON.parse(p.additionalContext?.["scene-craft"]?.value ?? "{}"),
         p.input[0].text,
+        p.threadId,
       );
       if (turn.status !== "inProgress") return;
       turn.status = "completed";

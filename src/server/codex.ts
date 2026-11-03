@@ -161,6 +161,38 @@ export async function connectCodex(
     });
     connection.runtime = result.userAgent ?? null;
     child.stdin.write(JSON.stringify({ method: "initialized" }) + "\n");
+    if (mcp) {
+      // Even an empty CODEX_HOME includes bundled skills. Disable every discovered
+      // skill in this dedicated home before a thread can acquire tools/instructions.
+      const found = await connection.rpc("skills/list", {
+        cwds: [cwd],
+        forceReload: true,
+      });
+      if (!Array.isArray(found.data))
+        throw new OperationError(409, "CONFIGURATION_UNVERIFIED");
+      for (const entry of found.data)
+        for (const skill of entry.skills ?? []) {
+          const changed = await connection.rpc("skills/config/write", {
+            path: skill.path,
+            enabled: false,
+          });
+          if (changed.effectiveEnabled !== false)
+            throw new OperationError(409, "CONFIGURATION_UNVERIFIED");
+        }
+      const checked = await connection.rpc("skills/list", {
+        cwds: [cwd],
+        forceReload: true,
+      });
+      if (
+        !Array.isArray(checked.data) ||
+        checked.data.some(
+          (entry: any) =>
+            (entry.errors?.length ?? 0) ||
+            entry.skills?.some((skill: any) => skill.enabled !== false),
+        )
+      )
+        throw new OperationError(409, "CONFIGURATION_UNVERIFIED");
+    }
     return connection;
   } catch (error) {
     await connection.close();

@@ -90,15 +90,17 @@ export function contextStore(db: DatabaseSync) {
         `SELECT c.work_id FROM conversations c JOIN records r ON r.conversation_id = c.id WHERE r.id = ?`,
       )
       .get(record.id);
+    const changes = revisions(row!.work_id as string).filter(
+      (v) => v.targetId === record.id,
+    );
+    if (!changes.length) return record;
     const result = {
       ...record,
       originalBody: record.body,
       reason: initialReason(record.id),
       summary: null as string | null,
     };
-    for (const revision of revisions(row!.work_id as string).filter(
-      (v) => v.targetId === record.id,
-    )) {
+    for (const revision of changes) {
       if (revision.field === "body") result.body = revision.body;
       if (revision.field === "reason") result.reason = revision.body;
       if (revision.field === "summary") result.summary = revision.body;
