@@ -85,3 +85,11 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$env:LOCALAPPDATA\scene
 ```
 
 出力された`*-result.json`の`issue 66 scene plan and hypotheses`へ対象実装commit、環境、期待/実結果、画面の証跡を記入する。人間によるWindows実機確認は未実施であり、この手順を使って別途行う。
+
+## 開発時の確認結果（2026-11-04）
+
+WSL上の`npm run check`で型検査・API/保存88件・ビルド・画面37件が成功。仕様軸のレビューは指摘なし、規約軸の軽微な停止処理重複は共通ガードへ抽出して解消し、型検査と関連する文章記録・参考資料・計画31件を再実行して成功した。
+
+[計画詳細の画面](../implementation-evidence/issue-66/plan.png)は合成データとCodex代替境界による画面証跡。[隔離DBの構造確認](../implementation-evidence/issue-66/schema.json)で29テーブル・112物理カラムと、追加2テーブルのカラム・外部キー・一意制約を照合した。MCP12ツール・HTTP49操作と実装一覧も照合済み。
+
+Windowsの通常版とUI #102へ配置したLauncherとTest-Localは、リポジトリ内の最新版とSHA-256が一致した。既存の設定・認証・制作DBへ確認用作品を追加していない。定義コミットの追加は既存作業ツリーを変更せず行い、既定定義の選択は人間の画面操作に残している。

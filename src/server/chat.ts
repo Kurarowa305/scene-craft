@@ -314,15 +314,13 @@ export function registerChat(
     }
     return c;
   }
-  contextRpc.setReferenceInterpreter(async (request, id, stillCurrent) => {
+  async function authorizeInterpretation<T>(
+    request: ChatRequest,
+    stillCurrent: () => boolean,
+    interpret: () => Promise<T>,
+  ): Promise<T> {
     try {
-      return await interpretReferenceSelection(
-        await runtime(),
-        request,
-        store.references.view(request.workId).candidates,
-        id,
-        stillCurrent,
-      );
+      return await interpret();
     } catch (error) {
       if (
         error instanceof OperationError &&
@@ -337,38 +335,34 @@ export function registerChat(
       }
       throw error;
     }
-  });
-  contextRpc.setPlanInterpreter(
-    async (request, id, hypothesisId, stillCurrent) => {
-      try {
-        return await interpretPlanDecision(
-          await runtime(),
-          request,
-          store.scenePlans.view(request.workId),
-          id,
-          hypothesisId,
-          stillCurrent,
-        );
-      } catch (error) {
-        if (
-          error instanceof OperationError &&
-          blockingErrors.has(error.code) &&
-          stillCurrent()
-        ) {
-          const latest = chat.get(request.id);
-          latest.error = error.code;
-          latest.phase = latest.terminal ? "blocked" : "stopping";
-          save(latest);
-          void interrupt(latest);
-        }
-        throw error;
-      }
-    },
+  }
+  contextRpc.setReferenceInterpreter((request, id, stillCurrent) =>
+    authorizeInterpretation(request, stillCurrent, async () =>
+      interpretReferenceSelection(
+        await runtime(),
+        request,
+        store.references.view(request.workId).candidates,
+        id,
+        stillCurrent,
+      ),
+    ),
   );
-  contextRpc.setInterpreter(async (request, stillCurrent) => {
-    try {
+  contextRpc.setPlanInterpreter((request, id, hypothesisId, stillCurrent) =>
+    authorizeInterpretation(request, stillCurrent, async () =>
+      interpretPlanDecision(
+        await runtime(),
+        request,
+        store.scenePlans.view(request.workId),
+        id,
+        hypothesisId,
+        stillCurrent,
+      ),
+    ),
+  );
+  contextRpc.setInterpreter((request, stillCurrent) =>
+    authorizeInterpretation(request, stillCurrent, async () => {
       const intent = store.context.context(request.workId).work.intent;
-      return await interpretRecordInstruction(
+      return interpretRecordInstruction(
         await runtime(),
         request,
         {
@@ -377,21 +371,8 @@ export function registerChat(
         },
         stillCurrent,
       );
-    } catch (error) {
-      if (
-        error instanceof OperationError &&
-        blockingErrors.has(error.code) &&
-        stillCurrent()
-      ) {
-        const latest = chat.get(request.id);
-        latest.error = error.code;
-        latest.phase = latest.terminal ? "blocked" : "stopping";
-        save(latest);
-        void interrupt(latest);
-      }
-      throw error;
-    }
-  });
+    }),
+  );
   function save(r: ChatRequest) {
     chat.save(r);
     contextRpc.bind(r);
