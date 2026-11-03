@@ -1,4 +1,4 @@
-import { StrictMode, useEffect, useState, type FormEvent } from "react";
+import { StrictMode, useEffect, useRef, useState, type FormEvent } from "react";
 import { createRoot } from "react-dom/client";
 import type { Work, Conversation, BodyRecord } from "../shared/contracts";
 import { read, write } from "./api";
@@ -15,6 +15,7 @@ function App() {
   const [conversationId, setConversationId] = useState("");
   const [records, setRecords] = useState<BodyRecord[]>([]);
   const [recordsLoaded, setRecordsLoaded] = useState(false);
+  const recordsFetch = useRef(0);
   const [name, setName] = useState("");
   const [intent, setIntent] = useState("");
   const [styleChoice, setStyleChoice] = useState("none");
@@ -68,22 +69,25 @@ function App() {
   }, [workId]);
   useEffect(() => {
     let active = true;
+    const sequence = ++recordsFetch.current;
     setRecords([]);
     setRecordsLoaded(false);
     setLoadingRecords(Boolean(conversationId));
     if (conversationId) {
       read<BodyRecord[]>(`/api/conversations/${conversationId}/records`)
         .then((result) => {
-          if (active) {
+          if (active && sequence === recordsFetch.current) {
             setRecords(result);
             setRecordsLoaded(true);
           }
         })
         .catch((failure) => {
-          if (active) setError(failure.message);
+          if (active && sequence === recordsFetch.current)
+            setError(failure.message);
         })
         .finally(() => {
-          if (active) setLoadingRecords(false);
+          if (active && sequence === recordsFetch.current)
+            setLoadingRecords(false);
         });
     }
     return () => {
@@ -361,7 +365,10 @@ function App() {
                     key={`chat-${conversationId}`}
                     conversationId={conversationId}
                     onRecordsChanged={(items, nextIntent, revision) => {
+                      ++recordsFetch.current;
                       setRecords(items);
+                      setRecordsLoaded(true);
+                      setLoadingRecords(false);
                       setRecordRevision(revision);
                       setWorks((previous) =>
                         previous.map((w) =>

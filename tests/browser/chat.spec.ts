@@ -99,5 +99,84 @@ test("モデル選択・SSE再接続・会話継続・停止を画面から行�
   await expect(
     page.getByText("現在の制作意図: 夕暮れの静かな港", { exact: true }),
   ).toBeVisible();
+  const works = await (await page.request.get("/api/works")).json();
+  const work = works.find((w: { name: string }) => w.name === "Codex確認");
+  const conversations = await (
+    await page.request.get(`/api/works/${work.id}/conversations`)
+  ).json();
+  const conversation = conversations[0];
+  const session = await (await page.request.get("/api/session")).json();
+  const importedResponse = await page.request.post(
+    `/api/conversations/${conversation.id}/imports`,
+    {
+      headers: {
+        origin: new URL(page.url()).origin,
+        "x-csrf-token": session.csrfToken,
+      },
+      data: {
+        requestKey: crypto.randomUUID(),
+        body: "元の手作業本文",
+        application: "Photoshop",
+        beforeStateId: null,
+        reason: "元の理由",
+        files: [{ rootId: "source", relativePath: "drawing.psd", role: "psd" }],
+      },
+    },
+  );
+  expect(importedResponse.ok()).toBeTruthy();
+  const imported = await importedResponse.json();
+  let releaseInitial: () => void = () => {};
+  const initialHeld = new Promise<void>((resolve) => {
+    releaseInitial = resolve;
+  });
+  const returned: Promise<void>[] = [];
+  for (const pattern of [
+    "**/api/conversations/*/records",
+    "**/api/works/*/states",
+  ]) {
+    let done: () => void = () => {};
+    returned.push(
+      new Promise<void>((resolve) => {
+        done = resolve;
+      }),
+    );
+    await page.route(
+      pattern,
+      async (route) => {
+        const response = await route.fetch();
+        await initialHeld;
+        await route.fulfill({ response });
+        done();
+      },
+      { times: 1 },
+    );
+  }
+  await page.reload();
+  await page.getByRole("button", { name: "Codex確認", exact: true }).click();
+  await page
+    .getByRole("button", { name: "未命名のチャット 1", exact: true })
+    .click();
+  await page
+    .getByLabel("Codexへのメッセージ")
+    .fill(`記録を訂正: ${imported.state.recordId} body 訂正後の手作業本文`);
+  await page.getByRole("button", { name: "Codexへ送信", exact: true }).click();
+  await expect(
+    page.getByText("訂正後の手作業本文", { exact: true }).first(),
+  ).toBeVisible();
+  await page
+    .getByLabel("Codexへのメッセージ")
+    .fill(`記録を訂正: ${imported.state.recordId} reason 明暗差を整えるため`);
+  await page.getByRole("button", { name: "Codexへ送信", exact: true }).click();
+  await expect(
+    page.getByText("Photoshop / 理由：明暗差を整えるため", { exact: true }),
+  ).toBeVisible();
+  releaseInitial();
+  await Promise.all(returned);
+  await expect(
+    page.getByText("訂正後の手作業本文", { exact: true }).first(),
+  ).toBeVisible();
+  await expect(
+    page.getByText("Photoshop / 理由：明暗差を整えるため", { exact: true }),
+  ).toBeVisible();
   await page.screenshot({ path: "test-results/chat.png", fullPage: true });
 });

@@ -36,7 +36,9 @@ export function FileRecords({
   const [states, setStates] = useState<SavedState[]>([]);
   const [current, setCurrent] = useState<string | null>(null);
   const [operations, setOperations] = useState<ImportOperation[]>([]);
-  const [loaded, setLoaded] = useState(false);
+  const [rootsLoaded, setRootsLoaded] = useState(false);
+  const [statesLoaded, setStatesLoaded] = useState(false);
+  const loaded = rootsLoaded && statesLoaded;
   const [sourceRoot, setSourceRoot] = useState("");
   const [paths, setPaths] = useState<Record<string, string>>({});
   const [application, setApplication] =
@@ -50,6 +52,7 @@ export function FileRecords({
   const [pending, setPending] = useState<ImportInput | null>(null);
   useEffect(() => {
     let active = true;
+    setStatesLoaded(false);
     void read<{ states: SavedState[]; currentStateId: string | null }>(
       `/api/works/${workId}/states`,
     )
@@ -57,9 +60,13 @@ export function FileRecords({
         if (active) {
           setStates(result.states);
           setCurrent(result.currentStateId);
+          setStatesLoaded(true);
         }
       })
-      .catch(() => {});
+      .catch(() => {
+        if (active)
+          setError("保存状態を取得できません。再読み込みしてください。");
+      });
     return () => {
       active = false;
     };
@@ -70,19 +77,14 @@ export function FileRecords({
       read<{ sources: { id: string }[]; configured: boolean }>(
         "/api/file-roots",
       ),
-      read<{ states: SavedState[]; currentStateId: string | null }>(
-        `/api/works/${workId}/states`,
-      ),
       read<ImportOperation[]>(`/api/works/${workId}/imports`),
     ])
-      .then(([rootInfo, result, ops]) => {
+      .then(([rootInfo, ops]) => {
         if (!active) return;
         setRoots(rootInfo);
         setSourceRoot(rootInfo.sources[0]?.id ?? "");
-        setStates(result.states);
-        setCurrent(result.currentStateId);
         setOperations(ops);
-        setLoaded(true);
+        setRootsLoaded(true);
         const previous = ops.find(
           (op) =>
             op.conversationId === conversationId &&
