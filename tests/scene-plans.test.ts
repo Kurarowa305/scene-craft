@@ -266,11 +266,13 @@ test("未選択参考・不正構造・他作品・停止済みturnからの計�
   let client: Awaited<ReturnType<typeof mcp>> | undefined;
   try {
     await f.post(`/api/conversations/${f.chat.id}/messages`, {
-      body: "計画を作って",
+      body: "計画を作って [fixture-hold]",
       role: "planning",
     });
     client = await mcp(f);
     const c = await client.current();
+    // Model slow CI process startup without relying on a wall-clock completion window.
+    await new Promise((resolve) => setTimeout(resolve, 1300));
     const args = { ...planInput, contextRef: c.contextRef };
     assert.equal(
       (
