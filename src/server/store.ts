@@ -11,6 +11,7 @@ import type { Work, Conversation, BodyRecord } from "../shared/contracts.js";
 import type { GitReference, VersionPlan } from "../shared/versions.js";
 import { chatStore } from "./chat-store.js";
 import { contextStore } from "./context-store.js";
+import { auxiliaryStore } from "./auxiliary-store.js";
 
 export class OperationError extends Error {
   constructor(
@@ -181,6 +182,15 @@ export function openStore(directory: string) {
   const chat = chatStore(db, once);
   if (
     !db
+      .prepare("SELECT name FROM sqlite_master WHERE name='auxiliary_jobs'")
+      .get()
+  ) {
+    const backup = join(directory, "records.before-auxiliary.sqlite");
+    if (!existsSync(backup)) db.prepare("VACUUM INTO ?").run(backup);
+  }
+  const auxiliary = auxiliaryStore(db, once);
+  if (
+    !db
       .prepare("SELECT name FROM sqlite_master WHERE name = 'text_revisions'")
       .get()
   ) {
@@ -213,6 +223,7 @@ export function openStore(directory: string) {
     chat.session(row.id as string);
   return {
     context,
+    auxiliary,
     contextOperation: (
       key: string,
       requestId: string,
@@ -498,11 +509,12 @@ export function openStore(directory: string) {
       ),
     conversations: (workId: string) => {
       requireEntity("works", workId);
-      return db
+      const result = db
         .prepare(
           `SELECT ${conversationColumns} FROM conversations WHERE work_id = ? ORDER BY sequence`,
         )
         .all(workId) as unknown as Conversation[];
+      return result.map((c) => ({ ...c, title: auxiliary.view(c.id).name }));
     },
     createConversation: (key: string, workId: string) =>
       once(key, ["conversation", workId], () => {

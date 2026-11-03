@@ -118,6 +118,7 @@ export async function createApp(options: AppOptions) {
       return {
         snapshot: {
           ...store.context.context(workId),
+          conversationSummaries: store.auxiliary.context(workId),
           states: store.states(workId),
           plan,
           style: plan.style

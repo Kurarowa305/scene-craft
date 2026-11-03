@@ -67,6 +67,7 @@ export interface ChatRequest {
   previousAttempt: string | null;
 }
 export interface ChatView {
+  auxiliary: import("./auxiliary.js").AuxiliaryView;
   session: ChatSession;
   requests: ChatRequest[];
   revision: number;

@@ -234,7 +234,7 @@ function App() {
                           setConversationId(chat.id);
                         }}
                       >
-                        未命名のチャット {index + 1}
+                        {chat.title ?? `未命名のチャット ${index + 1}`}
                       </button>
                     ))}
                   </div>
@@ -325,10 +325,13 @@ function App() {
                 <>
                   <div className="conversation-heading">
                     <h2>
-                      未命名のチャット{" "}
-                      {conversations.findIndex(
-                        (item) => item.id === conversationId,
-                      ) + 1}
+                      {conversations.find((c) => c.id === conversationId)
+                        ?.title ??
+                        `未命名のチャット ${
+                          conversations.findIndex(
+                            (item) => item.id === conversationId,
+                          ) + 1
+                        }`}
                     </h2>
                     <span>本文の記録</span>
                   </div>
@@ -363,6 +366,13 @@ function App() {
                   <Chat
                     key={`chat-${conversationId}`}
                     conversationId={conversationId}
+                    onNameChanged={(name) =>
+                      setConversations((previous) =>
+                        previous.map((c) =>
+                          c.id === conversationId ? { ...c, title: name } : c,
+                        ),
+                      )
+                    }
                     onRecordsChanged={(items, nextIntent, revision) => {
                       ++recordsFetch.current;
                       setRecords(items);

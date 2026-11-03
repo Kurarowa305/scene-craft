@@ -21,7 +21,7 @@ export async function chatFixture(external = false, withFiles = false) {
     };
   }
   const calls: { method: string; params: any }[] = [];
-  let listener: (method: string, params: any) => void = () => {};
+  const listeners = new Set<(method: string, params: any) => void>();
   let hook: ((method: string, params: any) => any) | undefined;
   let authenticated = true;
   const models = ["a", "b"].map((model, index) => ({
@@ -38,8 +38,10 @@ export async function chatFixture(external = false, withFiles = false) {
   const codex: CodexConnection = {
     runtime: "fixture-2",
     onEvent(fn) {
-      listener = fn;
-      return () => {};
+      listeners.add(fn);
+      return () => {
+        listeners.delete(fn);
+      };
     },
     async close() {},
     async rpc(method, params) {
@@ -127,7 +129,8 @@ export async function chatFixture(external = false, withFiles = false) {
       authenticated = value;
     },
     notify(method: string, params: any) {
-      listener(method, { threadId: "thread-fixture", ...params });
+      for (const listener of listeners)
+        listener(method, { threadId: "thread-fixture", ...params });
     },
     async send() {
       const r = await post(`/api/conversations/${chat.id}/messages`, {

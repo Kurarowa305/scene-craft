@@ -15,7 +15,7 @@
 
 | ツール名 | 状態 | 操作・結果 | 主なDB参照／変更 |
 | --- | --- | --- | --- |
-| `get_execution_context` | 実装済み | 現在依頼・工程・実行照合、固定文脈と最新共有情報、固定版、残る再実行回数、未対応操作 | works、text_revisions、chat_requests等を参照 |
+| `get_execution_context` | 実装済み | 現在依頼・工程・実行照合、固定文脈と最新共有情報、作品内の訂正後要約・未要約原文、固定版、残る再実行回数、未対応操作 | works、text_revisions、chat_requests、records、summary_revisions等を参照 |
 | `find_records` | 実装済み | 作品内の原文履歴をページ取得。現実装はread_recordsと同じ取得処理（検索語の引数なし） | records、conversations、chat_requests、text_revisionsを参照 |
 | `read_records` | 実装済み | 原文記録・会話ID・依頼・改訂を取得。記録と依頼はそれぞれ最大50件、独立カーソル | 同上 |
 | `create_work_intent` | 実装済み | CREATE：新しい全文で制作意図を作成・全置換 | works.intent更新、text_revisions追加 |
@@ -40,24 +40,28 @@
 
 ## バックエンドHTTP API
 
-明示登録は33操作。表はパスの辞書順、同一パスはメソッド順（GET→POST）で並べる。追加時も該当パスの位置へ行を挿入する。[基本・作品・ファイル・Git API](../src/server/app.ts)、[Codex・会話・実行API](../src/server/chat.ts)、[共通schema](../src/server/http-schema.ts)。
+明示登録は37操作。表はパスの辞書順、同一パスはメソッド順（GET→POST）で並べる。追加時も該当パスの位置へ行を挿入する。[基本・作品・ファイル・Git API](../src/server/app.ts)、[Codex・会話・実行API](../src/server/chat.ts)、[共通schema](../src/server/http-schema.ts)。
 
 同一localhost originを使用する。GET/HEAD以外はOrigin・HttpOnlyセッションcookie・`x-csrf-token`・`application/json`が必要。本文上限は1MiB。POSTは`/api/shutdown`を除き`requestKey`（8〜128文字、英数字・`_`・`-`）を必須とし、表はそれ以外の入力を記載する。`:id`と`:fileId`はUUID。追加本文プロパティは拒否する。業務エラーはHTTP状態コードと`{error:コード}`を返す。`reconcile`等、schema上のrequestKeyを処理の冪等キーとして使わない操作もある。
 
 | メソッド | パス | 入力 | 結果・副作用 |
 | --- | --- | --- | --- |
+| POST | `/api/auxiliary/model` | `model`（1〜200文字・空白のみ不可） | 実モデル一覧で存在確認し全会話共通の命名・要約モデルを保存。初期値`gpt-6-luna`。受付済み補助処理のモデルは変更しない |
 | POST | `/api/chat-requests/:id/reconcile` | 依頼ID、追加本文項目なし | 実行履歴と照合した `ChatRequest`。処理を新規送信しない |
 | POST | `/api/chat-requests/:id/resume` | 依頼ID、追加本文項目なし | 同じ依頼を明示再開した `ChatRequest`。既存の再実行上限を継承 |
 | POST | `/api/chat-requests/:id/stop` | 依頼ID、追加本文項目なし | 停止要求を保存し、非同期で実行turnを中断 |
 | GET | `/api/codex` | なし | `{configured,authenticated,runtime,models}`。未接続時も利用可否を返す |
 | POST | `/api/codex/login` | 追加本文項目なし | ChatGPT専用ログインの `{authUrl}` |
-| GET | `/api/conversations/:id/chat` | 会話ID | `ChatView {session,requests,revision}`。未選択なら利用可能な既定モデルを初期選択 |
+| POST | `/api/conversations/:id/auxiliary/resume` | 会話ID、追加本文項目なし | 通常完了した最新依頼で、失敗等の命名・未要約分を明示再実行。停止・エラー・未確定の依頼では拒否。同一requestKeyの再送は重複起動しない。停止した制作依頼は既存resumeまたは新しい依頼で再開 |
+| GET | `/api/conversations/:id/chat` | 会話ID | `ChatView {session,requests,revision,auxiliary}`。補助モデル設定・会話名・処理履歴・根拠付き要約・未要約原文を含む。未選択なら利用可能な既定モデルを初期選択 |
 | GET | `/api/conversations/:id/events` | 会話ID、任意header `Last-Event-ID` | SSE `event: chat`、`id: revision`、`data: ChatView`。15秒ごとkeepalive |
 | POST | `/api/conversations/:id/imports` | 会話ID、`body,application,beforeStateId,files`。任意`render,reason`（旧互換） | `{operationId,id,state,record}`。制作ファイルを管理下へ固定し保存状態・記録を確定 |
 | POST | `/api/conversations/:id/messages` | 会話ID、`body`（1〜200000文字・空白のみ不可）、任意`role`（1〜100文字、既定none） | `ChatRequest`を受付。固定文脈・版・工程で非同期実行 |
 | POST | `/api/conversations/:id/model` | 会話ID、`model`（最大200文字）、`effort`（最大30文字）、`speed: standard/fast` | 利用可能なモデル・強度を検査して選択を保存 |
+| POST | `/api/conversations/:id/name` | 会話ID、`name`（1〜100文字・空白のみ不可） | 人間の会話名を保存。後着の自動命名では上書きしない |
 | GET | `/api/conversations/:id/records` | 会話ID | 最新表示の `BodyRecord[]`。元本文・旧理由を保持し現在本文を返す |
 | POST | `/api/conversations/:id/records` | 会話ID、`body`（1〜200000文字・空白のみ不可） | LLMを使わず原文を記録し `BodyRecord` を返す |
+| POST | `/api/conversations/:id/summaries/:summaryId` | 会話IDと要約改訂ID（UUID）、`body`（1〜200000文字・空白のみ不可） | LLMなしで人間の訂正を追加。旧要約・根拠原文・作成者と時刻・訂正元を保持。別会話の要約は404、既に訂正済みの版は409 |
 | GET | `/api/file-roots` | なし | `{sources:[{id}],configured}`。実パスは返さない |
 | POST | `/api/imports/:id/abandon` | 取り込み操作ID、追加本文項目なし | 明示中止した取り込み操作。照合が必要な完成実体は先に照合 |
 | GET | `/api/instance` | `x-scene-craft-challenge`: 64桁の小文字hex | `{app,proof}`（HMAC）。`instanceSecret`設定時だけ登録 |
@@ -98,7 +102,7 @@ GETにはFastifyによるHEADも自動登録される。`staticRoot`設定時の
 
 ## DBテーブル・物理カラム
 
-保存先はアプリの`dataDirectory/records.sqlite`。アプリ用17テーブル・60カラム。[DDL・移行・トランザクション](../src/server/store.ts)、[会話保存](../src/server/chat-store.ts)、[文章改訂](../src/server/context-store.ts)を参照する。`PRAGMA user_version`は1。追加機能の移行は対象テーブルの有無で判定し、追加前に`records.before-imports.sqlite`・`records.before-git-versions.sqlite`・`records.before-chat.sqlite`・`records.before-context.sqlite`へ退避する。
+保存先はアプリの`dataDirectory/records.sqlite`。アプリ用22テーブル・77カラム。[DDL・移行・トランザクション](../src/server/store.ts)、[会話保存](../src/server/chat-store.ts)、[文章改訂](../src/server/context-store.ts)を参照する。`PRAGMA user_version`は1。追加機能の移行は対象テーブルの有無で判定し、追加前に`records.before-imports.sqlite`・`records.before-git-versions.sqlite`・`records.before-chat.sqlite`・`records.before-context.sqlite`・`records.before-auxiliary.sqlite`へ退避する。
 
 制約欄はDDLで明示したPK・UNIQUE・NOT NULL・AUTOINCREMENT・外部キーを記載する。空欄相当の「—」は明示制約なし。JSON中のキーは物理カラムには数えない。全カラムともSQL DEFAULT指定はない。外部キー検査はON、busy_timeoutは3000ms。
 
@@ -108,11 +112,15 @@ GETにはFastifyによるHEADも自動登録される。`staticRoot`設定時の
 
 | テーブル | 用途 | 詳細 |
 | --- | --- | --- |
+| `auxiliary_jobs` | 命名・要約の固定入力・実行結果 | [カラム一覧](#auxiliary_jobs) |
+| `auxiliary_pauses` | 補助側の認証待ち・利用上限の保留 | [カラム一覧](#auxiliary_pauses) |
+| `auxiliary_settings` | 全会話共通の補助モデル | [カラム一覧](#auxiliary_settings) |
 | `chat_events` | 会話更新の永続revision | [カラム一覧](#chat_events) |
 | `chat_requests` | 依頼原文・実行状態・解釈結果 | [カラム一覧](#chat_requests) |
 | `chat_selections` | モデル選択の引き継ぎ用履歴 | [カラム一覧](#chat_selections) |
 | `chat_sessions` | 会話とCodex thread・選択設定 | [カラム一覧](#chat_sessions) |
 | `context_operations` | 専用MCPの参照・更新操作と結果 | [カラム一覧](#context_operations) |
+| `conversation_names` | 人間または補助モデルが確定した会話名 | [カラム一覧](#conversation_names) |
 | `conversations` | 作品内の会話 | [カラム一覧](#conversations) |
 | `current_state_updates` | 現在保存状態の更新履歴 | [カラム一覧](#current_state_updates) |
 | `current_states` | 作品の現在保存状態 | [カラム一覧](#current_states) |
@@ -121,6 +129,7 @@ GETにはFastifyによるHEADも自動登録される。`staticRoot`設定時の
 | `receipts` | 冪等受付の入力と確定結果 | [カラム一覧](#receipts) |
 | `records` | LLM不要の記録原文・手作業原文 | [カラム一覧](#records) |
 | `saved_states` | 確定した制作ファイルの保存状態 | [カラム一覧](#saved_states) |
+| `summary_revisions` | 根拠付き要約と人間の訂正履歴 | [カラム一覧](#summary_revisions) |
 | `text_revisions` | 制作意図・手作業文章・要約等の改訂 | [カラム一覧](#text_revisions) |
 | `version_plans` | 依頼用の固定Git参照 | [カラム一覧](#version_plans) |
 | `work_git` | 作品作成時の定義・作風参照 | [カラム一覧](#work_git) |
@@ -129,6 +138,65 @@ GETにはFastifyによるHEADも自動登録される。`staticRoot`設定時の
 ### テーブルごとのカラム一覧
 
 JSON保存項目は、対応する物理カラム表の直下に記載する。`data`等のTEXTカラム内のキーを物理カラムとは区別し、旧データで任意項目が欠けている場合もある。
+
+#### auxiliary_jobs
+
+[DDL・保存処理](../src/server/auxiliary-store.ts)。移行時は退避後に5テーブルをトランザクションで追加する。再起動時はpending/runningをfailed・PROCESS_INTERRUPTEDへ変更し、自動再送しない。命名・要約は制作threadと別threadでMCP・shell等の権限なしに実行する。
+
+| カラム | SQLite型 | 制約 | 用途 |
+| --- | --- | --- | --- |
+| `sequence` | INTEGER | PK、AUTOINCREMENT | 処理の受付順 |
+| `id` | TEXT | UNIQUE、NOT NULL | 処理ID |
+| `conversation_id` | TEXT | NOT NULL、FK→conversations.id | 対象会話 |
+| `data` | TEXT | NOT NULL | 下記JSON |
+
+| JSON項目 | 保存内容 |
+| --- | --- |
+| `id,conversationId,kind` | ID・会話・name/summary |
+| `model,sourceRequestId,generation,createdAt` | 受付時の補助モデル・起点依頼・再実行世代・時刻 |
+| `sources[]` | 固定対象原文の`id,requestId,body,complete`。記録ID・依頼ID・返答の試行/項目ID・完全/途中・本文hashを識別。対象本文を固定し後から書き換えない |
+| `status,error,result,finishedAt` | pending/running/completed/failed/stopped、固定エラーコード、出力、終了時刻 |
+| `threadId,turnId,runtime,actualModel` | 補助thread・turn・実ランタイム・実モデル。制作thread・MCP資格情報は渡さない |
+
+#### auxiliary_pauses
+
+| カラム | SQLite型 | 制約 | 用途 |
+| --- | --- | --- | --- |
+| `conversation_id` | TEXT | PK、FK→conversations.id | 保留対象会話 |
+| `source_request_id` | TEXT | NOT NULL、FK→chat_requests.id | 保留起点の依頼 |
+| `error` | TEXT | NOT NULL | AUTH_REQUIREDまたはUSAGE_LIMIT。同じ起点の補助処理を抑止し、明示再実行で解除。新しい明示依頼は再度認証を検査 |
+
+#### auxiliary_settings
+
+| カラム | SQLite型 | 制約 | 用途 |
+| --- | --- | --- | --- |
+| `id` | INTEGER | PK、CHECK(id=1) | 単一設定行 |
+| `model` | TEXT | NOT NULL | 初期値gpt-6-luna。今後受付の補助処理へ適用 |
+
+#### conversation_names
+
+| カラム | SQLite型 | 制約 | 用途 |
+| --- | --- | --- | --- |
+| `conversation_id` | TEXT | PK、FK→conversations.id | 会話 |
+| `name` | TEXT | NOT NULL | 確定した表示名。会話一覧のtitleにも付加 |
+| `author` | TEXT | NOT NULL | human/assistant。人間名の後着上書きを禁止 |
+| `created_at` | TEXT | NOT NULL | 設定時刻 |
+
+#### summary_revisions
+
+| カラム | SQLite型 | 制約 | 用途 |
+| --- | --- | --- | --- |
+| `sequence` | INTEGER | PK、AUTOINCREMENT | 要約・訂正の追加順 |
+| `id` | TEXT | UNIQUE、NOT NULL | 要約改訂ID |
+| `conversation_id` | TEXT | NOT NULL、FK→conversations.id | 会話 |
+| `data` | TEXT | NOT NULL | 下記JSON |
+
+| JSON項目 | 保存内容 |
+| --- | --- |
+| `id,jobId,body,sources[]` | 改訂ID・起点補助処理・要約本文・固定した根拠原文（auxiliary_jobs.sourcesと同じ構造） |
+| `previousId,author,createdAt` | 訂正元ID、human/assistant、時刻。旧要約と原文を削除・置換しない |
+
+未要約は保存された原文と全要約の対象ID差分から表示時に計算する。`AuxiliaryView {model,name,nameAuthor,jobs,summaries,pending}`は表示用。次の依頼の`contextSnapshot.conversationSummaries`とMCP `get_execution_context`の`conversationSummaries`には作品内各会話の訂正後の要約・未要約原文を分離して含め、現在の制作意図等を要約で置換しない。HTTP/SSEのrevisionは補助結果・訂正・命名・記録専用送信・取り込みでも更新する。
 
 #### chat_events
 
