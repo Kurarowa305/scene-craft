@@ -80,6 +80,7 @@ test("画面で補助モデル・会話名・根拠付き要約の訂正と再�
   await page
     .getByRole("button", { name: "要約の訂正を保存", exact: true })
     .click();
+  await expect(page.getByLabel("訂正する要約", { exact: true })).toHaveCount(0);
   await expect(
     page.getByText("港の光を比較中。人間はまだ採用していない。", {
       exact: true,
