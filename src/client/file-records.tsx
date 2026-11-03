@@ -13,11 +13,13 @@ export function FileRecords({
   disabled,
   onBusy,
   recordRevision,
+  onSaved,
 }: {
   workId: string;
   disabled: boolean;
   onBusy: (busy: boolean) => void;
   recordRevision: number;
+  onSaved: () => void;
 }) {
   const [states, setStates] = useState<SavedState[]>([]);
   const [current, setCurrent] = useState<string | null>(null);
@@ -134,6 +136,32 @@ export function FileRecords({
           <p role="status" key={op.id}>
             {op.phase === "reconciling" ? "照合待ち" : "未完成"}：
             {op.input.body}。同じ内容で再送してください。
+            <button
+              disabled={busy || disabled}
+              onClick={async () => {
+                setBusy(true);
+                onBusy(true);
+                setError("");
+                try {
+                  await write(
+                    `/api/conversations/${op.conversationId}/imports`,
+                    op.input as unknown as Record<string, unknown>,
+                    false,
+                  );
+                  setOperations((items) =>
+                    items.filter((item) => item.id !== op.id),
+                  );
+                  onSaved();
+                } catch (failure) {
+                  setError((failure as Error).message);
+                } finally {
+                  setBusy(false);
+                  onBusy(false);
+                }
+              }}
+            >
+              同じ内容で再送
+            </button>
             {op.phase === "incomplete" && (
               <button
                 disabled={busy || disabled}

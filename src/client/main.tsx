@@ -229,7 +229,10 @@ function App() {
         const operation = operations.find(
           (item) => item.requestKey === attempt.input?.requestKey,
         );
-        if (operation?.phase === "reconciling")
+        if (
+          !operation ||
+          !["incomplete", "committed", "abandoned"].includes(operation.phase)
+        )
           throw new Error(
             "保存状態を確認中です。同じ内容で再試行してください。",
           );
@@ -793,6 +796,7 @@ function App() {
                 conversationId && workId ? (
                   <FileRecords
                     recordRevision={recordRevision}
+                    onSaved={() => setRecordRevision((value) => value + 1)}
                     onBusy={setBusy}
                     workId={workId}
                     disabled={busy || loading || uploading || pendingImport}

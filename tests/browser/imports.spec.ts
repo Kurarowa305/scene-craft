@@ -158,3 +158,108 @@ test("作品作成が明示的に拒否されたらファイルを保持した�
   await openArtifacts(page);
   await expect(page.locator(".saved-state")).toHaveCount(1);
 });
+
+test("取り込みの結果がまだ不明なら中止済みとしてモーダルを閉じない", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await openWorkDialog(page);
+  await page.getByLabel("作品名", { exact: true }).fill("処理途中を確認");
+  await page
+    .getByLabel("既存ファイルから始める", { exact: false })
+    .setInputFiles({
+      name: "pending.psd",
+      mimeType: "application/octet-stream",
+      buffer: Buffer.from("saved source"),
+    });
+  let input: { requestKey: string };
+  await page.route("**/api/conversations/*/imports", async (route) => {
+    input = route.request().postDataJSON();
+    await route.abort("failed");
+  });
+  await page.route("**/api/works/*/imports", (route) =>
+    route.fulfill({
+      contentType: "application/json",
+      body: JSON.stringify([
+        { phase: "planned", requestKey: input.requestKey },
+      ]),
+    }),
+  );
+  const dialog = page.getByRole("dialog");
+  await dialog.getByRole("button", { name: "作品を作成", exact: true }).click();
+  await page
+    .getByRole("button", { name: "取り込みを中止して作品を開く", exact: true })
+    .click();
+  await expect(dialog).toBeVisible();
+  await expect(dialog.getByRole("alert")).toContainText("保存状態を確認中");
+});
+
+test("再読み込み後も保存済みの未確定取り込み入力で再送できる", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await openWorkDialog(page);
+  await page.getByLabel("作品名", { exact: true }).fill("取り込み復旧入口");
+  await page
+    .getByRole("dialog")
+    .getByRole("button", { name: "作品を作成", exact: true })
+    .click();
+  await page
+    .getByRole("button", {
+      name: "取り込み復旧入口に新しいチャット",
+      exact: true,
+    })
+    .click();
+  const works = await (await page.request.get("/api/works")).json();
+  const work = works.find(
+    (item: { name: string }) => item.name === "取り込み復旧入口",
+  );
+  const [chat] = await (
+    await page.request.get(`/api/works/${work.id}/conversations`)
+  ).json();
+  const { csrfToken } = await (await page.request.get("/api/session")).json();
+  const pending = {
+    requestKey: crypto.randomUUID(),
+    body: "復旧対象の保存済み入力",
+    application: "Photoshop",
+    beforeStateId: null,
+    files: [{ rootId: "source", relativePath: "absent.psd", role: "psd" }],
+  };
+  const failure = await page.request.post(
+    `/api/conversations/${chat.id}/imports`,
+    {
+      headers: {
+        "x-csrf-token": csrfToken,
+        origin: new URL(page.url()).origin,
+      },
+      data: pending,
+    },
+  );
+  expect(failure.ok()).toBe(false);
+  await page.reload();
+  await page
+    .getByRole("button", { name: "取り込み復旧入口", exact: true })
+    .click();
+  await page
+    .getByRole("button", { name: "未命名のチャット 1", exact: true })
+    .click();
+  await openArtifacts(page);
+  let resent: unknown;
+  await page.route(`**/api/conversations/${chat.id}/imports`, async (route) => {
+    resent = route.request().postDataJSON();
+    await route.continue();
+  });
+  await page
+    .getByRole("button", { name: "同じ内容で再送", exact: true })
+    .click();
+  await expect.poll(() => resent).toEqual(pending);
+  await expect(
+    page.getByRole("button", { name: "未完成の登録を中止", exact: true }),
+  ).toBeVisible();
+  await page
+    .getByRole("button", { name: "未完成の登録を中止", exact: true })
+    .click();
+  await expect(
+    page.getByRole("button", { name: "同じ内容で再送", exact: true }),
+  ).toHaveCount(0);
+});
