@@ -6,6 +6,31 @@ import { readFile, stat } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import { createInterface } from "node:readline";
 
+test("工程なしでも明示した制作意図更新を共通の記録指示としてCodexへ渡す", async () => {
+  const f = await chatFixture();
+  try {
+    const request = await f.post(`/api/conversations/${f.chat.id}/messages`, {
+      body: "制作意図を更新: 静かな海辺",
+      role: "none",
+    });
+    await waitFor(async () =>
+      f.calls.some((call) => call.method === "turn/start"),
+    );
+    const turn = f.calls.find((call) => call.method === "turn/start")!;
+    const context = JSON.parse(
+      turn.params.additionalContext["scene-craft"].value,
+    );
+    assert.equal(context.role, "none");
+    assert.equal(context.sourceRequestId, request.id);
+    assert.equal(
+      context.explicitRecordInstruction?.tool,
+      "update_work_context",
+    );
+  } finally {
+    await f.close();
+  }
+});
+
 async function waitFor(check: () => Promise<boolean>) {
   for (let attempt = 0; attempt < 150; attempt++) {
     if (await check()) return;

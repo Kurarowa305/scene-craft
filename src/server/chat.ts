@@ -11,9 +11,12 @@ import { OperationError, type openStore } from "./store.js";
 import { idParams as params, bodySchema as body } from "./http-schema.js";
 import type { startContextRpc } from "./context-rpc.js";
 import { createHash } from "node:crypto";
+import { explicitInstruction } from "./context-store.js";
 
 export const commonInstructions = `You are scene-craft's assistant. Use only the dedicated scene_craft MCP tools and text answers.
 The application context on each turn fixes the current role, instructions, sourceRequestId and contextRef. Earlier roles/references are history only.
+Common record operations are allowed in EVERY role, explicitly including none and reference. Role instructions restrict production work only; they do not remove common record operations.
+The application's explicitRecordInstruction identifies a literal human record command parsed by the backend. When it is present, call its named MCP tool with the current sourceRequestId, contextRef and a stable operationId. Do not refuse it because of the selected role. The backend performs the final authorization checks.
 Fetch current context with get_execution_context before answering about shared work information. Shared current intent always overrides old summaries.
 Never execute shell, filesystem, external MCP, production, Blender or Photoshop operations. These capabilities are unavailable.
 For literal human commands only: 制作意図を更新: TEXT -> update_work_context; 手作業を記録: TEXT -> record_manual_work;
@@ -313,6 +316,7 @@ export function registerChat(
             kind: "application",
             value: JSON.stringify({
               role: r.role ?? "none",
+              explicitRecordInstruction: explicitInstruction(r.body),
               instructions: r.instructions,
               contextRef,
               sourceRequestId: r.id,

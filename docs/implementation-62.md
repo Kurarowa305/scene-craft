@@ -86,4 +86,6 @@ node --import tsx scripts/verify-context-live.ts http://localhost:4317
 
 制作意図の現在値だけでなく、その依頼IDを根拠とした訂正記録が保存されたことを合格条件とする。失敗時は終了コード1。過去の診断会話IDを第2引数へ指定すると、同じthreadの継続も確認する。診断ラベルのない作品へは送信しない。
 
+第3引数に`reference`または`none`を指定すると、同じ診断チャットで工程変更後の記録更新を確認できる。既定は`none`。記録更新は工程を選ばない共通操作であり、「なし」でも制作意図・手作業文章・本文/理由/要約の補記を許可する。アプリが原文から解析した`explicitRecordInstruction`を実行文脈へ渡し、LLMが工程を理由に拒否しないよう共通指示に明記する。業務上の最終認可は従来どおりバックエンドで行う。
+
 根拠: [#62](https://github.com/Kurarowa305/scene-craft/issues/62)、[検証](verification/issue-62.md)、[公式app-server文書](https://learn.chatgpt.com/docs/app-server)。

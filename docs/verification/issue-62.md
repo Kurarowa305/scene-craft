@@ -49,3 +49,11 @@ Windowsの`%LOCALAPPDATA%\scene-craft`へ`Launcher.ps1`と`Test-Local.ps1`を配
 利用者がWindowsから手動再起動後、同じ公開HTTP→実モデル→MCP→SQLiteの経路で、新しい診断会話と以前失敗した診断会話の両方で制作意図更新・訂正1件の保存が成功した。以前の診断会話は同じthread IDを維持した。元の制作作品は更新していない。[証跡](evidence/issue-62-mcp-approval.json)。`scripts/verify-context-live.ts`を実接続回帰確認として残した。認証コピー・APIキー・別providerを利用しない。
 
 非推論プローブも`config/read`で7ツールの有効承認モード、既定`prompt`、`approval_policy=never`、read-onlyを検査するよう更新した。[公式MCP設定](https://learn.chatgpt.com/docs/extend/mcp)と導入済みCodex 0.166.0の有効設定を照合した。Windowsでの全受け入れ、工程切替全般やシェル等の迂回試験は引き続き未完了。
+
+## 工程なしで記録更新を拒否する誤判断の修正（2026-11-03）
+
+利用者から「工程なしでは制作意図更新できない」と報告された。保存済み依頼`ffb53dd5-4dd8-4d32-a395-9bdfeb8f784f`では、明示指示の書式が正しいにもかかわらず、LLMがnoneを理由に更新を拒否し、MCP呼出は0件だった。前項の承認拒否とは別で、モデルが「相談と明示した記録更新のみ」という工程指示を更新禁止と誤解した。同じ診断チャットのreferenceでも固定指示を理由とした拒否が再現した。
+
+全工程（none/referenceを含む）に共通の記録操作を許可することを共通指示で明記した。原文から既存の厳密なparserで解析した`explicitRecordInstruction`をturnのapplication contextへ渡し、該当ツールを呼ぶことを明記した。権限・明示原文・停止・現在turnのバックエンド照合は変更しない。共通指示のhash変更で旧チャットもcold resumeする。
+
+Codexアダプター境界でnoneの明示更新指示が渡る回帰試験を追加し、修正前のundefinedによる失敗、修正後の成功を確認した。全自動試験45件・画面9件・型検査・ビルドが成功。利用者のWindows再起動後、同じ診断threadでreference→noneの2依頼を実モデルで実行し、双方で現在値と該当依頼IDからの訂正記録の保存が成功した。[証跡](evidence/issue-62-none-recording.json)。元の制作作品の意図は変更していない。

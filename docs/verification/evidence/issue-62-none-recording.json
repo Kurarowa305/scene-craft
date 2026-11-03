@@ -1,0 +1,37 @@
+{
+  "checkedOn": "2026-11-03 JST",
+  "beforeCommit": "825a0807ae60cda7de492d679a61009296137a1f",
+  "reportedFailure": {
+    "requestId": "ffb53dd5-4dd8-4d32-a395-9bdfeb8f784f",
+    "role": "none",
+    "explicitIntentCommand": true,
+    "toolCalls": 0,
+    "outcome": "model refused based on role; backend was not called"
+  },
+  "diagnosticFailure": {
+    "requestId": "15462cf1-7eb5-4c49-be54-f804f3dce5b1",
+    "role": "reference",
+    "updated": false,
+    "recorded": false,
+    "sameThread": true
+  },
+  "afterReference": {
+    "requestId": "688c5919-dc52-4160-8a9a-d831666f3780",
+    "updated": true,
+    "recorded": true,
+    "sameThread": true,
+    "revisionCount": 2
+  },
+  "afterNone": {
+    "requestId": "d70c0aeb-f112-4bc9-ab81-c25a28df41b7",
+    "updated": true,
+    "recorded": true,
+    "sameThread": true,
+    "revisionCount": 3
+  },
+  "scope": "Real HTTP -> Codex model -> MCP -> SQLite in the same labelled diagnostic conversation; no original production work updated. User manually restarted the Windows launcher.",
+  "commands": [
+    "node --import tsx scripts/verify-context-live.ts http://localhost:4317 8a9aa89f-216f-4fe8-b300-328e33270672 reference",
+    "node --import tsx scripts/verify-context-live.ts http://localhost:4317 8a9aa89f-216f-4fe8-b300-328e33270672 none"
+  ]
+}

@@ -2,6 +2,10 @@
 // Creates a labelled diagnostic work; never copies credentials or modifies other works.
 const origin = process.argv[2] ?? "http://localhost:4317";
 const address = new URL(origin);
+const role = process.argv[4] ?? "none";
+if (!["none", "reference"].includes(role))
+  throw new Error("DIAGNOSTIC_ROLE_REQUIRED");
+const expectedIntent = `接続診断の制作意図 (${role})`;
 if (address.protocol !== "http:" || address.hostname !== "localhost")
   throw new Error("LOCAL_ORIGIN_REQUIRED");
 const response = await fetch(origin + "/api/session");
@@ -44,8 +48,8 @@ if (conversationId) {
   conversationId = conversation.id;
 }
 const request = await post(`/api/conversations/${conversationId}/messages`, {
-  body: "制作意図を更新: 接続診断の制作意図",
-  role: "none",
+  body: `制作意図を更新: ${expectedIntent}`,
+  role,
 });
 console.log(
   JSON.stringify({
@@ -71,7 +75,7 @@ for (let attempt = 0; attempt < 120; attempt++) {
     (revision: { sourceRequestId: string }) =>
       revision.sourceRequestId === request.id,
   );
-  const updated = context.work.intent === "接続診断の制作意図";
+  const updated = context.work.intent === expectedIntent;
   const sameThread =
     !previousThread || previousThread === view.session.threadId;
   console.log(
