@@ -301,3 +301,39 @@ test("作品の保存中にEscapeを押しても失敗した入力とエラー�
     "Escape後も残す入力",
   );
 });
+
+test("狭い画面でも作品を選び、チャットと右タブを切り替えられる", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 760, height: 900 });
+  await page.goto("/");
+  await page.getByRole("button", { name: "作品を作成", exact: true }).click();
+  const dialog = page.getByRole("dialog", { name: "作品を作成" });
+  await dialog.getByLabel("作品名", { exact: true }).fill("狭い画面の作品");
+  await dialog.getByRole("button", { name: "作品を作成", exact: true }).click();
+  await page
+    .getByRole("button", {
+      name: "狭い画面の作品に新しいチャット",
+      exact: true,
+    })
+    .click();
+  await expect(page.getByLabel("メッセージ", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "右タブを表示", exact: true }).click();
+  await expect(
+    page.getByRole("heading", { name: "タブを開く", exact: true }),
+  ).toBeVisible();
+  await page
+    .getByRole("button", { name: "チャットに戻る", exact: true })
+    .click();
+  await expect(page.getByLabel("メッセージ", { exact: true })).toBeVisible();
+  await page.reload();
+  await page.getByRole("button", { name: "作品を選択", exact: true }).click();
+  await page
+    .getByRole("dialog", { name: "作品を選択" })
+    .getByRole("button", { name: "狭い画面の作品", exact: true })
+    .click();
+  await page
+    .getByRole("button", { name: "未命名のチャット 1", exact: true })
+    .click();
+  await expect(page.getByLabel("メッセージ", { exact: true })).toBeVisible();
+});

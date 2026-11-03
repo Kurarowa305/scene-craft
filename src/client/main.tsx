@@ -24,12 +24,25 @@ function App() {
   const [uploading, setUploading] = useState(false);
   const pendingImports = useRef<Record<string, ImportInput>>({});
   const [pendingImport, setPendingImport] = useState(false);
-  const [modal, setModal] = useState<"work" | "settings" | "reflection" | null>(
-    null,
-  );
+  const [modal, setModal] = useState<
+    "work" | "settings" | "reflection" | "works" | null
+  >(null);
   const [settingsTab, setSettingsTab] = useState("version");
   const [sidebarWidth, setSidebarWidth] = useState(235);
   const [mainWidth, setMainWidth] = useState(590);
+  const [viewport, setViewport] = useState(window.innerWidth);
+  const maxMainWidth = Math.max(
+    315,
+    Math.min(1000, viewport - sidebarWidth - 309),
+  );
+  useEffect(() => {
+    const resize = () => setViewport(window.innerWidth);
+    window.addEventListener("resize", resize);
+    return () => window.removeEventListener("resize", resize);
+  }, []);
+  useEffect(() => {
+    setMainWidth((width) => Math.min(width, maxMainWidth));
+  }, [maxMainWidth]);
   const [showPanel, setShowPanel] = useState(false);
   const [attachOpen, setAttachOpen] = useState(false);
   const [statuses, setStatuses] = useState<Record<string, string>>({});
@@ -308,12 +321,25 @@ function App() {
           <button
             className="nav-button"
             disabled={busy || uploading || pendingImport}
+            aria-label="作品を作成"
             onClick={() => setModal("work")}
           >
             <Icon name="plus" />
             <span>作品を作成</span>
           </button>
-          <button className="nav-button" onClick={() => setModal("reflection")}>
+          <button
+            className="nav-button mobile-toggle"
+            aria-label="作品を選択"
+            disabled={busy || uploading || pendingImport}
+            onClick={() => setModal("works")}
+          >
+            <Icon name="folder" />
+          </button>
+          <button
+            className="nav-button"
+            aria-label="作品を振り返る"
+            onClick={() => setModal("reflection")}
+          >
             <Icon name="history" />
             <span>作品を振り返る</span>
           </button>
@@ -387,7 +413,11 @@ function App() {
           ))}
         </nav>
         <div className="sidebar-footer">
-          <button className="nav-button" onClick={() => setModal("settings")}>
+          <button
+            className="nav-button"
+            aria-label="設定・保存データ"
+            onClick={() => setModal("settings")}
+          >
             <Icon name="settings" />
             <span>設定・保存データ</span>
           </button>
@@ -663,7 +693,7 @@ function App() {
             value={mainWidth}
             onChange={setMainWidth}
             min={315}
-            max={1000}
+            max={maxMainWidth}
           />
           <SideChats
             key={conversationId || workId}
@@ -721,6 +751,27 @@ function App() {
           />
         </div>
       </div>
+      {modal === "works" && (
+        <Modal title="作品を選択" close={() => setModal(null)}>
+          <div className="tab-type-list">
+            {works.map((w) => (
+              <button
+                key={w.id}
+                onClick={() => {
+                  setWorkId(w.id);
+                  setConversationId("");
+                  setError("");
+                  setModal(null);
+                  setShowPanel(false);
+                }}
+              >
+                <Icon name="folder" />
+                <span>{w.name}</span>
+              </button>
+            ))}
+          </div>
+        </Modal>
+      )}
       {modal === "work" && (
         <Modal title="作品を作成" close={() => !busy && setModal(null)}>
           <form className="create-work" onSubmit={createWork}>

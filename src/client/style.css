@@ -1423,11 +1423,6 @@ dialog .dialog-footer {
 .panel-content {
   overscroll-behavior: contain;
 }
-@media (max-width: 1100px) and (min-width: 801px) {
-  .workspace-body {
-    grid-template-columns: minmax(315px, 1fr) 5px minmax(300px, 1fr);
-  }
-}
 @media (max-width: 800px) {
   .shell {
     grid-template-columns: 60px minmax(0, 1fr);
