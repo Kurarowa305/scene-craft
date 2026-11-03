@@ -171,6 +171,7 @@ export async function startContextRpc(store: ReturnType<typeof openStore>) {
             execution: bindings.get(args.contextRef),
             fixed: r.contextSnapshot,
             current: store.context.context(r.workId),
+            conversationSummaries: store.auxiliary.context(r.workId),
             plan: r.plan,
             remainingRetries: 2 - r.retryCount,
             unavailable: [

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // External protocol fixture only; the application uses its production stdio adapter.
 import { createInterface } from "node:readline";
-import { writeFileSync, readFileSync, existsSync } from "node:fs";
+import { writeFileSync, readFileSync, existsSync, renameSync } from "node:fs";
 import { join } from "node:path";
 import { spawn } from "node:child_process";
 async function recordInstruction(context, body, threadId) {
@@ -141,6 +141,24 @@ createInterface({ input: process.stdin }).on("line", (line) => {
     const turn = { id: `turn-${++next}`, status: "inProgress", items: [] };
     threads.get(p.threadId).push(turn);
     result = { turn };
+    if (p.outputSchema?.properties?.text) {
+      const input = JSON.parse(p.input[0].text);
+      turn.status = "completed";
+      turn.items = [
+        {
+          id: `item-${turn.id}`,
+          type: "agentMessage",
+          text: JSON.stringify({
+            text:
+              input.kind === "name"
+                ? "港の光の検討"
+                : "港の光を検討した。採用は未確定。",
+          }),
+        },
+      ];
+      send({ id: m.id, result: { turn } });
+      return;
+    }
     if (p.outputSchema) {
       // Recorded external semantic outputs for the public contract tests.
       // This fixture is not a natural-language parser used by the product.
@@ -285,11 +303,16 @@ createInterface({ input: process.stdin }).on("line", (line) => {
       send({ id: m.id, result: { turn } });
       return;
     }
-    if (p.additionalContext)
+    if (p.additionalContext) {
       writeFileSync(
-        join(process.env.CODEX_HOME, "fixture-context.json"),
+        join(process.env.CODEX_HOME, "fixture-context.tmp"),
         JSON.stringify(p.additionalContext),
       );
+      renameSync(
+        join(process.env.CODEX_HOME, "fixture-context.tmp"),
+        join(process.env.CODEX_HOME, "fixture-context.json"),
+      );
+    }
     setTimeout(() => {
       if (turn.status !== "inProgress") return;
       send({

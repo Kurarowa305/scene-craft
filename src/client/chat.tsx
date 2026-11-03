@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type FormEvent } from "react";
 import type { BodyRecord } from "../shared/contracts";
 import type { ChatModel, ChatView, ModelChoice } from "../shared/chat";
 import { read, write } from "./api";
+import { Auxiliary } from "./auxiliary";
 
 const phases: Record<string, string> = {
   accepted: "受付済み",
@@ -34,9 +35,11 @@ interface Status {
 }
 export function Chat({
   conversationId,
+  onNameChanged,
   onRecordsChanged,
 }: {
   conversationId: string;
+  onNameChanged: (name: string | null) => void;
   onRecordsChanged: (
     records: BodyRecord[],
     intent: string | null,
@@ -47,6 +50,9 @@ export function Chat({
   const contextFetch = useRef(0);
   const contextRevision = useRef(-1);
   const [view, setView] = useState<ChatView>();
+  useEffect(() => {
+    if (view) onNameChanged(view.auxiliary.name);
+  }, [view?.auxiliary.name]);
   function applyView(next: ChatView) {
     setView((previous) =>
       previous && previous.revision > next.revision ? previous : next,
@@ -218,6 +224,16 @@ export function Chat({
         接続状態を更新
       </button>
       {error && <p role="alert">{error}</p>}
+      {view && (
+        <Auxiliary
+          value={view.auxiliary}
+          models={status?.models ?? []}
+          conversationId={conversationId}
+          requestId={view.requests.at(-1)?.id}
+          refresh={refresh}
+          onError={setError}
+        />
+      )}
       <div className="chat-settings">
         <label>
           工程

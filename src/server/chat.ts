@@ -11,6 +11,8 @@ import { OperationError, type openStore } from "./store.js";
 import { idParams as params, bodySchema as body } from "./http-schema.js";
 import type { startContextRpc } from "./context-rpc.js";
 import { createHash } from "node:crypto";
+import { runAuxiliary } from "./auxiliary.js";
+import type { AuxiliaryJob } from "../shared/auxiliary.js";
 import { explicitInstruction } from "./context-store.js";
 import { interpretRecordInstruction } from "./record-interpreter.js";
 
@@ -49,9 +51,122 @@ export function registerChat(
   ) => { snapshot: unknown; instructions: string },
 ) {
   const chat = store.chat;
+  const view = (id: string) => ({
+    ...chat.view(id),
+    auxiliary: store.auxiliary.view(id),
+  });
   const executing = new Set<string>();
   const subscribers = new Map<string, Set<() => void>>();
   const streams = new Set<() => void>();
+  const auxiliaryRuns = new Set<Promise<void>>();
+  const launched = new Set<string>();
+  let closing = false;
+  function publish(id: string) {
+    chat.saveSession(chat.session(id));
+    for (const fn of subscribers.get(id) ?? []) fn();
+  }
+  app.addHook("onResponse", async (req, reply) => {
+    if (
+      reply.statusCode === 200 &&
+      req.method === "POST" &&
+      [
+        "/api/conversations/:id/records",
+        "/api/conversations/:id/imports",
+      ].includes(req.routeOptions.url ?? "")
+    )
+      publish((req.params as { id: string }).id);
+  });
+  function auxiliaryAllowed(job: AuxiliaryJob) {
+    const r = chat.get(job.sourceRequestId);
+    const latest = chat.requests(job.conversationId).at(-1);
+    return (
+      !closing &&
+      r.retryCount === job.generation &&
+      !r.stopRequested &&
+      !r.error &&
+      !chat
+        .requests(job.conversationId)
+        .some((x) => x.stopRequested && !x.terminal) &&
+      !latest?.stopRequested &&
+      !latest?.error &&
+      r.phase !== "unknown" &&
+      !store.auxiliary.paused(
+        job.conversationId,
+        latest?.id ?? job.sourceRequestId,
+      )
+    );
+  }
+  function launch(job: AuxiliaryJob | null) {
+    if (!job || launched.has(job.id) || !store.auxiliary.pending(job.id))
+      return;
+    launched.add(job.id);
+    let storageFailed = false;
+    const changed = () => {
+      try {
+        store.auxiliary.save(job);
+        publish(job.conversationId);
+      } catch {
+        storageFailed = true;
+      }
+    };
+    const task = (async () => {
+      try {
+        if (!auxiliaryAllowed(job))
+          throw new OperationError(409, "AUXILIARY_STOPPED");
+        const c = await authenticate();
+        if (!(await models()).some((m) => m.model === job.model))
+          throw new OperationError(409, "MODEL_UNAVAILABLE");
+        const text = await runAuxiliary(
+          c,
+          job,
+          () => !storageFailed && auxiliaryAllowed(job),
+          changed,
+        );
+        if (storageFailed || !auxiliaryAllowed(job))
+          throw new OperationError(409, "AUXILIARY_STOPPED");
+        store.auxiliary.finish(job, text);
+        if (job.kind === "summary") {
+          const latest = chat.requests(job.conversationId).at(-1);
+          if (
+            latest &&
+            latest.id !== job.sourceRequestId &&
+            latest.phase === "completed" &&
+            !latest.stopRequested &&
+            !latest.error
+          )
+            schedule(latest, "summary");
+        }
+      } catch (error) {
+        job.error =
+          error instanceof OperationError ? error.code : "AUXILIARY_FAILED";
+        job.status = job.error === "AUXILIARY_STOPPED" ? "stopped" : "failed";
+        job.finishedAt = new Date().toISOString();
+        try {
+          store.auxiliary.save(job);
+          if (["AUTH_REQUIRED", "USAGE_LIMIT"].includes(job.error))
+            store.auxiliary.pause(job);
+        } catch {
+          /* Keep the durable original; pending ownership is recovered on restart. */
+        }
+      }
+      try {
+        publish(job.conversationId);
+      } catch {
+        /* Storage may be unavailable. */
+      }
+    })().catch(() => {
+      /* A helper must never terminate the production process. */
+    });
+    auxiliaryRuns.add(task);
+    void task.finally(() => auxiliaryRuns.delete(task));
+  }
+  function schedule(r: ChatRequest, kind: AuxiliaryJob["kind"]) {
+    try {
+      launch(store.auxiliary.create(r, kind));
+    } catch {
+      /* Auxiliary persistence failure cannot reject an accepted production request. */
+    }
+  }
   let attached: CodexConnection | undefined;
   let detach: (() => void) | undefined;
   async function runtime() {
@@ -94,6 +209,25 @@ export function registerChat(
     chat.save(r);
     contextRpc.bind(r);
     for (const fn of subscribers.get(r.conversationId) ?? []) fn();
+    try {
+      if (
+        r.terminal &&
+        !r.stopRequested &&
+        !r.error &&
+        r.phase === "completed" &&
+        !store.auxiliary
+          .view(r.conversationId)
+          .jobs.some(
+            (j) =>
+              j.kind === "summary" &&
+              j.sourceRequestId === r.id &&
+              j.generation === r.retryCount,
+          )
+      )
+        schedule(r, "summary");
+    } catch {
+      /* Production state was saved independently of the helper. */
+    }
   }
   function classify(info: unknown): string {
     if (info === "usageLimitExceeded" || info === "sessionBudgetExceeded")
@@ -456,6 +590,125 @@ export function registerChat(
     if (latest.stopRequested && !latest.terminal) await interrupt(latest);
     return latest;
   }
+  app.post<{ Body: { requestKey: string; model: string } }>(
+    "/api/auxiliary/model",
+    {
+      schema: {
+        body: body(
+          {
+            model: {
+              type: "string",
+              minLength: 1,
+              maxLength: 200,
+              pattern: "\\S",
+            },
+          },
+          ["model"],
+        ),
+      },
+    },
+    async (req) => {
+      if (!(await models()).some((m) => m.model === req.body.model))
+        throw new OperationError(409, "MODEL_UNAVAILABLE");
+      const result = store.auxiliary.configure(
+        req.body.requestKey,
+        req.body.model,
+      );
+      for (const id of subscribers.keys()) publish(id);
+      return result;
+    },
+  );
+  app.post<{
+    Params: { id: string };
+    Body: { requestKey: string; name: string };
+  }>(
+    "/api/conversations/:id/name",
+    {
+      schema: {
+        params,
+        body: body(
+          {
+            name: {
+              type: "string",
+              minLength: 1,
+              maxLength: 100,
+              pattern: "\\S",
+            },
+          },
+          ["name"],
+        ),
+      },
+    },
+    async (req) => {
+      const result = store.auxiliary.rename(
+        req.body.requestKey,
+        req.params.id,
+        req.body.name.trim(),
+      );
+      publish(req.params.id);
+      return result;
+    },
+  );
+  app.post<{
+    Params: { id: string; summaryId: string };
+    Body: { requestKey: string; body: string };
+  }>(
+    "/api/conversations/:id/summaries/:summaryId",
+    {
+      schema: {
+        params: {
+          type: "object",
+          required: ["id", "summaryId"],
+          properties: {
+            id: { type: "string", format: "uuid" },
+            summaryId: { type: "string", format: "uuid" },
+          },
+        },
+        body: body(
+          {
+            body: {
+              type: "string",
+              minLength: 1,
+              maxLength: 200000,
+              pattern: "\\S",
+            },
+          },
+          ["body"],
+        ),
+      },
+    },
+    async (req) => {
+      const result = store.auxiliary.correct(
+        req.body.requestKey,
+        req.params.id,
+        req.params.summaryId,
+        req.body.body,
+      );
+      publish(req.params.id);
+      return result;
+    },
+  );
+  app.post<{ Params: { id: string }; Body: { requestKey: string } }>(
+    "/api/conversations/:id/auxiliary/resume",
+    {
+      schema: { params, body: body({}, []) },
+    },
+    async (req) => {
+      chat.session(req.params.id);
+      const requests = chat.requests(req.params.id);
+      const latest = requests.at(-1);
+      if (
+        !latest ||
+        latest.stopRequested ||
+        latest.error ||
+        chat.unsettled(latest)
+      )
+        throw new OperationError(409, "AUXILIARY_BLOCKED");
+      for (const job of store.auxiliary.resume(req.body.requestKey, latest))
+        launch(job);
+      return view(req.params.id);
+    },
+  );
   app.get("/api/codex", async () => {
     try {
       const c = await runtime();
@@ -503,7 +756,7 @@ export function registerChat(
         } catch {
           /* Local history remains available offline. */
         }
-      return chat.view(req.params.id);
+      return view(req.params.id);
     },
   );
   app.post<{
@@ -575,6 +828,7 @@ export function registerChat(
         req.body.role ?? "none",
         (workId, plan) => fixedContext(workId, plan, req.body.role ?? "none"),
       );
+      schedule(r, "name");
       void dispatch(r.id);
       return r;
     },
@@ -615,9 +869,9 @@ export function registerChat(
         connection: "keep-alive",
       });
       const send = () => {
-        const view = chat.view(req.params.id);
+        const snapshot = view(req.params.id);
         reply.raw.write(
-          `id: ${view.revision}\nevent: chat\ndata: ${JSON.stringify(view)}\n\n`,
+          `id: ${snapshot.revision}\nevent: chat\ndata: ${JSON.stringify(snapshot)}\n\n`,
         );
       };
       let group = subscribers.get(req.params.id);
@@ -646,6 +900,8 @@ export function registerChat(
     },
   );
   app.addHook("preClose", async () => {
+    closing = true;
+    await Promise.allSettled(auxiliaryRuns);
     detach?.();
     for (const r of chat.requests())
       if (chat.unsettled(r)) {

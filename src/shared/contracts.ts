@@ -12,7 +12,7 @@ export interface Conversation {
   id: string;
   sequence: number;
   workId: string;
-  title: null;
+  title: string | null;
   createdAt: string;
 }
 export interface BodyRecord {
