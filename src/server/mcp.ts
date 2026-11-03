@@ -10,7 +10,7 @@ const lines = createInterface({ input: process.stdin });
 async function invoke(tool: string, args: unknown): Promise<unknown> {
   return new Promise((resolve, reject) => {
     const socket = createConnection(socketPath!);
-    socket.setTimeout(30000, () =>
+    socket.setTimeout(60000, () =>
       socket.destroy(new Error("RPC_UNAVAILABLE")),
     );
     socket.once("error", () => reject(new Error("RPC_UNAVAILABLE")));
@@ -59,7 +59,7 @@ lines.on("line", async (line) => {
           description:
             name === "record_human_decision"
               ? "Unavailable: downstream decision handling is not implemented."
-              : `${name}. Use the current contextRef. Writes require the current sourceRequestId and an exact human command; values are resolved from that command, never inferred. Production/protection changes are unavailable.`,
+              : `${name}. Use the current contextRef. Writes require the current sourceRequestId and an explicit human instruction, including ordinary natural language; the backend resolves it from the original message. Never provide a replacement text or target as tool arguments. If needsClarification is returned, ask its question without claiming a save. Production/protection changes are unavailable.`,
           inputSchema: {
             type: "object",
             additionalProperties: false,

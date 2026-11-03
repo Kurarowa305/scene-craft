@@ -5,13 +5,16 @@ import { writeFileSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { spawn } from "node:child_process";
 async function recordInstruction(context, body, threadId) {
-  const tool = body.startsWith("制作意図を更新: ")
-    ? "update_work_context"
-    : body.startsWith("手作業を記録: ")
+  const tool =
+    body === "手作業で「Photoshopで空の色を調整した」を記録して"
       ? "record_manual_work"
-      : body.startsWith("記録を訂正: ")
-        ? "amend_record"
-        : null;
+      : body.startsWith("制作意図を更新: ")
+        ? "update_work_context"
+        : body.startsWith("手作業を記録: ")
+          ? "record_manual_work"
+          : body.startsWith("記録を訂正: ")
+            ? "amend_record"
+            : null;
   if (!tool) return "保存される返答";
   const config = readFileSync(
     join(process.env.CODEX_HOME, "config.toml"),
@@ -110,10 +113,11 @@ createInterface({ input: process.stdin }).on("line", (line) => {
     const id = p.threadId ?? `thread-${++next}`;
     if (!threads.has(id)) threads.set(id, []);
     threadEnvironments.set(id, p.config?.["mcp_servers.scene_craft.env"]);
-    writeFileSync(
-      join(process.env.CODEX_HOME, "fixture-mcp.json"),
-      JSON.stringify(threadEnvironments.get(id) ?? {}),
-    );
+    if (threadEnvironments.get(id))
+      writeFileSync(
+        join(process.env.CODEX_HOME, "fixture-mcp.json"),
+        JSON.stringify(threadEnvironments.get(id) ?? {}),
+      );
     result = { thread: { id }, model: p.model, modelProvider: "openai" };
   }
   if (m.method === "thread/unsubscribe") result = { status: "unsubscribed" };
@@ -121,6 +125,81 @@ createInterface({ input: process.stdin }).on("line", (line) => {
     const turn = { id: `turn-${++next}`, status: "inProgress", items: [] };
     threads.get(p.threadId).push(turn);
     result = { turn };
+    if (p.outputSchema) {
+      // Recorded external semantic outputs for the public contract tests.
+      // This fixture is not a natural-language parser used by the product.
+      const input = JSON.parse(p.input[0].text);
+      writeFileSync(
+        join(process.env.CODEX_HOME, "fixture-interpretation-started.json"),
+        JSON.stringify({ request: p.clientUserMessageId }),
+      );
+      const examples = {
+        "手作業で「Photoshopで空の色を調整した」を記録して": {
+          tool: "record_manual_work",
+          field: "body",
+          body: "Photoshopで空の色を調整した",
+          targetId: null,
+        },
+        "制作意図を「夕暮れの港」に変えてください": {
+          tool: "update_work_context",
+          field: "intent",
+          body: "夕暮れの港",
+          targetId: null,
+        },
+        "直前の記録の理由を「静けさを出すため」に修正して": {
+          tool: "amend_record",
+          field: "reason",
+          body: "静けさを出すため",
+          targetId: input.recentRecords[0]?.id ?? null,
+        },
+        原文にない文章を返す故障を検査: {
+          tool: "record_manual_work",
+          field: "body",
+          body: "原文に存在しない本文",
+          targetId: null,
+        },
+      };
+      const value = examples[input.currentHumanMessage];
+      if (input.currentHumanMessage === "解釈中の停止を検査する記録依頼") {
+        send({ id: m.id, result: { turn } });
+        return;
+      }
+      if (input.currentHumanMessage === "解釈時の利用上限を検査する記録依頼") {
+        turn.status = "failed";
+        turn.error = { codexErrorInfo: "usageLimitExceeded" };
+        send({ id: m.id, result: { turn } });
+        return;
+      }
+      const answer = value
+        ? { status: "update", ...value, question: null }
+        : input.currentHumanMessage === "その記録をいい感じに直して"
+          ? {
+              status: "clarification",
+              tool: null,
+              field: null,
+              body: null,
+              targetId: null,
+              question: "どの記録のどの文章を、どの内容に訂正しますか？",
+            }
+          : {
+              status: "not_requested",
+              tool: null,
+              field: null,
+              body: null,
+              targetId: null,
+              question: null,
+            };
+      turn.status = "completed";
+      turn.items = [
+        {
+          id: `item-${turn.id}`,
+          type: "agentMessage",
+          text: JSON.stringify(answer),
+        },
+      ];
+      send({ id: m.id, result: { turn } });
+      return;
+    }
     if (p.additionalContext)
       writeFileSync(
         join(process.env.CODEX_HOME, "fixture-context.json"),

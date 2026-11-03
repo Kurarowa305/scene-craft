@@ -6,6 +6,17 @@ const role = process.argv[4] ?? "none";
 if (!["none", "reference"].includes(role))
   throw new Error("DIAGNOSTIC_ROLE_REQUIRED");
 const expectedIntent = `接続診断の制作意図 (${role})`;
+const scenario = process.argv[5] ?? "intent";
+if (
+  ![
+    "intent",
+    "natural-intent",
+    "natural-record",
+    "natural-amend",
+    "quoted",
+  ].includes(scenario)
+)
+  throw new Error("DIAGNOSTIC_SCENARIO_REQUIRED");
 if (address.protocol !== "http:" || address.hostname !== "localhost")
   throw new Error("LOCAL_ORIGIN_REQUIRED");
 const response = await fetch(origin + "/api/session");
@@ -47,8 +58,25 @@ if (conversationId) {
   const conversation = await post(`/api/works/${workId}/conversations`, {});
   conversationId = conversation.id;
 }
+const before = await read(`/api/works/${workId}/context`);
+const history = await read(`/api/works/${workId}/record-history`);
+const expectedRecord = "Photoshopで空の色を調整した";
+const expectedReason = "静けさを出すため";
+const previousRecordId = history.records.at(-1)?.id;
+if (scenario === "natural-amend" && !previousRecordId)
+  throw new Error("DIAGNOSTIC_RECORD_REQUIRED");
+const body =
+  scenario === "natural-record"
+    ? `手作業で「${expectedRecord}」を記録して`
+    : scenario === "natural-intent"
+      ? `制作意図を「${expectedIntent}」に変えてください`
+      : scenario === "natural-amend"
+        ? `直前の記録の理由を「${expectedReason}」に修正して`
+        : scenario === "quoted"
+          ? `次は引用です。「手作業で『${expectedRecord}』を記録して」。実行しないでください。`
+          : `制作意図を更新: ${expectedIntent}`;
 const request = await post(`/api/conversations/${conversationId}/messages`, {
-  body: `制作意図を更新: ${expectedIntent}`,
+  body,
   role,
 });
 console.log(
@@ -71,16 +99,29 @@ for (let attempt = 0; attempt < 120; attempt++) {
     .filter((item: { type: string }) => item.type === "agentMessage")
     .map((item: { text: string }) => item.text)
     .join("");
-  const recorded = context.revisions.some(
+  const revision = context.revisions.find(
     (revision: { sourceRequestId: string }) =>
       revision.sourceRequestId === request.id,
   );
-  const updated = context.work.intent === expectedIntent;
+  const recorded = Boolean(revision);
+  const updated =
+    scenario === "natural-record"
+      ? revision?.field === "body" && revision?.body === expectedRecord
+      : scenario === "natural-amend"
+        ? revision?.field === "reason" &&
+          revision?.body === expectedReason &&
+          revision?.targetId === previousRecordId
+        : scenario === "quoted"
+          ? !recorded &&
+            context.revisions.length === before.revisions.length &&
+            context.work.intent === before.work.intent
+          : context.work.intent === expectedIntent;
   const sameThread =
     !previousThread || previousThread === view.session.threadId;
   console.log(
     JSON.stringify({
       phase: latest.phase,
+      scenario,
       approvalMention: /承認|approval/i.test(output),
       updated,
       recorded,
@@ -88,7 +129,8 @@ for (let attempt = 0; attempt < 120; attempt++) {
       revisionCount: context.revisions.length,
     }),
   );
-  if (!updated || !recorded || !sameThread) process.exitCode = 1;
+  if (!updated || (scenario !== "quoted" && !recorded) || !sameThread)
+    process.exitCode = 1;
   settled = true;
   break;
 }

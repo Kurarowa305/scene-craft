@@ -114,7 +114,7 @@ export async function createApp(options: AppOptions) {
                 versions().content(plan.definition, "definition", path).content,
             )
             .join("\n")
-        : "工程なしでも制作意図の更新(update_work_context)、手作業の文章記録(record_manual_work)、本文・理由・要約の補記(amend_record)は共通操作として許可される。explicitRecordInstructionがあれば対応するツールを呼ぶ。通常の相談から更新を推測せず、制作ファイルの操作は開始しない。";
+        : "工程なしでも制作意図の更新(update_work_context)、手作業の文章記録(record_manual_work)、本文・理由・要約の補記(amend_record)は共通操作として許可される。自然な言い方の明示依頼にも対応するツールを呼ぶ。定型文は必須ではない。通常の相談から更新を推測せず、制作ファイルの操作は開始しない。";
       return {
         snapshot: {
           ...store.context.context(workId),

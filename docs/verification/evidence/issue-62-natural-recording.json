@@ -1,0 +1,12 @@
+{
+  "checkedOn": "2026-11-03 JST",
+  "beforeCommit": "735da37f60b1460db2bb463538bb7fe1c158c65e",
+  "before": { "test": "自然な文章の手作業記録依頼を原文に結び付けて一度だけ保存する", "error": "EXPLICIT_INSTRUCTION_REQUIRED" },
+  "afterLive": [
+    { "requestId": "8f98af65-5da5-476f-907e-377f23de0105", "scenario": "natural-record", "updated": true, "recorded": true, "sameThread": true, "revisionCount": 4 },
+    { "requestId": "2016a576-fe85-4beb-85f5-12ec4ec1d592", "scenario": "natural-intent", "updated": true, "recorded": true, "sameThread": true, "revisionCount": 5 },
+    { "requestId": "ff9b40d3-8e8f-439c-8289-ee0fec0561dc", "scenario": "natural-amend", "updated": true, "recorded": true, "sameThread": true, "revisionCount": 6 },
+    { "requestId": "781ac64e-7b72-454d-9826-d6b3ec0894a5", "scenario": "quoted", "unchanged": true, "recorded": false, "sameThread": true, "revisionCount": 6 }
+  ],
+  "scope": "Actual authenticated HTTP -> Codex acting model -> MCP -> separate tool-free interpretation thread -> backend -> SQLite. Diagnostic work only, role none. User manually restarted Windows launcher. Original production work was not modified."
+}

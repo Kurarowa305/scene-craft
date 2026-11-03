@@ -31,6 +31,85 @@ test("工程なしでも明示した制作意図更新を共通の記録指示�
   }
 });
 
+test(
+  "自然文の解釈中に停止した依頼は保存せず、解釈用turnも中断する",
+  { timeout: 10000 },
+  async () => {
+    const f = await chatFixture(true);
+    let client: Awaited<ReturnType<typeof mcp>> | undefined;
+    try {
+      const r = await f.post(`/api/conversations/${f.chat.id}/messages`, {
+        body: "解釈中の停止を検査する記録依頼",
+      });
+      client = await mcp(f);
+      const current = await client.current();
+      const pending = client.call("record_manual_work", {
+        contextRef: current.contextRef,
+        sourceRequestId: r.id,
+      });
+      await waitFor(async () => {
+        try {
+          await stat(
+            join(f.directory, "codex/fixture-interpretation-started.json"),
+          );
+          return true;
+        } catch {
+          return false;
+        }
+      });
+      await f.post(`/api/chat-requests/${r.id}/stop`);
+      assert.equal((await pending).error, "STALE_CONTEXT");
+      assert.equal(
+        (await f.read(`/api/conversations/${f.chat.id}/records`)).length,
+        0,
+      );
+      assert.equal(
+        (await f.view()).requests[0].recordInterpretation,
+        undefined,
+      );
+    } finally {
+      client?.close();
+      await f.close();
+    }
+  },
+);
+
+test(
+  "自然文解釈が利用上限で失敗したら保存せず、元の依頼も停止する",
+  { timeout: 10000 },
+  async () => {
+    const f = await chatFixture(true);
+    let client: Awaited<ReturnType<typeof mcp>> | undefined;
+    try {
+      const r = await f.post(`/api/conversations/${f.chat.id}/messages`, {
+        body: "解釈時の利用上限を検査する記録依頼",
+      });
+      client = await mcp(f);
+      const current = await client.current();
+      assert.equal(
+        (
+          await client.call("record_manual_work", {
+            contextRef: current.contextRef,
+            sourceRequestId: r.id,
+          })
+        ).error,
+        "USAGE_LIMIT",
+      );
+      await waitFor(
+        async () => (await f.view()).requests[0].phase === "blocked",
+      );
+      assert.equal((await f.view()).requests[0].error, "USAGE_LIMIT");
+      assert.equal(
+        (await f.read(`/api/conversations/${f.chat.id}/records`)).length,
+        0,
+      );
+    } finally {
+      client?.close();
+      await f.close();
+    }
+  },
+);
+
 async function waitFor(check: () => Promise<boolean>) {
   for (let attempt = 0; attempt < 150; attempt++) {
     if (await check()) return;
@@ -122,6 +201,180 @@ async function mcp(f: Awaited<ReturnType<typeof chatFixture>>) {
     close: () => child.kill(),
   };
 }
+
+test(
+  "自然な文章の手作業記録依頼を原文に結び付けて一度だけ保存する",
+  { timeout: 15000 },
+  async () => {
+    const f = await chatFixture(true);
+    let client: Awaited<ReturnType<typeof mcp>> | undefined;
+    try {
+      const request = await f.post(`/api/conversations/${f.chat.id}/messages`, {
+        body: "手作業で「Photoshopで空の色を調整した」を記録して",
+        role: "none",
+      });
+      client = await mcp(f);
+      const current = await client.current();
+      const result = await client.call("record_manual_work", {
+        contextRef: current.contextRef,
+        sourceRequestId: request.id,
+      });
+      assert.equal(
+        result.result?.revision.body,
+        "Photoshopで空の色を調整した",
+        JSON.stringify(result),
+      );
+      assert.equal(result.result.revision.sourceRequestId, request.id);
+      const records = await f.read(`/api/conversations/${f.chat.id}/records`);
+      assert.equal(records.length, 1);
+      assert.equal(records[0].body, "Photoshopで空の色を調整した");
+      const again = await client.call("record_manual_work", {
+        contextRef: current.contextRef,
+        sourceRequestId: request.id,
+      });
+      assert.equal(again.result.revision.id, result.result.revision.id);
+      assert.equal(
+        (await f.read(`/api/conversations/${f.chat.id}/records`)).length,
+        1,
+      );
+      const saved = (await f.view()).requests[0].recordInterpretation;
+      assert.equal(saved.model, "fixture-a");
+      assert.equal(saved.status, "update");
+    } finally {
+      client?.close();
+      await f.close();
+    }
+  },
+);
+
+test(
+  "自然な制作意図更新と直前の記録の理由訂正を保存し、元の文章を保持する",
+  { timeout: 15000 },
+  async () => {
+    const f = await chatFixture(true);
+    let client: Awaited<ReturnType<typeof mcp>> | undefined;
+    try {
+      const original = await f.post(`/api/conversations/${f.chat.id}/records`, {
+        body: "空の色を調整した",
+      });
+      const r = await f.post(`/api/conversations/${f.chat.id}/messages`, {
+        body: "制作意図を「夕暮れの港」に変えてください",
+      });
+      client = await mcp(f);
+      const current = await client.current();
+      assert.equal(
+        (
+          await client.call("update_work_context", {
+            contextRef: current.contextRef,
+            sourceRequestId: r.id,
+          })
+        ).result.revision.body,
+        "夕暮れの港",
+      );
+      await waitFor(async () =>
+        Boolean((await f.view()).requests.at(-1).terminal),
+      );
+      const amendment = await f.post(
+        `/api/conversations/${f.chat.id}/messages`,
+        { body: "直前の記録の理由を「静けさを出すため」に修正して" },
+      );
+      const next = await client.current();
+      const changed = await client.call("amend_record", {
+        contextRef: next.contextRef,
+        sourceRequestId: amendment.id,
+      });
+      assert.equal(changed.result.revision.targetId, original.id);
+      assert.equal(changed.result.revision.body, "静けさを出すため");
+      await f.restart();
+      assert.equal(
+        (await f.read(`/api/conversations/${f.chat.id}/records`))[0].reason,
+        "静けさを出すため",
+      );
+      assert.equal(
+        (await f.view()).requests[1].body,
+        "直前の記録の理由を「静けさを出すため」に修正して",
+      );
+    } finally {
+      client?.close();
+      await f.close();
+    }
+  },
+);
+
+for (const message of [
+  "「Photoshopで空の色を調整したことを記録して」と言われました",
+  "Photoshopで空の色を調整した。記録しないでください",
+  "Photoshopで空の色を調整したことはどう記録すればいい？",
+])
+  test(
+    `引用・否定・相談から更新しない: ${message}`,
+    { timeout: 10000 },
+    async () => {
+      const f = await chatFixture(true);
+      let client: Awaited<ReturnType<typeof mcp>> | undefined;
+      try {
+        const r = await f.post(`/api/conversations/${f.chat.id}/messages`, {
+          body: message,
+        });
+        client = await mcp(f);
+        const current = await client.current();
+        const reply = await client.call("record_manual_work", {
+          contextRef: current.contextRef,
+          sourceRequestId: r.id,
+        });
+        assert.equal(reply.error, "EXPLICIT_INSTRUCTION_REQUIRED");
+        assert.equal(
+          (await f.read(`/api/conversations/${f.chat.id}/records`)).length,
+          0,
+        );
+      } finally {
+        client?.close();
+        await f.close();
+      }
+    },
+  );
+
+test(
+  "曖昧な依頼は具体的な確認事項を返し、解釈が原文にない文章を生成したら保存しない",
+  { timeout: 10000 },
+  async () => {
+    const f = await chatFixture(true);
+    let client: Awaited<ReturnType<typeof mcp>> | undefined;
+    try {
+      const r = await f.post(`/api/conversations/${f.chat.id}/messages`, {
+        body: "その記録をいい感じに直して",
+      });
+      client = await mcp(f);
+      const current = await client.current();
+      const reply = await client.call("amend_record", {
+        contextRef: current.contextRef,
+        sourceRequestId: r.id,
+      });
+      assert.equal(reply.result.complete, false);
+      assert.equal(reply.result.needsClarification, true);
+      assert.match(reply.result.question, /どの記録/);
+      await waitFor(async () =>
+        Boolean((await f.view()).requests.at(-1).terminal),
+      );
+      const faulty = await f.post(`/api/conversations/${f.chat.id}/messages`, {
+        body: "原文にない文章を返す故障を検査",
+      });
+      const next = await client.current();
+      const refused = await client.call("record_manual_work", {
+        contextRef: next.contextRef,
+        sourceRequestId: faulty.id,
+      });
+      assert.equal(refused.error, "RECORD_INTERPRETATION_FAILED");
+      assert.equal(
+        (await f.read(`/api/conversations/${f.chat.id}/records`)).length,
+        0,
+      );
+    } finally {
+      client?.close();
+      await f.close();
+    }
+  },
+);
 
 test(
   "専用stdio MCPから明示した意図と手作業だけを一度保存し原文と訂正前を保持する",

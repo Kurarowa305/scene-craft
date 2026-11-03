@@ -1,5 +1,6 @@
 import type { DatabaseSync } from "node:sqlite";
-import { randomUUID } from "node:crypto";
+import { randomUUID, createHash } from "node:crypto";
+import type { RecordInstruction } from "../shared/record-instruction.js";
 import type { ChatRequest } from "../shared/chat.js";
 import { OperationError } from "./store.js";
 
@@ -16,9 +17,9 @@ export interface TextRevision {
   createdAt: string;
 }
 
-// Only literal, whole-message commands confer write authority. Model prose,
-// summaries and quoted instructions cannot authorize a shared-state update.
-export function explicitInstruction(body: string) {
+// Fast path for existing shorthand. Other wording is interpreted in a separate
+// tool-free thread and bound to the original human message before applying.
+export function explicitInstruction(body: string): RecordInstruction | null {
   const intent = /^制作意図を更新: ([\s\S]+)$/.exec(body);
   if (intent)
     return { tool: "update_work_context", field: "intent", body: intent[1] };
@@ -27,7 +28,10 @@ export function explicitInstruction(body: string) {
     return { tool: "record_manual_work", field: "body", body: record[1] };
   const amend =
     /^記録を訂正: ([a-f0-9-]{36}) (body|reason|summary) ([\s\S]+)$/.exec(body);
-  if (amend)
+  if (
+    amend &&
+    (amend[2] === "body" || amend[2] === "reason" || amend[2] === "summary")
+  )
     return {
       tool: "amend_record",
       targetId: amend[1],
@@ -116,7 +120,13 @@ export function contextStore(db: DatabaseSync) {
     return state ? (JSON.parse(state.data as string).reason ?? null) : null;
   }
   function apply(r: ChatRequest, tool: string, args: Record<string, unknown>) {
-    const directive = explicitInstruction(r.body);
+    const resolved = r.recordInterpretation;
+    if (
+      resolved &&
+      resolved.sourceHash !== createHash("sha256").update(r.body).digest("hex")
+    )
+      throw new OperationError(403, "EXPLICIT_INSTRUCTION_REQUIRED");
+    const directive = explicitInstruction(r.body) ?? resolved?.instruction;
     if (!directive || directive.tool !== tool || args.sourceRequestId !== r.id)
       throw new OperationError(403, "EXPLICIT_INSTRUCTION_REQUIRED");
     // No model-authored value, target, role or work ID can enlarge this directive.
@@ -179,5 +189,14 @@ export function contextStore(db: DatabaseSync) {
       );
     return { operationId: revision.id, complete: true, revision };
   }
-  return { context, history, apply, latest };
+  function recordTargets(workId: string) {
+    return db
+      .prepare(
+        `SELECT r.id, r.body FROM records r JOIN conversations c ON c.id = r.conversation_id
+      WHERE c.work_id = ? ORDER BY r.sequence DESC LIMIT 50`,
+      )
+      .all(workId)
+      .map((row) => latest({ id: row.id as string, body: row.body as string }));
+  }
+  return { context, history, apply, latest, recordTargets };
 }

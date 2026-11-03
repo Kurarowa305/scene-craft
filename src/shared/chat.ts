@@ -1,4 +1,5 @@
 import type { VersionPlan } from "./versions.js";
+import type { RecordInterpretation } from "./record-instruction.js";
 export interface ModelChoice {
   model: string;
   effort: string;
@@ -25,6 +26,7 @@ export interface ChatItem {
   complete: boolean;
 }
 export interface ChatRequest {
+  recordInterpretation?: RecordInterpretation;
   role?: string;
   contextSnapshot?: unknown;
   instructions?: string;

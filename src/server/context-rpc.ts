@@ -5,6 +5,8 @@ import { join } from "node:path";
 import { randomBytes, randomUUID, timingSafeEqual } from "node:crypto";
 import { OperationError, type openStore } from "./store.js";
 import type { ChatRequest } from "../shared/chat.js";
+import { explicitInstruction } from "./context-store.js";
+import type { RecordInterpretation } from "../shared/record-instruction.js";
 
 export const contextTools = [
   "get_execution_context",
@@ -42,6 +44,13 @@ export async function startContextRpc(store: ReturnType<typeof openStore>) {
   const connections = new Map<string, string>();
   let generation = randomUUID();
   const sockets = new Set<Socket>();
+  let interpret:
+    | ((
+        request: ChatRequest,
+        stillCurrent: () => boolean,
+      ) => Promise<RecordInterpretation>)
+    | undefined;
+  const interpretations = new Map<string, Promise<RecordInterpretation>>();
   function authorize(input: any): ChatRequest {
     const credential =
       typeof input?.credential === "string"
@@ -74,8 +83,8 @@ export async function startContextRpc(store: ReturnType<typeof openStore>) {
       throw new OperationError(403, "STALE_CONTEXT");
     return r;
   }
-  function call(input: any) {
-    const r = authorize(input);
+  async function call(input: any) {
+    let r = authorize(input);
     const args = input.args;
     const tool = input.tool;
     if (!contextTools.includes(tool))
@@ -89,13 +98,54 @@ export async function startContextRpc(store: ReturnType<typeof openStore>) {
       ["update_work_context", "record_manual_work", "amend_record"].includes(
         tool,
       )
-    )
+    ) {
+      // Validate the acting model's narrow arguments BEFORE any interpretation.
+      if (args.sourceRequestId !== r.id)
+        throw new OperationError(403, "EXPLICIT_INSTRUCTION_REQUIRED");
+      if (
+        Object.keys(args).some(
+          (key) =>
+            !["sourceRequestId", "contextRef", "operationId"].includes(key),
+        )
+      )
+        throw new OperationError(403, "PERMISSION_DENIED");
+      if (!explicitInstruction(r.body) && !r.recordInterpretation) {
+        if (!interpret)
+          throw new OperationError(409, "RECORD_INTERPRETATION_FAILED");
+        const key = `${r.id}:${r.retryCount}`;
+        const stillCurrent = () => {
+          try {
+            authorize(input);
+            return true;
+          } catch {
+            return false;
+          }
+        };
+        let pending = interpretations.get(key);
+        if (!pending) {
+          pending = interpret(r, stillCurrent);
+          interpretations.set(key, pending);
+        }
+        const resolution = await pending;
+        r = authorize(input);
+        r.recordInterpretation = resolution;
+        store.chat.save(r);
+      }
+      r = authorize(input);
       return store.contextOperation(
         args.operationId,
         r.id,
         { tool, args },
-        () => store.context.apply(r, tool, args),
+        () =>
+          r.recordInterpretation?.status === "clarification"
+            ? {
+                complete: false,
+                needsClarification: true,
+                question: r.recordInterpretation.question,
+              }
+            : store.context.apply(r, tool, args),
       );
+    }
     if (tool === "record_human_decision")
       throw new OperationError(409, "FEATURE_UNAVAILABLE");
     const keys = [
@@ -137,8 +187,9 @@ export async function startContextRpc(store: ReturnType<typeof openStore>) {
     sockets.add(socket);
     socket.on("close", () => sockets.delete(socket));
     socket.on("error", () => {});
-    socket.setTimeout(30000, () => socket.destroy());
+    socket.setTimeout(60000, () => socket.destroy());
     let buffer = "";
+    let queued = Promise.resolve();
     socket.setEncoding("utf8");
     socket.on("data", (data) => {
       buffer += data;
@@ -150,18 +201,23 @@ export async function startContextRpc(store: ReturnType<typeof openStore>) {
       while ((end = buffer.indexOf("\n")) >= 0) {
         const line = buffer.slice(0, end);
         buffer = buffer.slice(end + 1);
-        try {
-          socket.write(
-            JSON.stringify({ result: call(JSON.parse(line)) }) + "\n",
-          );
-        } catch (error) {
-          socket.write(
-            JSON.stringify({
-              error:
-                error instanceof OperationError ? error.code : "RPC_REJECTED",
-            }) + "\n",
-          );
-        }
+        queued = queued.then(async () => {
+          try {
+            const result = await call(JSON.parse(line));
+            if (!socket.destroyed)
+              socket.write(JSON.stringify({ result }) + "\n");
+          } catch (error) {
+            if (!socket.destroyed)
+              socket.write(
+                JSON.stringify({
+                  error:
+                    error instanceof OperationError
+                      ? error.code
+                      : "RPC_REJECTED",
+                }) + "\n",
+              );
+          }
+        });
       }
     });
   });
@@ -172,6 +228,9 @@ export async function startContextRpc(store: ReturnType<typeof openStore>) {
   await chmod(endpoint.socketPath, 0o600);
   return {
     endpoint,
+    setInterpreter(value: NonNullable<typeof interpret>) {
+      interpret = value;
+    },
     configuration(conversationId: string) {
       let credential = connections.get(conversationId);
       if (!credential) {

@@ -178,5 +178,12 @@ test("モデル選択・SSE再接続・会話継続・停止を画面から行�
   await expect(
     page.getByText("Photoshop / 理由：明暗差を整えるため", { exact: true }),
   ).toBeVisible();
+  await page
+    .getByLabel("Codexへのメッセージ")
+    .fill("手作業で「Photoshopで空の色を調整した」を記録して");
+  await page.getByRole("button", { name: "Codexへ送信", exact: true }).click();
+  await expect(
+    page.getByText("Photoshopで空の色を調整した", { exact: true }).first(),
+  ).toBeVisible();
   await page.screenshot({ path: "test-results/chat.png", fullPage: true });
 });
