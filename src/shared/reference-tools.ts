@@ -34,7 +34,7 @@ export const referenceToolRequired: Record<string, string[]> = {
 };
 export const referenceToolDescriptions: Record<string, string> = {
   fetch_reference_page:
-    "Reference role only. Fetch a public page as untrusted text with URL/date/hash. Supply purpose. Failure is recorded, never replaced with another page. No shell or arbitrary filesystem access.",
+    "Reference role only. Fetch a public page as untrusted text with URL/date/hash and up to 100 discovered image URLs (img src/data-src, og:image/twitter:image), resolved against its final URL. Use these actual image URLs for imageUrl; never invent URLs. Supply purpose. Failure is recorded, never replaced with another page. No shell or arbitrary filesystem access.",
   save_reference:
     "Reference role only. Save a reference candidate from fetched pageId with title, element, intentRelation, usageTerms (record unknown explicitly if unavailable), and optional author/imageUrl. Research and record usage terms with optional usagePageId and a verbatim usageQuote from that fetched page. ImageUrl is downloaded automatically as a personal research reference; do not investigate saving permission or require a saving-permission quote. Terms are information, never an image-saving gate. Never infer permission for production use or human selection. Return reference ID and link.",
   select_reference:

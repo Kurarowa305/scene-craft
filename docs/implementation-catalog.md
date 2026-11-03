@@ -22,7 +22,7 @@
 | `update_work_intent` | 実装済み | UPDATE：既存意図への追記・部分編集・書き直し | 同上 |
 | `create_manual_record` | 実装済み | CREATE：新規手作業文章、または明示された既存記録の全文置換 | 新規時records追加、text_revisions追加 |
 | `update_manual_record` | 実装済み | UPDATE：既存手作業本文への追記・部分編集・書き直し。省略入力で指定した要約・旧理由の訂正もこのツールで処理 | text_revisions追加。records原文は保持 |
-| `fetch_reference_page` | 実装済み・参考工程のみ | 公開URLを取得し、目的・取得先・確認日時・本文・hashまたは失敗を固定 | reference_pages追加、context_operations・receipts追加 |
+| `fetch_reference_page` | 実装済み・参考工程のみ | 公開URLを取得し、目的・取得先・確認日時・本文・ページ内の画像URL（最大100件）・hashまたは失敗を固定 | reference_pages追加、context_operations・receipts追加 |
 | `save_reference` | 実装済み・参考工程のみ | 取得済みページから候補を保存。出典・参考要素・意図との関係と条件根拠を保持。利用条件を情報として記録（不明も保持）。imageUrlがあれば保存条件の調査なしで取得し、検査成功したPNG/JPEG/WebPを管理ルートへ固定 | reference_pages参照、reference_candidates追加、context_operations・receipts追加 |
 | `select_reference` | 実装済み・メインのみ | 現在の人間原文全文と作品内候補を、同じ選択モデルのツールなし解釈threadへ渡して直接の参考選択を判定。対象が一致するときだけ参考として選択。曖昧・否定・質問・翻訳依頼等は保存せず確認待ち。原文に任意理由を含めて保持し、未選択は不採用にしない | reference_candidates参照、reference_selections追加、context_operations・receipts追加 |
 | `record_human_decision` | 公開済み・未実装 | `FEATURE_UNAVAILABLE`を返す | 変更なし |
@@ -440,7 +440,7 @@ LLM不要の記録原文・手作業原文。
 
 | JSON保存項目 | 内容 |
 | --- | --- |
-| `data` | `id,workId,requestId,conversationId,threadId,turnId,attempt,url,finalUrl,purpose,checkedAt,status,text,sha256,error`。statusはavailable/broken/failed/stopped。sha256は取得バイト列、textはHTML除去等をした本文。停止時も取得履歴を保持 |
+| `data` | `id,workId,requestId,conversationId,threadId,turnId,attempt,url,finalUrl,purpose,checkedAt,status,text,images,sha256,error`。statusはavailable/broken/failed/stopped。sha256は取得バイト列、textはHTML除去等をした本文。imagesは最大100件の`{url,alt}`。img src/data-srcとog:image/twitter:imageを最終URL基準で絶対URL化し、非公開/不正URLを除外する。旧記録では未設定。停止時も取得履歴を保持 |
 
 #### reference_searches
 

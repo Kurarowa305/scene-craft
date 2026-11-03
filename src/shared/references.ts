@@ -10,6 +10,7 @@ export interface ReferencePage {
   url: string;
   finalUrl: string;
   purpose: string;
+  images?: { url: string; alt: string | null }[];
   checkedAt: string;
   status: "available" | "broken" | "failed" | "stopped";
   text: string;

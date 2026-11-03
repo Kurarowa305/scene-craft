@@ -8,5 +8,7 @@
     "reference-preview.png": "Click candidate -> shared ImagePreview, zoom120%, fit100%, live selection and reload"
   },
   "realCodex": "not_run",
-  "windowsHumanCheck": "not_run"
+  "windowsHumanCheck": "not_run",
+  "sourceCommit": "42f0c16",
+  "portalChecks": "1280px and 390px; both design pages; no page overflow; screenshot load, TOC anchor and print styles verified"
 }

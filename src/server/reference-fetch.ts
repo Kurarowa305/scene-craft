@@ -182,3 +182,53 @@ export function imageMime(bytes: Buffer) {
     return "image/webp";
   return null;
 }
+/** Surface actual page image URLs rather than asking the model to invent them. */
+export function referenceImages(
+  bytes: Buffer,
+  mime: string,
+  baseUrl: string,
+): { url: string; alt: string | null }[] {
+  if (!["text/html", "application/xhtml+xml"].includes(mime)) return [];
+  const html = bytes
+    .toString("utf8")
+    .replace(/<(script|style|noscript)\b[^>]*>[\s\S]*?<\/\1>/gi, " ");
+  const result = new Map<string, { url: string; alt: string | null }>();
+  const decode = (text: string) =>
+    text
+      .replace(/&amp;/gi, "&")
+      .replace(/&quot;/gi, '"')
+      .replace(/&#39;/g, "'");
+  for (const tag of html.match(/<(?:img|meta)\b[^>]*>/gi) ?? []) {
+    const attrs = new Map<string, string>();
+    for (const match of tag.matchAll(
+      /([^\s=<>]+)\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]+))/g,
+    ))
+      attrs.set(
+        match[1].toLowerCase(),
+        decode(match[2] ?? match[3] ?? match[4]),
+      );
+    const values = /^<img\b/i.test(tag)
+      ? [attrs.get("data-src"), attrs.get("src")]
+      : ["og:image", "twitter:image"].includes(
+            attrs.get("property") ?? attrs.get("name") ?? "",
+          )
+        ? [attrs.get("content")]
+        : [];
+    for (const value of values) {
+      if (!value) continue;
+      try {
+        const url = publicReferenceUrl(new URL(value, baseUrl).href);
+        if (!result.has(url))
+          result.set(url, {
+            url,
+            alt: attrs.get("alt")?.slice(0, 500) ?? null,
+          });
+        break;
+      } catch {
+        /* Try the next attribute when a lazy placeholder is not a public URL. */
+      }
+    }
+    if (result.size === 100) break;
+  }
+  return [...result.values()];
+}

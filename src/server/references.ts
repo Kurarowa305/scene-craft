@@ -11,6 +11,7 @@ import {
   fetchReference,
   publicReferenceUrl,
   referenceText,
+  referenceImages,
   imageMime,
   type ReferenceFetcher,
 } from "./reference-fetch.js";
@@ -114,6 +115,11 @@ export function referenceService(
             page.error = `HTTP_${response.status}`;
           } else {
             page.text = referenceText(response.bytes, response.mime);
+            page.images = referenceImages(
+              response.bytes,
+              response.mime,
+              page.finalUrl,
+            );
             page.sha256 = hash(response.bytes);
             page.status = "available";
           }

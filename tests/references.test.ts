@@ -125,7 +125,9 @@ test("専用MCPで出典付き候補を保存し、人間の選択原文と画�
     url,
     status: 200,
     mime: "text/html",
-    bytes: Buffer.from("<p>Harbor photograph. Copyright unknown.</p>"),
+    bytes: Buffer.from(
+      '<p>Harbor photograph. Copyright unknown.</p><img src="/images/harbor.png" alt="Harbor"><img src="http://127.0.0.1/private.png"><img src="data:image/png;base64,placeholder" data-src="/images/lazy.png"><meta property="og:image" content="/images/cover.png">',
+    ),
   }));
   let client: Awaited<ReturnType<typeof mcp>> | undefined;
   try {
@@ -141,6 +143,11 @@ test("専用MCPで出典付き候補を保存し、人間の選択原文と画�
       purpose: "港の構造",
     });
     assert.equal(page.result?.page.status, "available", JSON.stringify(page));
+    assert.deepEqual(page.result.page.images, [
+      { url: "https://example.org/images/harbor.png", alt: "Harbor" },
+      { url: "https://example.org/images/lazy.png", alt: null },
+      { url: "https://example.org/images/cover.png", alt: null },
+    ]);
     const args = {
       contextRef: c.contextRef,
       operationId: crypto.randomUUID(),
