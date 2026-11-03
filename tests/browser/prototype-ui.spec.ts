@@ -86,6 +86,9 @@ test("入力欄の＋で画像をLLMに添付し、送信前と発言直上に�
     ),
   });
   await expect(page.locator(".draft-images img")).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "成果物・ファイルを添付", exact: true }),
+  ).toBeEnabled();
   await page.screenshot({ path: "test-results/chat-image-draft.png" });
   await expect(
     page.getByRole("button", { name: "Codexへ送信", exact: true }),

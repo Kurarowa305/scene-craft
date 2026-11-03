@@ -423,7 +423,8 @@ export function Chat({
               {images.error}
             </p>
           )}
-          {images.items.some((item) => !item.uploaded) && (
+          {images.busy && <p role="status">画像を添付中…</p>}
+          {!images.busy && images.items.some((item) => !item.uploaded) && (
             <button
               type="button"
               disabled={busy || images.busy}
