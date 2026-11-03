@@ -14,6 +14,8 @@ import { gitVersions } from "./versions.js";
 import { registerChat } from "./chat.js";
 import { connectCodex, type CodexConnection } from "./codex.js";
 import { text, bodySchema, idParams } from "./http-schema.js";
+import { startContextRpc } from "./context-rpc.js";
+import type { DefinitionManifest } from "../shared/versions.js";
 
 interface AppOptions {
   directory: string;
@@ -55,6 +57,18 @@ export async function createApp(options: AppOptions) {
   const csrfToken = randomBytes(32).toString("hex");
   const session = randomBytes(32).toString("hex");
   let codexPromise: Promise<CodexConnection> | undefined;
+  const contextRpc = await startContextRpc(store);
+  function definition(plan: {
+    definition: import("../shared/versions.js").GitReference;
+  }) {
+    return JSON.parse(
+      versions().content(
+        plan.definition,
+        "definition",
+        plan.definition.manifest,
+      ).content,
+    ) as DefinitionManifest;
+  }
   registerChat(
     app,
     store,
@@ -72,6 +86,7 @@ export async function createApp(options: AppOptions) {
       codexPromise ??= connectCodex(
         options.codexBinary,
         options.directory,
+        contextRpc.endpoint,
       ).catch((error) => {
         codexPromise = undefined;
         throw error;
@@ -86,8 +101,51 @@ export async function createApp(options: AppOptions) {
     (plan) => {
       versions().prepare(plan.definition, plan.style);
     },
+    contextRpc,
+    (workId, plan, role) => {
+      const manifest = definition(plan);
+      const selected = manifest.roles.find((r) => r.id === role);
+      if (role !== "none" && !selected)
+        throw new OperationError(409, "ROLE_UNAVAILABLE");
+      const instructions = selected
+        ? [...selected.instructions, ...selected.procedures]
+            .map(
+              (path) =>
+                versions().content(plan.definition, "definition", path).content,
+            )
+            .join("\n")
+        : "相談と明示した記録更新だけを行う。制作操作を開始しない。";
+      return {
+        snapshot: {
+          ...store.context.context(workId),
+          states: store.states(workId),
+          plan,
+        },
+        instructions,
+      };
+    },
+  );
+  app.get("/api/roles", async () => {
+    const ref = store.defaultDefinition();
+    return ref
+      ? definition({ definition: ref }).roles.map((r) => ({
+          id: r.id,
+          description: r.description,
+        }))
+      : [];
+  });
+  app.get<{ Params: { id: string } }>(
+    "/api/works/:id/context",
+    { schema: { params: idParams } },
+    async (request) => store.context.context(request.params.id),
+  );
+  app.get<{ Params: { id: string } }>(
+    "/api/works/:id/record-history",
+    { schema: { params: idParams } },
+    async (request) => store.context.history(request.params.id),
   );
   app.addHook("onClose", async () => {
+    await contextRpc.close();
     store.close();
   });
   app.addHook("onRequest", async (request, reply) => {

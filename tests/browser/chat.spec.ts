@@ -18,6 +18,7 @@ test("モデル選択・SSE再接続・会話継続・停止を画面から行�
   await expect(page.getByLabel("会話モデル", { exact: true })).toHaveValue(
     "fixture-a",
   );
+  await page.getByLabel("工程", { exact: true }).selectOption("reference");
   await page.getByLabel("Codexへのメッセージ").fill("港について相談");
   await page.getByRole("button", { name: "Codexへ送信", exact: true }).click();
   await expect(page.getByText("応答中", { exact: true })).toBeVisible();
@@ -31,6 +32,10 @@ test("モデル選択・SSE再接続・会話継続・停止を画面から行�
   await expect(page.getByText("港について相談", { exact: true })).toHaveCount(
     1,
   );
+  await expect(
+    page.getByText("工程: reference", { exact: true }),
+  ).toBeVisible();
+  await page.getByLabel("工程", { exact: true }).selectOption("none");
   await page
     .getByLabel("会話モデル", { exact: true })
     .selectOption("fixture-b");
@@ -60,5 +65,16 @@ test("モデル選択・SSE再接続・会話継続・停止を画面から行�
     page.getByRole("button", { name: "接続状態を更新" }),
   ).toBeEnabled();
   await expect(page.getByText("完了", { exact: true })).toHaveCount(2);
+  await page
+    .getByLabel("Codexへのメッセージ")
+    .fill("制作意図を更新: 夕暮れの静かな港");
+  await page.getByRole("button", { name: "Codexへ送信", exact: true }).click();
+  await expect(
+    page.getByText("明示した内容を記録しました", { exact: true }),
+  ).toBeVisible();
+  await page.getByText("共有情報と更新履歴", { exact: true }).click();
+  await expect(
+    page.getByText("現在の制作意図: 夕暮れの静かな港", { exact: true }),
+  ).toBeVisible();
   await page.screenshot({ path: "test-results/chat.png", fullPage: true });
 });

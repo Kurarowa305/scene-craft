@@ -1,6 +1,80 @@
 #!/usr/bin/env node
 // External protocol fixture only; the application uses its production stdio adapter.
 import { createInterface } from "node:readline";
+import { writeFileSync, readFileSync } from "node:fs";
+import { join } from "node:path";
+import { spawn } from "node:child_process";
+async function recordInstruction(context, body) {
+  const tool = body.startsWith("制作意図を更新: ")
+    ? "update_work_context"
+    : body.startsWith("手作業を記録: ")
+      ? "record_manual_work"
+      : body.startsWith("記録を訂正: ")
+        ? "amend_record"
+        : null;
+  if (!tool) return "保存される返答";
+  const config = readFileSync(
+    join(process.env.CODEX_HOME, "config.toml"),
+    "utf8",
+  );
+  const get = (key) =>
+    JSON.parse(new RegExp("^" + key + " = (.+)$", "m").exec(config)[1]);
+  const child = spawn(get("command"), get("args"), {
+    env: {
+      ...process.env,
+      SCENE_CRAFT_RPC_SOCKET: get("SCENE_CRAFT_RPC_SOCKET"),
+      SCENE_CRAFT_RPC_CREDENTIAL: get("SCENE_CRAFT_RPC_CREDENTIAL"),
+    },
+    stdio: "pipe",
+  });
+  child.stderr.resume();
+  return new Promise((resolve) => {
+    const timer = setTimeout(() => {
+      child.kill();
+      resolve("記録できませんでした");
+    }, 3000);
+    child.once("exit", () => {
+      clearTimeout(timer);
+      resolve("記録できませんでした");
+    });
+    createInterface({ input: child.stdout }).on("line", (line) => {
+      const reply = JSON.parse(line);
+      if (reply.id === 1)
+        child.stdin.write(
+          JSON.stringify({
+            jsonrpc: "2.0",
+            id: 2,
+            method: "tools/call",
+            params: {
+              name: tool,
+              arguments: {
+                contextRef: context.contextRef,
+                sourceRequestId: context.sourceRequestId,
+                operationId: crypto.randomUUID(),
+              },
+            },
+          }) + "\n",
+        );
+      if (reply.id === 2) {
+        child.kill();
+        resolve(
+          reply.result.isError
+            ? "記録できませんでした"
+            : "明示した内容を記録しました",
+        );
+      }
+    });
+    child.stdin.write(
+      JSON.stringify({
+        jsonrpc: "2.0",
+        id: 1,
+        method: "initialize",
+        params: {},
+      }) + "\n",
+    );
+    child.on("error", () => resolve("記録できませんでした"));
+  });
+}
 let next = 0;
 const threads = new Map();
 const send = (v) => process.stdout.write(JSON.stringify(v) + "\n");
@@ -35,10 +109,16 @@ createInterface({ input: process.stdin }).on("line", (line) => {
     if (!threads.has(id)) threads.set(id, []);
     result = { thread: { id }, model: p.model, modelProvider: "openai" };
   }
+  if (m.method === "thread/unsubscribe") result = { status: "unsubscribed" };
   if (m.method === "turn/start") {
     const turn = { id: `turn-${++next}`, status: "inProgress", items: [] };
     threads.get(p.threadId).push(turn);
     result = { turn };
+    if (p.additionalContext)
+      writeFileSync(
+        join(process.env.CODEX_HOME, "fixture-context.json"),
+        JSON.stringify(p.additionalContext),
+      );
     setTimeout(() => {
       if (turn.status !== "inProgress") return;
       send({
@@ -51,12 +131,15 @@ createInterface({ input: process.stdin }).on("line", (line) => {
         },
       });
     }, 150);
-    setTimeout(() => {
+    setTimeout(async () => {
+      if (turn.status !== "inProgress") return;
+      const text = await recordInstruction(
+        JSON.parse(p.additionalContext?.["scene-craft"]?.value ?? "{}"),
+        p.input[0].text,
+      );
       if (turn.status !== "inProgress") return;
       turn.status = "completed";
-      turn.items = [
-        { id: `item-${turn.id}`, type: "agentMessage", text: "保存される返答" },
-      ];
+      turn.items = [{ id: `item-${turn.id}`, type: "agentMessage", text }];
       send({
         method: "item/completed",
         params: { threadId: p.threadId, turnId: turn.id, item: turn.items[0] },

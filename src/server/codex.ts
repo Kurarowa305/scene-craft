@@ -3,6 +3,8 @@ import { createInterface } from "node:readline";
 import { mkdir, writeFile } from "node:fs/promises";
 import { join, dirname } from "node:path";
 import { OperationError } from "./store.js";
+import { fileURLToPath } from "node:url";
+import type { McpEndpoint } from "./context-rpc.js";
 
 // JSON is decoded only at this external protocol boundary. Raw errors never leave it.
 export interface CodexConnection {
@@ -15,6 +17,7 @@ export interface CodexConnection {
 export async function connectCodex(
   binary: string,
   directory: string,
+  mcp?: McpEndpoint,
 ): Promise<CodexConnection> {
   const home = join(directory, "codex");
   const cwd = join(directory, "chat-workspace");
@@ -22,7 +25,14 @@ export async function connectCodex(
   await mkdir(cwd, { recursive: true, mode: 0o700 });
   // Own this configuration. Never inherit user's providers, MCP servers or hooks.
   const config = `forced_login_method = "chatgpt"\ncli_auth_credentials_store = "file"\nmodel_provider = "openai"\nweb_search = "disabled"\napproval_policy = "never"\nsandbox_mode = "read-only"\n[features]\nshell_tool = false\nunified_exec = false\napps = false\nplugins = false\nhooks = false\ncomputer_use = false\nbrowser_use = false\nmulti_agent = false\nimage_generation = false\n`;
-  await writeFile(join(home, "config.toml"), config, { mode: 0o600 });
+  const mcpConfig = mcp
+    ? `\n[mcp_servers.scene_craft]\ncommand = ${JSON.stringify(process.execPath)}\nargs = [${JSON.stringify(fileURLToPath(new URL("./mcp.js", import.meta.url)))}]\nrequired = true\nenabled_tools = ["get_execution_context", "find_records", "read_records", "update_work_context", "record_manual_work", "amend_record", "record_human_decision"]\n[mcp_servers.scene_craft.env]\nSCENE_CRAFT_RPC_SOCKET = ${JSON.stringify(mcp.socketPath)}\nSCENE_CRAFT_RPC_CREDENTIAL = ${JSON.stringify(mcp.credential)}\n`
+    : "";
+  await writeFile(
+    join(home, "config.toml"),
+    "project_doc_max_bytes = 0\n" + config + mcpConfig,
+    { mode: 0o600 },
+  );
   const environment: NodeJS.ProcessEnv = {};
   for (const key of [
     "HOME",

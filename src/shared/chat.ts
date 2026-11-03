@@ -13,6 +13,7 @@ export interface ChatModel {
   supportedReasoningEfforts: { reasoningEffort: string }[];
 }
 export interface ChatSession {
+  instructionKey?: string;
   conversationId: string;
   threadId: string | null;
   selection: ModelChoice | null;
@@ -24,6 +25,9 @@ export interface ChatItem {
   complete: boolean;
 }
 export interface ChatRequest {
+  role?: string;
+  contextSnapshot?: unknown;
+  instructions?: string;
   attempts: {
     stopRequested: boolean;
     turnId: string | null;

@@ -16,6 +16,9 @@ export interface Conversation {
   createdAt: string;
 }
 export interface BodyRecord {
+  originalBody?: string;
+  reason?: string | null;
+  summary?: string | null;
   id: string;
   sequence: number;
   conversationId: string;
