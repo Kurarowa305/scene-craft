@@ -28,9 +28,7 @@ test("一覧は最小幅で一度止まってから折りたたみ、戻せる",
   await expect(handle).toHaveAttribute("aria-valuenow", String(minimum));
 });
 
-test("各入力要素は最小幅でも一列に収まり、メインと右タブを折りたたんで戻せる", async ({
-  page,
-}) => {
+test("メインは最小幅で止まり、右タブを折りたたんで戻せる", async ({ page }) => {
   await page.setViewportSize({ width: 1512, height: 960 });
   await page.goto("/");
   await openWorkDialog(page);
@@ -62,13 +60,16 @@ test("各入力要素は最小幅でも一列に収まり、メインと右タ�
   await page.mouse.move(box.x + 2, box.y + 100);
   await page.mouse.down();
   await page.mouse.move(box.x - 40, box.y + 100);
+  await page.clock.install();
+  await page.clock.runFor(500);
   await expect(
     page.getByRole("button", { name: "メインチャットを表示", exact: true }),
-  ).toBeVisible();
+  ).toHaveCount(0);
+  await expect(handle).toHaveAttribute(
+    "aria-valuenow",
+    (await handle.getAttribute("aria-valuemin")) ?? "",
+  );
   await page.mouse.up();
-  await page
-    .getByRole("button", { name: "メインチャットを表示", exact: true })
-    .click();
   await expect(page.getByLabel("メッセージ", { exact: true })).toHaveValue(
     "幅を戻しても入力を保持",
   );

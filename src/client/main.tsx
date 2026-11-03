@@ -51,6 +51,13 @@ function App() {
   const [records, setRecords] = useState<BodyRecord[]>([]);
   const [recordsLoaded, setRecordsLoaded] = useState(false);
   const recordsFetch = useRef(0);
+  const [initialFile, setInitialFile] = useState<File | null>(null);
+  const creation = useRef<{
+    fileId: string;
+    work?: Work;
+    conversation?: Conversation;
+    input?: ImportInput;
+  } | null>(null);
   const [name, setName] = useState("");
   const [intent, setIntent] = useState("");
   const [styleChoice, setStyleChoice] = useState("none");
@@ -144,21 +151,83 @@ function App() {
   function createWork(event: FormEvent) {
     event.preventDefault();
     void action(async () => {
-      const created = await write<Work>("/api/works", {
-        name,
-        styleCommit: styleChoice === "none" ? null : styleCommit,
-        ...(intent ? { intent } : {}),
-      });
-      setWorks((previous) =>
-        previous.some((item) => item.id === created.id)
-          ? previous
-          : [...previous, created],
-      );
-      setConversationId("");
-      setWorkId(created.id);
-      setModal(null);
-      setName("");
-      setIntent("");
+      if (initialFile && !/\.(blend|psd|psb)$/i.test(initialFile.name))
+        throw new Error(
+          "既存ファイルは.blend、.psd、.psbから選択してください。",
+        );
+      const attempt = initialFile
+        ? (creation.current ??= { fileId: crypto.randomUUID() })
+        : null;
+      const created =
+        attempt?.work ??
+        (await write<Work>("/api/works", {
+          name,
+          styleCommit: styleChoice === "none" ? null : styleCommit,
+          ...(intent ? { intent } : {}),
+        }));
+      if (attempt && initialFile) {
+        attempt.work = created;
+        attempt.conversation ??= await write<Conversation>(
+          `/api/works/${created.id}/conversations`,
+          {},
+        );
+        if (!attempt.input) {
+          const uploaded = await uploadFile(
+            attempt.conversation.id,
+            attempt.fileId,
+            initialFile,
+          );
+          attempt.input = {
+            requestKey: crypto.randomUUID(),
+            body: `${initialFile.name}を取り込みました。`,
+            application:
+              uploaded.file.role === "blend" ? "Blender" : "Photoshop",
+            beforeStateId: null,
+            files: [uploaded.file],
+          };
+        }
+        await write(
+          `/api/conversations/${attempt.conversation.id}/imports`,
+          attempt.input as unknown as Record<string, unknown>,
+          false,
+        );
+      }
+      finishWorkCreation(created, attempt?.conversation?.id ?? "");
+    });
+  }
+  function finishWorkCreation(created: Work, createdConversationId: string) {
+    setWorks((previous) =>
+      previous.some((item) => item.id === created.id)
+        ? previous
+        : [...previous, created],
+    );
+    setConversationId(createdConversationId);
+    setWorkId(created.id);
+    setModal(null);
+    setName("");
+    setIntent("");
+    setInitialFile(null);
+    creation.current = null;
+  }
+  function stopInitialImport() {
+    void action(async () => {
+      const attempt = creation.current;
+      if (!attempt?.work) return;
+      if (attempt.input) {
+        const operations = await read<ImportOperation[]>(
+          `/api/works/${attempt.work.id}/imports`,
+        );
+        const operation = operations.find(
+          (item) => item.requestKey === attempt.input?.requestKey,
+        );
+        if (operation?.phase === "reconciling")
+          throw new Error(
+            "保存状態を確認中です。同じ内容で再試行してください。",
+          );
+        if (operation?.phase === "incomplete")
+          await write(`/api/imports/${operation.id}/abandon`, {});
+      }
+      finishWorkCreation(attempt.work, attempt.conversation?.id ?? "");
     });
   }
   function createConversation(target: string) {
@@ -316,6 +385,12 @@ function App() {
           <button
             className="pane-restore"
             aria-label="チャット一覧を表示"
+            disabled={!panes.canRestore(0)}
+            title={
+              panes.canRestore(0)
+                ? "チャット一覧を表示"
+                : "ウィンドウを広げると表示できます"
+            }
             onClick={() => panes.restore(0)}
           >
             ☰
@@ -438,15 +513,6 @@ function App() {
             className={`main-chat ${panes.collapsed[1] ? "pane-collapsed" : ""}`}
             aria-label="メインチャット"
           >
-            {panes.collapsed[1] && (
-              <button
-                className="pane-restore"
-                aria-label="メインチャットを表示"
-                onClick={() => panes.restore(1)}
-              >
-                ▤
-              </button>
-            )}
             <header className="chat-header">
               <h1>
                 {conversationId
@@ -668,6 +734,12 @@ function App() {
               <button
                 className="pane-restore"
                 aria-label="右タブを表示"
+                disabled={!panes.canRestore(2)}
+                title={
+                  panes.canRestore(2)
+                    ? "右タブを表示"
+                    : "ウィンドウを広げると表示できます"
+                }
                 onClick={() => panes.restore(2)}
               >
                 ▣
@@ -714,16 +786,7 @@ function App() {
                     recordRevision={recordRevision}
                     onBusy={setBusy}
                     workId={workId}
-                    conversationId={conversationId}
                     disabled={busy || loading || uploading || pendingImport}
-                    onRecord={(record) => {
-                      setRecords((previous) =>
-                        previous.some((item) => item.id === record.id)
-                          ? previous
-                          : [...previous, record],
-                      );
-                      setRecordRevision((value) => value + 1);
-                    }}
                   />
                 ) : undefined
               }
@@ -762,7 +825,7 @@ function App() {
                 maxLength={200}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                disabled={busy}
+                disabled={busy || Boolean(creation.current)}
                 autoFocus
                 placeholder="例：夕暮れの港"
               />
@@ -773,7 +836,7 @@ function App() {
                 maxLength={20000}
                 value={intent}
                 onChange={(e) => setIntent(e.target.value)}
-                disabled={busy}
+                disabled={busy || Boolean(creation.current)}
                 rows={3}
                 placeholder="この作品で表現したいこと"
               />
@@ -783,7 +846,7 @@ function App() {
               <select
                 aria-label="作品の作風"
                 value={styleChoice}
-                disabled={busy}
+                disabled={busy || Boolean(creation.current)}
                 onChange={(e) => setStyleChoice(e.target.value)}
               >
                 <option value="none">作風なし</option>
@@ -798,17 +861,31 @@ function App() {
                   pattern="([a-f0-9]{40}|[a-f0-9]{64})"
                   value={styleCommit}
                   onChange={(e) => setStyleCommit(e.target.value)}
-                  disabled={busy}
+                  disabled={busy || Boolean(creation.current)}
                 />
               </label>
             )}
-            <p className="hint">
-              空の作品を作成します。制作ファイルはチャットの＋から添付できます。
-            </p>
+            <label className="field">
+              既存ファイルから始める（任意）
+              <input
+                type="file"
+                accept=".blend,.psd,.psb"
+                disabled={busy || Boolean(creation.current)}
+                onChange={(event) =>
+                  setInitialFile(event.target.files?.[0] ?? null)
+                }
+              />
+              {initialFile && <span>{initialFile.name}</span>}
+            </label>
             {error && (
               <p className="error" role="alert">
                 {error}
               </p>
+            )}
+            {error && creation.current?.work && (
+              <button type="button" disabled={busy} onClick={stopInitialImport}>
+                取り込みを中止して作品を開く
+              </button>
             )}
             <div className="dialog-footer">
               <button
@@ -829,7 +906,7 @@ function App() {
                   !name.trim()
                 }
               >
-                作品を作成
+                {creation.current ? "同じ内容で再試行" : "作品を作成"}
               </button>
             </div>
           </form>

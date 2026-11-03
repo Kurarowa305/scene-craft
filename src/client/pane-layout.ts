@@ -43,13 +43,14 @@ export function usePaneLayout(root: RefObject<HTMLDivElement | null>) {
       next[i]! -= take;
       excess -= take;
     }
-    for (const i of [2, 0, 1].filter((i) => i !== protect)) {
+    for (const i of [2, 0].filter((i) => i !== protect)) {
       if (excess <= 0) break;
       if (next[i] === rail) continue;
       remembered.current[i] = next[i]!;
       excess -= next[i]! - rail;
       next[i] = rail;
     }
+    if (excess > 0) return [...widthsRef.current];
     const recipient = [2, 1, 0].find((i) => next[i] !== rail) ?? 2;
     next[recipient]! -= excess;
     return next;
@@ -149,7 +150,7 @@ export function usePaneLayout(root: RefObject<HTMLDivElement | null>) {
           : -1;
     if (pane === pending.current?.pane) return;
     cancelPending();
-    if (pane < 0 || !drag.current) return;
+    if (pane < 0 || pane === 1 || !drag.current) return;
     pending.current = {
       pane,
       timer: setTimeout(() => {
@@ -167,6 +168,12 @@ export function usePaneLayout(root: RefObject<HTMLDivElement | null>) {
   return {
     widths,
     collapsed: widths.map((w) => w === rail),
+    canRestore(pane: number) {
+      return (
+        minimums.current[1] + minimums.current[pane]! + rail <=
+        available.current
+      );
+    },
     restore(pane: number) {
       if (widthsRef.current[pane] !== rail) return;
       const next: Widths = [...widthsRef.current];

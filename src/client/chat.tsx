@@ -511,11 +511,9 @@ export function Chat({
             )}
           </div>
         </form>
-        <p className="composer-footnote">
-          {side
-            ? "制作データ・記録は変更しません"
-            : "保存済みデータが対象 · 記録として送信はAIを使わず保存します"}
-        </p>
+        {side && (
+          <p className="composer-footnote">制作データ・記録は変更しません</p>
+        )}
       </div>
     </section>
   );

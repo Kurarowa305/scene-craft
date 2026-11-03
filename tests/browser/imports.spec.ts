@@ -1,112 +1,126 @@
-import { recordBodies } from "./ui-helpers";
-import {
-  openWorkDialog,
-  openSettings,
-  openArtifacts,
-  choosePanel,
-} from "./ui-helpers";
 import { test, expect } from "@playwright/test";
+import { openWorkDialog, openArtifacts, recordBodies } from "./ui-helpers";
 
-test("制作ファイルを取り込み、手修正の変更前後と任意理由を開き直して確認する", async ({
+test("作品作成で既存ファイルを選んで取り込み、成果物タブから開き直せる", async ({
   page,
 }) => {
   await page.goto("/");
   await openWorkDialog(page);
-  await page.getByLabel("作品名").fill("ファイル取り込みの作品");
   await page
-    .getByRole("dialog", { name: "作品を作成" })
+    .getByLabel("作品名", { exact: true })
+    .fill("最初のファイルから開始");
+  await page
+    .getByLabel("既存ファイルから始める", { exact: false })
+    .setInputFiles({
+      name: "drawing.psd",
+      mimeType: "application/octet-stream",
+      buffer: Buffer.from("saved production source"),
+    });
+  await page.screenshot({
+    path: "test-results/issue-102-create-work-file.png",
+  });
+  await page
+    .getByRole("dialog")
     .getByRole("button", { name: "作品を作成", exact: true })
     .click();
-  await page
-    .getByRole("button", {
-      name: "ファイル取り込みの作品に新しいチャット",
-      exact: true,
-    })
-    .click();
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  await expect(page.getByLabel("メッセージ", { exact: true })).toBeVisible();
+  await expect(page.getByText(/保存済みデータが対象/)).toHaveCount(0);
   await openArtifacts(page);
-  await page.getByText("制作ファイルを添付して記録", { exact: true }).click();
-  await page.getByLabel("作業アプリ").selectOption("Photoshop");
-  await page
-    .getByLabel("PSD / PSBファイル（フォルダー内の相対パス）")
-    .fill("drawing.psd");
-  await page.getByLabel("ファイル記録の本文").fill("最初の取り込み");
-  await page
-    .getByRole("button", { name: "ファイルと本文を記録", exact: true })
-    .click();
+  await expect(
+    page.getByText("制作ファイルを添付して記録", { exact: true }),
+  ).toHaveCount(0);
   await expect(page.locator(".saved-state")).toHaveCount(1);
   await expect(page.locator(".saved-state")).toContainText(
     "取り込み前の経緯は不明",
   );
-  await page
-    .getByLabel("PSD / PSBファイル（フォルダー内の相対パス）")
-    .fill("after.psb");
-  await page.getByLabel("ファイル記録の本文").fill("色を調整\n暖かくしたい");
-  await expect(page.getByLabel("手修正の理由（任意）")).toHaveCount(0);
-  await page
-    .getByRole("button", { name: "ファイルと本文を記録", exact: true })
-    .click();
-  await expect(page.locator(".saved-state")).toHaveCount(2);
-  await expect(page.locator(".saved-state").nth(1)).toContainText(
-    "変更前：保存状態 1 → 変更後：保存状態 2",
-  );
+  await expect
+    .poll(() => recordBodies(page, "最初のファイルから開始"))
+    .toEqual(["drawing.psdを取り込みました。"]);
   await page.reload();
   await page
-    .getByRole("button", { name: "ファイル取り込みの作品", exact: true })
+    .getByRole("button", { name: "最初のファイルから開始", exact: true })
     .click();
   await page
     .getByRole("button", { name: "未命名のチャット 1", exact: true })
     .click();
   await openArtifacts(page);
-  await expect(page.locator(".saved-state").nth(1)).toContainText(
-    "暖かくしたい",
-  );
-  await expect
-    .poll(() => recordBodies(page, "ファイル取り込みの作品"))
-    .toEqual(["最初の取り込み", "色を調整\n暖かくしたい"]);
-  await page.screenshot({ path: "test-results/imports.png", fullPage: true });
+  await expect(page.locator(".saved-state")).toHaveCount(1);
 });
 
-test("失敗時は入力と未完成を保ち、中止後に修正したファイルで登録できる", async ({
+test("初期取り込みの応答を失っても同じ作品と会話で再試行する", async ({
   page,
 }) => {
   await page.goto("/");
   await openWorkDialog(page);
-  await page.getByLabel("作品名").fill("取り込みの失敗");
+  await page.getByLabel("作品名", { exact: true }).fill("初期取り込み再試行");
   await page
-    .getByRole("dialog", { name: "作品を作成" })
+    .getByLabel("既存ファイルから始める", { exact: false })
+    .setInputFiles({
+      name: "start.blend",
+      mimeType: "application/octet-stream",
+      buffer: Buffer.from("blend source"),
+    });
+  let lost = false;
+  const inputs: string[] = [];
+  await page.route("**/api/conversations/*/imports", async (route) => {
+    inputs.push(route.request().postData()!);
+    if (lost) return route.continue();
+    lost = true;
+    await route.fetch();
+    await route.abort("failed");
+  });
+  const dialog = page.getByRole("dialog");
+  await dialog.getByRole("button", { name: "作品を作成", exact: true }).click();
+  await expect(dialog.getByRole("alert")).toBeVisible();
+  await expect(page.getByLabel("作品名", { exact: true })).toBeDisabled();
+  await dialog
+    .getByRole("button", { name: "同じ内容で再試行", exact: true })
+    .click();
+  await expect(dialog).toHaveCount(0);
+  expect(inputs).toHaveLength(2);
+  expect(inputs[1]).toBe(inputs[0]);
+  const works = await (await page.request.get("/api/works")).json();
+  const matches = works.filter(
+    (w: { name: string }) => w.name === "初期取り込み再試行",
+  );
+  expect(matches).toHaveLength(1);
+  const chats = await (
+    await page.request.get(`/api/works/${matches[0].id}/conversations`)
+  ).json();
+  expect(chats).toHaveLength(1);
+  await openArtifacts(page);
+  await expect(page.locator(".saved-state")).toHaveCount(1);
+});
+
+test("初期ファイルの受け渡しが失敗しても作成済み作品を開いて続けられる", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await openWorkDialog(page);
+  await page.getByLabel("作品名", { exact: true }).fill("取り込みをやめて継続");
+  await page
+    .getByLabel("既存ファイルから始める", { exact: false })
+    .setInputFiles({
+      name: "failed.psd",
+      mimeType: "application/octet-stream",
+      buffer: Buffer.from("saved source"),
+    });
+  await page.route("**/api/conversations/*/attachments/*", (route) =>
+    route.abort("failed"),
+  );
+  await page
+    .getByRole("dialog")
     .getByRole("button", { name: "作品を作成", exact: true })
     .click();
   await page
-    .getByRole("button", {
-      name: "取り込みの失敗に新しいチャット",
-      exact: true,
-    })
+    .getByRole("button", { name: "取り込みを中止して作品を開く", exact: true })
     .click();
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  await expect(page.getByLabel("メッセージ", { exact: true })).toBeVisible();
   await openArtifacts(page);
-  await page.getByText("制作ファイルを添付して記録", { exact: true }).click();
-  await page
-    .getByLabel("PSD / PSBファイル（フォルダー内の相対パス）")
-    .fill("absent.psd");
-  await page.getByLabel("ファイル記録の本文").fill("保持する原文");
-  await page
-    .getByRole("button", { name: "ファイルと本文を記録", exact: true })
-    .click();
-  await expect(
-    page.getByRole("button", { name: "未完成の登録を中止" }),
-  ).toBeVisible();
-  await expect(page.getByLabel("ファイル記録の本文")).toHaveValue(
-    "保持する原文",
-  );
   await expect(page.locator(".saved-state")).toHaveCount(0);
-  await page.getByRole("button", { name: "未完成の登録を中止" }).click();
-  await page
-    .getByLabel("PSD / PSBファイル（フォルダー内の相対パス）")
-    .fill("drawing.psd");
-  await page
-    .getByRole("button", { name: "ファイルと本文を記録", exact: true })
-    .click();
-  await expect(page.locator(".saved-state")).toHaveCount(1);
-  await expect
-    .poll(() => recordBodies(page, "取り込みの失敗"))
-    .toEqual(["保持する原文"]);
+  await openWorkDialog(page);
+  await expect(page.getByLabel("作品名", { exact: true })).toBeEnabled();
+  await expect(page.getByLabel("作品名", { exact: true })).toHaveValue("");
 });
