@@ -100,9 +100,14 @@ export function registerChat(
     if (!job || launched.has(job.id) || !store.auxiliary.pending(job.id))
       return;
     launched.add(job.id);
+    let storageFailed = false;
     const changed = () => {
-      store.auxiliary.save(job);
-      publish(job.conversationId);
+      try {
+        store.auxiliary.save(job);
+        publish(job.conversationId);
+      } catch {
+        storageFailed = true;
+      }
     };
     const task = (async () => {
       try {
@@ -114,25 +119,53 @@ export function registerChat(
         const text = await runAuxiliary(
           c,
           job,
-          () => auxiliaryAllowed(job),
+          () => !storageFailed && auxiliaryAllowed(job),
           changed,
         );
-        if (!auxiliaryAllowed(job))
+        if (storageFailed || !auxiliaryAllowed(job))
           throw new OperationError(409, "AUXILIARY_STOPPED");
         store.auxiliary.finish(job, text);
+        if (job.kind === "summary") {
+          const latest = chat.requests(job.conversationId).at(-1);
+          if (
+            latest &&
+            latest.id !== job.sourceRequestId &&
+            latest.phase === "completed" &&
+            !latest.stopRequested &&
+            !latest.error
+          )
+            schedule(latest, "summary");
+        }
       } catch (error) {
         job.error =
           error instanceof OperationError ? error.code : "AUXILIARY_FAILED";
         job.status = job.error === "AUXILIARY_STOPPED" ? "stopped" : "failed";
         job.finishedAt = new Date().toISOString();
-        store.auxiliary.save(job);
-        if (["AUTH_REQUIRED", "USAGE_LIMIT"].includes(job.error))
-          store.auxiliary.pause(job);
+        try {
+          store.auxiliary.save(job);
+          if (["AUTH_REQUIRED", "USAGE_LIMIT"].includes(job.error))
+            store.auxiliary.pause(job);
+        } catch {
+          /* Keep the durable original; pending ownership is recovered on restart. */
+        }
       }
-      publish(job.conversationId);
-    })();
+      try {
+        publish(job.conversationId);
+      } catch {
+        /* Storage may be unavailable. */
+      }
+    })().catch(() => {
+      /* A helper must never terminate the production process. */
+    });
     auxiliaryRuns.add(task);
     void task.finally(() => auxiliaryRuns.delete(task));
+  }
+  function schedule(r: ChatRequest, kind: AuxiliaryJob["kind"]) {
+    try {
+      launch(store.auxiliary.create(r, kind));
+    } catch {
+      /* Auxiliary persistence failure cannot reject an accepted production request. */
+    }
   }
   let attached: CodexConnection | undefined;
   let detach: (() => void) | undefined;
@@ -176,21 +209,25 @@ export function registerChat(
     chat.save(r);
     contextRpc.bind(r);
     for (const fn of subscribers.get(r.conversationId) ?? []) fn();
-    if (
-      r.terminal &&
-      !r.stopRequested &&
-      !r.error &&
-      r.phase === "completed" &&
-      !store.auxiliary
-        .view(r.conversationId)
-        .jobs.some(
-          (j) =>
-            j.kind === "summary" &&
-            j.sourceRequestId === r.id &&
-            j.generation === r.retryCount,
-        )
-    )
-      launch(store.auxiliary.create(r, "summary"));
+    try {
+      if (
+        r.terminal &&
+        !r.stopRequested &&
+        !r.error &&
+        r.phase === "completed" &&
+        !store.auxiliary
+          .view(r.conversationId)
+          .jobs.some(
+            (j) =>
+              j.kind === "summary" &&
+              j.sourceRequestId === r.id &&
+              j.generation === r.retryCount,
+          )
+      )
+        schedule(r, "summary");
+    } catch {
+      /* Production state was saved independently of the helper. */
+    }
   }
   function classify(info: unknown): string {
     if (info === "usageLimitExceeded" || info === "sessionBudgetExceeded")
@@ -791,7 +828,7 @@ export function registerChat(
         req.body.role ?? "none",
         (workId, plan) => fixedContext(workId, plan, req.body.role ?? "none"),
       );
-      launch(store.auxiliary.create(r, "name"));
+      schedule(r, "name");
       void dispatch(r.id);
       return r;
     },

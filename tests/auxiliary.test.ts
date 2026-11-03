@@ -1,6 +1,8 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { chatFixture } from "./chat-fixture.js";
+import { DatabaseSync } from "node:sqlite";
+import { join } from "node:path";
 
 async function until(read: () => Promise<any>, check: (value: any) => boolean) {
   const end = Date.now() + 5000;
@@ -11,6 +13,139 @@ async function until(read: () => Promise<any>, check: (value: any) => boolean) {
   }
   assert.fail("公開操作の保存結果が制限時間内に確定しなかった");
 }
+
+test("要約中に次の依頼が完了しても、その区切りの追加原文を後続要約へ送る", async () => {
+  const f = await chatFixture();
+  let release: (() => void) | undefined;
+  let summaries = 0;
+  try {
+    await f.post("/api/auxiliary/model", { model: "a" });
+    f.setHook((method, p) => {
+      if (
+        method === "thread/start" &&
+        p.baseInstructions?.startsWith("scene-craft auxiliary")
+      )
+        return {
+          thread: { id: `aux-${f.calls.length}` },
+          model: p.model,
+          modelProvider: "openai",
+        };
+      if (method === "turn/start" && p.outputSchema?.properties?.text) {
+        const kind = JSON.parse(p.input[0].text).kind;
+        const turn = {
+          id: `aux-turn-${f.calls.length}`,
+          status: "completed",
+          items: [
+            {
+              type: "agentMessage",
+              text: JSON.stringify({
+                text: kind === "name" ? "港の検討" : "追加原文の要約",
+              }),
+            },
+          ],
+        };
+        if (kind === "summary" && ++summaries === 1)
+          return new Promise((resolve) => {
+            release = () => resolve({ turn });
+          });
+        return { turn };
+      }
+    });
+    await f.send();
+    let r = (await f.view()).requests[0];
+    f.notify("turn/completed", {
+      turn: { id: r.turnId, status: "completed", items: [] },
+    });
+    await until(f.view, (v) =>
+      v.auxiliary.jobs.some(
+        (j: any) => j.kind === "summary" && j.status === "running",
+      ),
+    );
+    const second = await f.send();
+    r = (await f.view()).requests[1];
+    f.notify("turn/completed", {
+      turn: { id: r.turnId, status: "completed", items: [] },
+    });
+    release?.();
+    const result = await until(
+      f.view,
+      (v) => v.auxiliary.summaries.length === 2,
+    );
+    assert.ok(
+      result.auxiliary.summaries[1].sources.some(
+        (s: any) => s.id === `request:${second.id}`,
+      ),
+    );
+    assert.equal(result.auxiliary.pending.length, 0);
+  } finally {
+    release?.();
+    await f.close();
+  }
+});
+
+test("補助結果のDB保存失敗で制作プロセスを終了せず、原文の閲覧と記録を続けられる", async () => {
+  const f = await chatFixture();
+  let release: (() => void) | undefined;
+  const db = new DatabaseSync(join(f.directory, "records.sqlite"));
+  try {
+    await f.post("/api/auxiliary/model", { model: "a" });
+    f.setHook((method, p) => {
+      if (
+        method === "thread/start" &&
+        p.baseInstructions?.startsWith("scene-craft auxiliary")
+      )
+        return {
+          thread: { id: "aux-thread" },
+          model: p.model,
+          modelProvider: "openai",
+        };
+      if (method === "turn/start" && p.threadId === "aux-thread")
+        return new Promise((resolve) => {
+          release = () =>
+            resolve({
+              turn: {
+                id: "aux-done",
+                status: "completed",
+                items: [
+                  {
+                    type: "agentMessage",
+                    text: JSON.stringify({ text: "保存に失敗する会話名" }),
+                  },
+                ],
+              },
+            });
+        });
+    });
+    await f.send();
+    await until(f.view, (v) => v.auxiliary.jobs[0]?.status === "running");
+    // Inject a real SQLite write failure only at the auxiliary storage boundary.
+    db.exec(
+      "CREATE TRIGGER fail_auxiliary BEFORE UPDATE ON auxiliary_jobs BEGIN SELECT RAISE(ABORT,'simulated storage failure'); END;",
+    );
+    release?.();
+    await new Promise((resolve) => setTimeout(resolve, 100));
+    const view = await f.view();
+    assert.equal(view.auxiliary.name, null);
+    assert.equal(view.requests[0].body, "保持する原文");
+    await f.post(`/api/conversations/${f.chat.id}/records`, {
+      body: "補助失敗後の手作業記録",
+    });
+    assert.equal(
+      (await f.read(`/api/conversations/${f.chat.id}/records`))[0].body,
+      "補助失敗後の手作業記録",
+    );
+    db.exec("DROP TRIGGER fail_auxiliary");
+    await f.restart();
+    assert.equal(
+      (await f.view()).auxiliary.jobs[0].error,
+      "PROCESS_INTERRUPTED",
+    );
+  } finally {
+    release?.();
+    db.close();
+    await f.close();
+  }
+});
 
 test("追加原文のみを要約し、初回名を維持し、次の依頼へ訂正済み要約と最新の制作意図を渡す", async () => {
   const f = await chatFixture(true);

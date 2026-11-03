@@ -122,6 +122,15 @@ export function auxiliaryStore(
   const api = {
     view,
     save,
+    name(id: string) {
+      return (
+        (db
+          .prepare(
+            "SELECT name FROM conversation_names WHERE conversation_id=?",
+          )
+          .get(id)?.name as string) ?? null
+      );
+    },
     paused(id: string, requestId: string) {
       return !!db
         .prepare(

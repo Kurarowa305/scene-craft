@@ -1,7 +1,26 @@
 import { useState } from "react";
-import type { AuxiliaryView } from "../shared/auxiliary";
+import type { AuxiliaryView, SourceText } from "../shared/auxiliary";
 import type { ChatModel } from "../shared/chat";
 import { write } from "./api";
+
+function Sources({ title, sources }: { title: string; sources: SourceText[] }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <details onToggle={(e) => setOpen(e.currentTarget.open)}>
+      <summary>{title}</summary>
+      {open &&
+        sources.map((s) => (
+          <div key={s.id}>
+            <code>{s.id}</code>
+            <p className="record-body">
+              {s.body}
+              {!s.complete && "（途中・欠落の可能性）"}
+            </p>
+          </div>
+        ))}
+    </details>
+  );
+}
 
 export function Auxiliary({
   value,
@@ -113,18 +132,10 @@ export function Auxiliary({
               {s.createdAt}
             </p>
             {s.previousId && <p>訂正元: {s.previousId}</p>}
-            <details>
-              <summary>対象原文と根拠 ({s.sources.length} 件)</summary>
-              {s.sources.map((t) => (
-                <div key={t.id}>
-                  <code>{t.id}</code>
-                  <p className="record-body">
-                    {t.body}
-                    {!t.complete && "（途中・欠落の可能性）"}
-                  </p>
-                </div>
-              ))}
-            </details>
+            <Sources
+              title={`対象原文と根拠 (${s.sources.length} 件)`}
+              sources={s.sources}
+            />
             {!value.summaries.some((v) => v.previousId === s.id) && (
               <button
                 onClick={() => {
@@ -160,18 +171,7 @@ export function Auxiliary({
             )}
           </article>
         ))}
-        <details>
-          <summary>未要約の原文</summary>
-          {value.pending.map((s) => (
-            <div key={s.id}>
-              <code>{s.id}</code>
-              <p className="record-body">
-                {s.body}
-                {!s.complete && "（途中）"}
-              </p>
-            </div>
-          ))}
-        </details>
+        <Sources title="未要約の原文" sources={value.pending} />
         <details>
           <summary>補助処理の履歴</summary>
           {value.jobs.map((j) => (

@@ -514,7 +514,7 @@ export function openStore(directory: string) {
           `SELECT ${conversationColumns} FROM conversations WHERE work_id = ? ORDER BY sequence`,
         )
         .all(workId) as unknown as Conversation[];
-      return result.map((c) => ({ ...c, title: auxiliary.view(c.id).name }));
+      return result.map((c) => ({ ...c, title: auxiliary.name(c.id) }));
     },
     createConversation: (key: string, workId: string) =>
       once(key, ["conversation", workId], () => {
