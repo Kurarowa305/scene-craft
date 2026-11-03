@@ -5,6 +5,10 @@ import type { ChatRequest } from "../shared/chat.js";
 import { OperationError } from "./store.js";
 
 export interface TextRevision {
+  action?: "create" | "update";
+  mode?: "replace" | "append" | "edit";
+  addedText?: string;
+  format?: "unified-record-v1";
   id: string;
   workId: string;
   targetId: string;
@@ -20,6 +24,23 @@ export interface TextRevision {
 // Fast path for existing shorthand. Other wording is interpreted in a separate
 // tool-free thread and bound to the original human message before applying.
 export function explicitInstruction(body: string): RecordInstruction | null {
+  const intentAppend = /^制作意図に追記: ([\s\S]+)$/.exec(body);
+  if (intentAppend)
+    return {
+      tool: "update_work_context",
+      field: "intent",
+      mode: "append",
+      body: intentAppend[1],
+    };
+  const recordAppend = /^記録に追記: ([a-f0-9-]{36}) ([\s\S]+)$/.exec(body);
+  if (recordAppend)
+    return {
+      tool: "amend_record",
+      field: "body",
+      mode: "append",
+      targetId: recordAppend[1],
+      body: recordAppend[2],
+    };
   const intent = /^制作意図を更新: ([\s\S]+)$/.exec(body);
   if (intent)
     return { tool: "update_work_context", field: "intent", body: intent[1] };
@@ -42,6 +63,31 @@ export function explicitInstruction(body: string): RecordInstruction | null {
 }
 
 export function contextStore(db: DatabaseSync) {
+  function operation(directive: RecordInstruction) {
+    const action =
+      directive.action ??
+      (directive.mode === "append" || directive.mode === "edit"
+        ? "update"
+        : "create");
+    if (directive.field === "intent")
+      return action === "create" ? "create_work_intent" : "update_work_intent";
+    if (directive.field === "body")
+      return action === "create"
+        ? "create_manual_record"
+        : "update_manual_record";
+    return "legacy_amend";
+  }
+  function acceptsTool(tool: string, directive: RecordInstruction) {
+    const op = operation(directive);
+    return (
+      tool === op ||
+      (tool === "update_work_context" && directive.field === "intent") ||
+      (tool === "record_manual_work" && op === "create_manual_record") ||
+      (tool === "amend_record" &&
+        Boolean(directive.targetId) &&
+        directive.field !== "intent")
+    );
+  }
   function revisions(workId: string): TextRevision[] {
     return db
       .prepare(
@@ -97,19 +143,41 @@ export function contextStore(db: DatabaseSync) {
     const changes = revisions(row!.work_id as string).filter(
       (v) => v.targetId === record.id,
     );
-    if (!changes.length) return record;
+    const originalReason = initialReason(record.id);
+    if (!changes.length && !originalReason) return record;
     const result = {
       ...record,
       originalBody: record.body,
-      reason: initialReason(record.id),
+      reason: originalReason,
       summary: null as string | null,
     };
+    let unified = false;
     for (const revision of changes) {
-      if (revision.field === "body") result.body = revision.body;
-      if (revision.field === "reason") result.reason = revision.body;
+      if (revision.field === "body") {
+        result.body = revision.body;
+        if (revision.format === "unified-record-v1") {
+          unified = true;
+          result.reason = null;
+        }
+      }
+      if (revision.field === "reason") {
+        // Older clients can still submit their old reason command. Keep its text
+        // in the unified note once a record has switched to the new format.
+        if (unified) result.body = appendText(result.body, revision.body);
+        else result.reason = revision.body;
+      }
       if (revision.field === "summary") result.summary = revision.body;
     }
+    if (!unified) result.body = appendText(result.body, result.reason);
     return result;
+  }
+  function appendText(before: string | null, text: string | null) {
+    return before && text ? `${before}\n${text}` : before || text || "";
+  }
+  function recordText(id: string) {
+    const row = db.prepare("SELECT body FROM records WHERE id = ?").get(id);
+    if (!row) throw new OperationError(404, "RECORD_NOT_FOUND");
+    return latest({ id, body: row.body as string });
   }
   function initialReason(recordId: string): string | null {
     const state = db
@@ -127,7 +195,11 @@ export function contextStore(db: DatabaseSync) {
     )
       throw new OperationError(403, "EXPLICIT_INSTRUCTION_REQUIRED");
     const directive = explicitInstruction(r.body) ?? resolved?.instruction;
-    if (!directive || directive.tool !== tool || args.sourceRequestId !== r.id)
+    if (
+      !directive ||
+      !acceptsTool(tool, directive) ||
+      args.sourceRequestId !== r.id
+    )
       throw new OperationError(403, "EXPLICIT_INSTRUCTION_REQUIRED");
     // No model-authored value, target, role or work ID can enlarge this directive.
     const allowed = ["sourceRequestId", "contextRef", "operationId"];
@@ -140,9 +212,12 @@ export function contextStore(db: DatabaseSync) {
       return { operationId: existing.id, complete: true, revision: existing };
     let targetId = r.workId;
     let previousBody: string | null = null;
-    if (tool === "update_work_context") {
+    if (directive.field === "intent") {
       previousBody = context(r.workId).work.intent as string | null;
-    } else if (tool === "record_manual_work") {
+    } else if (
+      operation(directive) === "create_manual_record" &&
+      !directive.targetId
+    ) {
       targetId = randomUUID();
       db.prepare(
         "INSERT INTO records (id, conversation_id, body, created_at) VALUES (?, ?, ?, ?)",
@@ -161,20 +236,37 @@ export function contextStore(db: DatabaseSync) {
         )
         .get(targetId, r.workId);
       if (!record) throw new OperationError(404, "RECORD_NOT_FOUND");
-      if (directive.field === "body") previousBody = record.body as string;
+      if (directive.field === "body") previousBody = recordText(targetId).body;
       if (directive.field === "reason") previousBody = initialReason(targetId);
     }
     const previous = revisions(r.workId)
       .filter((v) => v.targetId === targetId && v.field === directive.field)
       .at(-1);
+    if (directive.field !== "body")
+      previousBody = previous?.body ?? previousBody;
+    if (directive.baseText !== undefined && directive.baseText !== previousBody)
+      throw new OperationError(409, "STALE_RECORD_TEXT");
+    const mode = directive.mode ?? "replace";
+    const nextBody =
+      mode === "append"
+        ? appendText(previousBody, directive.body)
+        : directive.body;
     const revision: TextRevision = {
       id: randomUUID(),
       workId: r.workId,
       targetId,
       field: directive.field,
-      body: directive.body,
+      body: nextBody,
+      mode,
+      action:
+        directive.action ??
+        (mode === "append" || mode === "edit" ? "update" : "create"),
+      ...(directive.field === "body"
+        ? { format: "unified-record-v1" as const }
+        : {}),
+      ...(mode === "append" ? { addedText: directive.body } : {}),
       previousId: previous?.id ?? null,
-      previousBody: previous?.body ?? previousBody,
+      previousBody,
       sourceRequestId: r.id,
       author: "human",
       createdAt: new Date().toISOString(),
@@ -182,9 +274,9 @@ export function contextStore(db: DatabaseSync) {
     db.prepare(
       "INSERT INTO text_revisions (id, work_id, data) VALUES (?, ?, ?)",
     ).run(revision.id, r.workId, JSON.stringify(revision));
-    if (tool === "update_work_context")
+    if (directive.field === "intent")
       db.prepare("UPDATE works SET intent = ? WHERE id = ?").run(
-        directive.body,
+        nextBody,
         r.workId,
       );
     return { operationId: revision.id, complete: true, revision };
@@ -198,5 +290,5 @@ export function contextStore(db: DatabaseSync) {
       .all(workId)
       .map((row) => latest({ id: row.id as string, body: row.body as string }));
   }
-  return { context, history, apply, latest, recordTargets };
+  return { context, history, apply, latest, recordTargets, recordText };
 }

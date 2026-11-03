@@ -161,22 +161,22 @@ test("モデル選択・SSE再接続・会話継続・停止を画面から行�
     .fill(`記録を訂正: ${imported.state.recordId} body 訂正後の手作業本文`);
   await page.getByRole("button", { name: "Codexへ送信", exact: true }).click();
   await expect(
-    page.getByText("訂正後の手作業本文", { exact: true }).first(),
+    page.locator(".record-body").filter({ hasText: /^訂正後の手作業本文/ }),
   ).toBeVisible();
   await page
     .getByLabel("Codexへのメッセージ")
     .fill(`記録を訂正: ${imported.state.recordId} reason 明暗差を整えるため`);
   await page.getByRole("button", { name: "Codexへ送信", exact: true }).click();
   await expect(
-    page.getByText("Photoshop / 理由：明暗差を整えるため", { exact: true }),
+    page.locator(".saved-state-text").filter({ hasText: "明暗差を整えるため" }),
   ).toBeVisible();
   releaseInitial();
   await Promise.all(returned);
   await expect(
-    page.getByText("訂正後の手作業本文", { exact: true }).first(),
+    page.locator(".record-body").filter({ hasText: /^訂正後の手作業本文/ }),
   ).toBeVisible();
   await expect(
-    page.getByText("Photoshop / 理由：明暗差を整えるため", { exact: true }),
+    page.locator(".saved-state-text").filter({ hasText: "明暗差を整えるため" }),
   ).toBeVisible();
   await page
     .getByLabel("Codexへのメッセージ")
@@ -184,6 +184,24 @@ test("モデル選択・SSE再接続・会話継続・停止を画面から行�
   await page.getByRole("button", { name: "Codexへ送信", exact: true }).click();
   await expect(
     page.getByText("Photoshopで空の色を調整した", { exact: true }).first(),
+  ).toBeVisible();
+  await page
+    .getByLabel("Codexへのメッセージ")
+    .fill("直前の記録に「静けさを出すため」を追記して");
+  await page.getByRole("button", { name: "Codexへ送信", exact: true }).click();
+  await expect(
+    page
+      .locator(".record-body")
+      .filter({ hasText: "Photoshopで空の色を調整した\n静けさを出すため" }),
+  ).toBeVisible();
+  await page
+    .getByLabel("Codexへのメッセージ")
+    .fill("直前の記録の「空」を「海」に変更して");
+  await page.getByRole("button", { name: "Codexへ送信", exact: true }).click();
+  await expect(
+    page
+      .locator(".record-body")
+      .filter({ hasText: "Photoshopで海の色を調整した\n静けさを出すため" }),
   ).toBeVisible();
   await page.screenshot({ path: "test-results/chat.png", fullPage: true });
 });

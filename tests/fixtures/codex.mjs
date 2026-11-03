@@ -5,16 +5,23 @@ import { writeFileSync, readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import { spawn } from "node:child_process";
 async function recordInstruction(context, body, threadId) {
+  const naturalTools = {
+    "直前の記録の「空」を「海」に変更して": "update_manual_record",
+    "直前の記録に「静けさを出すため」を追記して": "update_manual_record",
+    "制作意図の「静かな」を「賑やかな」に変更して": "update_work_intent",
+    "制作意図に「夕方の光を重視」を追記して": "update_work_intent",
+  };
   const tool =
-    body === "手作業で「Photoshopで空の色を調整した」を記録して"
-      ? "record_manual_work"
+    naturalTools[body] ??
+    (body === "手作業で「Photoshopで空の色を調整した」を記録して"
+      ? "create_manual_record"
       : body.startsWith("制作意図を更新: ")
         ? "update_work_context"
         : body.startsWith("手作業を記録: ")
           ? "record_manual_work"
           : body.startsWith("記録を訂正: ")
             ? "amend_record"
-            : null;
+            : null);
   if (!tool) return "保存される返答";
   const config = readFileSync(
     join(process.env.CODEX_HOME, "config.toml"),
@@ -148,26 +155,56 @@ createInterface({ input: process.stdin }).on("line", (line) => {
         JSON.stringify({ request: p.clientUserMessageId }),
       );
       const examples = {
+        "制作意図の「静かな」を「賑やかな」に変更して": {
+          tool: "update_work_intent",
+          field: "intent",
+          mode: "edit",
+          body: "賑やかな港",
+          targetId: null,
+        },
+        "直前の記録の「空」を「海」に変更して": {
+          tool: "update_manual_record",
+          field: "body",
+          mode: "edit",
+          body: input.recentRecords[0]?.body.replace("空", "海"),
+          targetId: input.recentRecords[0]?.id ?? null,
+        },
         "手作業で「Photoshopで空の色を調整した」を記録して": {
-          tool: "record_manual_work",
+          tool: "create_manual_record",
           field: "body",
           body: "Photoshopで空の色を調整した",
           targetId: null,
         },
         "制作意図を「夕暮れの港」に変えてください": {
-          tool: "update_work_context",
+          tool: "create_work_intent",
           field: "intent",
           body: "夕暮れの港",
           targetId: null,
         },
-        "直前の記録の理由を「静けさを出すため」に修正して": {
-          tool: "amend_record",
-          field: "reason",
+        "直前の記録に「静けさを出すため」を追記して": {
+          tool: "update_manual_record",
+          field: "body",
+          mode: "append",
           body: "静けさを出すため",
           targetId: input.recentRecords[0]?.id ?? null,
         },
+        "制作意図に「夕方の光を重視」を追記して": {
+          tool: "update_work_intent",
+          field: "intent",
+          mode: "append",
+          body: "夕方の光を重視",
+          targetId: null,
+        },
+        "直前の記録の全文を「空と照明を調整した。落ち着いた雰囲気にするため。」に変更して":
+          {
+            tool: "create_manual_record",
+            field: "body",
+            mode: "replace",
+            body: "空と照明を調整した。落ち着いた雰囲気にするため。",
+            targetId: input.recentRecords[0]?.id ?? null,
+          },
         原文にない文章を返す故障を検査: {
-          tool: "record_manual_work",
+          tool: "create_manual_record",
           field: "body",
           body: "原文に存在しない本文",
           targetId: null,
@@ -185,20 +222,43 @@ createInterface({ input: process.stdin }).on("line", (line) => {
         return;
       }
       const answer = value
-        ? { status: "update", ...value, question: null }
+        ? {
+            status: "update",
+            action:
+              value.mode === "append" || value.mode === "edit"
+                ? "update"
+                : "create",
+            mode: "replace",
+            baseText:
+              value.mode === "append" || value.mode === "edit"
+                ? value.field === "intent"
+                  ? input.currentIntent
+                  : input.recentRecords.find(
+                      (record) => record.id === value.targetId,
+                    )?.body
+                : null,
+            ...value,
+            question: null,
+          }
         : input.currentHumanMessage === "その記録をいい感じに直して"
           ? {
               status: "clarification",
+              action: null,
+              baseText: null,
               tool: null,
               field: null,
+              mode: null,
               body: null,
               targetId: null,
               question: "どの記録のどの文章を、どの内容に訂正しますか？",
             }
           : {
               status: "not_requested",
+              action: null,
+              baseText: null,
               tool: null,
               field: null,
+              mode: null,
               body: null,
               targetId: null,
               question: null,

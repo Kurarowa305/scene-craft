@@ -161,6 +161,163 @@ test(
   },
 );
 
+test(
+  "制作意図へ一度だけ追記し、現在の全文と変更前後を保持する",
+  { timeout: 10000 },
+  async () => {
+    const f = await chatFixture(true);
+    let client: Awaited<ReturnType<typeof mcp>> | undefined;
+    try {
+      let request = await f.post(`/api/conversations/${f.chat.id}/messages`, {
+        body: "制作意図を更新: 静かな港",
+      });
+      client = await mcp(f);
+      let current = await client.current();
+      await client.call("update_work_context", {
+        contextRef: current.contextRef,
+        sourceRequestId: request.id,
+      });
+      await waitFor(async () =>
+        Boolean((await f.view()).requests.at(-1).terminal),
+      );
+      request = await f.post(`/api/conversations/${f.chat.id}/messages`, {
+        body: "制作意図に追記: 夕方の光を重視",
+      });
+      current = await client.current();
+      const args = {
+        contextRef: current.contextRef,
+        sourceRequestId: request.id,
+      };
+      const added = await client.call("update_work_context", args);
+      assert.equal(
+        added.result?.revision.body,
+        "静かな港\n夕方の光を重視",
+        JSON.stringify(added),
+      );
+      assert.equal(added.result.revision.previousBody, "静かな港");
+      assert.equal(added.result.revision.mode, "append");
+      assert.equal(added.result.revision.addedText, "夕方の光を重視");
+      await client.call("update_work_context", args);
+      assert.equal(
+        (await f.read(`/api/works/${f.work.id}/context`)).work.intent,
+        "静かな港\n夕方の光を重視",
+      );
+    } finally {
+      client?.close();
+      await f.close();
+    }
+  },
+);
+
+test(
+  "手作業の既存本文と理由を一つの文章として追記・全文変更し、旧文章を残す",
+  { timeout: 10000 },
+  async () => {
+    const f = await chatFixture(true, true);
+    let client: Awaited<ReturnType<typeof mcp>> | undefined;
+    try {
+      const imported = await f.post(`/api/conversations/${f.chat.id}/imports`, {
+        body: "空の色を調整した",
+        reason: "静けさを出すため",
+        application: "Photoshop",
+        beforeStateId: null,
+        files: [{ rootId: "source", relativePath: "drawing.psd", role: "psd" }],
+      });
+      let records = await f.read(`/api/conversations/${f.chat.id}/records`);
+      assert.equal(records[0].body, "空の色を調整した\n静けさを出すため");
+      let request = await f.post(`/api/conversations/${f.chat.id}/messages`, {
+        body: `記録に追記: ${imported.state.recordId} 照明も調整した。影を柔らかくするため。`,
+      });
+      client = await mcp(f);
+      let current = await client.current();
+      const args = {
+        contextRef: current.contextRef,
+        sourceRequestId: request.id,
+      };
+      const added = await client.call("amend_record", args);
+      assert.equal(
+        added.result.revision.body,
+        "空の色を調整した\n静けさを出すため\n照明も調整した。影を柔らかくするため。",
+      );
+      assert.equal(
+        added.result.revision.previousBody,
+        "空の色を調整した\n静けさを出すため",
+      );
+      await client.call("amend_record", args);
+      await waitFor(async () =>
+        Boolean((await f.view()).requests.at(-1).terminal),
+      );
+      request = await f.post(`/api/conversations/${f.chat.id}/messages`, {
+        body: `記録を訂正: ${imported.state.recordId} body 完成記録。明暗を整えた。`,
+      });
+      current = await client.current();
+      await client.call("amend_record", {
+        contextRef: current.contextRef,
+        sourceRequestId: request.id,
+      });
+      await f.restart();
+      records = await f.read(`/api/conversations/${f.chat.id}/records`);
+      assert.equal(records[0].body, "完成記録。明暗を整えた。");
+      assert.equal(records[0].reason, null);
+      const revisions = (await f.read(`/api/works/${f.work.id}/context`))
+        .revisions;
+      assert.equal(
+        revisions.at(-1).previousBody,
+        "空の色を調整した\n静けさを出すため\n照明も調整した。影を柔らかくするため。",
+      );
+    } finally {
+      client?.close();
+      await f.close();
+    }
+  },
+);
+
+test(
+  "CREATEで制作意図を設定し、UPDATEで既存内容の一部を編集する",
+  { timeout: 10000 },
+  async () => {
+    const f = await chatFixture(true);
+    let client: Awaited<ReturnType<typeof mcp>> | undefined;
+    try {
+      let r = await f.post(`/api/conversations/${f.chat.id}/messages`, {
+        body: "制作意図を更新: 静かな港",
+      });
+      client = await mcp(f);
+      let c = await client.current();
+      const created = await client.call("create_work_intent", {
+        contextRef: c.contextRef,
+        sourceRequestId: r.id,
+      });
+      assert.equal(
+        created.result?.revision.body,
+        "静かな港",
+        JSON.stringify(created),
+      );
+      await waitFor(async () =>
+        Boolean((await f.view()).requests.at(-1).terminal),
+      );
+      r = await f.post(`/api/conversations/${f.chat.id}/messages`, {
+        body: "制作意図の「静かな」を「賑やかな」に変更して",
+      });
+      c = await client.current();
+      const updated = await client.call("update_work_intent", {
+        contextRef: c.contextRef,
+        sourceRequestId: r.id,
+      });
+      assert.equal(
+        updated.result?.revision.body,
+        "賑やかな港",
+        JSON.stringify(updated),
+      );
+      assert.equal(updated.result.revision.action, "update");
+      assert.equal(updated.result.revision.previousBody, "静かな港");
+    } finally {
+      client?.close();
+      await f.close();
+    }
+  },
+);
+
 async function waitFor(check: () => Promise<boolean>) {
   for (let attempt = 0; attempt < 150; attempt++) {
     if (await check()) return;
@@ -299,7 +456,7 @@ test(
 );
 
 test(
-  "自然な制作意図更新と直前の記録の理由訂正を保存し、元の文章を保持する",
+  "自然な制作意図更新と直前の記録への追記を保存し、元の文章を保持する",
   { timeout: 15000 },
   async () => {
     const f = await chatFixture(true);
@@ -325,9 +482,25 @@ test(
       await waitFor(async () =>
         Boolean((await f.view()).requests.at(-1).terminal),
       );
+      const intentAppend = await f.post(
+        `/api/conversations/${f.chat.id}/messages`,
+        { body: "制作意図に「夕方の光を重視」を追記して" },
+      );
+      const intentContext = await client.current();
+      const appendedIntent = await client.call("update_work_context", {
+        contextRef: intentContext.contextRef,
+        sourceRequestId: intentAppend.id,
+      });
+      assert.equal(
+        appendedIntent.result.revision.body,
+        "夕暮れの港\n夕方の光を重視",
+      );
+      await waitFor(async () =>
+        Boolean((await f.view()).requests.at(-1).terminal),
+      );
       const amendment = await f.post(
         `/api/conversations/${f.chat.id}/messages`,
-        { body: "直前の記録の理由を「静けさを出すため」に修正して" },
+        { body: "直前の記録に「静けさを出すため」を追記して" },
       );
       const next = await client.current();
       const changed = await client.call("amend_record", {
@@ -335,15 +508,18 @@ test(
         sourceRequestId: amendment.id,
       });
       assert.equal(changed.result.revision.targetId, original.id);
-      assert.equal(changed.result.revision.body, "静けさを出すため");
+      assert.equal(
+        changed.result.revision.body,
+        "空の色を調整した\n静けさを出すため",
+      );
       await f.restart();
       assert.equal(
-        (await f.read(`/api/conversations/${f.chat.id}/records`))[0].reason,
-        "静けさを出すため",
+        (await f.read(`/api/conversations/${f.chat.id}/records`))[0].body,
+        "空の色を調整した\n静けさを出すため",
       );
       assert.equal(
-        (await f.view()).requests[1].body,
-        "直前の記録の理由を「静けさを出すため」に修正して",
+        (await f.view()).requests[2].body,
+        "直前の記録に「静けさを出すため」を追記して",
       );
     } finally {
       client?.close();
@@ -755,6 +931,72 @@ test(
         (await f.read(`/api/works/${f.work.id}/context`)).revisions[0]
           .previousBody,
         "以前の理由",
+      );
+    } finally {
+      client?.close();
+      await f.close();
+    }
+  },
+);
+
+test(
+  "手作業のUPDATEで一部だけ編集し、CREATEで同じ記録の全文を置き換える",
+  { timeout: 12000 },
+  async () => {
+    const f = await chatFixture(true);
+    let client: Awaited<ReturnType<typeof mcp>> | undefined;
+    try {
+      const original = await f.post(`/api/conversations/${f.chat.id}/records`, {
+        body: "空の色を調整した。静けさを出すため。",
+      });
+      let r = await f.post(`/api/conversations/${f.chat.id}/messages`, {
+        body: "直前の記録の「空」を「海」に変更して",
+      });
+      client = await mcp(f);
+      let c = await client.current();
+      const args = { contextRef: c.contextRef, sourceRequestId: r.id };
+      assert.equal(
+        (await client.call("create_manual_record", args)).error,
+        "EXPLICIT_INSTRUCTION_REQUIRED",
+      );
+      const edited = await client.call("update_manual_record", args);
+      assert.equal(
+        edited.result?.revision.body,
+        "海の色を調整した。静けさを出すため。",
+        JSON.stringify(edited),
+      );
+      assert.equal(edited.result.revision.targetId, original.id);
+      assert.equal(
+        edited.result.revision.previousBody,
+        "空の色を調整した。静けさを出すため。",
+      );
+      await waitFor(async () =>
+        Boolean((await f.view()).requests.at(-1).terminal),
+      );
+      r = await f.post(`/api/conversations/${f.chat.id}/messages`, {
+        body: "直前の記録の全文を「空と照明を調整した。落ち着いた雰囲気にするため。」に変更して",
+      });
+      c = await client.current();
+      const created = await client.call("create_manual_record", {
+        contextRef: c.contextRef,
+        sourceRequestId: r.id,
+      });
+      assert.equal(
+        created.result?.revision.action,
+        "create",
+        JSON.stringify(created),
+      );
+      assert.equal(created.result.revision.targetId, original.id);
+      await f.restart();
+      const records = await f.read(`/api/conversations/${f.chat.id}/records`);
+      assert.equal(records.length, 1);
+      assert.equal(
+        records[0].body,
+        "空と照明を調整した。落ち着いた雰囲気にするため。",
+      );
+      assert.equal(
+        records[0].originalBody,
+        "空の色を調整した。静けさを出すため。",
       );
     } finally {
       client?.close();

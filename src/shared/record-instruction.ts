@@ -1,5 +1,15 @@
 export interface RecordInstruction {
-  tool: "update_work_context" | "record_manual_work" | "amend_record";
+  action?: "create" | "update";
+  mode?: "replace" | "append" | "edit";
+  baseText?: string | null;
+  tool:
+    | "create_work_intent"
+    | "update_work_intent"
+    | "create_manual_record"
+    | "update_manual_record"
+    | "update_work_context"
+    | "record_manual_work"
+    | "amend_record";
   field: "intent" | "body" | "reason" | "summary";
   body: string;
   targetId?: string;

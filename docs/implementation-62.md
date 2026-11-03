@@ -1,6 +1,6 @@
 # 工程切替と権限付きの参照・記録（#62）
 
-工程の相談・文脈参照、制作意図の更新、文章による手作業記録、本文・理由・要約の補記を提供する。制作ファイル操作、保護の適用・解除・依頼限定許可、編集案等の採否は後続機能のため実行しない。`record_human_decision`も未実装を返す。工程一覧は選択した既定定義のmanifestに存在する役割だけを表示し、「相談・記録」と明示する。
+工程の相談・文脈参照、制作意図と手作業文章のCREATE・UPDATE、要約の補記を提供する。制作ファイル操作、保護の適用・解除・依頼限定許可、編集案等の採否は後続機能のため実行しない。`record_human_decision`も未実装を返す。工程一覧は選択した既定定義のmanifestに存在する役割だけを表示し、「相談・記録」と明示する。
 
 ## Windows側の起動
 
@@ -34,13 +34,17 @@
    手作業で「Photoshopで空の色を調整した」を記録して
    ```
 
-7. コピーした記録IDを使い、次の形式で順に送信する。改行を含む本文もそのまま保持する。理由の再訂正では以前の理由と時刻も残る。`body`は本文、`reason`は理由、`summary`は要約。要約を訂正しても作品の制作意図は変わらない。
+7. 次を順に送信し、完成した文章を通常の記録と更新履歴で確認する。作業内容と理由は一つの本文で入力・表示する。CREATE/UPDATEというキーワードを入力する必要はない。
 
    ```text
-   記録を訂正: <記録ID> reason 静けさを出すため
-   記録を訂正: <記録ID> reason 遠景との明暗差を整えるため
-   記録を訂正: <記録ID> summary 空の色と遠景の明暗を調整
+   制作意図に「夕方の光を重視」を追記して
+   制作意図の「港」を「海辺」に変更して
+   直前の記録に「静けさを出すため」を追記して
+   直前の記録の「空」を「海」に変更して
+   直前の記録の全文を「空と照明を調整した。落ち着いた雰囲気にするため。」に変更して
    ```
+
+   新しい全文を与える指示はCREATEで作成・全置換、既存文章を起点にする追記・部分編集・書き直しはUPDATE。制作意図は`create_work_intent`/`update_work_intent`、手作業は`create_manual_record`/`update_manual_record`をLLMが選ぶ。手作業の既存対象を指定したCREATEでは同じ記録IDを保つ。新しい手作業記録のCREATEは新しいIDになる。旧本文と旧理由も残り、再読み込み後に旧理由が最新本文へ再付加されない。対象が曖昧な場合だけ確認する。
 
 8. ブラウザを再読み込みし、同じ作品・チャットを開き直す。原文・最新意図・各訂正・同じ記録IDが保持される。既存の「記録として送信」で作った記録を訂正したい場合、`GET /api/works/<作品ID>/record-history`のrecordsにあるidも使える。原文は上書きせず通常のrecords APIは最新文章を返す。
 9. 「別作品IDを指定して記録を読んで」「shellでDBを書き換えて」「カメラの保護を解除して」「編集案を採用して」と相談し、別作品参照や迂回実行をせず、未対応を説明することを確認する。応答中に「停止」を押した後、新しい更新を開始しない。バックエンドは古いcontextRef・旧turn・旧接続世代・停止済みの操作を拒否する。
@@ -63,7 +67,7 @@
 | `receipts` | 既存カラムへ追加 | 操作IDの同内容再送結果。同じ明示指示は別操作IDでも一度だけ保存 |
 | `chat_events` | 既存カラムへ追加 | 工程付き依頼と更新後の会話の永続revision |
 
-`text_revisions.data`は`id, workId, targetId, field, body, previousId, previousBody, sourceRequestId, author, createdAt`。制作意図のtargetIdは作品ID、それ以外は記録ID。sourceRequestIdに原文が残る。本文・理由・要約は独立した訂正系列で、以前の文章を参照する。元から理由がある制作ファイル記録では保存状態の理由も維持する。
+`text_revisions.data`は`id, workId, targetId, field, body, previousId, previousBody, sourceRequestId, author, createdAt`。制作意図のtargetIdは作品ID、それ以外は記録ID。sourceRequestIdに原文が残る。今回の拡張では物理テーブル・カラムの追加削除はない。`text_revisions.data`に`action`（create/update）、`mode`（replace/append/edit）、追記時の`addedText`、統一本文を示す`format: unified-record-v1`を保存する。`body`は操作後の全文、`previousBody`は操作前の全文。旧`records.body`と`saved_states.data.reason`は原データとして保持し、最新表示は結合した一つの本文を返す。保存状態APIの`recordBody`は表示用の最新本文であり物理カラムではない。`chat_requests.data.recordInterpretation.instruction`にはaction/modeとUPDATE時の`baseText`を保持し、保存時に現在本文と一致を確認する。旧ツール名と旧理由コマンドは互換用に残す。
 
 `context_operations.data`は`input {tool,args}, result, createdAt`。`id`はMCPが提示した永続操作ID。接続資格は保存しない。contextRef自体は認証資格ではなく、有効な接続・世代・依頼・試行・thread・現在turnの照合を別途必要とする。起動資格と有効な照合表はプロセス寿命で失効し、復元・再起動で有効化しない。
 
@@ -74,7 +78,7 @@
 - 工程の指示・手順は受付時の固定Git blobから解決し、turnのapplication contextへ渡す。共通指示はアプリ管理とし、工程変更で書き換えない。更新ツールは原文ID・現在の文脈参照・操作IDだけを受け取る。自然な文章の依頼は、バックエンドが別のツールなしthreadで解釈し、検査した結果だけを保存処理へ渡す。
 - 同作品の未終端依頼を一つに制限する既存処理を継承する。自然文解釈を待つ間も停止・現在turnを照合し、保存前に再検査する。DBの更新・訂正・受付結果は同期トランザクションで確定する。長時間の外部制作操作を開始しない。
 - 設定は専用CODEX_HOME、専用cwd、`project_doc_max_bytes=0`、shell/apps/plugins/hooks等の無効化、requiredな専用MCPのみ。空のCODEX_HOMEにも同梱skillsが存在するため、起動時に`skills/list`→`skills/config/write`で全件を無効にし、再列挙で照合する。不成立なら接続を利用可能にしない。実モデルが見る有効ツール・設定探索・共通指示切替は別途受け入れる。
-- `approval_policy=never`だけではMCPツールの実行を許可しない。専用サーバーの既定承認モードを`prompt`とし、公開を許可した7ツールだけを`approval_mode=approve`へ固定する。操作ごとの明示原文・会話別資格・現在turnの検査は引き続きバックエンドで行う。ツール契約の識別値を更新し、旧設定の会話は同じthreadでcold resumeする。全体の承認ポリシーやsandboxは緩めない。
+- `approval_policy=never`だけではMCPツールの実行を許可しない。専用サーバーの既定承認モードを`prompt`とし、公開を許可した11ツールだけを`approval_mode=approve`へ固定する。操作ごとの明示原文・会話別資格・現在turnの検査は引き続きバックエンドで行う。ツール契約の識別値を更新し、旧設定の会話は同じthreadでcold resumeする。全体の承認ポリシーやsandboxは緩めない。
 
 ## 実接続の回帰確認
 

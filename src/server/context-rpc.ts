@@ -8,13 +8,20 @@ import type { ChatRequest } from "../shared/chat.js";
 import { explicitInstruction } from "./context-store.js";
 import type { RecordInterpretation } from "../shared/record-instruction.js";
 
+export const writeContextTools = [
+  "create_work_intent",
+  "update_work_intent",
+  "create_manual_record",
+  "update_manual_record",
+  "update_work_context",
+  "record_manual_work",
+  "amend_record",
+] as const;
 export const contextTools = [
   "get_execution_context",
   "find_records",
   "read_records",
-  "update_work_context",
-  "record_manual_work",
-  "amend_record",
+  ...writeContextTools,
   "record_human_decision",
 ] as const;
 export interface McpEndpoint {
@@ -94,11 +101,7 @@ export async function startContextRpc(store: ReturnType<typeof openStore>) {
       !/^[a-zA-Z0-9-]{8,100}$/.test(args.operationId)
     )
       throw new OperationError(400, "INVALID_OPERATION_ID");
-    if (
-      ["update_work_context", "record_manual_work", "amend_record"].includes(
-        tool,
-      )
-    ) {
+    if (writeContextTools.includes(tool)) {
       // Validate the acting model's narrow arguments BEFORE any interpretation.
       if (args.sourceRequestId !== r.id)
         throw new OperationError(403, "EXPLICIT_INSTRUCTION_REQUIRED");

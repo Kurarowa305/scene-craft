@@ -193,6 +193,19 @@ export function openStore(directory: string) {
       COMMIT;`);
   }
   const context = contextStore(db);
+  function stateView(state: SavedState): SavedState {
+    const text = context.recordText(state.recordId);
+    return {
+      ...state,
+      recordBody: text.body,
+      reason:
+        "reason" in text
+          ? typeof text.reason === "string"
+            ? text.reason
+            : null
+          : state.reason,
+    };
+  }
   // Existing chats receive their inherited selection before a later choice changes it.
   for (const row of db
     .prepare("SELECT id FROM conversations ORDER BY sequence")
@@ -284,14 +297,9 @@ export function openStore(directory: string) {
             "SELECT data FROM saved_states WHERE work_id = ? ORDER BY sequence",
           )
           .all(workId)
-          .map((row) => {
-            const state = JSON.parse(row.data as string) as SavedState;
-            const text = context.latest({ id: state.recordId, body: "" });
-            return {
-              ...state,
-              reason: "reason" in text ? text.reason : state.reason,
-            };
-          }),
+          .map((row) =>
+            stateView(JSON.parse(row.data as string) as SavedState),
+          ),
       };
     },
     planImport: (conversationId: string, input: ImportInput) => {
@@ -409,7 +417,11 @@ export function openStore(directory: string) {
       const record = db
         .prepare(`SELECT ${recordColumns} FROM records WHERE id = ?`)
         .get(state.recordId) as unknown as BodyRecord;
-      return { operationId: id, state, record };
+      return {
+        operationId: id,
+        state: stateView(state),
+        record: { ...record, ...context.latest(record) },
+      };
     },
     commitImport: (id: string, state: SavedState) => {
       db.exec("BEGIN IMMEDIATE");

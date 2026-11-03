@@ -259,7 +259,8 @@ p {
   font-weight: 500;
   color: #38664e;
 }
-.record-body {
+.record-body,
+.saved-state-text {
   white-space: pre-wrap;
   overflow-wrap: anywhere;
   line-height: 1.9;

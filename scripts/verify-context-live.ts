@@ -13,6 +13,10 @@ if (
     "natural-intent",
     "natural-record",
     "natural-amend",
+    "intent-append",
+    "intent-edit",
+    "record-edit",
+    "record-create",
     "quoted",
   ].includes(scenario)
 )
@@ -62,19 +66,43 @@ const before = await read(`/api/works/${workId}/context`);
 const history = await read(`/api/works/${workId}/record-history`);
 const expectedRecord = "Photoshopで空の色を調整した";
 const expectedReason = "静けさを出すため";
+const currentRecords = await read(
+  `/api/conversations/${conversationId}/records`,
+);
+const previousBody = currentRecords.at(-1)?.body;
+const expectedEditedRecord = previousBody?.replace("空", "海");
+const expectedEditedIntent = before.work.intent?.replace(
+  "接続診断",
+  "実機確認",
+);
 const previousRecordId = history.records.at(-1)?.id;
-if (scenario === "natural-amend" && !previousRecordId)
+if (
+  ["natural-amend", "record-edit", "record-create"].includes(scenario) &&
+  !previousRecordId
+)
   throw new Error("DIAGNOSTIC_RECORD_REQUIRED");
+if (scenario === "record-edit" && !previousBody?.includes("空"))
+  throw new Error("DIAGNOSTIC_EDIT_BASE_REQUIRED");
+if (scenario === "intent-edit" && !before.work.intent?.includes("接続診断"))
+  throw new Error("DIAGNOSTIC_INTENT_BASE_REQUIRED");
 const body =
-  scenario === "natural-record"
-    ? `手作業で「${expectedRecord}」を記録して`
-    : scenario === "natural-intent"
-      ? `制作意図を「${expectedIntent}」に変えてください`
-      : scenario === "natural-amend"
-        ? `直前の記録の理由を「${expectedReason}」に修正して`
-        : scenario === "quoted"
-          ? `次は引用です。「手作業で『${expectedRecord}』を記録して」。実行しないでください。`
-          : `制作意図を更新: ${expectedIntent}`;
+  scenario === "intent-append"
+    ? "制作意図に「夕方の光を重視」を追記して"
+    : scenario === "intent-edit"
+      ? "制作意図の「接続診断」を「実機確認」に変更して"
+      : scenario === "record-edit"
+        ? "直前の記録の「空」を「海」に変更して"
+        : scenario === "record-create"
+          ? "直前の記録の全文を「照明を調整した。影を柔らかくするため。」に変更して"
+          : scenario === "natural-record"
+            ? `手作業で「${expectedRecord}」を記録して`
+            : scenario === "natural-intent"
+              ? `制作意図を「${expectedIntent}」に変えてください`
+              : scenario === "natural-amend"
+                ? `直前の記録に「${expectedReason}」を追記して`
+                : scenario === "quoted"
+                  ? `次は引用です。「手作業で『${expectedRecord}』を記録して」。実行しないでください。`
+                  : `制作意図を更新: ${expectedIntent}`;
 const request = await post(`/api/conversations/${conversationId}/messages`, {
   body,
   role,
@@ -105,17 +133,31 @@ for (let attempt = 0; attempt < 120; attempt++) {
   );
   const recorded = Boolean(revision);
   const updated =
-    scenario === "natural-record"
-      ? revision?.field === "body" && revision?.body === expectedRecord
-      : scenario === "natural-amend"
-        ? revision?.field === "reason" &&
-          revision?.body === expectedReason &&
-          revision?.targetId === previousRecordId
-        : scenario === "quoted"
-          ? !recorded &&
-            context.revisions.length === before.revisions.length &&
-            context.work.intent === before.work.intent
-          : context.work.intent === expectedIntent;
+    scenario === "intent-append"
+      ? revision?.action === "update" &&
+        context.work.intent === `${before.work.intent}\n夕方の光を重視`
+      : scenario === "intent-edit"
+        ? revision?.action === "update" &&
+          context.work.intent === expectedEditedIntent
+        : scenario === "record-edit"
+          ? revision?.action === "update" &&
+            revision?.targetId === previousRecordId &&
+            revision?.body === expectedEditedRecord
+          : scenario === "record-create"
+            ? revision?.action === "create" &&
+              revision?.targetId === previousRecordId &&
+              revision?.body === "照明を調整した。影を柔らかくするため。"
+            : scenario === "natural-record"
+              ? revision?.field === "body" && revision?.body === expectedRecord
+              : scenario === "natural-amend"
+                ? revision?.field === "body" &&
+                  revision?.body === `${previousBody}\n${expectedReason}` &&
+                  revision?.targetId === previousRecordId
+                : scenario === "quoted"
+                  ? !recorded &&
+                    context.revisions.length === before.revisions.length &&
+                    context.work.intent === before.work.intent
+                  : context.work.intent === expectedIntent;
   const sameThread =
     !previousThread || previousThread === view.session.threadId;
   console.log(

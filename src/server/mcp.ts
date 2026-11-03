@@ -59,7 +59,7 @@ lines.on("line", async (line) => {
           description:
             name === "record_human_decision"
               ? "Unavailable: downstream decision handling is not implemented."
-              : `${name}. Use the current contextRef. Writes require the current sourceRequestId and an explicit human instruction, including ordinary natural language; the backend resolves it from the original message. Never provide a replacement text or target as tool arguments. If needsClarification is returned, ask its question without claiming a save. Production/protection changes are unavailable.`,
+              : `${name}. ${name.startsWith("create_") ? "CREATE: new complete text, or replace the complete text of an explicitly identified existing target." : name.startsWith("update_") ? "UPDATE: start from existing text and append or edit according to the human instruction." : ""} Use the current contextRef. Writes require the current sourceRequestId and an explicit human instruction, including ordinary natural language; the backend resolves it from the original message. Never provide a replacement text or target as tool arguments. If needsClarification is returned, ask its question without claiming a save. Production/protection changes are unavailable.`,
           inputSchema: {
             type: "object",
             additionalProperties: false,

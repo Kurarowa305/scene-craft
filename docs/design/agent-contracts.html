@@ -1024,7 +1024,27 @@
                   </td>
                 </tr>
                 <tr>
-                  <th scope="row"><code>update_work_context</code></th>
+                  <th scope="row">
+                    <code>create_work_intent</code> /
+                    <code>update_work_intent</code>
+                  </th>
+                  <td>明示指示原文ID、現在の文脈参照、操作ID</td>
+                  <td>
+                    自然言語からCREATE（全文作成・置換）とUPDATE（既存文章への追記・編集）を解釈する。UPDATEは解釈時と保存時の本文を照合する。
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">
+                    <code>create_manual_record</code> /
+                    <code>update_manual_record</code>
+                  </th>
+                  <td>明示指示原文ID、現在の文脈参照、操作ID</td>
+                  <td>
+                    作業内容と任意の理由を一つの本文で扱う。CREATEは新規作成または指定記録の全文置換、UPDATEは指定記録への追記・編集。以前の全文と原文を保持する。
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row"><code>update_work_context</code>（互換）</th>
                   <td>
                     明示された人間の指示原文ID、制作意図・保護指定・依頼限定許可等の対象と内容
                   </td>

@@ -100,7 +100,7 @@ test("制作ファイルを公開操作で固定し、手修正の前後と原�
     assert.equal(states.currentStateId, next.state.id);
     assert.equal(
       (await get(`/api/conversations/${chat.id}/records`))[1].body,
-      " 明るくした\n",
+      " 明るくした\n\n夕方らしく",
     );
   } finally {
     await app.close();

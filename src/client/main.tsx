@@ -355,7 +355,6 @@ function App() {
                             </time>
                           </div>
                           <p className="record-body">{record.body}</p>
-                          {record.reason && <p>理由: {record.reason}</p>}
                           {record.summary && <p>要約: {record.summary}</p>}
                         </article>
                       ))
