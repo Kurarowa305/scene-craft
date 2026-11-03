@@ -140,11 +140,6 @@ export function References({
   return (
     <section className="reference-detail" aria-label="参考資料の詳細">
       {error && <p role="alert">{error}</p>}
-      {
-        <p>
-          会話でタイトルまたはIDを指定して参考として選べます。趣味の参考調査として画像を保持し、調べた利用条件を記録します。
-        </p>
-      }
       {view?.candidates.length === 0 && <p>まだ参考資料はありません。</p>}
       {view?.candidates
         .filter((c) => c.id === referenceId)

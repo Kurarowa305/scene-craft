@@ -1851,7 +1851,7 @@ dialog .dialog-footer {
   color: var(--muted);
 }
 .reference-record > .preview-wrap {
-  height: calc(100dvh - 80px);
+  height: calc(100dvh - 50px);
   min-height: 360px;
 }
 .reference-detail > p {
