@@ -5,6 +5,7 @@ import { read, write } from "./api";
 import { FileRecords } from "./file-records";
 import { VersionSettings, WorkVersions } from "./versions";
 import { Chat } from "./chat";
+import { References } from "./references";
 import { SideChats } from "./side-chats";
 import "./style.css";
 
@@ -388,6 +389,11 @@ function App() {
                         ),
                       );
                     }}
+                  />
+                  <References
+                    workId={workId}
+                    revision={recordRevision}
+                    compact
                   />
                   <FileRecords
                     recordRevision={recordRevision}

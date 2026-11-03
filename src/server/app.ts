@@ -15,9 +15,11 @@ import { registerChat } from "./chat.js";
 import { connectCodex, type CodexConnection } from "./codex.js";
 import { text, bodySchema, idParams } from "./http-schema.js";
 import { startContextRpc } from "./context-rpc.js";
+import type { ReferenceFetcher } from "./reference-fetch.js";
 import type { DefinitionManifest } from "../shared/versions.js";
 
 interface AppOptions {
+  referenceFetcher?: ReferenceFetcher;
   directory: string;
   gitRepository?: string;
   codex?: CodexConnection;
@@ -34,7 +36,7 @@ interface AppOptions {
 export async function createApp(options: AppOptions) {
   if (options.fileRoots) validateFileRoots(options.fileRoots);
   await mkdir(options.directory, { recursive: true, mode: 0o700 });
-  const store = openStore(options.directory);
+  const store = openStore(options.directory, options.fileRoots?.managed.path);
   function versions() {
     if (!options.gitRepository)
       throw new OperationError(409, "GIT_NOT_CONFIGURED");
@@ -57,7 +59,7 @@ export async function createApp(options: AppOptions) {
   const csrfToken = randomBytes(32).toString("hex");
   const session = randomBytes(32).toString("hex");
   let codexPromise: Promise<CodexConnection> | undefined;
-  const contextRpc = await startContextRpc(store);
+  const contextRpc = await startContextRpc(store, options.referenceFetcher);
   function definition(plan: {
     definition: import("../shared/versions.js").GitReference;
   }) {
@@ -120,6 +122,7 @@ export async function createApp(options: AppOptions) {
           ...store.context.context(workId),
           conversationSummaries: store.auxiliary.context(workId),
           states: store.states(workId),
+          references: store.references.context(workId),
           plan,
           style: plan.style
             ? JSON.parse(
@@ -130,6 +133,50 @@ export async function createApp(options: AppOptions) {
         },
         instructions,
       };
+    },
+  );
+  app.get<{ Params: { id: string } }>(
+    "/api/works/:id/references",
+    { schema: { params: idParams } },
+    async (req) => {
+      store.context.context(req.params.id);
+      return store.references.view(req.params.id);
+    },
+  );
+  app.get<{ Params: { id: string } }>(
+    "/api/references/:id",
+    { schema: { params: idParams } },
+    async (req) => {
+      for (const work of store.works()) {
+        const candidate = store.references
+          .view(work.id)
+          .candidates.find((c) => c.id === req.params.id);
+        if (candidate)
+          return {
+            candidate,
+            page: store.references.page(work.id, candidate.pageId),
+            selections: store.references
+              .view(work.id)
+              .selections.filter((s) => s.referenceId === candidate.id),
+          };
+      }
+      throw new OperationError(404, "REFERENCE_NOT_FOUND");
+    },
+  );
+  app.get<{ Params: { id: string } }>(
+    "/api/references/:id/image",
+    { schema: { params: idParams } },
+    async (req, reply) => {
+      for (const work of store.works()) {
+        const c = store.references
+          .view(work.id)
+          .candidates.find((c) => c.id === req.params.id);
+        if (c)
+          return reply
+            .type(c.image.mime ?? "application/octet-stream")
+            .send(store.references.image(c));
+      }
+      throw new OperationError(404, "REFERENCE_NOT_FOUND");
     },
   );
   app.get("/api/roles", async () => {

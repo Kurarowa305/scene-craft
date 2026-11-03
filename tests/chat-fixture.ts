@@ -5,7 +5,12 @@ import { createApp } from "../src/server/app.js";
 import { gitFixture, cleanGitFixture } from "./git-fixture.js";
 import type { CodexConnection } from "../src/server/codex.js";
 import type { FileRoots } from "../src/shared/files.js";
-export async function chatFixture(external = false, withFiles = false) {
+export async function chatFixture(
+  external = false,
+  withFiles = false,
+  referenceFetcher?: import("../src/server/reference-fetch.js").ReferenceFetcher,
+  port = 4317,
+) {
   const directory = await mkdtemp(join(tmpdir(), "chat-fault-"));
   const git = await gitFixture(directory);
   let fileRoots: FileRoots | undefined;
@@ -70,22 +75,23 @@ export async function chatFixture(external = false, withFiles = false) {
   };
   let app = await createApp({
     directory,
+    referenceFetcher,
     fileRoots,
-    port: 4317,
+    port,
     gitRepository: git.repository,
     ...(external
       ? { codexBinary: resolve("tests/fixtures/codex.mjs") }
       : { codex }),
   });
-  let headers: Record<string, string> = { host: "localhost:4317" };
+  let headers: Record<string, string> = { host: `localhost:${port}` };
   async function login() {
     const r = await app.inject({
       url: "/api/session",
-      headers: { host: "localhost:4317" },
+      headers: { host: `localhost:${port}` },
     });
     headers = {
-      host: "localhost:4317",
-      origin: "http://localhost:4317",
+      host: `localhost:${port}`,
+      origin: `http://localhost:${port}`,
       cookie: r.headers["set-cookie"]!.toString().split(";")[0],
       "x-csrf-token": r.json().csrfToken,
     };
@@ -114,6 +120,8 @@ export async function chatFixture(external = false, withFiles = false) {
   });
   return {
     directory,
+    closeRuntime: () => app.close(),
+    response: (url: string) => app.inject({ url, headers }),
     git,
     work,
     chat,
@@ -144,8 +152,9 @@ export async function chatFixture(external = false, withFiles = false) {
       await app.close();
       app = await createApp({
         directory,
+        referenceFetcher,
         fileRoots,
-        port: 4317,
+        port,
         gitRepository: git.repository,
         ...(external
           ? { codexBinary: resolve("tests/fixtures/codex.mjs") }

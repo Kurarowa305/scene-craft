@@ -11,18 +11,31 @@
 
 ## MCPツール
 
-専用stdio MCPはメインに8ツール、サイドチャットに参照専用3ツール（`get_execution_context/find_records/read_records`）を公開する。サイドの接続設定・stdio公開一覧を絞り、バックエンドでも更新・制作・採否・保護・メイン受け渡し・shell等を拒否する。処理は会話別資格付きUnix socket RPCを経由し、DBを所有するバックエンドで実行する。MCPと内部RPCはHTTP APIとは別の入口。[公開定義](../src/server/mcp.ts)、[ツール一覧・認可・分岐](../src/server/context-rpc.ts)、[保存処理](../src/server/context-store.ts)。
+専用stdio MCPはメインに11ツール、サイドチャットに参照専用3ツール（`get_execution_context/find_records/read_records`）を公開する。サイドの接続設定・stdio公開一覧を絞り、バックエンドでも更新・制作・採否・保護・メイン受け渡し・shell等を拒否する。処理は会話別資格付きUnix socket RPCを経由し、DBを所有するバックエンドで実行する。MCPと内部RPCはHTTP APIとは別の入口。[公開定義](../src/server/mcp.ts)、[ツール一覧・認可・分岐](../src/server/context-rpc.ts)、[保存処理](../src/server/context-store.ts)。
 
 | ツール名 | 状態 | 操作・結果 | 主なDB参照／変更 |
 | --- | --- | --- | --- |
-| `get_execution_context` | 実装済み | 現在依頼・工程・実行照合、固定文脈と最新共有情報、作品内の訂正後要約・未要約原文、固定版、残る再実行回数、未対応操作 | works、text_revisions、chat_requests、records、summary_revisions等を参照 |
+| `get_execution_context` | 実装済み | 現在依頼・工程・実行照合、固定文脈と最新共有情報、選択済み参考資料（参考工程では全候補も）、作品内の訂正後要約・未要約原文、固定版、残る再実行回数、未対応操作 | works、text_revisions、chat_requests、records、summary_revisions等を参照 |
 | `find_records` | 実装済み | 作品内の原文履歴をページ取得。現実装はread_recordsと同じ取得処理（検索語の引数なし） | records、conversations、chat_requests、text_revisionsを参照 |
 | `read_records` | 実装済み | 原文記録・会話ID・依頼・改訂を取得。記録と依頼はそれぞれ最大50件、独立カーソル | 同上 |
 | `create_work_intent` | 実装済み | CREATE：新しい全文で制作意図を作成・全置換 | works.intent更新、text_revisions追加 |
 | `update_work_intent` | 実装済み | UPDATE：既存意図への追記・部分編集・書き直し | 同上 |
 | `create_manual_record` | 実装済み | CREATE：新規手作業文章、または明示された既存記録の全文置換 | 新規時records追加、text_revisions追加 |
 | `update_manual_record` | 実装済み | UPDATE：既存手作業本文への追記・部分編集・書き直し。省略入力で指定した要約・旧理由の訂正もこのツールで処理 | text_revisions追加。records原文は保持 |
+| `fetch_reference_page` | 実装済み・参考工程のみ | 公開URLを取得し、目的・取得先・確認日時・本文・hashまたは失敗を固定 | reference_pages追加、context_operations・receipts追加 |
+| `save_reference` | 実装済み・参考工程のみ | 取得済みページから候補を保存。出典・参考要素・意図との関係と条件根拠を保持。条件が不明なら画像未保持。明示条件を調査モデルが確認し、取得成功したPNG/JPEG/WebPのみ管理ルートへ固定 | reference_pages参照、reference_candidates追加、context_operations・receipts追加 |
+| `select_reference` | 実装済み・メインのみ | 現在の人間原文に候補の正確なタイトル/IDと直接の選択指示がある場合に参考として選択。曖昧・否定・質問等は確認待ち。原文に任意理由を含めて保持し、未選択は不採用にしない | reference_candidates参照、reference_selections追加、context_operations・receipts追加 |
 | `record_human_decision` | 公開済み・未実装 | `FEATURE_UNAVAILABLE`を返す | 変更なし |
+
+### 参考調査MCPの引数・取得契約
+
+全操作でcontextRef/operationIdが必須。fetch_reference_pageは`url,purpose`、save_referenceは`pageId,title,element,intentRelation`が必須、任意`author,imageUrl,permissionPageId,permissionQuote`。select_referenceは`referenceId,sourceRequestId`が必須。URLは最大4000文字、タイトル/作者は500文字、IDは100文字、参考要素等は20000文字。未知の引数は拒否する。
+
+ページ取得は`{complete,page,purpose}`、候補保存は`{complete:true,candidate,link}`、選択は`{complete:true,selection}`または確認待ち。ページは最大1MiB、本文はテキスト化後最大100000文字、画像は8MiBまで。12秒の取得制限、最大5回のリダイレクト、各接続のDNS検査と検査済みアドレスへの固定を行う。localhost・プライベートIP・認証付きURL・80/443以外のポート等は拒否。取得先に認証情報を送らず、本文は実行しない。
+
+画像保存には取得済み条件ページIDと、その本文に実在する許可引用が必要。引用が対象画像の保存を認めるかの意味判断は参考調査モデルが担う。管理下ルートが未設定なら画像未保持。制作素材としての利用許可は別途未確認。実体は`managed/reference-images/<candidate-id>`へ固定し、読出時にサイズ/hashを検査する。欠落・破損でも候補・本文・選択を保持する。
+
+取得中も停止・現在turn・試行を検査し、停止後は候補や選択を確定しない。ページ取得中の停止結果だけをreference_pagesへ残す。操作IDの同一内容再送は外部再取得なしで同じ確定結果を返す。異内容再送は拒否。参考工程のthread/start/resumeだけ`web_search=live`、工程なし・他工程・サイドはdisabled。組込Web検索はMCPではなくCodexのitem通知/履歴から記録する。
 
 ### MCP共通引数・保存条件
 
@@ -34,7 +47,7 @@
 | `after` | integer ≥ 0、find_records/read_recordsのみ任意、既定0 | メインは記録sequence、サイドは固定配列の後続オフセット |
 | `afterRequests` | integer ≥ 0、同上 | メインは依頼sequence、サイドは固定配列の後続オフセット |
 
-更新ツールは新本文・対象IDを引数として受け取らず、保存済みの指示原文から解決する。自然文は同じ選択モデルのツールなし解釈処理でCREATE/UPDATE・対象・本文を構造化し、UPDATEの編集元全文を保存時に照合する。手作業は作業内容と任意の理由を一つの本文として扱う。対象不明時は`{complete:false,needsClarification:true,question}`、保存確定時は`{operationId,complete:true,revision}`を返す。
+制作意図・手作業の更新ツールは新本文・対象IDを引数として受け取らず、保存済みの指示原文から解決する。自然文は同じ選択モデルのツールなし解釈処理でCREATE/UPDATE・対象・本文を構造化し、UPDATEの編集元全文を保存時に照合する。手作業は作業内容と任意の理由を一つの本文として扱う。対象不明時は`{complete:false,needsClarification:true,question}`、保存確定時は`{operationId,complete:true,revision}`を返す。
 
 成功した参照・更新操作はcontext_operationsとreceiptsに保存する。更新依頼の解釈結果はchat_requests.dataにも保存する。同じ明示指示の更新は操作IDを変えても一度だけ確定する。未実装の人間判断操作は保存しない。MCP応答のtext contentにはRPC結果の`{result:...}`または`{error:...}`をJSONで載せる。
 
@@ -42,7 +55,7 @@
 
 ## バックエンドHTTP API
 
-明示登録は40操作。表はパスの辞書順、同一パスはメソッド順（GET→POST）で並べる。追加時も該当パスの位置へ行を挿入する。[基本・作品・ファイル・Git API](../src/server/app.ts)、[Codex・会話・実行API](../src/server/chat.ts)、[共通schema](../src/server/http-schema.ts)。
+明示登録は43操作。表はパスの辞書順、同一パスはメソッド順（GET→POST）で並べる。追加時も該当パスの位置へ行を挿入する。[基本・作品・ファイル・Git API](../src/server/app.ts)、[Codex・会話・実行API](../src/server/chat.ts)、[共通schema](../src/server/http-schema.ts)。
 
 同一localhost originを使用する。GET/HEAD以外はOrigin・HttpOnlyセッションcookie・`x-csrf-token`・`application/json`が必要。本文上限は1MiB。POSTは`/api/shutdown`を除き`requestKey`（8〜128文字、英数字・`_`・`-`）を必須とし、表はそれ以外の入力を記載する。`:id`と`:fileId`はUUID。追加本文プロパティは拒否する。業務エラーはHTTP状態コードと`{error:コード}`を返す。`reconcile`等、schema上のrequestKeyを処理の冪等キーとして使わない操作もある。
 
@@ -70,6 +83,8 @@
 | GET | `/api/file-roots` | なし | `{sources:[{id}],configured}`。実パスは返さない |
 | POST | `/api/imports/:id/abandon` | 取り込み操作ID、追加本文項目なし | 明示中止した取り込み操作。照合が必要な完成実体は先に照合 |
 | GET | `/api/instance` | `x-scene-craft-challenge`: 64桁の小文字hex | `{app,proof}`（HMAC）。`instanceSecret`設定時だけ登録 |
+| GET | `/api/references/:id` | 参考候補ID | `{candidate,page,selections}`。保存本文・出典・確認日・画像保持条件・人間の選択原文 |
+| GET | `/api/references/:id/image` | 参考候補ID | 保存済み画像をサイズ/hash検査してPNG/JPEG/WebPで返す。未保持/欠落404、破損409、保存未設定409 |
 | GET | `/api/roles` | なし | 既定定義の工程一覧 `{id,description}[]`。未選択は空配列 |
 | GET | `/api/session` | なし | `{csrfToken}` とHttpOnlyセッションcookieを発行 |
 | POST | `/api/shutdown` | 空オブジェクト `{}`（requestKeyなし） | `{status:stopping}`。応答完了後に終了コールバック |
@@ -84,6 +99,7 @@
 | POST | `/api/works/:id/conversations` | 作品ID、追加本文項目なし | 空の `Conversation` を作成 |
 | GET | `/api/works/:id/imports` | 作品ID | `ImportOperation[]` |
 | GET | `/api/works/:id/record-history` | 作品ID | 原文記録・会話ID・依頼・文章改訂・次カーソル。HTTP側は先頭ページ |
+| GET | `/api/works/:id/references` | 作品ID | `ReferenceView {searches,pages,candidates,selections}`。全候補と選択履歴。存在しない作品404 |
 | GET | `/api/works/:id/states` | 作品ID | `{states:SavedState[],currentStateId}`。`recordBody`は表示用最新本文 |
 | GET | `/api/works/:id/version-plans` | 作品ID | 固定済み `VersionPlan[]` |
 | POST | `/api/works/:id/version-plans` | 作品ID、追加本文項目なし | 現在の定義・作風を固定した `VersionPlan` |
@@ -107,7 +123,7 @@ GETにはFastifyによるHEADも自動登録される。`staticRoot`設定時の
 
 ## DBテーブル・物理カラム
 
-保存先はアプリの`dataDirectory/records.sqlite`。アプリ用23テーブル・80カラム。[DDL・移行・トランザクション](../src/server/store.ts)、[会話保存](../src/server/chat-store.ts)、[文章改訂](../src/server/context-store.ts)を参照する。`PRAGMA user_version`は1。追加機能の移行は対象テーブルの有無で判定し、追加前に`records.before-imports.sqlite`・`records.before-git-versions.sqlite`・`records.before-chat.sqlite`・`records.before-context.sqlite`・`records.before-auxiliary.sqlite`・`records.before-side-chats.sqlite`へ退避する。
+保存先はアプリの`dataDirectory/records.sqlite`。アプリ用27テーブル・101カラム。[DDL・移行・トランザクション](../src/server/store.ts)、[会話保存](../src/server/chat-store.ts)、[文章改訂](../src/server/context-store.ts)を参照する。`PRAGMA user_version`は1。追加機能の移行は対象テーブルの有無で判定し、追加前に`records.before-imports.sqlite`・`records.before-git-versions.sqlite`・`records.before-chat.sqlite`・`records.before-context.sqlite`・`records.before-auxiliary.sqlite`・`records.before-side-chats.sqlite`・`records.before-references.sqlite`へ退避する。
 
 制約欄はDDLで明示したPK・UNIQUE・NOT NULL・AUTOINCREMENT・外部キーを記載する。空欄相当の「—」は明示制約なし。JSON中のキーは物理カラムには数えない。全カラムともSQL DEFAULT指定はない。外部キー検査はON、busy_timeoutは3000ms。
 
@@ -133,6 +149,10 @@ GETにはFastifyによるHEADも自動登録される。`staticRoot`設定時の
 | `import_operations` | 制作ファイル取り込みの状態 | [カラム一覧](#import_operations) |
 | `receipts` | 冪等受付の入力と確定結果 | [カラム一覧](#receipts) |
 | `records` | LLM不要の記録原文・手作業原文 | [カラム一覧](#records) |
+| `reference_candidates` | 出典・参考要素・画像保存条件を持つ候補 | [カラム一覧](#reference_candidates) |
+| `reference_pages` | ページ取得本文・目的・失敗 | [カラム一覧](#reference_pages) |
+| `reference_searches` | Codex組込Web検索と依頼/turn/item | [カラム一覧](#reference_searches) |
+| `reference_selections` | 人間の参考選択原文・任意理由 | [カラム一覧](#reference_selections) |
 | `saved_states` | 確定した制作ファイルの保存状態 | [カラム一覧](#saved_states) |
 | `side_chats` | 相談会話・開始時の固定参照 | [カラム一覧](#side_chats) |
 | `summary_revisions` | 根拠付き要約と人間の訂正履歴 | [カラム一覧](#summary_revisions) |
@@ -209,6 +229,8 @@ JSON保存項目は、対応する物理カラム表の直下に記載する。`
 | `chat_requests.data.attempts[]` | `stopRequested,turnId,selection,actualModel,runtime,terminal,error,items`。itemsは`id,type,text,complete` | ChatRequest / ChatItem |
 | `chat_requests.data.recordInterpretation` | `sourceHash,model,runtime,threadId,turnId,status,instruction,question`。statusはupdate/not_requested/clarification | shared/record-instruction.ts |
 | `chat_requests.data.recordInterpretation.instruction` | `tool,field,body`、任意`action,mode,baseText,targetId`。actionはcreate/update、modeはreplace/append/edit。自然文UPDATEはbaseTextで編集元全文を固定 | RecordInstruction |
+
+受付時contextSnapshot.referencesとget_execution_context.referencesには人間の選択済み参考資料・対応本文・選択原文を含める。未選択は制作条件へ自動反映しない。
 
 phaseはaccepted/running/stopping/completed/interrupted/blocked/unknown。planは[version_plans](#version_plans)のVersionPlan、selectionは[chat_selections](#chat_selections)のModelChoice。contextSnapshotは受付時の作品・文章改訂・保存状態・固定計画・作風、instructionsは固定Git blob由来の工程指示。
 
@@ -370,6 +392,71 @@ LLM不要の記録原文・手作業原文。
 | `created_at` | TEXT | NOT NULL | 作成時刻（ISO 8601文字列） |
 
 通常表示では原文と改訂を重ね、旧理由も統合本文として返す。`BodyRecord.originalBody/reason/summary`は読み取り時に付加する表示項目であり、物理カラムではない。新しい全文への置換後に旧理由を再付加しない。
+
+#### reference_candidates
+
+[DDL・保存処理](../src/server/reference-store.ts)。
+
+| カラム | SQLite型 | 制約 | 用途 |
+| --- | --- | --- | --- |
+| sequence | INTEGER | PK、AUTOINCREMENT | 確定順 |
+| id | TEXT | NOT NULL、UNIQUE | 候補ID |
+| work_id | TEXT | NOT NULL、FK→works.id | 作品 |
+| page_id | TEXT | NOT NULL、FK→reference_pages.id | 取得ページ |
+| data | TEXT | NOT NULL | 下記JSON |
+
+| JSON保存項目 | 内容 |
+| --- | --- |
+| `data` | `id,workId,requestId,conversationId,threadId,turnId,attempt,pageId,title,author,element,intentRelation,checkedAt,image`。imageは`status,url,sha256,size,mime,permissionPageId,permissionQuote,error`。statusはurl_only/not_retained/stored/broken/failed/stopped。実体パスはIDから解決し保存JSONに個人パスを含めない |
+
+#### reference_pages
+
+[DDL・保存処理](../src/server/reference-store.ts)。
+
+| カラム | SQLite型 | 制約 | 用途 |
+| --- | --- | --- | --- |
+| sequence | INTEGER | PK、AUTOINCREMENT | 確定順 |
+| id | TEXT | NOT NULL、UNIQUE | ページID |
+| work_id | TEXT | NOT NULL、FK→works.id | 作品 |
+| request_id | TEXT | NOT NULL、FK→chat_requests.id | 依頼 |
+| data | TEXT | NOT NULL | 下記JSON |
+
+| JSON保存項目 | 内容 |
+| --- | --- |
+| `data` | `id,workId,requestId,conversationId,threadId,turnId,attempt,url,finalUrl,purpose,checkedAt,status,text,sha256,error`。statusはavailable/broken/failed/stopped。sha256は取得バイト列、textはHTML除去等をした本文。停止時も取得履歴を保持 |
+
+#### reference_searches
+
+[DDL・保存処理](../src/server/reference-store.ts)。
+
+| カラム | SQLite型 | 制約 | 用途 |
+| --- | --- | --- | --- |
+| sequence | INTEGER | PK、AUTOINCREMENT | 受付順 |
+| request_id | TEXT | NOT NULL、FK→chat_requests.id | 依頼 |
+| item_id | TEXT | NOT NULL | 検索item |
+| attempt | INTEGER | NOT NULL | 試行 |
+| work_id | TEXT | NOT NULL、FK→works.id | 作品 |
+| data | TEXT | NOT NULL | 下記JSON |
+
+| JSON保存項目 | 内容 |
+| --- | --- |
+| `data` | `workId,requestId,conversationId,threadId,turnId,attempt,checkedAt,itemId,query,action,status,resultAvailability,results`。action/resultsはCodex schemaの構造化値。resultAvailabilityはresults/empty/not_provided。通知に結果がなければ空結果と推測しない。UNIQUE(request_id,attempt,item_id)で通知と履歴照合を重複させない |
+
+#### reference_selections
+
+[DDL・保存処理](../src/server/reference-store.ts)。
+
+| カラム | SQLite型 | 制約 | 用途 |
+| --- | --- | --- | --- |
+| sequence | INTEGER | PK、AUTOINCREMENT | 確定順 |
+| id | TEXT | NOT NULL、UNIQUE | 選択ID |
+| reference_id | TEXT | NOT NULL、FK→reference_candidates.id | 候補 |
+| request_id | TEXT | NOT NULL、FK→chat_requests.id | 人間の指示依頼 |
+| data | TEXT | NOT NULL | 下記JSON |
+
+| JSON保存項目 | 内容 |
+| --- | --- |
+| `data` | `id,referenceId,requestId,body,author,createdAt`。bodyは人間の選択原文全体（任意理由を含む）。authorはhuman。UNIQUE(reference_id,request_id)で操作IDを変えても同じ指示の同じ選択は一度だけ |
 
 #### saved_states
 

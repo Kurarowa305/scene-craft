@@ -501,3 +501,10 @@ p {
     grid-column: 1;
   }
 }
+
+.reference-image {
+  display: block;
+  max-width: 100%;
+  max-height: 360px;
+  object-fit: contain;
+}

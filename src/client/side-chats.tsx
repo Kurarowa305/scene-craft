@@ -2,6 +2,7 @@ import { useEffect, useState, type FormEvent } from "react";
 import type { SideChat, SideChatView } from "../shared/side-chat";
 import type { SavedState } from "../shared/files";
 import { read, write } from "./api";
+import { References } from "./references";
 import { Chat } from "./chat";
 
 export function SideChats({
@@ -15,6 +16,7 @@ export function SideChats({
   recordRevision: number;
   names: Record<string, string | null>;
 }) {
+  const [tabKind, setTabKind] = useState("side");
   const [sides, setSides] = useState<SideChatView[]>([]);
   const [states, setStates] = useState<SavedState[]>([]);
   const [open, setOpen] = useState<string[]>([]);
@@ -90,6 +92,13 @@ export function SideChats({
         >
           ＋ 新しいタブ
         </button>
+        <button
+          role="tab"
+          aria-selected={active === "references"}
+          onClick={() => setActive("references")}
+        >
+          参考資料
+        </button>
         {open.map((id) => (
           <button
             role="tab"
@@ -102,39 +111,59 @@ export function SideChats({
         ))}
       </div>
       {error && <p role="alert">{error}</p>}
+      {active === "references" && (
+        <div role="tabpanel">
+          <References workId={workId} revision={recordRevision} />
+        </div>
+      )}
       {!active && (
         <div role="tabpanel">
           <form onSubmit={(e) => void create(e)}>
             <label>
               タブの種類
-              <select aria-label="タブの種類">
-                <option>サイドチャット</option>
-              </select>
-            </label>
-            <label>
-              参照する保存済み成果物
               <select
-                multiple
-                aria-label="参照する保存済み成果物"
-                value={selected}
-                onChange={(e) =>
-                  setSelected(
-                    Array.from(e.target.selectedOptions, (o) => o.value),
-                  )
-                }
+                aria-label="タブの種類"
+                value={tabKind}
+                onChange={(e) => setTabKind(e.target.value)}
               >
-                {states.map((s) => (
-                  <option key={s.id} value={s.id}>
-                    {s.application} / {s.recordBody ?? s.id}
-                  </option>
-                ))}
+                <option value="side">サイドチャット</option>
+                <option value="reference">参考資料</option>
               </select>
             </label>
-            {!states.length && <p>参照できる保存済み成果物はありません。</p>}
-            <p className="hint">
-              開始時の作品情報・メインの原文・選択成果物を固定します。
-            </p>
-            <button disabled={busy}>相談を開始</button>
+            {tabKind === "reference" ? (
+              <button type="button" onClick={() => setActive("references")}>
+                参考資料を開く
+              </button>
+            ) : (
+              <>
+                <label>
+                  参照する保存済み成果物
+                  <select
+                    multiple
+                    aria-label="参照する保存済み成果物"
+                    value={selected}
+                    onChange={(e) =>
+                      setSelected(
+                        Array.from(e.target.selectedOptions, (o) => o.value),
+                      )
+                    }
+                  >
+                    {states.map((s) => (
+                      <option key={s.id} value={s.id}>
+                        {s.application} / {s.recordBody ?? s.id}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                {!states.length && (
+                  <p>参照できる保存済み成果物はありません。</p>
+                )}
+                <p className="hint">
+                  開始時の作品情報・メインの原文・選択成果物を固定します。
+                </p>
+                <button disabled={busy}>相談を開始</button>
+              </>
+            )}
           </form>
           <h3>保存済みの相談</h3>
           {sides.map((s) => (
