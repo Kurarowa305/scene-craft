@@ -284,7 +284,7 @@ createInterface({ input: process.stdin }).on("line", (line) => {
         {
           id: `item-${turn.id}`,
           type: "agentMessage",
-          text: JSON.stringify(answer),
+          text: JSON.stringify({ result: answer }),
         },
       ];
       send({ id: m.id, result: { turn } });

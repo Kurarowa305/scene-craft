@@ -81,3 +81,8 @@ Codexアダプター境界でnoneの明示更新指示が渡る回帰試験を�
 
 
 今回の独立レビューでは、Standardsの規約違反・ブロッカー0件、既定action判定の重複1件（改善候補）を確認し、判定を共通化した。Specは最新50件より古い記録を自然文UPDATEできない点と、原文substring制約の説明不足を指摘した。51件目以前のID指定UPDATEの公開MCP試験が失敗することを確認後、同じ作品内の明示IDの最新本文を追加取得して成功させた。CREATE/appendの原文コピーとUPDATE editの全文組み立てを資料で区別した。画面試験9件が成功している。
+
+
+実接続で、解釈LLMがUPDATE/replaceという矛盾した組合せを返しRECORD_INTERPRETATION_FAILEDになることを診断依頼26a4080b-9aca-4b08-8e0b-327ab201cde3で検出した。mainはCREATEを選んでいた。独立enumでは関係を制約できていなかったため、解釈出力をresult内のanyOfに変更し、CREATEはcreate/replace/baseText null、UPDATEはupdate/appendまたはedit/baseText stringへ制約した。同じ原文の実app-server解釈がcreate_work_intent/create/replaceとして成功することを確認した。追加の実モデル解釈でも、制作意図の追記・部分編集、手作業の新規・追記・部分編集の操作選択を確認した。これは解釈処理の確認であり、再起動後のMCP保存確認とは区別する。
+
+最終ローカル確認は型検査・自動試験59件・画面9件・ビルド成功。Spec再レビューでも制約付きschemaと検査にブロッカーなし。Windows Test-Local.ps1の手動項目を自然文CREATE/UPDATE・統合本文・古いID指定へ更新し、構文検査と配置を実施した。
