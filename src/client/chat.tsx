@@ -395,7 +395,7 @@ export function Chat({
                     type="button"
                     aria-label={`${item.file.name}を外す`}
                     disabled={busy || images.busy}
-                    onClick={() => void images.remove(item.id)}
+                    onClick={() => void images.remove(item.id).catch(() => {})}
                   >
                     ×
                   </button>

@@ -44,9 +44,9 @@ test("メインは最小幅で止まり、右タブを折りたたんで戻せ�
   await handle.focus();
   await page.keyboard.press("Home");
   const controls = page.locator(".main-chat .composer-tools");
-  expect(
-    await controls.evaluate((row) => row.scrollWidth <= row.clientWidth),
-  ).toBe(true);
+  await expect
+    .poll(() => controls.evaluate((row) => row.scrollWidth <= row.clientWidth))
+    .toBe(true);
   const selectRows = await page
     .locator(".main-chat .composer-selects select")
     .evaluateAll((items) =>

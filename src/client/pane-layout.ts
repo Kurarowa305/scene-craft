@@ -113,7 +113,7 @@ export function usePaneLayout(root: RefObject<HTMLDivElement | null>) {
       observer.disconnect();
       observer.observe(element!);
       element!
-        .querySelectorAll(".brand, .composer-tools")
+        .querySelectorAll(".brand, .composer-tools, .composer-tools > .row")
         .forEach((item) => observer.observe(item));
       measure();
     }
