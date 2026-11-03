@@ -15,7 +15,7 @@ export function SavedImageSubmenu({
   const [states, setStates] = useState<SavedState[] | null>(null);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
-  const [position, setPosition] = useState({ left: 0, top: 0 });
+  const [position, setPosition] = useState({ left: 0, top: 0, width: 260 });
   const trigger = useRef<HTMLButtonElement>(null);
   const panel = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -45,10 +45,16 @@ export function SavedImageSubmenu({
       const width = Math.min(260, window.innerWidth - 16);
       const right = parent.right + 6;
       setPosition({
-        left:
-          right + width <= window.innerWidth - 8
-            ? right
-            : Math.max(8, parent.left - width - 6),
+        left: Math.max(
+          8,
+          Math.min(
+            window.innerWidth - width - 8,
+            right + width <= window.innerWidth - 8
+              ? right
+              : parent.left - width - 6,
+          ),
+        ),
+        width,
         top: Math.max(
           8,
           Math.min(
@@ -61,15 +67,19 @@ export function SavedImageSubmenu({
     place();
     const observer = new ResizeObserver(place);
     if (panel.current) observer.observe(panel.current);
-    window.addEventListener("resize", place);
+    const resize = () => requestAnimationFrame(place);
+    window.addEventListener("resize", resize);
     return () => {
       observer.disconnect();
-      window.removeEventListener("resize", place);
+      window.removeEventListener("resize", resize);
     };
   }, [open]);
   useEffect(() => {
-    if (open && states)
-      panel.current?.querySelector<HTMLButtonElement>("button")?.focus();
+    if (open)
+      (
+        panel.current?.querySelector<HTMLButtonElement>("button") ??
+        panel.current
+      )?.focus();
   }, [open, states]);
   const files =
     states?.flatMap((state) =>
@@ -102,6 +112,7 @@ export function SavedImageSubmenu({
           ref={panel}
           className="artifact-submenu"
           role="menu"
+          tabIndex={-1}
           aria-label="添付する保存済み画像"
           style={position}
           onKeyDown={(event) => {
