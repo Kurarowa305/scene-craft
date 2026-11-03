@@ -32,6 +32,8 @@
 
 全操作でcontextRef/operationIdが必須。save_scene_planはtitle（500文字まで）、body、referenceIds（100件以下）、parts（1〜100件）、hypotheses（0〜100件）が必須。任意previousPlanIdは同じ作品の元計画。partsはid/name/placement/dimensions/order（1〜1000の整数）、hypothesesはid/body/evidence/missing。IDは100文字、他本文は20000文字まで、空白のみ・未知フィールド・同配列内の重複IDを拒否。参考IDは依頼の固定references.selectedに存在するものだけ許可する。返却は{complete:true,plan,link}。
 
+get_execution_contextはscenePlansに計画・判断履歴を返し、unavailableにはnon_plan_decisions（計画以外の採否）を含める。計画の判断まで未対応と表示しない。
+
 record_human_decisionはsourceRequestId/planIdが必須、個別仮説にはhypothesisId。作用モデルから判断種別・理由本文を受け付けず、同じ選択モデルの独立したツールなし解釈で現在の人間原文全体からaccept/revise/holdを判定する。対象が一致した場合だけ原文全体（任意理由を含む）・人間・日時と解釈のthread/turn/model/runtimeを保存。返却は{complete:true,decision}または{complete:false,needsClarification:true,question}。同じplan/request/targetの保存を一度にする。計画全体の採用と個別仮説の採用は別で、最新判断を表示し過去の判断も保持する。改訂計画へ採用を移さず、制作ファイル・現在保存状態・モデリングを更新しない。
 
 stdioと認可付き内部RPCを通り、既存の停止/turn/世代/会話資格/冪等受付を再利用。保存はreceipts/context_operationsと同じDBトランザクション。失敗は成功receiptを残さず再送可能。保存後に会話のrevision/SSEを通知する。サイドは参照専用のため保存・判断を拒否し、開始時点の固定snapshotだけを参照する。[型・schema](../src/shared/scene-plans.ts)、[受付](../src/server/scene-plans.ts)、[保存](../src/server/scene-plan-store.ts)。

@@ -38,6 +38,11 @@ test("計画のDB確定失敗は完了扱いせず、同じ操作IDの再送で�
     });
     client = await mcp(f);
     const c = await client.current();
+    const execution = await client.call("get_execution_context", {
+      contextRef: c.contextRef,
+    });
+    assert.ok(!execution.result.unavailable.includes("human_decision"));
+    assert.deepEqual(execution.result.scenePlans, { plans: [], decisions: [] });
     const args = {
       ...planInput,
       contextRef: c.contextRef,

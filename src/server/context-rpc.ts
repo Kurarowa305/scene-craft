@@ -288,7 +288,7 @@ export async function startContextRpc(
               unavailable: [
                 "production",
                 "protection",
-                "human_decision",
+                "non_plan_decisions",
                 "file_attachment",
               ],
             }
