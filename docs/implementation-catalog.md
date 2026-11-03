@@ -5,7 +5,8 @@
 - [MCPツール](#mcpツール)
 - [バックエンドHTTP API](#バックエンドhttp-api)
 - [DBテーブル・物理カラム](#dbテーブル物理カラム)
-- [JSON保存項目と表示用項目](#json保存項目と表示用項目)
+  - [テーブル一覧](#テーブル一覧)
+  - [テーブルごとのカラム一覧](#テーブルごとのカラム一覧)
 - [ソースとの照合](#ソースとの照合)
 
 ## MCPツール
@@ -42,45 +43,45 @@
 
 ## バックエンドHTTP API
 
-明示登録は33操作。[基本・作品・ファイル・Git API](../src/server/app.ts)、[Codex・会話・実行API](../src/server/chat.ts)、[共通schema](../src/server/http-schema.ts)。
+明示登録は33操作。表はパスの辞書順、同一パスはメソッド順（GET→POST）で並べる。追加時も該当パスの位置へ行を挿入する。[基本・作品・ファイル・Git API](../src/server/app.ts)、[Codex・会話・実行API](../src/server/chat.ts)、[共通schema](../src/server/http-schema.ts)。
 
 同一localhost originを使用する。GET/HEAD以外はOrigin・HttpOnlyセッションcookie・`x-csrf-token`・`application/json`が必要。本文上限は1MiB。POSTは`/api/shutdown`を除き`requestKey`（8〜128文字、英数字・`_`・`-`）を必須とし、表はそれ以外の入力を記載する。`:id`と`:fileId`はUUID。追加本文プロパティは拒否する。業務エラーはHTTP状態コードと`{error:コード}`を返す。`reconcile`等、schema上のrequestKeyを処理の冪等キーとして使わない操作もある。
 
 | メソッド | パス | 入力 | 結果・副作用 |
 | --- | --- | --- | --- |
-| GET | `/api/roles` | なし | 既定定義の工程一覧 `{id,description}[]`。未選択は空配列 |
-| GET | `/api/works/:id/context` | 作品ID | 現在の作品 `{id,name,intent}` と文章改訂 `revisions` |
-| GET | `/api/works/:id/record-history` | 作品ID | 原文記録・会話ID・依頼・文章改訂・次カーソル。HTTP側は先頭ページ |
-| GET | `/api/session` | なし | `{csrfToken}` とHttpOnlyセッションcookieを発行 |
-| GET | `/api/instance` | `x-scene-craft-challenge`: 64桁の小文字hex | `{app,proof}`（HMAC）。`instanceSecret`設定時だけ登録 |
-| GET | `/api/works` | なし | `Work[]`（確定順） |
-| GET | `/api/versions` | なし | `configured, definition, style, availability, remote` |
-| POST | `/api/versions/default` | `commit`：40/64桁の小文字hex | 既定定義のGit参照を選択・固定 |
-| GET | `/api/works/:id/versions` | 作品ID | 新規依頼用の既定定義・作品の固定作風と利用可否 |
-| GET | `/api/works/:id/version-plans` | 作品ID | 固定済み `VersionPlan[]` |
-| POST | `/api/works/:id/version-plans` | 作品ID、追加本文項目なし | 現在の定義・作風を固定した `VersionPlan` |
-| GET | `/api/version-plans/:id/content` | 計画ID、query `kind: definition/style`, `path`（1〜2000文字） | 固定参照から取得したファイル内容・blob等 |
-| POST | `/api/works` | `name`（1〜200文字・空白のみ不可）、任意`intent`（最大20000文字）、任意`styleCommit`（commit/null） | 作成した `Work` |
-| GET | `/api/works/:id/conversations` | 作品ID | `Conversation[]`（確定順） |
-| POST | `/api/works/:id/conversations` | 作品ID、追加本文項目なし | 空の `Conversation` を作成 |
-| GET | `/api/conversations/:id/records` | 会話ID | 最新表示の `BodyRecord[]`。元本文・旧理由を保持し現在本文を返す |
-| POST | `/api/conversations/:id/records` | 会話ID、`body`（1〜200000文字・空白のみ不可） | LLMを使わず原文を記録し `BodyRecord` を返す |
-| GET | `/api/file-roots` | なし | `{sources:[{id}],configured}`。実パスは返さない |
-| GET | `/api/works/:id/states` | 作品ID | `{states:SavedState[],currentStateId}`。`recordBody`は表示用最新本文 |
-| GET | `/api/works/:id/imports` | 作品ID | `ImportOperation[]` |
-| POST | `/api/imports/:id/abandon` | 取り込み操作ID、追加本文項目なし | 明示中止した取り込み操作。照合が必要な完成実体は先に照合 |
-| POST | `/api/conversations/:id/imports` | 会話ID、`body,application,beforeStateId,files`。任意`render,reason`（旧互換） | `{operationId,id,state,record}`。制作ファイルを管理下へ固定し保存状態・記録を確定 |
-| GET | `/api/states/:id/files/:fileId` | 保存状態ID・ファイルID、任意query `inline=1` | 検査済み実体のダウンロード。inlineはPNG/JPEG/WebP署名検査後に画像応答 |
-| POST | `/api/shutdown` | 空オブジェクト `{}`（requestKeyなし） | `{status:stopping}`。応答完了後に終了コールバック |
+| POST | `/api/chat-requests/:id/reconcile` | 依頼ID、追加本文項目なし | 実行履歴と照合した `ChatRequest`。処理を新規送信しない |
+| POST | `/api/chat-requests/:id/resume` | 依頼ID、追加本文項目なし | 同じ依頼を明示再開した `ChatRequest`。既存の再実行上限を継承 |
+| POST | `/api/chat-requests/:id/stop` | 依頼ID、追加本文項目なし | 停止要求を保存し、非同期で実行turnを中断 |
 | GET | `/api/codex` | なし | `{configured,authenticated,runtime,models}`。未接続時も利用可否を返す |
 | POST | `/api/codex/login` | 追加本文項目なし | ChatGPT専用ログインの `{authUrl}` |
 | GET | `/api/conversations/:id/chat` | 会話ID | `ChatView {session,requests,revision}`。未選択なら利用可能な既定モデルを初期選択 |
-| POST | `/api/conversations/:id/model` | 会話ID、`model`（最大200文字）、`effort`（最大30文字）、`speed: standard/fast` | 利用可能なモデル・強度を検査して選択を保存 |
-| POST | `/api/conversations/:id/messages` | 会話ID、`body`（1〜200000文字・空白のみ不可）、任意`role`（1〜100文字、既定none） | `ChatRequest`を受付。固定文脈・版・工程で非同期実行 |
-| POST | `/api/chat-requests/:id/stop` | 依頼ID、追加本文項目なし | 停止要求を保存し、非同期で実行turnを中断 |
-| POST | `/api/chat-requests/:id/reconcile` | 依頼ID、追加本文項目なし | 実行履歴と照合した `ChatRequest`。処理を新規送信しない |
-| POST | `/api/chat-requests/:id/resume` | 依頼ID、追加本文項目なし | 同じ依頼を明示再開した `ChatRequest`。既存の再実行上限を継承 |
 | GET | `/api/conversations/:id/events` | 会話ID、任意header `Last-Event-ID` | SSE `event: chat`、`id: revision`、`data: ChatView`。15秒ごとkeepalive |
+| POST | `/api/conversations/:id/imports` | 会話ID、`body,application,beforeStateId,files`。任意`render,reason`（旧互換） | `{operationId,id,state,record}`。制作ファイルを管理下へ固定し保存状態・記録を確定 |
+| POST | `/api/conversations/:id/messages` | 会話ID、`body`（1〜200000文字・空白のみ不可）、任意`role`（1〜100文字、既定none） | `ChatRequest`を受付。固定文脈・版・工程で非同期実行 |
+| POST | `/api/conversations/:id/model` | 会話ID、`model`（最大200文字）、`effort`（最大30文字）、`speed: standard/fast` | 利用可能なモデル・強度を検査して選択を保存 |
+| GET | `/api/conversations/:id/records` | 会話ID | 最新表示の `BodyRecord[]`。元本文・旧理由を保持し現在本文を返す |
+| POST | `/api/conversations/:id/records` | 会話ID、`body`（1〜200000文字・空白のみ不可） | LLMを使わず原文を記録し `BodyRecord` を返す |
+| GET | `/api/file-roots` | なし | `{sources:[{id}],configured}`。実パスは返さない |
+| POST | `/api/imports/:id/abandon` | 取り込み操作ID、追加本文項目なし | 明示中止した取り込み操作。照合が必要な完成実体は先に照合 |
+| GET | `/api/instance` | `x-scene-craft-challenge`: 64桁の小文字hex | `{app,proof}`（HMAC）。`instanceSecret`設定時だけ登録 |
+| GET | `/api/roles` | なし | 既定定義の工程一覧 `{id,description}[]`。未選択は空配列 |
+| GET | `/api/session` | なし | `{csrfToken}` とHttpOnlyセッションcookieを発行 |
+| POST | `/api/shutdown` | 空オブジェクト `{}`（requestKeyなし） | `{status:stopping}`。応答完了後に終了コールバック |
+| GET | `/api/states/:id/files/:fileId` | 保存状態ID・ファイルID、任意query `inline=1` | 検査済み実体のダウンロード。inlineはPNG/JPEG/WebP署名検査後に画像応答 |
+| GET | `/api/version-plans/:id/content` | 計画ID、query `kind: definition/style`, `path`（1〜2000文字） | 固定参照から取得したファイル内容・blob等 |
+| GET | `/api/versions` | なし | `configured, definition, style, availability, remote` |
+| POST | `/api/versions/default` | `commit`：40/64桁の小文字hex | 既定定義のGit参照を選択・固定 |
+| GET | `/api/works` | なし | `Work[]`（確定順） |
+| POST | `/api/works` | `name`（1〜200文字・空白のみ不可）、任意`intent`（最大20000文字）、任意`styleCommit`（commit/null） | 作成した `Work` |
+| GET | `/api/works/:id/context` | 作品ID | 現在の作品 `{id,name,intent}` と文章改訂 `revisions` |
+| GET | `/api/works/:id/conversations` | 作品ID | `Conversation[]`（確定順） |
+| POST | `/api/works/:id/conversations` | 作品ID、追加本文項目なし | 空の `Conversation` を作成 |
+| GET | `/api/works/:id/imports` | 作品ID | `ImportOperation[]` |
+| GET | `/api/works/:id/record-history` | 作品ID | 原文記録・会話ID・依頼・文章改訂・次カーソル。HTTP側は先頭ページ |
+| GET | `/api/works/:id/states` | 作品ID | `{states:SavedState[],currentStateId}`。`recordBody`は表示用最新本文 |
+| GET | `/api/works/:id/version-plans` | 作品ID | 固定済み `VersionPlan[]` |
+| POST | `/api/works/:id/version-plans` | 作品ID、追加本文項目なし | 現在の定義・作風を固定した `VersionPlan` |
+| GET | `/api/works/:id/versions` | 作品ID | 新規依頼用の既定定義・作品の固定作風と利用可否 |
 
 GETにはFastifyによるHEADも自動登録される。`staticRoot`設定時の静的ファイル配信もFastify pluginが登録する。これらは表の明示HTTP APIとは分けて扱う。内部Codex app-serverのJSON-RPCメソッドは、本バックエンドのHTTP APIではない。
 
@@ -104,95 +105,303 @@ GETにはFastifyによるHEADも自動登録される。`staticRoot`設定時の
 
 制約欄はDDLで明示したPK・UNIQUE・NOT NULL・AUTOINCREMENT・外部キーを記載する。空欄相当の「—」は明示制約なし。JSON中のキーは物理カラムには数えない。全カラムともSQL DEFAULT指定はない。外部キー検査はON、busy_timeoutは3000ms。
 
-| テーブル | 用途 | カラム | SQLite型 | 明示制約・参照 | カラムの意味 |
-| --- | --- | --- | --- | --- | --- |
-| `chat_events` | 会話更新の永続revision | `sequence` | INTEGER | PK, AUTOINCREMENT | 確定順の連番 |
-| `chat_events` | 会話更新の永続revision | `conversation_id` | TEXT | NOT NULL, FK → conversations.id | 所属会話ID |
-| `chat_events` | 会話更新の永続revision | `request_id` | TEXT | FK → chat_requests.id | 更新対象の依頼ID。セッション設定の変更時はNULL |
-| `chat_requests` | 依頼原文・実行状態・解釈結果 | `sequence` | INTEGER | PK, AUTOINCREMENT | 確定順の連番 |
-| `chat_requests` | 依頼原文・実行状態・解釈結果 | `id` | TEXT | NOT NULL, UNIQUE | 識別子 |
-| `chat_requests` | 依頼原文・実行状態・解釈結果 | `conversation_id` | TEXT | NOT NULL, FK → conversations.id | 所属会話ID |
-| `chat_requests` | 依頼原文・実行状態・解釈結果 | `work_id` | TEXT | NOT NULL, FK → works.id | 所属作品ID |
-| `chat_requests` | 依頼原文・実行状態・解釈結果 | `data` | TEXT | NOT NULL | 下表の構造化データを保持するJSON文字列 |
-| `chat_selections` | モデル選択の引き継ぎ用履歴 | `sequence` | INTEGER | PK, AUTOINCREMENT | 確定順の連番 |
-| `chat_selections` | モデル選択の引き継ぎ用履歴 | `data` | TEXT | NOT NULL | 下表の構造化データを保持するJSON文字列 |
-| `chat_sessions` | 会話とCodex thread・選択設定 | `conversation_id` | TEXT | PK, FK → conversations.id | 所属会話ID |
-| `chat_sessions` | 会話とCodex thread・選択設定 | `data` | TEXT | NOT NULL | 下表の構造化データを保持するJSON文字列 |
-| `context_operations` | 専用MCPの参照・更新操作と結果 | `sequence` | INTEGER | PK, AUTOINCREMENT | 確定順の連番 |
-| `context_operations` | 専用MCPの参照・更新操作と結果 | `id` | TEXT | NOT NULL, UNIQUE | 識別子 |
-| `context_operations` | 専用MCPの参照・更新操作と結果 | `request_id` | TEXT | NOT NULL, FK → chat_requests.id | 元依頼ID |
-| `context_operations` | 専用MCPの参照・更新操作と結果 | `data` | TEXT | NOT NULL | 下表の構造化データを保持するJSON文字列 |
-| `conversations` | 作品内の会話 | `sequence` | INTEGER | PK, AUTOINCREMENT | 確定順の連番 |
-| `conversations` | 作品内の会話 | `id` | TEXT | NOT NULL, UNIQUE | 識別子 |
-| `conversations` | 作品内の会話 | `work_id` | TEXT | NOT NULL, FK → works.id | 所属作品ID |
-| `conversations` | 作品内の会話 | `created_at` | TEXT | NOT NULL | 作成時刻（ISO 8601文字列） |
-| `current_state_updates` | 現在保存状態の更新履歴 | `sequence` | INTEGER | PK, AUTOINCREMENT | 確定順の連番 |
-| `current_state_updates` | 現在保存状態の更新履歴 | `work_id` | TEXT | NOT NULL, FK → works.id | 所属作品ID |
-| `current_state_updates` | 現在保存状態の更新履歴 | `before_id` | TEXT | — | 変更前の保存状態ID（初回はNULL） |
-| `current_state_updates` | 現在保存状態の更新履歴 | `after_id` | TEXT | NOT NULL, FK → saved_states.id | 変更後の保存状態ID |
-| `current_state_updates` | 現在保存状態の更新履歴 | `operation_id` | TEXT | NOT NULL, UNIQUE, FK → import_operations.id | 確定した取り込み操作ID |
-| `current_states` | 作品の現在保存状態 | `work_id` | TEXT | PK, FK → works.id | 所属作品ID |
-| `current_states` | 作品の現在保存状態 | `state_id` | TEXT | NOT NULL, FK → saved_states.id | 現在の保存状態ID |
-| `git_settings` | 既定定義の選択履歴 | `sequence` | INTEGER | PK, AUTOINCREMENT | 確定順の連番 |
-| `git_settings` | 既定定義の選択履歴 | `data` | TEXT | NOT NULL | 下表の構造化データを保持するJSON文字列 |
-| `git_settings` | 既定定義の選択履歴 | `created_at` | TEXT | NOT NULL | 作成時刻（ISO 8601文字列） |
-| `import_operations` | 制作ファイル取り込みの状態 | `id` | TEXT | PK | 識別子 |
-| `import_operations` | 制作ファイル取り込みの状態 | `request_key` | TEXT | NOT NULL, UNIQUE | 同内容再送を識別する受付キー |
-| `import_operations` | 制作ファイル取り込みの状態 | `work_id` | TEXT | NOT NULL, FK → works.id | 所属作品ID |
-| `import_operations` | 制作ファイル取り込みの状態 | `data` | TEXT | NOT NULL | 下表の構造化データを保持するJSON文字列 |
-| `receipts` | 冪等受付の入力と確定結果 | `request_key` | TEXT | PK | 同内容再送を識別する受付キー |
-| `receipts` | 冪等受付の入力と確定結果 | `content` | TEXT | NOT NULL | 受付内容のJSON文字列 |
-| `receipts` | 冪等受付の入力と確定結果 | `result` | TEXT | NOT NULL | 確定応答のJSON文字列 |
-| `records` | LLM不要の記録原文・手作業原文 | `sequence` | INTEGER | PK, AUTOINCREMENT | 確定順の連番 |
-| `records` | LLM不要の記録原文・手作業原文 | `id` | TEXT | NOT NULL, UNIQUE | 識別子 |
-| `records` | LLM不要の記録原文・手作業原文 | `conversation_id` | TEXT | NOT NULL, FK → conversations.id | 所属会話ID |
-| `records` | LLM不要の記録原文・手作業原文 | `body` | TEXT | NOT NULL | 記録の原文本文 |
-| `records` | LLM不要の記録原文・手作業原文 | `created_at` | TEXT | NOT NULL | 作成時刻（ISO 8601文字列） |
-| `saved_states` | 確定した制作ファイルの保存状態 | `sequence` | INTEGER | PK, AUTOINCREMENT | 確定順の連番 |
-| `saved_states` | 確定した制作ファイルの保存状態 | `id` | TEXT | NOT NULL, UNIQUE | 識別子 |
-| `saved_states` | 確定した制作ファイルの保存状態 | `work_id` | TEXT | NOT NULL, FK → works.id | 所属作品ID |
-| `saved_states` | 確定した制作ファイルの保存状態 | `data` | TEXT | NOT NULL | 下表の構造化データを保持するJSON文字列 |
-| `text_revisions` | 制作意図・手作業文章・要約等の改訂 | `sequence` | INTEGER | PK, AUTOINCREMENT | 確定順の連番 |
-| `text_revisions` | 制作意図・手作業文章・要約等の改訂 | `id` | TEXT | NOT NULL, UNIQUE | 識別子 |
-| `text_revisions` | 制作意図・手作業文章・要約等の改訂 | `work_id` | TEXT | NOT NULL, FK → works.id | 所属作品ID |
-| `text_revisions` | 制作意図・手作業文章・要約等の改訂 | `data` | TEXT | NOT NULL | 下表の構造化データを保持するJSON文字列 |
-| `version_plans` | 依頼用の固定Git参照 | `id` | TEXT | PK | 識別子 |
-| `version_plans` | 依頼用の固定Git参照 | `work_id` | TEXT | NOT NULL, FK → works.id | 所属作品ID |
-| `version_plans` | 依頼用の固定Git参照 | `data` | TEXT | NOT NULL | 下表の構造化データを保持するJSON文字列 |
-| `work_git` | 作品作成時の定義・作風参照 | `work_id` | TEXT | PK, FK → works.id | 所属作品ID |
-| `work_git` | 作品作成時の定義・作風参照 | `data` | TEXT | NOT NULL | 下表の構造化データを保持するJSON文字列 |
-| `works` | 作品の現在値 | `sequence` | INTEGER | PK, AUTOINCREMENT | 確定順の連番 |
-| `works` | 作品の現在値 | `id` | TEXT | NOT NULL, UNIQUE | 識別子 |
-| `works` | 作品の現在値 | `name` | TEXT | NOT NULL | 作品名 |
-| `works` | 作品の現在値 | `intent` | TEXT | — | 現在の制作意図（未入力はNULL） |
-| `works` | 作品の現在値 | `created_at` | TEXT | NOT NULL | 作成時刻（ISO 8601文字列） |
+### テーブル一覧
 
-追加の明示インデックスは`conversations_work(work_id,sequence)`、`records_conversation(conversation_id,sequence)`、`text_revisions_work(work_id,sequence)`。PK/UNIQUE用の自動インデックスはSQLiteが管理する。SQLite内部の`sqlite_sequence(name,seq)`はAUTOINCREMENT連番を保持し、アプリ用テーブル数に含めない。
+テーブル名順に並べる。カラムとJSON項目は各テーブルの詳細へ記載する。
 
-## JSON保存項目と表示用項目
+| テーブル | 用途 | 詳細 |
+| --- | --- | --- |
+| `chat_events` | 会話更新の永続revision | [カラム一覧](#chat_events) |
+| `chat_requests` | 依頼原文・実行状態・解釈結果 | [カラム一覧](#chat_requests) |
+| `chat_selections` | モデル選択の引き継ぎ用履歴 | [カラム一覧](#chat_selections) |
+| `chat_sessions` | 会話とCodex thread・選択設定 | [カラム一覧](#chat_sessions) |
+| `context_operations` | 専用MCPの参照・更新操作と結果 | [カラム一覧](#context_operations) |
+| `conversations` | 作品内の会話 | [カラム一覧](#conversations) |
+| `current_state_updates` | 現在保存状態の更新履歴 | [カラム一覧](#current_state_updates) |
+| `current_states` | 作品の現在保存状態 | [カラム一覧](#current_states) |
+| `git_settings` | 既定定義の選択履歴 | [カラム一覧](#git_settings) |
+| `import_operations` | 制作ファイル取り込みの状態 | [カラム一覧](#import_operations) |
+| `receipts` | 冪等受付の入力と確定結果 | [カラム一覧](#receipts) |
+| `records` | LLM不要の記録原文・手作業原文 | [カラム一覧](#records) |
+| `saved_states` | 確定した制作ファイルの保存状態 | [カラム一覧](#saved_states) |
+| `text_revisions` | 制作意図・手作業文章・要約等の改訂 | [カラム一覧](#text_revisions) |
+| `version_plans` | 依頼用の固定Git参照 | [カラム一覧](#version_plans) |
+| `work_git` | 作品作成時の定義・作風参照 | [カラム一覧](#work_git) |
+| `works` | 作品の現在値 | [カラム一覧](#works) |
 
-`data`等はTEXTカラムにJSONを保存する。以下はJSON内の項目であり、新しい物理カラムではない。旧データで任意項目が欠けている場合もある。
+### テーブルごとのカラム一覧
+
+JSON保存項目は、対応する物理カラム表の直下に記載する。`data`等のTEXTカラム内のキーを物理カラムとは区別し、旧データで任意項目が欠けている場合もある。
+
+#### chat_events
+
+会話更新の永続revision。
+
+| カラム | SQLite型 | 明示制約・参照 | カラムの意味 |
+| --- | --- | --- | --- |
+| `sequence` | INTEGER | PK, AUTOINCREMENT | 確定順の連番 |
+| `conversation_id` | TEXT | NOT NULL, FK → conversations.id | 所属会話ID |
+| `request_id` | TEXT | FK → chat_requests.id | 更新対象の依頼ID。セッション設定の変更時はNULL |
+
+#### chat_requests
+
+依頼原文・実行状態・解釈結果。
+
+| カラム | SQLite型 | 明示制約・参照 | カラムの意味 |
+| --- | --- | --- | --- |
+| `sequence` | INTEGER | PK, AUTOINCREMENT | 確定順の連番 |
+| `id` | TEXT | NOT NULL, UNIQUE | 識別子 |
+| `conversation_id` | TEXT | NOT NULL, FK → conversations.id | 所属会話ID |
+| `work_id` | TEXT | NOT NULL, FK → works.id | 所属作品ID |
+| `data` | TEXT | NOT NULL | 下表の構造化データを保持するJSON文字列 |
+
+##### JSON保存項目
+
+| 保存場所 | 保存項目・構造 | 根拠 |
+| --- | --- | --- |
+| `chat_requests.data` | `id,conversationId,workId,body,selection,actualModel,runtime,threadId,turnId,phase,stopRequested,error,terminal,items,plan,createdAt,retryCount,previousAttempt,attempts`、任意`role,contextSnapshot,instructions,recordInterpretation` | ChatRequest |
+| `chat_requests.data.attempts[]` | `stopRequested,turnId,selection,actualModel,runtime,terminal,error,items`。itemsは`id,type,text,complete` | ChatRequest / ChatItem |
+| `chat_requests.data.recordInterpretation` | `sourceHash,model,runtime,threadId,turnId,status,instruction,question`。statusはupdate/not_requested/clarification | shared/record-instruction.ts |
+| `chat_requests.data.recordInterpretation.instruction` | `tool,field,body`、任意`action,mode,baseText,targetId`。actionはcreate/update、modeはreplace/append/edit。自然文UPDATEはbaseTextで編集元全文を固定 | RecordInstruction |
+
+phaseはaccepted/running/stopping/completed/interrupted/blocked/unknown。planは[version_plans](#version_plans)のVersionPlan、selectionは[chat_selections](#chat_selections)のModelChoice。contextSnapshotは受付時の作品・文章改訂・保存状態・固定計画・作風、instructionsは固定Git blob由来の工程指示。
+
+#### chat_selections
+
+モデル選択の引き継ぎ用履歴。
+
+| カラム | SQLite型 | 明示制約・参照 | カラムの意味 |
+| --- | --- | --- | --- |
+| `sequence` | INTEGER | PK, AUTOINCREMENT | 確定順の連番 |
+| `data` | TEXT | NOT NULL | 下表の構造化データを保持するJSON文字列 |
+
+##### JSON保存項目
+
+| 保存場所 | 保存項目・構造 | 根拠 |
+| --- | --- | --- |
+| `chat_selections.data` | ModelChoice：`model,effort,speed`（standard/fast） | chat-store.ts |
+
+#### chat_sessions
+
+会話とCodex thread・選択設定。
+
+| カラム | SQLite型 | 明示制約・参照 | カラムの意味 |
+| --- | --- | --- | --- |
+| `conversation_id` | TEXT | PK, FK → conversations.id | 所属会話ID |
+| `data` | TEXT | NOT NULL | 下表の構造化データを保持するJSON文字列 |
+
+##### JSON保存項目
+
+| 保存場所 | 保存項目・構造 | 根拠 |
+| --- | --- | --- |
+| `chat_sessions.data` | `conversationId,threadId,selection`、任意`instructionKey`（共通指示の識別hash） | ChatSession |
+
+selectionは[chat_selections](#chat_selections)のModelChoiceまたはnull。
+
+#### context_operations
+
+専用MCPの参照・更新操作と結果。
+
+| カラム | SQLite型 | 明示制約・参照 | カラムの意味 |
+| --- | --- | --- | --- |
+| `sequence` | INTEGER | PK, AUTOINCREMENT | 確定順の連番 |
+| `id` | TEXT | NOT NULL, UNIQUE | 識別子 |
+| `request_id` | TEXT | NOT NULL, FK → chat_requests.id | 元依頼ID |
+| `data` | TEXT | NOT NULL | 下表の構造化データを保持するJSON文字列 |
+
+##### JSON保存項目
+
+| 保存場所 | 保存項目・構造 | 根拠 |
+| --- | --- | --- |
+| `context_operations.data` | `input:{tool,args},result,createdAt`。接続資格は保存しない | store.ts のcontextOperation |
+
+#### conversations
+
+作品内の会話。
+
+| カラム | SQLite型 | 明示制約・参照 | カラムの意味 |
+| --- | --- | --- | --- |
+| `sequence` | INTEGER | PK, AUTOINCREMENT | 確定順の連番 |
+| `id` | TEXT | NOT NULL, UNIQUE | 識別子 |
+| `work_id` | TEXT | NOT NULL, FK → works.id | 所属作品ID |
+| `created_at` | TEXT | NOT NULL | 作成時刻（ISO 8601文字列） |
+
+`Conversation.title`は読み取り時に付加する表示項目であり、物理カラムではない。
+
+#### current_state_updates
+
+現在保存状態の更新履歴。
+
+| カラム | SQLite型 | 明示制約・参照 | カラムの意味 |
+| --- | --- | --- | --- |
+| `sequence` | INTEGER | PK, AUTOINCREMENT | 確定順の連番 |
+| `work_id` | TEXT | NOT NULL, FK → works.id | 所属作品ID |
+| `before_id` | TEXT | — | 変更前の保存状態ID（初回はNULL） |
+| `after_id` | TEXT | NOT NULL, FK → saved_states.id | 変更後の保存状態ID |
+| `operation_id` | TEXT | NOT NULL, UNIQUE, FK → import_operations.id | 確定した取り込み操作ID |
+
+#### current_states
+
+作品の現在保存状態。
+
+| カラム | SQLite型 | 明示制約・参照 | カラムの意味 |
+| --- | --- | --- | --- |
+| `work_id` | TEXT | PK, FK → works.id | 所属作品ID |
+| `state_id` | TEXT | NOT NULL, FK → saved_states.id | 現在の保存状態ID |
+
+#### git_settings
+
+既定定義の選択履歴。
+
+| カラム | SQLite型 | 明示制約・参照 | カラムの意味 |
+| --- | --- | --- | --- |
+| `sequence` | INTEGER | PK, AUTOINCREMENT | 確定順の連番 |
+| `data` | TEXT | NOT NULL | 下表の構造化データを保持するJSON文字列 |
+| `created_at` | TEXT | NOT NULL | 作成時刻（ISO 8601文字列） |
+
+##### JSON保存項目
+
+| 保存場所 | 保存項目・構造 | 根拠 |
+| --- | --- | --- |
+| `git_settings.data` | GitReference | shared/versions.ts |
+
+GitReferenceの項目は`repositoryId,objectFormat,commit,tree,tag,manifest,files[{path,blob}]`。
+
+#### import_operations
+
+制作ファイル取り込みの状態。
+
+| カラム | SQLite型 | 明示制約・参照 | カラムの意味 |
+| --- | --- | --- | --- |
+| `id` | TEXT | PK | 識別子 |
+| `request_key` | TEXT | NOT NULL, UNIQUE | 同内容再送を識別する受付キー |
+| `work_id` | TEXT | NOT NULL, FK → works.id | 所属作品ID |
+| `data` | TEXT | NOT NULL | 下表の構造化データを保持するJSON文字列 |
+
+##### JSON保存項目
+
+| 保存場所 | 保存項目・構造 | 根拠 |
+| --- | --- | --- |
+| `import_operations.data` | `id,requestKey,workId,conversationId,stateId,input,phase,error,createdAt`、任意`completionHash`。phaseはplanned/incomplete/reconciling/committed/abandoned | ImportOperation |
+
+inputは[ファイル取り込みAPIの入力](#ファイル取り込みの入力詳細)。
+
+#### receipts
+
+冪等受付の入力と確定結果。
+
+| カラム | SQLite型 | 明示制約・参照 | カラムの意味 |
+| --- | --- | --- | --- |
+| `request_key` | TEXT | PK | 同内容再送を識別する受付キー |
+| `content` | TEXT | NOT NULL | 受付内容のJSON文字列 |
+| `result` | TEXT | NOT NULL | 確定応答のJSON文字列 |
+
+##### JSON保存項目
 
 | 保存場所 | 保存項目・構造 | 根拠 |
 | --- | --- | --- |
 | `receipts.content` / `result` | 操作種別・対象・入力を含む配列／確定応答。同じキーの異内容はREQUEST_KEY_CONFLICT | store.ts のonce |
-| `git_settings.data` | GitReference | shared/versions.ts |
-| `work_git.data` | `definition, style`（GitReference/null） | store.ts |
-| `version_plans.data` | `id,workId,definition,style,createdAt` | VersionPlan |
-| `import_operations.data` | `id,requestKey,workId,conversationId,stateId,input,phase,error,createdAt`、任意`completionHash`。phaseはplanned/incomplete/reconciling/committed/abandoned | ImportOperation |
+
+#### records
+
+LLM不要の記録原文・手作業原文。
+
+| カラム | SQLite型 | 明示制約・参照 | カラムの意味 |
+| --- | --- | --- | --- |
+| `sequence` | INTEGER | PK, AUTOINCREMENT | 確定順の連番 |
+| `id` | TEXT | NOT NULL, UNIQUE | 識別子 |
+| `conversation_id` | TEXT | NOT NULL, FK → conversations.id | 所属会話ID |
+| `body` | TEXT | NOT NULL | 記録の原文本文 |
+| `created_at` | TEXT | NOT NULL | 作成時刻（ISO 8601文字列） |
+
+通常表示では原文と改訂を重ね、旧理由も統合本文として返す。`BodyRecord.originalBody/reason/summary`は読み取り時に付加する表示項目であり、物理カラムではない。新しい全文への置換後に旧理由を再付加しない。
+
+#### saved_states
+
+確定した制作ファイルの保存状態。
+
+| カラム | SQLite型 | 明示制約・参照 | カラムの意味 |
+| --- | --- | --- | --- |
+| `sequence` | INTEGER | PK, AUTOINCREMENT | 確定順の連番 |
+| `id` | TEXT | NOT NULL, UNIQUE | 識別子 |
+| `work_id` | TEXT | NOT NULL, FK → works.id | 所属作品ID |
+| `data` | TEXT | NOT NULL | 下表の構造化データを保持するJSON文字列 |
+
+##### JSON保存項目
+
+| 保存場所 | 保存項目・構造 | 根拠 |
+| --- | --- | --- |
 | `saved_states.data` | `id,workId,recordId,beforeStateId,changeKind,application,reason,render,historyBeforeImport,files,missing,createdAt`。changeKindはimport/manual、historyBeforeImportはunknown/recorded | SavedState |
-| `chat_sessions.data` | `conversationId,threadId,selection`、任意`instructionKey`（共通指示の識別hash） | ChatSession |
-| `chat_selections.data` | ModelChoice：`model,effort,speed`（standard/fast） | chat-store.ts |
-| `chat_requests.data` | `id,conversationId,workId,body,selection,actualModel,runtime,threadId,turnId,phase,stopRequested,error,terminal,items,plan,createdAt,retryCount,previousAttempt,attempts`、任意`role,contextSnapshot,instructions,recordInterpretation` | ChatRequest |
-| `chat_requests.data.attempts[]` | `stopRequested,turnId,selection,actualModel,runtime,terminal,error,items`。itemsは`id,type,text,complete` | ChatRequest / ChatItem |
-| `chat_requests.data.recordInterpretation` | `sourceHash,model,runtime,threadId,turnId,status,instruction,question`。statusはupdate/not_requested/clarification | shared/record-instruction.ts |
-| `…recordInterpretation.instruction` | `tool,field,body`、任意`action,mode,baseText,targetId`。actionはcreate/update、modeはreplace/append/edit。自然文UPDATEはbaseTextで編集元全文を固定 | RecordInstruction |
+
+filesは`id,rootId,relativePath,role,source{rootId,relativePath},size,sha256`、missingは`source,reason`（not_found/cycle/outside_root/inspection_pending）。保存済みrenderは`{stateId,fileId}`またはnull。`SavedState.recordBody`は読み取り時に付加する表示用の最新本文であり、物理カラムでも保存JSON項目でもない。
+
+#### text_revisions
+
+制作意図・手作業文章・要約等の改訂。
+
+| カラム | SQLite型 | 明示制約・参照 | カラムの意味 |
+| --- | --- | --- | --- |
+| `sequence` | INTEGER | PK, AUTOINCREMENT | 確定順の連番 |
+| `id` | TEXT | NOT NULL, UNIQUE | 識別子 |
+| `work_id` | TEXT | NOT NULL, FK → works.id | 所属作品ID |
+| `data` | TEXT | NOT NULL | 下表の構造化データを保持するJSON文字列 |
+
+##### JSON保存項目
+
+| 保存場所 | 保存項目・構造 | 根拠 |
+| --- | --- | --- |
 | `text_revisions.data` | `id,workId,targetId,field,body,previousId,previousBody,sourceRequestId,author,createdAt`、任意`action,mode,addedText,format`。body/previousBodyは変更後/前の全文。formatはunified-record-v1 | TextRevision |
-| `context_operations.data` | `input:{tool,args},result,createdAt`。接続資格は保存しない | store.ts のcontextOperation |
 
-GitReferenceは`repositoryId,objectFormat,commit,tree,tag,manifest,files[{path,blob}]`。SavedStateのfilesは`id,rootId,relativePath,role,source{rootId,relativePath},size,sha256`、missingは`source,reason`（not_found/cycle/outside_root/inspection_pending）。保存済みrenderは`{stateId,fileId}`またはnull。ImportOperation.inputは上記取り込みAPIの入力。ChatRequest.phaseはaccepted/running/stopping/completed/interrupted/blocked/unknown、planはVersionPlan、selectionはModelChoice。contextSnapshotは受付時の作品・文章改訂・保存状態・固定計画・作風、instructionsは固定Git blob由来の工程指示。
+#### version_plans
 
-通常表示ではrecords原文と改訂を重ね、旧理由も統合本文として返す。`BodyRecord.originalBody/reason/summary`、`SavedState.recordBody`、`Work.style/plannedDefinition`、`Conversation.title`等は読み取り時に付加する表示項目。これらの名前の物理カラムはない。新しい全文への置換後に旧理由を再付加しない。
+依頼用の固定Git参照。
+
+| カラム | SQLite型 | 明示制約・参照 | カラムの意味 |
+| --- | --- | --- | --- |
+| `id` | TEXT | PK | 識別子 |
+| `work_id` | TEXT | NOT NULL, FK → works.id | 所属作品ID |
+| `data` | TEXT | NOT NULL | 下表の構造化データを保持するJSON文字列 |
+
+##### JSON保存項目
+
+| 保存場所 | 保存項目・構造 | 根拠 |
+| --- | --- | --- |
+| `version_plans.data` | `id,workId,definition,style,createdAt` | VersionPlan |
+
+definition/styleのGitReferenceの構造は[git_settings](#git_settings)を参照。
+
+#### work_git
+
+作品作成時の定義・作風参照。
+
+| カラム | SQLite型 | 明示制約・参照 | カラムの意味 |
+| --- | --- | --- | --- |
+| `work_id` | TEXT | PK, FK → works.id | 所属作品ID |
+| `data` | TEXT | NOT NULL | 下表の構造化データを保持するJSON文字列 |
+
+##### JSON保存項目
+
+| 保存場所 | 保存項目・構造 | 根拠 |
+| --- | --- | --- |
+| `work_git.data` | `definition, style`（GitReference/null） | store.ts |
+
+GitReferenceの構造は[git_settings](#git_settings)を参照。`Work.style/plannedDefinition`は読み取り時に付加する表示項目であり、物理カラムではない。
+
+#### works
+
+作品の現在値。
+
+| カラム | SQLite型 | 明示制約・参照 | カラムの意味 |
+| --- | --- | --- | --- |
+| `sequence` | INTEGER | PK, AUTOINCREMENT | 確定順の連番 |
+| `id` | TEXT | NOT NULL, UNIQUE | 識別子 |
+| `name` | TEXT | NOT NULL | 作品名 |
+| `intent` | TEXT | — | 現在の制作意図（未入力はNULL） |
+| `created_at` | TEXT | NOT NULL | 作成時刻（ISO 8601文字列） |
+
+### インデックスとSQLite内部テーブル
+
+追加の明示インデックスは`conversations_work(work_id,sequence)`、`records_conversation(conversation_id,sequence)`、`text_revisions_work(work_id,sequence)`。PK/UNIQUE用の自動インデックスはSQLiteが管理する。SQLite内部の`sqlite_sequence(name,seq)`はAUTOINCREMENT連番を保持し、アプリ用テーブル数に含めない。
 
 ## ソースとの照合
 
