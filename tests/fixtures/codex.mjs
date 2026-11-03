@@ -159,6 +159,28 @@ createInterface({ input: process.stdin }).on("line", (line) => {
       send({ id: m.id, result: { turn } });
       return;
     }
+    if (p.outputSchema?.properties?.referenceId) {
+      const input = JSON.parse(p.input[0].text);
+      const selected = [
+        "「港の写真 (v1).[1]」を参考として選んで。岸壁の構造が分かるため。",
+        "「港の資料」を参考として選んで。静けさを表現するため。",
+        "「港資料 (v1).写真[1]」を参考として選んで。",
+      ].includes(input.currentHumanMessage);
+      turn.status = "completed";
+      turn.items = [
+        {
+          id: `item-${turn.id}`,
+          type: "agentMessage",
+          text: JSON.stringify({
+            status: selected ? "select" : "not_requested",
+            referenceId: selected ? input.requestedReferenceId : null,
+            question: null,
+          }),
+        },
+      ];
+      send({ id: m.id, result: { turn } });
+      return;
+    }
     if (p.outputSchema) {
       // Recorded external semantic outputs for the public contract tests.
       // This fixture is not a natural-language parser used by the product.

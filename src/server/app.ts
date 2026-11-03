@@ -147,36 +147,24 @@ export async function createApp(options: AppOptions) {
     "/api/references/:id",
     { schema: { params: idParams } },
     async (req) => {
-      for (const work of store.works()) {
-        const candidate = store.references
-          .view(work.id)
-          .candidates.find((c) => c.id === req.params.id);
-        if (candidate)
-          return {
-            candidate,
-            page: store.references.page(work.id, candidate.pageId),
-            selections: store.references
-              .view(work.id)
-              .selections.filter((s) => s.referenceId === candidate.id),
-          };
-      }
-      throw new OperationError(404, "REFERENCE_NOT_FOUND");
+      const candidate = store.references.find(req.params.id);
+      return {
+        candidate,
+        page: store.references.page(candidate.workId, candidate.pageId),
+        selections: store.references
+          .view(candidate.workId)
+          .selections.filter((s) => s.referenceId === candidate.id),
+      };
     },
   );
   app.get<{ Params: { id: string } }>(
     "/api/references/:id/image",
     { schema: { params: idParams } },
     async (req, reply) => {
-      for (const work of store.works()) {
-        const c = store.references
-          .view(work.id)
-          .candidates.find((c) => c.id === req.params.id);
-        if (c)
-          return reply
-            .type(c.image.mime ?? "application/octet-stream")
-            .send(store.references.image(c));
-      }
-      throw new OperationError(404, "REFERENCE_NOT_FOUND");
+      const c = store.references.find(req.params.id);
+      return reply
+        .type(c.image.mime ?? "application/octet-stream")
+        .send(store.references.image(c));
     },
   );
   app.get("/api/roles", async () => {

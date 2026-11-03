@@ -18,16 +18,16 @@ test("参考調査のWeb検索を依頼・turn・itemに結び、空結果と失
         id: "search-1",
         type: "webSearch",
         action: { type: "search", query: "港 写真" },
-        status: "completed",
+        results: null,
       },
     });
-    f.notify("item/completed", {
+    f.notify("item/started", {
       turnId: running.turnId,
       item: {
         id: "search-2",
         type: "webSearch",
         action: { type: "search", query: "missing" },
-        status: "failed",
+        results: null,
       },
     });
     const data = await f.read(`/api/works/${f.work.id}/references`);
@@ -37,7 +37,7 @@ test("参考調査のWeb検索を依頼・turn・itemに結び、空結果と失
     assert.equal(data.searches[0].itemId, "search-1");
     assert.equal(data.searches[0].status, "completed");
     assert.equal(data.searches[0].resultAvailability, "not_provided");
-    assert.equal(data.searches[1].status, "failed");
+
     f.notify("item/completed", {
       turnId: running.turnId,
       item: {
@@ -52,6 +52,52 @@ test("参考調査のWeb検索を依頼・turn・itemに結び、空結果と失
       (await f.read(`/api/works/${f.work.id}/references`)).searches[2]
         .resultAvailability,
       "empty",
+    );
+    f.notify("item/completed", {
+      turnId: running.turnId,
+      item: {
+        id: "search-3",
+        type: "webSearch",
+        query: "no results",
+        action: null,
+        results: null,
+      },
+    });
+    assert.equal(
+      (await f.read(`/api/works/${f.work.id}/references`)).searches[2]
+        .resultAvailability,
+      "empty",
+    );
+    f.notify("turn/completed", {
+      turn: {
+        id: running.turnId,
+        status: "failed",
+        items: [
+          {
+            id: "search-1",
+            type: "webSearch",
+            query: "港 写真",
+            action: { type: "search", query: "港 写真", queries: null },
+            results: null,
+          },
+          {
+            id: "search-2",
+            type: "webSearch",
+            query: "missing",
+            action: { type: "search", query: "missing", queries: null },
+            results: null,
+          },
+        ],
+        error: { codexErrorInfo: "other" },
+      },
+    });
+    assert.equal(
+      (await f.read(`/api/works/${f.work.id}/references`)).searches[1].status,
+      "failed",
+    );
+    assert.equal(
+      (await f.read(`/api/works/${f.work.id}/references`)).searches[0].status,
+      "completed",
     );
     await f.restart();
     assert.equal(
@@ -89,7 +135,7 @@ test("専用MCPで出典付き候補を保存し、人間の選択原文と画�
       contextRef: c.contextRef,
       operationId: crypto.randomUUID(),
       pageId: page.result.page.id,
-      title: "港の写真",
+      title: "港の写真 (v1).[1]",
       element: "石造りの岸壁",
       intentRelation: "夕暮れの静けさ",
       imageUrl: "https://example.org/harbor.jpg",
@@ -106,7 +152,7 @@ test("専用MCPで出典付き候補を保存し、人間の選択原文と画�
       Boolean((await f.view()).requests.at(-1).terminal),
     );
     const r = await f.post(`/api/conversations/${f.chat.id}/messages`, {
-      body: "「港の写真」を参考として選んで。岸壁の構造が分かるため。",
+      body: "「港の写真 (v1).[1]」を参考として選んで。岸壁の構造が分かるため。",
       role: "none",
     });
     c = await client.current();
@@ -122,7 +168,7 @@ test("専用MCPで出典付き候補を保存し、人間の選択原文と画�
     assert.equal(view.pages[0].text, "Harbor photograph. Copyright unknown.");
     assert.equal(
       view.selections[0].body,
-      "「港の写真」を参考として選んで。岸壁の構造が分かるため。",
+      "「港の写真 (v1).[1]」を参考として選んで。岸壁の構造が分かるため。",
     );
     assert.equal(view.selections[0].author, "human");
   } finally {
@@ -133,7 +179,7 @@ test("専用MCPで出典付き候補を保存し、人間の選択原文と画�
 
 test("保存条件の根拠と画像を固定し、切れた画像・未選択候補・欠落でも本文と選択を保つ", async () => {
   const png = Buffer.from(
-    "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+j3iUAAAAASUVORK5CYII=",
+    "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAADElEQVQImWP4//8/AAX+Av5Y8msOAAAAAElFTkSuQmCC",
     "base64",
   );
   let imageRequests = 0;
@@ -144,7 +190,7 @@ test("保存条件の根拠と画像を固定し、切れた画像・未選択�
         url,
         status: url.includes("missing") ? 404 : 200,
         mime: "image/png",
-        bytes: png,
+        bytes: url.includes("corrupt") ? png.subarray(0, 8) : png,
       };
     }
     return {
@@ -233,8 +279,14 @@ test("保存条件の根拠と画像を固定し、切れた画像・未選択�
         .title,
       "保存できる港",
     );
+    const corrupt = await client.call("save_reference", {
+      ...args,
+      title: "破損画像",
+      imageUrl: "https://example.org/corrupt.png",
+    });
+    assert.equal(corrupt.result.candidate.image.status, "failed");
     const view = await f.read(`/api/works/${f.work.id}/references`);
-    assert.equal(view.candidates.length, 2);
+    assert.equal(view.candidates.length, 3);
     assert.deepEqual(view.selections, []);
   } finally {
     client?.close();
@@ -354,7 +406,7 @@ test("参考以外の工程は取得できず、参考工程だけWeb検索を�
   }
 });
 
-test("公開URL以外の取得・別作品の候補参照・選択していない指示を拒否する", async () => {
+test("公開URL以外の取得・存在しない候補参照・選択していない指示を拒否する", async () => {
   let fetched = 0;
   const f = await chatFixture(true, false, async (url) => {
     fetched++;
@@ -407,17 +459,27 @@ test("公開URL以外の取得・別作品の候補参照・選択していな�
     await waitFor(async () =>
       Boolean((await f.view()).requests.at(-1).terminal),
     );
-    const r = await f.post(`/api/conversations/${f.chat.id}/messages`, {
-      body: "港資料は参考として選ばない",
-      role: "none",
-    });
-    c = await client.current();
-    const result = await client.call("select_reference", {
-      contextRef: c.contextRef,
-      sourceRequestId: r.id,
-      referenceId: candidate.id,
-    });
-    assert.equal(result.result.needsClarification, true);
+    for (const body of [
+      "「港資料」を参考として選ぶ方法を教えて",
+      "港資料を参考として選ぶ。この文を英語にして",
+      "港資料は参考として選ばない",
+    ]) {
+      await waitFor(async () =>
+        Boolean((await f.view()).requests.at(-1).terminal),
+      );
+      const r = await f.post(`/api/conversations/${f.chat.id}/messages`, {
+        body,
+        role: "none",
+      });
+      c = await client.current();
+      const result = await client.call("select_reference", {
+        contextRef: c.contextRef,
+        sourceRequestId: r.id,
+        referenceId: candidate.id,
+      });
+      assert.equal(result.result.needsClarification, true);
+    }
+    const r = (await f.view()).requests.at(-1);
     assert.deepEqual(
       (await f.read(`/api/works/${f.work.id}/references`)).selections,
       [],

@@ -16,7 +16,7 @@ export function SideChats({
   recordRevision: number;
   names: Record<string, string | null>;
 }) {
-  const [tabKind, setTabKind] = useState("side");
+  const [tabKind, setTabKind] = useState("サイドチャット");
   const [sides, setSides] = useState<SideChatView[]>([]);
   const [states, setStates] = useState<SavedState[]>([]);
   const [open, setOpen] = useState<string[]>([]);
@@ -126,11 +126,11 @@ export function SideChats({
                 value={tabKind}
                 onChange={(e) => setTabKind(e.target.value)}
               >
-                <option value="side">サイドチャット</option>
-                <option value="reference">参考資料</option>
+                <option value="サイドチャット">サイドチャット</option>
+                <option value="参考資料">参考資料</option>
               </select>
             </label>
-            {tabKind === "reference" ? (
+            {tabKind === "参考資料" ? (
               <button type="button" onClick={() => setActive("references")}>
                 参考資料を開く
               </button>

@@ -107,6 +107,10 @@ test("チャットの参考リンクと右タブに出典・画像未保持・�
     await expect(
       panel.getByText("参考として選択済み", { exact: true }),
     ).toBeVisible();
+    await page.screenshot({
+      path: "test-results/issue-65-reference-panel.png",
+      fullPage: true,
+    });
   } finally {
     client?.close();
     await viewer?.close();

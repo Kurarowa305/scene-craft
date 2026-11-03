@@ -168,7 +168,13 @@ export function References({
                 ? "検索失敗"
                 : s.status === "in_progress"
                   ? "検索中"
-                  : s.status}{" "}
+                  : s.status === "interrupted"
+                    ? "検索中断"
+                    : s.status === "unknown"
+                      ? "検索結果未確定"
+                      : s.status === "completed"
+                        ? "検索完了"
+                        : s.status}{" "}
               /{" "}
               {s.resultAvailability === "empty"
                 ? "結果なし"

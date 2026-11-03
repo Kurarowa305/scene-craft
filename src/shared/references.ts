@@ -42,6 +42,15 @@ export interface ReferenceCandidate {
   };
 }
 export interface ReferenceSelection {
+  authorization?: {
+    status: string;
+    referenceId: string | null;
+    question: string | null;
+    threadId: string;
+    turnId: string;
+    model: string;
+    runtime: string | null;
+  };
   id: string;
   referenceId: string;
   requestId: string;

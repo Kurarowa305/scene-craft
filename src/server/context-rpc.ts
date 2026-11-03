@@ -47,7 +47,13 @@ export async function startContextRpc(
     socketPath: join(directory, "rpc"),
     credential: randomBytes(32).toString("hex"),
   };
-  const references = referenceService(store, fetcher);
+  let referenceInterpreter:
+    import("./references.js").ReferenceInterpreter | undefined;
+  const references = referenceService(store, fetcher, (r, id, current) => {
+    if (!referenceInterpreter)
+      throw new OperationError(409, "REFERENCE_INTERPRETATION_FAILED");
+    return referenceInterpreter(r, id, current);
+  });
   const fetching = new Map<
     string,
     { input: string; promise: Promise<unknown> }
@@ -318,6 +324,11 @@ export async function startContextRpc(
   await chmod(endpoint.socketPath, 0o600);
   return {
     endpoint,
+    setReferenceInterpreter(
+      value: import("./references.js").ReferenceInterpreter,
+    ) {
+      referenceInterpreter = value;
+    },
     setInterpreter(value: NonNullable<typeof interpret>) {
       interpret = value;
     },

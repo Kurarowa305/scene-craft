@@ -1,3 +1,4 @@
+import sharp from "sharp";
 import { createHash, randomUUID } from "node:crypto";
 import type { openStore } from "./store.js";
 import { OperationError } from "./store.js";
@@ -19,9 +20,15 @@ import {
 } from "../shared/reference-tools.js";
 const hash = (bytes: Buffer) =>
   createHash("sha256").update(bytes).digest("hex");
+export type ReferenceInterpreter = (
+  r: ChatRequest,
+  id: string,
+  current: () => boolean,
+) => Promise<import("./reference-interpreter.js").ReferenceAuthorization>;
 export function referenceService(
   store: ReturnType<typeof openStore>,
   fetcher: ReferenceFetcher = fetchReference,
+  interpret: ReferenceInterpreter,
 ) {
   const refs = store.references;
   return async (
@@ -49,7 +56,27 @@ export function referenceService(
     if (tool === "select_reference") {
       if (args.sourceRequestId !== r.id)
         throw new OperationError(403, "EXPLICIT_INSTRUCTION_REQUIRED");
-      return () => refs.select(current(), args.referenceId);
+      refs.candidate(r.workId, args.referenceId);
+      const authorization = await interpret(r, args.referenceId, () => {
+        try {
+          current();
+          return true;
+        } catch {
+          return false;
+        }
+      });
+      current();
+      return () =>
+        authorization.status === "select"
+          ? refs.select(current(), args.referenceId, authorization)
+          : {
+              complete: false,
+              needsClarification: true,
+              question:
+                authorization.question ??
+                "選ぶ参考資料と、参考として選ぶ指示を明記してください。",
+              authorization,
+            };
     }
     if (r.role !== "reference")
       throw new OperationError(403, "REFERENCE_ROLE_REQUIRED");
@@ -165,6 +192,14 @@ export function referenceService(
             c.image.status = "failed";
             c.image.error = "REFERENCE_IMAGE_UNSUPPORTED";
           } else {
+            await sharp(response.bytes, {
+              limitInputPixels: 16_000_000,
+              failOn: "warning",
+              pages: -1,
+            })
+              .timeout({ seconds: 5 })
+              .raw()
+              .toBuffer();
             bytes = response.bytes;
             c.image.status = "stored";
             c.image.mime = mime;

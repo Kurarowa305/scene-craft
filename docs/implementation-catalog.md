@@ -24,14 +24,14 @@
 | `update_manual_record` | 実装済み | UPDATE：既存手作業本文への追記・部分編集・書き直し。省略入力で指定した要約・旧理由の訂正もこのツールで処理 | text_revisions追加。records原文は保持 |
 | `fetch_reference_page` | 実装済み・参考工程のみ | 公開URLを取得し、目的・取得先・確認日時・本文・hashまたは失敗を固定 | reference_pages追加、context_operations・receipts追加 |
 | `save_reference` | 実装済み・参考工程のみ | 取得済みページから候補を保存。出典・参考要素・意図との関係と条件根拠を保持。条件が不明なら画像未保持。明示条件を調査モデルが確認し、取得成功したPNG/JPEG/WebPのみ管理ルートへ固定 | reference_pages参照、reference_candidates追加、context_operations・receipts追加 |
-| `select_reference` | 実装済み・メインのみ | 現在の人間原文に候補の正確なタイトル/IDと直接の選択指示がある場合に参考として選択。曖昧・否定・質問等は確認待ち。原文に任意理由を含めて保持し、未選択は不採用にしない | reference_candidates参照、reference_selections追加、context_operations・receipts追加 |
+| `select_reference` | 実装済み・メインのみ | 現在の人間原文全文と作品内候補を、同じ選択モデルのツールなし解釈threadへ渡して直接の参考選択を判定。対象が一致するときだけ参考として選択。曖昧・否定・質問・翻訳依頼等は保存せず確認待ち。原文に任意理由を含めて保持し、未選択は不採用にしない | reference_candidates参照、reference_selections追加、context_operations・receipts追加 |
 | `record_human_decision` | 公開済み・未実装 | `FEATURE_UNAVAILABLE`を返す | 変更なし |
 
 ### 参考調査MCPの引数・取得契約
 
 全操作でcontextRef/operationIdが必須。fetch_reference_pageは`url,purpose`、save_referenceは`pageId,title,element,intentRelation`が必須、任意`author,imageUrl,permissionPageId,permissionQuote`。select_referenceは`referenceId,sourceRequestId`が必須。URLは最大4000文字、タイトル/作者は500文字、IDは100文字、参考要素等は20000文字。未知の引数は拒否する。
 
-ページ取得は`{complete,page,purpose}`、候補保存は`{complete:true,candidate,link}`、選択は`{complete:true,selection}`または確認待ち。ページは最大1MiB、本文はテキスト化後最大100000文字、画像は8MiBまで。12秒の取得制限、最大5回のリダイレクト、各接続のDNS検査と検査済みアドレスへの固定を行う。localhost・プライベートIP・認証付きURL・80/443以外のポート等は拒否。取得先に認証情報を送らず、本文は実行しない。
+ページ取得は`{complete,page,purpose}`、候補保存は`{complete:true,candidate,link}`、選択は`{complete:true,selection}`または確認待ち。ページは最大1MiB、本文はテキスト化後最大100000文字、画像は8MiB・1600万画素まで、Sharp 0.35.5で全画素をデコードして破損/切断を検査（5秒上限、アニメーションは全フレームの合計画素数）。12秒の取得制限、最大5回のリダイレクト、各接続のDNS検査と検査済みアドレスへの固定を行う。localhost・プライベートIP・認証付きURL・80/443以外のポート等は拒否。取得先に認証情報を送らず、本文は実行しない。
 
 画像保存には取得済み条件ページIDと、その本文に実在する許可引用が必要。引用が対象画像の保存を認めるかの意味判断は参考調査モデルが担う。管理下ルートが未設定なら画像未保持。制作素材としての利用許可は別途未確認。実体は`managed/reference-images/<candidate-id>`へ固定し、読出時にサイズ/hashを検査する。欠落・破損でも候補・本文・選択を保持する。
 
@@ -43,7 +43,7 @@
 | --- | --- | --- |
 | `contextRef` | string、全ツール必須 | アプリが発行した現在の依頼文脈。会話別接続資格・世代・試行・thread・現在turn・停止状態を別途照合 |
 | `operationId` | string、全ツール必須 | 再送に同じIDを使用。実行時は8〜100文字の英数字・ハイフンを検査。モデルには安定したUUIDを案内 |
-| `sourceRequestId` | string、書き込み操作で実行時必須 | 現在の利用者指示原文ID。公開schemaは任意プロパティだがバックエンドで一致を要求 |
+| `sourceRequestId` | string、制作意図・手作業更新とselect_referenceで実行時必須 | 現在の利用者指示原文ID。制作意図・手作業のschemaでは任意だが実行時一致を要求。select_referenceはschemaでも必須。fetch_reference_page/save_referenceでは受け付けない |
 | `after` | integer ≥ 0、find_records/read_recordsのみ任意、既定0 | メインは記録sequence、サイドは固定配列の後続オフセット |
 | `afterRequests` | integer ≥ 0、同上 | メインは依頼sequence、サイドは固定配列の後続オフセット |
 
@@ -440,7 +440,7 @@ LLM不要の記録原文・手作業原文。
 
 | JSON保存項目 | 内容 |
 | --- | --- |
-| `data` | `workId,requestId,conversationId,threadId,turnId,attempt,checkedAt,itemId,query,action,status,resultAvailability,results`。action/resultsはCodex schemaの構造化値。resultAvailabilityはresults/empty/not_provided。通知に結果がなければ空結果と推測しない。UNIQUE(request_id,attempt,item_id)で通知と履歴照合を重複させない |
+| `data` | `workId,requestId,conversationId,threadId,turnId,attempt,checkedAt,itemId,query,action,status,resultAvailability,results`。action/resultsはCodex schemaの構造化値。resultAvailabilityはresults/empty/not_provided。通知に結果がなければ空結果と推測しない。未完了検索はturnの失敗/中断/連絡喪失をfailed/interrupted/unknownへ反映。プロセス再起動時は残るin_progressをinterruptedへ整理。UNIQUE(request_id,attempt,item_id)で通知と履歴照合を重複させない |
 
 #### reference_selections
 
@@ -456,7 +456,7 @@ LLM不要の記録原文・手作業原文。
 
 | JSON保存項目 | 内容 |
 | --- | --- |
-| `data` | `id,referenceId,requestId,body,author,createdAt`。bodyは人間の選択原文全体（任意理由を含む）。authorはhuman。UNIQUE(reference_id,request_id)で操作IDを変えても同じ指示の同じ選択は一度だけ |
+| `data` | `id,referenceId,requestId,body,author,createdAt`。bodyは人間の選択原文全体（任意理由を含む）。authorはhuman。authorizationは`status,referenceId,question,threadId,turnId,model,runtime`（ツールなし解釈の出典）。UNIQUE(reference_id,request_id)で操作IDを変えても同じ指示の同じ選択は一度だけ |
 
 #### saved_states
 

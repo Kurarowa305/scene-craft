@@ -42,6 +42,17 @@ export function referenceStore(
   CREATE TABLE reference_candidates (sequence INTEGER PRIMARY KEY AUTOINCREMENT,id TEXT NOT NULL UNIQUE,work_id TEXT NOT NULL REFERENCES works(id),page_id TEXT NOT NULL REFERENCES reference_pages(id),data TEXT NOT NULL);
   CREATE TABLE reference_selections (sequence INTEGER PRIMARY KEY AUTOINCREMENT,id TEXT NOT NULL UNIQUE,reference_id TEXT NOT NULL REFERENCES reference_candidates(id),request_id TEXT NOT NULL REFERENCES chat_requests(id),data TEXT NOT NULL,UNIQUE(reference_id,request_id));
   COMMIT;`);
+  // An old process cannot still own an in-progress external search.
+  if (
+    db
+      .prepare(
+        "SELECT 1 FROM reference_searches WHERE json_extract(data,'$.status')='in_progress' LIMIT 1",
+      )
+      .get()
+  )
+    db.prepare(
+      "UPDATE reference_searches SET data=json_set(data,'$.status','interrupted') WHERE json_extract(data,'$.status')='in_progress'",
+    ).run();
   function view(workId: string): ReferenceView {
     const rows = (table: string) =>
       db
@@ -65,9 +76,17 @@ export function referenceStore(
     if (!value) throw new OperationError(404, "REFERENCE_PAGE_NOT_FOUND");
     return value;
   }
-  function candidate(workId: string, id: string): ReferenceCandidate {
-    const value = view(workId).candidates.find((p) => p.id === id);
-    if (!value) throw new OperationError(404, "REFERENCE_NOT_FOUND");
+  function find(id: string): ReferenceCandidate {
+    const row = db
+      .prepare("SELECT data FROM reference_candidates WHERE id=?")
+      .get(id);
+    if (!row) throw new OperationError(404, "REFERENCE_NOT_FOUND");
+    return JSON.parse(row.data as string);
+  }
+  function candidate(workId: string, id: string) {
+    const value = find(id);
+    if (value.workId !== workId)
+      throw new OperationError(404, "REFERENCE_NOT_FOUND");
     return value;
   }
   function persistPage(p: ReferencePage) {
@@ -90,6 +109,7 @@ export function referenceStore(
     view,
     page,
     candidate,
+    find,
     source,
     persistPage,
     context(workId: string) {
@@ -115,7 +135,7 @@ export function referenceStore(
         itemId: item.id,
         query: item.query ?? null,
         action: item.action ?? null,
-        status: complete ? (item.status ?? "completed") : "in_progress",
+        status: complete ? "completed" : "in_progress",
         resultAvailability: Array.isArray(item.results)
           ? item.results.length
             ? "results"
@@ -123,9 +143,41 @@ export function referenceStore(
           : "not_provided",
         results: item.results ?? null,
       };
+      const old = db
+        .prepare(
+          "SELECT data FROM reference_searches WHERE request_id=? AND attempt=? AND item_id=?",
+        )
+        .get(r.id, r.retryCount, item.id);
+      if (old) {
+        const previous = JSON.parse(old.data as string);
+        if (!complete && previous.status === "completed") return;
+        if (item.results == null && Array.isArray(previous.results)) {
+          data.results = previous.results;
+          data.resultAvailability = previous.resultAvailability;
+        }
+        data.action ??= previous.action;
+        data.query ??= previous.query;
+      }
       db.prepare(
         "INSERT INTO reference_searches (request_id,item_id,attempt,work_id,data) VALUES (?,?,?,?,?) ON CONFLICT(request_id,attempt,item_id) DO UPDATE SET data=excluded.data",
       ).run(r.id, item.id, r.retryCount, r.workId, JSON.stringify(data));
+    },
+    finishSearches(r: ChatRequest, status: string) {
+      const rows = db
+        .prepare(
+          "SELECT sequence,data FROM reference_searches WHERE request_id=? AND attempt=?",
+        )
+        .all(r.id, r.retryCount);
+      for (const row of rows) {
+        const data = JSON.parse(row.data as string);
+        if (data.status !== "in_progress") continue;
+        data.status = status === "completed" ? "unknown" : status;
+        data.checkedAt = new Date().toISOString();
+        db.prepare("UPDATE reference_searches SET data=? WHERE sequence=?").run(
+          JSON.stringify(data),
+          row.sequence,
+        );
+      }
     },
     save(c: ReferenceCandidate, bytes?: Buffer) {
       if (bytes) {
@@ -140,29 +192,17 @@ export function referenceStore(
       ).run(c.id, c.workId, c.pageId, JSON.stringify(c));
       return { complete: true, candidate: c, link: `/api/references/${c.id}` };
     },
-    select(r: ChatRequest, id: string) {
+    select(
+      r: ChatRequest,
+      id: string,
+      authorization: import("./reference-interpreter.js").ReferenceAuthorization,
+    ) {
       const c = candidate(r.workId, id);
-      const matching = view(r.workId).candidates.filter(
-        (v) => r.body.includes(v.id) || r.body.includes(v.title),
-      );
-      // Require an identified candidate and a direct reference-selection request.
-      // Ambiguous, quoted reports, questions, hypothetical and negative instructions fail closed.
       if (
-        matching.length !== 1 ||
-        matching[0].id !== c.id ||
-        !/(参考(?:資料)?として(?:選|採用|使|保存)|参考(?:資料)?に(?:選|し|使)|参考(?:資料)?を(?:選|採用))/.test(
-          r.body,
-        ) ||
-        /[?？]|(?:しない|選ばない|使わない|採用しない|ではなく|と言|という|た場合|なら|例えば|例として|命令|指示された)/.test(
-          r.body,
-        )
+        authorization.status !== "select" ||
+        authorization.referenceId !== c.id
       )
-        return {
-          complete: false,
-          needsClarification: true,
-          question:
-            "選ぶ参考資料のタイトルまたはIDと、参考として選ぶ指示を明記してください。",
-        };
+        throw new OperationError(403, "EXPLICIT_INSTRUCTION_REQUIRED");
       const old = view(r.workId).selections.find(
         (s) => s.requestId === r.id && s.referenceId === id,
       );
@@ -172,6 +212,7 @@ export function referenceStore(
         referenceId: id,
         requestId: r.id,
         body: r.body,
+        authorization,
         author: "human",
         createdAt: new Date().toISOString(),
       };

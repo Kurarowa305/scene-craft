@@ -15,6 +15,7 @@ import { runAuxiliary } from "./auxiliary.js";
 import type { AuxiliaryJob } from "../shared/auxiliary.js";
 import { explicitInstruction } from "./context-store.js";
 import { interpretRecordInstruction } from "./record-interpreter.js";
+import { interpretReferenceSelection } from "./reference-interpreter.js";
 import { sideReference } from "./side-store.js";
 
 export const commonInstructions = `You are scene-craft's assistant. Use the dedicated scene_craft MCP tools and text answers. In the reference role only, built-in Web search is also allowed.
@@ -306,6 +307,30 @@ export function registerChat(
     }
     return c;
   }
+  contextRpc.setReferenceInterpreter(async (request, id, stillCurrent) => {
+    try {
+      return await interpretReferenceSelection(
+        await runtime(),
+        request,
+        store.references.view(request.workId).candidates,
+        id,
+        stillCurrent,
+      );
+    } catch (error) {
+      if (
+        error instanceof OperationError &&
+        blockingErrors.has(error.code) &&
+        stillCurrent()
+      ) {
+        const latest = chat.get(request.id);
+        latest.error = error.code;
+        latest.phase = latest.terminal ? "blocked" : "stopping";
+        save(latest);
+        void interrupt(latest);
+      }
+      throw error;
+    }
+  });
   contextRpc.setInterpreter(async (request, stillCurrent) => {
     try {
       const intent = store.context.context(request.workId).work.intent;
@@ -388,8 +413,14 @@ export function registerChat(
   function terminal(r: ChatRequest, turn: any) {
     for (const i of turn.items ?? []) {
       merge(r, item(i, true));
-      store.references.search(r, i, true);
+      store.references.search(
+        r,
+        i,
+        turn.status === "completed" || i.completedAtMs != null,
+      );
     }
+    if (["completed", "failed", "interrupted"].includes(turn.status))
+      store.references.finishSearches(r, turn.status);
     r.terminal = turn.status;
     if (
       ["completed", "interrupted"].includes(turn.status) &&
@@ -442,6 +473,7 @@ export function registerChat(
         r.turnId = turnId;
       }
       if (method === "connection/lost") {
+        store.references.finishSearches(r, "unknown");
         r.phase = "unknown";
         r.error = "CODEX_DISCONNECTED";
       } else if (method === "model/rerouted") {

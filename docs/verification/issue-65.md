@@ -11,7 +11,7 @@
 既存の設定・認証・保存先を維持して、Windows側のスクリプトを更新する。
 
 ```powershell
-& '\\wsl.localhost\Ubuntu\home\oyadomaritaiki\scene-craft\scripts\windows\Update-Installation.ps1'
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File '\\wsl.localhost\Ubuntu\home\oyadomaritaiki\scene-craft\scripts\windows\Update-Installation.ps1'
 ```
 
 起動中なら画面右上の「アプリ終了」を押す。終了後にデスクトップの`scene-craft`をダブルクリックする。最新版のLauncherは新規バックエンドの起動前に、そのチェックアウトを自動ビルドする。起動中の旧プロセスは自動置換しない。ビルド失敗は`BUILD_FAILED`で停止する。設定の既定定義Git版は自動で変更しない。
@@ -19,7 +19,7 @@
 隔離した実機確認を行う場合は次を使う。既存アプリを終了してポートを空ける。通常の制作フォルダーと別のWindows管理フォルダー・WSL DBを作り、対象コミットと環境、各手動項目の未実施状態をJSONへ残す。
 
 ```powershell
-& "$env:LOCALAPPDATA\scene-craft\Test-Local.ps1" -Config "$env:LOCALAPPDATA\scene-craft\launcher.json"
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$env:LOCALAPPDATA\scene-craft\Test-Local.ps1" -Config "$env:LOCALAPPDATA\scene-craft\launcher.json"
 ```
 
 `%LOCALAPPDATA%\scene-craft\verification`の最新`*-result.json`（実際のファイル名はスクリプト末尾の出力を参照）へ実結果・証跡・成功/失敗を記入する。起動や自動確認が成功しても、手動項目を自動的に成功にはしない。
@@ -52,3 +52,13 @@
 ## 記録する証跡
 
 対象フルコミット、Windows/WSL/Node/Codexの版、上記手順、期待結果、実結果、スクリーンショットまたは参照ID、成功/失敗/未実施を保持する。実サイトの利用条件と実Codexの検索挙動はモデル・アカウント・サイトに依存するため、CIの代替成功から実接続成功を推定しない。Windows確認が終わるまで実機受け入れを完了としない。
+
+## 自動確認とレビュー
+
+公開HTTP/MCPから一時DB・一時管理フォルダーまで、検索の依頼/turn/item対応、結果未提供/空結果/失敗、候補と選択原文の再起動保持、同じ操作の再送、画像の保存条件根拠・全画素デコード・読出hash検査・欠落・リンク切れ、取得停止、工程権限、非公開URL拒否、相談文から選択しないことを確認する。画像検証は[Sharpの入力制限・破損検査仕様](https://sharp.pixelplumbing.com/api-constructor/)に従い、1600万画素/全フレーム・5秒上限で行う。
+
+ブラウザではチャットの参考リンク、右タブの出典・本文・画像未保持・選択原文、再読込を確認する。既存のサイドチャット等も回帰対象。新規隔離DBの実物をPRAGMAで照合し、27テーブル・101物理カラムと外部キー/UNIQUEを実装一覧へ反映した。Windows PowerShell全4スクリプトの構文を検査し、インストール済みLauncherとリポジトリ版のSHA256一致を確認する。
+
+規約レビューの2件（引数一覧の不一致、候補取得の全作品走査）と仕様レビューの3件（相談文の選択誤認、検索中断の未反映、ヘッダーだけの破損画像の成功扱い）を修正した。対象は着手時`0c3f01d`からの差分。実機受け入れ結果はこの自動確認・レビューと分けて残す。
+
+最終ローカル確認：`npm run check`で型検査・API/保存80件・画面14件・ビルドが成功。追加の検索結果保持の回帰も`tests/references.test.ts`で再確認。画面証跡は`test-results/issue-65-reference-panel.png`。CIは同じcheckをPR作成・更新ごとに実行する。Windowsの実検索・画像条件確認・実機操作は未実施として残す。
