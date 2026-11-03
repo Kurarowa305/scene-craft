@@ -15,14 +15,22 @@ async function waitFor(check: () => Promise<boolean>) {
 }
 
 async function mcp(f: Awaited<ReturnType<typeof chatFixture>>) {
+  let credential = "";
+  await waitFor(async () => {
+    try {
+      credential = JSON.parse(
+        await readFile(join(f.directory, "codex/fixture-mcp.json"), "utf8"),
+      ).SCENE_CRAFT_RPC_CREDENTIAL;
+      return typeof credential === "string" && credential.length > 0;
+    } catch {
+      return false;
+    }
+  });
   const config = await readFile(join(f.directory, "codex/config.toml"), "utf8");
   const socketPath = JSON.parse(
     /^SCENE_CRAFT_RPC_SOCKET = (.+)$/m.exec(config)![1],
   );
   assert.equal((await stat(socketPath)).mode & 0o777, 0o600);
-  const credential = JSON.parse(
-    await readFile(join(f.directory, "codex/fixture-mcp.json"), "utf8"),
-  ).SCENE_CRAFT_RPC_CREDENTIAL;
   const child = spawn(
     process.execPath,
     ["--import", "tsx", resolve("src/server/mcp.ts")],
