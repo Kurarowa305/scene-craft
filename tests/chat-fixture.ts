@@ -122,6 +122,14 @@ export async function chatFixture(external = false, withFiles = false) {
     post,
     read,
     raw,
+    upload: (url: string, bytes: Buffer) =>
+      app.inject({
+        method: "POST",
+        url,
+        headers: { ...headers, "content-type": "application/octet-stream" },
+        payload: bytes,
+      }),
+    response: (url: string) => app.inject({ url, headers }),
     setHook(fn: typeof hook) {
       hook = fn;
     },

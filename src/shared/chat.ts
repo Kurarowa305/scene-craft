@@ -1,3 +1,4 @@
+import type { ChatImage } from "./chat-image.js";
 import type { VersionPlan } from "./versions.js";
 import type { RecordInterpretation } from "./record-instruction.js";
 export interface ModelChoice {
@@ -26,6 +27,7 @@ export interface ChatItem {
   complete: boolean;
 }
 export interface ChatRequest {
+  images?: ChatImage[];
   recordInterpretation?: RecordInterpretation;
   role?: string;
   contextSnapshot?: unknown;

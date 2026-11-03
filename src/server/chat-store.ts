@@ -1,3 +1,4 @@
+import type { ChatImage } from "../shared/chat-image.js";
 import type { DatabaseSync } from "node:sqlite";
 import { randomUUID } from "node:crypto";
 import type { ChatRequest, ChatSession, ModelChoice } from "../shared/chat.js";
@@ -129,49 +130,57 @@ export function chatStore(
         workId: string,
         plan: VersionPlan,
       ) => { snapshot: unknown; instructions: string },
+      images: ChatImage[] = [],
     ) {
-      const saved = once(key, ["chat-send", id, body, role], () => {
-        const s = session(id);
-        if (!s.selection) throw new OperationError(409, "MODEL_REQUIRED");
-        const workId = db
-          .prepare("SELECT work_id FROM conversations WHERE id = ?")
-          .get(id)!.work_id as string;
-        if (side(id) && role !== "consultation")
-          throw new OperationError(403, "SIDE_CHAT_READ_ONLY");
-        if (requests().some((r) => conflicts(r, id, workId)))
-          throw new OperationError(409, "CHAT_RECONCILIATION_REQUIRED");
-        const r: ChatRequest = {
-          role,
-          attempts: [],
-          id: randomUUID(),
-          conversationId: id,
-          workId,
-          body,
-          selection: s.selection,
-          actualModel: null,
-          runtime: null,
-          threadId: s.threadId,
-          turnId: null,
-          phase: "accepted",
-          stopRequested: false,
-          error: null,
-          terminal: null,
-          items: [],
-          plan: plan(workId),
-          createdAt: new Date().toISOString(),
-          retryCount: 0,
-          previousAttempt: null,
-        };
-        if (context) {
-          const fixed = context(workId, r.plan);
-          r.contextSnapshot = fixed.snapshot;
-          r.instructions = fixed.instructions;
-        }
-        db.prepare(
-          "INSERT INTO chat_requests (id, conversation_id, work_id, data) VALUES (?, ?, ?, ?)",
-        ).run(r.id, id, workId, JSON.stringify(r));
-        return r;
-      });
+      const saved = once(
+        key,
+        images.length
+          ? ["chat-send", id, body, role, images]
+          : ["chat-send", id, body, role],
+        () => {
+          const s = session(id);
+          if (!s.selection) throw new OperationError(409, "MODEL_REQUIRED");
+          const workId = db
+            .prepare("SELECT work_id FROM conversations WHERE id = ?")
+            .get(id)!.work_id as string;
+          if (side(id) && role !== "consultation")
+            throw new OperationError(403, "SIDE_CHAT_READ_ONLY");
+          if (requests().some((r) => conflicts(r, id, workId)))
+            throw new OperationError(409, "CHAT_RECONCILIATION_REQUIRED");
+          const r: ChatRequest = {
+            ...(images.length ? { images } : {}),
+            role,
+            attempts: [],
+            id: randomUUID(),
+            conversationId: id,
+            workId,
+            body,
+            selection: s.selection,
+            actualModel: null,
+            runtime: null,
+            threadId: s.threadId,
+            turnId: null,
+            phase: "accepted",
+            stopRequested: false,
+            error: null,
+            terminal: null,
+            items: [],
+            plan: plan(workId),
+            createdAt: new Date().toISOString(),
+            retryCount: 0,
+            previousAttempt: null,
+          };
+          if (context) {
+            const fixed = context(workId, r.plan);
+            r.contextSnapshot = fixed.snapshot;
+            r.instructions = fixed.instructions;
+          }
+          db.prepare(
+            "INSERT INTO chat_requests (id, conversation_id, work_id, data) VALUES (?, ?, ?, ?)",
+          ).run(r.id, id, workId, JSON.stringify(r));
+          return r;
+        },
+      );
       return get(saved.id);
     },
     stop(key: string, id: string) {

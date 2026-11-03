@@ -1,3 +1,12 @@
+import { sendRecord } from "./ui-helpers";
+import {
+  openWorkDialog,
+  openSettings,
+  choosePanel,
+  openArtifacts,
+  openConnectionSettings,
+  closeSettings,
+} from "./ui-helpers";
 import { test, expect } from "@playwright/test";
 import { mkdtemp, mkdir, writeFile, chmod } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -37,178 +46,146 @@ test.afterAll(async () => {
   if (directory) await cleanGitFixture(directory);
 });
 
-test("保存済みサイドが8件あってもメインのAPI要求を妨げない", async ({
-  page,
-}) => {
-  const session = await (await page.request.get("/api/session")).json();
-  const headers = {
-    origin: "http://localhost:4519",
-    "x-csrf-token": session.csrfToken,
-  };
-  const post = async (path: string, body = {}) => {
-    const response = await page.request.post(path, {
-      headers,
-      data: { requestKey: crypto.randomUUID(), ...body },
-    });
-    expect(response.ok()).toBeTruthy();
-    return response.json();
-  };
-  await post("/api/versions/default", { commit: definition });
-  const work = await post("/api/works", { name: "相談8件の作品" });
-  const main = await post(`/api/works/${work.id}/conversations`);
-  for (let i = 0; i < 8; i++)
-    await post(`/api/conversations/${main.id}/side-chats`, {
-      selectedStateIds: [],
-    });
-  await page.goto("/");
-  await page
-    .getByRole("button", { name: "相談8件の作品", exact: true })
-    .click();
-  await page
-    .getByRole("button", { name: "未命名のチャット 1", exact: true })
-    .click();
-  await expect(
-    page.getByRole("button", { name: /^相談を再表示:/ }),
-  ).toHaveCount(8);
-  const status = await page.evaluate(async () => {
-    try {
-      return (await fetch("/api/works", { signal: AbortSignal.timeout(2000) }))
-        .status;
-    } catch {
-      return "timeout";
-    }
-  });
-  expect(status).toBe(200);
-});
-
-test("遅い相談一覧を受信しても新しく作った相談を失わない", async ({ page }) => {
-  await page.goto("/");
+async function createMain(page: import("@playwright/test").Page, name: string) {
+  await openSettings(page);
   await page.getByLabel("定義のフルコミット").fill(definition);
   await page
     .getByRole("button", { name: "既定定義を保存", exact: true })
     .click();
+  await openWorkDialog(page);
+  await page.getByLabel("作品名", { exact: true }).fill(name);
+  await page
+    .getByRole("dialog", { name: "作品を作成" })
+    .getByRole("button", { name: "作品を作成", exact: true })
+    .click();
+  await page.getByRole("button", { name: `${name}に新しいチャット` }).click();
+}
+
+test("種類を選ぶと中間画面なしでサイドチャットを開く", async ({ page }) => {
+  await page.goto("/");
+  await createMain(page, "直接開く相談");
+  await choosePanel(page, "サイドチャット");
+  await expect(
+    page.getByRole("region", { name: "サイドチャットの会話" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "相談を開始", exact: true }),
+  ).toHaveCount(0);
+  await expect(page.getByText("保存済みの相談", { exact: true })).toHaveCount(
+    0,
+  );
+  await expect(page.getByText("接続・会話の設定", { exact: true })).toHaveCount(
+    0,
+  );
+});
+
+test("複数の新しい相談を同時に開いても、別々の会話として確定する", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await createMain(page, "並行して開く相談");
   let release = () => {};
   const gate = new Promise<void>((resolve) => {
     release = resolve;
   });
-  let fetched = () => {};
-  const ready = new Promise<void>((resolve) => {
-    fetched = resolve;
-  });
+  let requests = 0;
   await page.route("**/api/conversations/*/side-chats", async (route) => {
-    if (route.request().method() !== "GET") return route.continue();
-    const response = await route.fetch();
-    fetched();
+    if (route.request().method() !== "POST") return route.continue();
+    requests++;
     await gate;
-    await route.fulfill({ response });
+    await route.continue();
   });
-  await page.getByLabel("作品名", { exact: true }).fill("相談一覧遅延");
-  await page.getByRole("button", { name: "作品を作成", exact: true }).click();
-  await page
-    .getByRole("button", { name: "相談一覧遅延に新しいチャット" })
-    .click();
-  await ready;
-  const panel = page.getByRole("complementary", { name: "右側タブ" });
-  await expect(panel.getByLabel("メインの話題")).toHaveCount(0);
-  await panel.getByRole("button", { name: "相談を開始", exact: true }).click();
+  await choosePanel(page, "サイドチャット");
+  await choosePanel(page, "サイドチャット");
+  try {
+    await expect.poll(() => requests).toBe(2);
+  } finally {
+    release();
+  }
   await expect(
-    panel.getByRole("tab", { name: "未命名のサイドチャット 1", exact: true }),
-  ).toBeVisible();
-  release();
-  await panel
-    .getByRole("button", { name: "タブを閉じる", exact: true })
-    .click();
-  await expect(
-    panel.getByRole("button", {
-      name: "相談を再表示: 未命名のサイドチャット 1",
-      exact: true,
-    }),
-  ).toBeVisible();
+    page.getByRole("region", { name: "サイドチャットの会話" }),
+  ).toHaveCount(1);
+  const works = await (await page.request.get("/api/works")).json();
+  const work = works.find(
+    (w: { name: string }) => w.name === "並行して開く相談",
+  );
+  const main = (
+    await (await page.request.get(`/api/works/${work.id}/conversations`)).json()
+  )[0];
+  await expect
+    .poll(
+      async () =>
+        (
+          await (
+            await page.request.get(`/api/conversations/${main.id}/side-chats`)
+          ).json()
+        ).length,
+    )
+    .toBe(2);
 });
 
-test("右タブの相談を閉じても継続し、再表示・停止・再読み込みで原文を保持する", async ({
+test("右タブでメインと並行して相談し、停止後も原文を保持する", async ({
   page,
 }) => {
   await page.goto("/");
-  await page.getByLabel("定義のフルコミット").fill(definition);
-  await page
-    .getByRole("button", { name: "既定定義を保存", exact: true })
-    .click();
-  await expect(
-    page.getByText(`新規依頼の既定定義: ${definition}`, { exact: true }),
-  ).toBeVisible();
-  await page.getByLabel("作品名", { exact: true }).fill("サイド確認");
-  await page.getByRole("button", { name: "作品を作成", exact: true }).click();
-  await page
-    .getByRole("button", { name: "サイド確認に新しいチャット" })
-    .click();
+  await createMain(page, "サイド確認");
   const main = page.getByRole("region", { name: "Codexとの会話", exact: true });
-  await expect(main.getByLabel("会話モデル", { exact: true })).toBeEnabled();
+  const panel = page.getByRole("complementary", { name: "右側タブ" });
   await main
     .getByLabel("会話モデル", { exact: true })
     .selectOption("fixture-a");
-  await main.getByText("保存用要約・根拠・補助モデル", { exact: true }).click();
-  await main
+  await openConnectionSettings(page);
+  await page
     .getByLabel("命名・要約モデル", { exact: true })
     .selectOption("fixture-a");
-  const panel = page.getByRole("complementary", { name: "右側タブ" });
-  await expect(
-    panel.getByLabel("参照する保存済み成果物").locator("option"),
-  ).toHaveCount(0);
-  await page.getByText("制作ファイルを添付して記録", { exact: true }).click();
-  await page.getByLabel("作業アプリ").selectOption("Photoshop");
-  await page
-    .getByLabel("PSD / PSBファイル（フォルダー内の相対パス）")
-    .fill("drawing.psd");
-  await page.getByLabel("ファイル記録の本文").fill("相談開始直前の成果物");
-  await page
-    .getByRole("button", { name: "ファイルと本文を記録", exact: true })
-    .click();
-  const outputs = panel.getByLabel("参照する保存済み成果物");
-  await expect(outputs.locator("option")).toHaveCount(1);
-  await outputs.selectOption({ index: 0 });
-  await main.getByLabel("Codexへのメッセージ").fill("メインの制作相談");
+  await closeSettings(page);
+  await main.getByLabel("メッセージ", { exact: true }).fill("メインの制作相談");
   await main.getByRole("button", { name: "Codexへ送信", exact: true }).click();
-  await expect(panel.getByLabel("タブの種類")).toHaveValue("サイドチャット");
-  await expect(panel.getByLabel("メインの話題")).toHaveCount(0);
-  await panel.getByRole("button", { name: "相談を開始", exact: true }).click();
+  await choosePanel(page, "サイドチャット");
   const side = panel.getByRole("region", { name: "サイドチャットの会話" });
   await expect(side.getByLabel("会話モデル", { exact: true })).toHaveValue(
     "fixture-a",
   );
-  await expect(side.getByLabel("工程", { exact: true })).toHaveCount(0);
+  await expect(side.getByLabel("エージェント", { exact: true })).toHaveCount(0);
+  await expect(
+    side.getByRole("button", { name: "記録として送信", exact: true }),
+  ).toHaveCount(0);
   await side
-    .getByLabel("Codexへのメッセージ")
+    .getByLabel("サイドチャットのメッセージ", { exact: true })
     .fill("ライトを調整する操作を教えて");
-  await side.getByRole("button", { name: "Codexへ送信", exact: true }).click();
-  await expect(side.getByText("応答中", { exact: true })).toBeVisible();
-  await panel
-    .getByRole("button", { name: "タブを閉じる", exact: true })
-    .click();
-  await panel
-    .getByRole("button", { name: "相談を再表示: 港の光の検討", exact: true })
-    .click();
+  await side
+    .getByLabel("サイドチャットのメッセージ", { exact: true })
+    .press("Enter");
   await expect(side.getByText("保存される返答", { exact: true })).toBeVisible();
   await expect(
-    side.getByText("ライトを調整する操作を教えて", { exact: true }),
-  ).toHaveCount(1);
-  await side.getByLabel("Codexへのメッセージ").fill("止める相談");
-  await side.getByRole("button", { name: "Codexへ送信", exact: true }).click();
-  await side.getByRole("button", { name: "停止", exact: true }).click();
-  await expect(side.getByText("停止しました", { exact: true })).toBeVisible();
-  await page.reload();
-  await page.getByRole("button", { name: "サイド確認", exact: true }).click();
-  await page
-    .getByRole("navigation", { name: "作品とチャット" })
-    .getByRole("button", { name: /港の光の検討|未命名のチャット 1/ })
-    .click();
-  await panel
-    .getByRole("button", { name: "相談を再表示: 港の光の検討", exact: true })
+    panel.getByRole("tab", { name: "港の光の検討", exact: true }),
+  ).toBeVisible();
+  await side
+    .getByLabel("サイドチャットのメッセージ", { exact: true })
+    .fill("止める相談");
+  await side.getByRole("button", { name: "相談を送信", exact: true }).click();
+  await side
+    .getByRole("button", { name: "現在の作業を停止", exact: true })
     .click();
   await expect(side.getByText("停止しました", { exact: true })).toBeVisible();
-  await expect(
-    side.getByText("ライトを調整する操作を教えて", { exact: true }),
-  ).toHaveCount(1);
+  const works = await (await page.request.get("/api/works")).json();
+  const work = works.find((w: { name: string }) => w.name === "サイド確認");
+  const conversations = await (
+    await page.request.get(`/api/works/${work.id}/conversations`)
+  ).json();
+  const saved = await (
+    await page.request.get(
+      `/api/conversations/${conversations[0].id}/side-chats`,
+    )
+  ).json();
+  expect(saved).toHaveLength(1);
+  const view = await (
+    await page.request.get(`/api/conversations/${saved[0].conversationId}/chat`)
+  ).json();
+  expect(view.requests.map((r: { body: string }) => r.body)).toEqual([
+    "ライトを調整する操作を教えて",
+    "止める相談",
+  ]);
   await page.screenshot({
     path: "test-results/issue-64-side-chat.png",
     fullPage: true,

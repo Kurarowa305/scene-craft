@@ -1,8 +1,16 @@
-import { useEffect, useRef, useState, useId, type FormEvent } from "react";
+import { useChatImages, SentImages, type ImageControls } from "./chat-images";
+import {
+  useEffect,
+  useRef,
+  useState,
+  useId,
+  type FormEvent,
+  type ReactNode,
+} from "react";
 import type { BodyRecord } from "../shared/contracts";
 import type { ChatModel, ChatView, ModelChoice } from "../shared/chat";
 import { read, write } from "./api";
-import { Auxiliary } from "./auxiliary";
+import { Icon, Popup } from "./ui";
 
 const phases: Record<string, string> = {
   accepted: "受付済み",
@@ -39,8 +47,30 @@ export function Chat({
   onRecordsChanged,
   side = false,
   onSideNamesChanged,
+  attachment,
+  recordDraft,
+  onDraftChange,
+  onRecord,
+  recordDisabled,
+  onStatusChange,
+  composerExtra,
+  forceRecord,
+  draftLocked,
+  connectionRevision = 0,
+  onImageBusyChange,
 }: {
   conversationId: string;
+  composerExtra?: ReactNode;
+  forceRecord?: boolean;
+  draftLocked?: boolean;
+  connectionRevision?: number;
+  attachment?: ReactNode | ((controls: ImageControls) => ReactNode);
+  onImageBusyChange?: (busy: boolean) => void;
+  recordDraft?: string;
+  onDraftChange?: (draft: string) => void;
+  onRecord?: (body: string) => Promise<void>;
+  recordDisabled?: boolean;
+  onStatusChange?: (state: string) => void;
   side?: boolean;
   onSideNamesChanged?: (names: Record<string, string | null>) => void;
   onNameChanged: (name: string | null) => void;
@@ -51,6 +81,10 @@ export function Chat({
   ) => void;
 }) {
   const bodyId = useId();
+  const imageInput = useRef<HTMLInputElement>(null);
+  const images = useChatImages(conversationId, onImageBusyChange);
+  const hasImages = images.items.length > 0;
+
   const alive = useRef(false);
   const contextFetch = useRef(0);
   const contextRevision = useRef(-1);
@@ -67,23 +101,16 @@ export function Chat({
     );
   }
   const [status, setStatus] = useState<Status>();
-  const [draft, setDraft] = useState("");
+  const [ownDraft, setOwnDraft] = useState("");
+  const draft = recordDraft ?? ownDraft;
+  const setDraft = onDraftChange ?? setOwnDraft;
+  const [sendMode, setSendMode] = useState("chat");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
-  const [authUrl, setAuthUrl] = useState("");
+  const actionGate = useRef<Promise<void> | null>(null);
   const [roles, setRoles] = useState<{ id: string; description: string }[]>([]);
   const [role, setRole] = useState("none");
-  const [context, setContext] = useState<{
-    work: { intent: string | null };
-    revisions: {
-      id: string;
-      targetId: string;
-      field: string;
-      body: string;
-      previousBody: string | null;
-      createdAt: string;
-    }[];
-  }>();
+  type WorkContext = { work: { intent: string | null }; revisions: unknown[] };
   async function refreshContext(v: ChatView) {
     if (side) return;
     if (!alive.current || v.revision < contextRevision.current) return;
@@ -93,11 +120,10 @@ export function Chat({
     if (workId) {
       try {
         const [next, records] = await Promise.all([
-          read<NonNullable<typeof context>>(`/api/works/${workId}/context`),
+          read<WorkContext>(`/api/works/${workId}/context`),
           read<BodyRecord[]>(`/api/conversations/${conversationId}/records`),
         ]);
         if (alive.current && sequence === contextFetch.current) {
-          setContext(next);
           onRecordsChanged(records, next.work.intent, next.revisions.length);
         }
       } catch {
@@ -110,6 +136,20 @@ export function Chat({
   const active = view?.requests.find((r) =>
     ["accepted", "running", "stopping", "unknown"].includes(r.phase),
   );
+  useEffect(() => {
+    if (!view) return;
+    const requests = view.requests;
+    const latest = requests.at(-1);
+    const state =
+      latest && ["unknown", "blocked"].includes(latest.phase)
+        ? "attention"
+        : latest && ["accepted", "running", "stopping"].includes(latest.phase)
+          ? "running"
+          : latest?.phase === "interrupted"
+            ? "stopped"
+            : "";
+    onStatusChange?.(state);
+  }, [view]);
   async function refresh() {
     const [s, v] = await Promise.all([
       read<Status>("/api/codex"),
@@ -163,7 +203,18 @@ export function Chat({
       source?.close();
     };
   }, [conversationId]);
+  useEffect(() => {
+    if (!connectionRevision || !alive.current) return;
+    void refresh().catch(() => {
+      if (alive.current) setError("接続状態を取得できません。");
+    });
+  }, [connectionRevision]);
   async function action(fn: () => Promise<void>) {
+    let release!: () => void;
+    const gate = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    actionGate.current = gate;
     setBusy(true);
     setError("");
     try {
@@ -172,7 +223,14 @@ export function Chat({
       setError((e as Error).message);
     } finally {
       setBusy(false);
+      if (actionGate.current === gate) actionGate.current = null;
+      release();
     }
+  }
+  async function addImages(files: File[]) {
+    // A saved-image download may finish after the message send has started.
+    while (actionGate.current) await actionGate.current;
+    await images.addImages(files);
   }
   async function choose(s: ModelChoice) {
     await write(
@@ -184,11 +242,27 @@ export function Chat({
   function send(e: FormEvent) {
     e.preventDefault();
     void action(async () => {
+      const submitter = (e.nativeEvent as SubmitEvent)
+        .submitter as HTMLButtonElement | null;
+      if (
+        !hasImages &&
+        !side &&
+        onRecord &&
+        (submitter?.value === "record" ||
+          (!hasImages && (sendMode === "record" || forceRecord)))
+      ) {
+        await onRecord(draft);
+        setDraft("");
+        return;
+      }
+      const sentImageIds = images.items.map((item) => item.id);
       await write(`/api/conversations/${conversationId}/messages`, {
         body: draft,
+        ...(sentImageIds.length ? { imageIds: sentImageIds } : {}),
         ...(side ? {} : { role }),
       });
       setDraft("");
+      images.clear(sentImageIds);
       await refresh();
     });
   }
@@ -198,292 +272,336 @@ export function Chat({
       className="codex-chat"
       aria-label={side ? "サイドチャットの会話" : "Codexとの会話"}
     >
-      <div className="section-heading">
-        <h3>{side ? "相談専用サイドチャット" : "Codexとの会話"}</h3>
-        <span>
-          {status?.authenticated
-            ? "ChatGPT認証済み"
-            : status?.configured
-              ? "ログインが必要"
-              : "Codex未接続"}
-        </span>
-      </div>
-      <p className="hint">
-        {side
-          ? "開始時の文脈で相談します。制作・採否・記録・制作意図や保護の変更・メインへの依頼受け渡しはできません。"
-          : "工程ごとの相談・文脈参照と、明示した文章の記録ができます。制作ファイル操作・保護の適用・採否は準備中です。"}
-      </p>
-      <button
-        type="button"
-        disabled={busy}
-        onClick={() =>
-          void action(async () => {
-            const r = await write<{ authUrl: string }>("/api/codex/login", {});
-            setAuthUrl(r.authUrl);
-          })
-        }
-      >
-        ChatGPTでログイン
-      </button>
-      {authUrl && (
-        <a href={authUrl} target="_blank" rel="noreferrer">
-          専用ログインを開く
-        </a>
-      )}
-      <button
-        type="button"
-        disabled={busy}
-        onClick={() => void action(refresh)}
-      >
-        接続状態を更新
-      </button>
-      {error && <p role="alert">{error}</p>}
-      {view && !side && (
-        <Auxiliary
-          value={view.auxiliary}
-          models={status?.models ?? []}
-          conversationId={conversationId}
-          requestId={view.requests.at(-1)?.id}
-          refresh={refresh}
-          onError={setError}
-        />
-      )}
-      <div className="chat-settings">
-        {!side && (
-          <label>
-            工程
-            <select
-              aria-label="工程"
-              value={role}
-              disabled={busy || !!active}
-              onChange={(e) => setRole(e.target.value)}
-            >
-              <option value="none">なし</option>
-              {roles.map((r) => (
-                <option key={r.id} value={r.id}>
-                  {r.description}（相談・記録）
-                </option>
-              ))}
-            </select>
-          </label>
+      <div className="messages">
+        {side && (
+          <div className="panel-top">
+            <h2>サイドチャット</h2>
+            <span className="badge">相談専用</span>
+          </div>
         )}
-        <label>
-          会話モデル
-          <select
-            aria-label="会話モデル"
-            value={selection?.model ?? ""}
-            disabled={busy || !view}
-            onChange={(e) => {
-              const m = status!.models.find((m) => m.model === e.target.value)!;
-              void action(() =>
-                choose({
-                  model: m.model,
-                  effort: m.defaultReasoningEffort,
-                  speed: "standard",
-                }),
-              );
-            }}
-          >
-            <option value="" disabled>
-              モデルを選択
-            </option>
-            {selection && !model && (
-              <option value={selection.model}>
-                {selection.model}（利用不可）
-              </option>
-            )}
-            {status?.models.map((m) => (
-              <option key={m.id} value={m.model}>
-                {m.displayName}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label>
-          推論強度
-          <select
-            aria-label="推論強度"
-            value={selection?.effort ?? ""}
-            disabled={busy || !model}
-            onChange={(e) =>
-              void action(() =>
-                choose({ ...selection!, effort: e.target.value }),
-              )
-            }
-          >
-            {model?.supportedReasoningEfforts.map((e) => (
-              <option key={e.reasoningEffort}>{e.reasoningEffort}</option>
-            ))}
-          </select>
-        </label>
-        <label>
-          速度
-          <select
-            aria-label="速度"
-            value={selection?.speed ?? "standard"}
-            disabled={busy || !selection}
-            onChange={(e) =>
-              void action(() =>
-                choose({
-                  ...selection!,
-                  speed: e.target.value as ModelChoice["speed"],
-                }),
-              )
-            }
-          >
-            <option value="standard">標準</option>
-            <option value="fast">高速</option>
-          </select>
-        </label>
-      </div>
-      <p className="hint">選択の変更は次の依頼から適用します。</p>
-      {!side && (
-        <details>
-          <summary>記録の指示方法</summary>
-          <p>
-            自然な文章から全文の作成・置き換え（CREATE）か、既存内容への追記・編集（UPDATE）を判断します。対象や内容が曖昧なときは確認します。引用の紹介や通常の相談だけでは更新しません。
+        {error && (
+          <p className="error" role="alert">
+            {error}
           </p>
-          <p>制作意図を「夕暮れの静かな港」に変えてください</p>
-          <p>制作意図に「夕方の光を重視」を追記して</p>
-          <p>制作意図の「夕暮れ」を「夜明け」に変更して</p>
-          <p>手作業で「Photoshopで空の色を調整した」を記録して</p>
-          <p>直前の記録に「静けさを出すため、照明も調整した」を追記して</p>
-          <p>
-            直前の記録の全文を「空と照明を調整した。落ち着いた雰囲気にするため。」に変更して
-          </p>
-          <p>直前の記録の「空」を「海」に変更して</p>
-          <p>従来の省略書式も利用できます。</p>
-          <p>記録を訂正: 記録ID body 変更後の全文</p>
-          <p>
-            訂正項目は
-            body（手作業の文章）・summary（要約）です。理由も手作業の文章へ含めて記録できます。追記は「記録に追記:
-            記録ID
-            追加文」とも指示できます。記録IDは下の更新履歴で確認できます。
-          </p>
-        </details>
-      )}
-      {context && (
-        <details>
-          <summary>共有情報と更新履歴</summary>
-          <p>現在の制作意図: {context.work.intent ?? "未入力"}</p>
-          {context.revisions.map((v) => (
-            <article key={v.id}>
-              <p>
-                記録ID: {v.targetId} / {v.field}
-              </p>
-              <p>{v.body}</p>
-              <p>
-                以前: {v.previousBody ?? "未入力"} / 記入者: 人間 /{" "}
-                {v.createdAt}
-              </p>
-            </article>
-          ))}
-        </details>
-      )}
-      <div aria-live="polite">
-        {view?.requests.map((r) => (
-          <article className="record" key={r.id}>
-            <strong>あなた</strong>
-            <p className="hint">工程: {r.role ?? "none"}</p>
-            <p className="record-body">{r.body}</p>
-            <strong>{phases[r.phase]}</strong>
-            <p className="hint">
-              要求: {r.selection.model} / {r.selection.effort} /{" "}
-              {r.selection.speed} · 実モデル: {r.actualModel ?? "未確認"}
-            </p>
-            {r.attempts.flatMap((a, index) =>
-              a.items
+        )}
+        <div aria-live="polite">
+          {view?.requests.map((r) => (
+            <article className="message exchange" key={r.id}>
+              <div className="message user">
+                <div className="message-label">あなた</div>
+                {!!r.images?.length && (
+                  <SentImages
+                    conversationId={conversationId}
+                    images={r.images}
+                  />
+                )}
+                {r.body && <p className="record-body message-body">{r.body}</p>}
+              </div>
+              <div className="message-label">
+                <span className="assistant-dot">s</span>scene-craft{" "}
+                <span className="hint">{phases[r.phase]}</span>
+              </div>
+              <details className="execution-details">
+                <summary>実行の詳細</summary>
+                <p className="hint">工程: {r.role ?? "none"}</p>
+                <p className="hint">
+                  要求: {r.selection.model} / {r.selection.effort} /{" "}
+                  {r.selection.speed} · 実モデル: {r.actualModel ?? "未確認"}
+                </p>
+              </details>
+              {r.attempts.flatMap((a, index) =>
+                a.items
+                  .filter((i) => i.type === "agentMessage")
+                  .map((i) => (
+                    <p className="record-body" key={`${index}-${i.id}`}>
+                      前の実行: {i.text}
+                    </p>
+                  )),
+              )}
+              {r.items
                 .filter((i) => i.type === "agentMessage")
                 .map((i) => (
-                  <p className="record-body" key={`${index}-${i.id}`}>
-                    前の実行: {i.text}
+                  <p className="record-body" key={i.id}>
+                    {i.text}
+                    {!i.complete && "（途中）"}
                   </p>
-                )),
-            )}
-            {r.items
-              .filter((i) => i.type === "agentMessage")
-              .map((i) => (
-                <p className="record-body" key={i.id}>
-                  {i.text}
-                  {!i.complete && "（途中）"}
+                ))}
+              {r.error && (
+                <p>
+                  {reasons[r.error] ??
+                    "状態を確認し、必要な対処を行ってください。自動再送は行いません。"}
                 </p>
+              )}
+              {r.phase === "completed" && r.items.some((i) => !i.complete) && (
+                <p>本文に欠落の可能性があります。</p>
+              )}
+              {["interrupted", "blocked"].includes(r.phase) && r.terminal && (
+                <button
+                  type="button"
+                  disabled={busy || r.retryCount >= 2 || !!active}
+                  onClick={() =>
+                    void action(async () => {
+                      await write(`/api/chat-requests/${r.id}/resume`, {});
+                      await refresh();
+                    })
+                  }
+                >
+                  この依頼を再開
+                </button>
+              )}
+            </article>
+          ))}
+        </div>
+      </div>
+      <div className="composer-area">
+        <form className="composer" onSubmit={send}>
+          <label className="sr-only" htmlFor={bodyId}>
+            {side ? "サイドチャットのメッセージ" : "メッセージ"}
+          </label>
+          <textarea
+            id={bodyId}
+            value={draft}
+            rows={3}
+            maxLength={200000}
+            onChange={(e) => setDraft(e.target.value)}
+            onKeyDown={(event) => {
+              if (
+                event.key !== "Enter" ||
+                event.shiftKey ||
+                event.nativeEvent.isComposing ||
+                event.keyCode === 229
+              )
+                return;
+              event.preventDefault();
+              const form = event.currentTarget.form;
+              const submit = form?.querySelector<HTMLButtonElement>(
+                "button.send[type='submit']",
+              );
+              if (submit && !submit.disabled) form?.requestSubmit(submit);
+            }}
+            disabled={busy || draftLocked}
+            placeholder={
+              side ? "操作方法や、気になることを相談…" : "メッセージを入力…"
+            }
+          />
+          {composerExtra}
+          <input
+            ref={imageInput}
+            className="sr-only"
+            type="file"
+            accept="image/png,image/jpeg,image/webp"
+            multiple
+            disabled={busy || images.busy}
+            aria-label="LLMに添付する画像を選択"
+            onChange={(event) => {
+              const files = Array.from(event.target.files ?? []);
+              event.target.value = "";
+              void addImages(files).catch((failure) =>
+                setError(failure.message),
+              );
+            }}
+          />
+          {hasImages && (
+            <div className="draft-images" aria-label="添付画像">
+              {images.items.map((item) => (
+                <div key={item.id} className="draft-image">
+                  <img src={item.preview} alt={item.file.name} />
+                  <button
+                    type="button"
+                    aria-label={`${item.file.name}を外す`}
+                    disabled={busy || images.busy}
+                    onClick={() => void images.remove(item.id)}
+                  >
+                    ×
+                  </button>
+                </div>
               ))}
-            {r.error && (
-              <p>
-                {reasons[r.error] ??
-                  "状態を確認し、必要な対処を行ってください。自動再送は行いません。"}
-              </p>
-            )}
-            {r.phase === "completed" && r.items.some((i) => !i.complete) && (
-              <p>本文に欠落の可能性があります。履歴を照合してください。</p>
-            )}
+            </div>
+          )}
+          {images.error && (
+            <p role="alert" className="error">
+              {images.error}
+            </p>
+          )}
+          {images.busy && <p role="status">画像を添付中…</p>}
+          {!images.busy && images.items.some((item) => !item.uploaded) && (
             <button
               type="button"
-              disabled={busy}
-              onClick={() =>
-                void action(async () => {
-                  await write(`/api/chat-requests/${r.id}/reconcile`, {});
-                  await refresh();
-                })
-              }
+              disabled={busy || images.busy}
+              onClick={() => void images.retry().catch(() => {})}
             >
-              履歴を照合
+              同じ画像で再試行
             </button>
-            {["interrupted", "blocked"].includes(r.phase) && r.terminal && (
+          )}
+
+          <div className="composer-tools">
+            <div className="row">
+              {typeof attachment === "function"
+                ? attachment({
+                    busy: busy || images.busy,
+                    addImages,
+                    selectImages: () => imageInput.current?.click(),
+                  })
+                : attachment}
+              <div className="composer-selects">
+                {!side && (
+                  <label>
+                    <span className="sr-only">エージェント</span>
+                    <select
+                      aria-label="エージェント"
+                      value={role}
+                      disabled={busy || !!active}
+                      onChange={(e) => setRole(e.target.value)}
+                    >
+                      <option value="none">なし</option>
+                      {roles.map((r) => (
+                        <option key={r.id} value={r.id}>
+                          {r.description}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                )}
+                <label>
+                  <span className="sr-only">会話モデル</span>
+                  <select
+                    aria-label="会話モデル"
+                    value={selection?.model ?? ""}
+                    disabled={busy || !view}
+                    onChange={(e) => {
+                      const m = status!.models.find(
+                        (m) => m.model === e.target.value,
+                      )!;
+                      void action(() =>
+                        choose({
+                          model: m.model,
+                          effort: m.defaultReasoningEffort,
+                          speed: "standard",
+                        }),
+                      );
+                    }}
+                  >
+                    <option value="" disabled>
+                      モデルを選択
+                    </option>
+                    {selection && !model && (
+                      <option value={selection.model}>
+                        {selection.model}（利用不可）
+                      </option>
+                    )}
+                    {status?.models.map((m) => (
+                      <option key={m.id} value={m.model}>
+                        {m.displayName}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                {!side && onRecord && (
+                  <select
+                    aria-label="送信方法"
+                    value={
+                      hasImages ? "chat" : forceRecord ? "record" : sendMode
+                    }
+                    disabled={hasImages || forceRecord || draftLocked}
+                    onChange={(e) => setSendMode(e.target.value)}
+                  >
+                    <option value="chat">会話で送信</option>
+                    <option value="record">記録として送信</option>
+                  </select>
+                )}
+                <Popup
+                  label="モデルの詳細設定"
+                  className="model-options"
+                  icon={<Icon name="settings" />}
+                >
+                  {() => (
+                    <div className="model-options-content">
+                      <label>
+                        <span>推論強度</span>
+                        <select
+                          aria-label="推論強度"
+                          value={selection?.effort ?? ""}
+                          disabled={busy || !model}
+                          onChange={(e) =>
+                            void action(() =>
+                              choose({ ...selection!, effort: e.target.value }),
+                            )
+                          }
+                        >
+                          {model?.supportedReasoningEfforts.map((e) => (
+                            <option key={e.reasoningEffort}>
+                              {e.reasoningEffort}
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+                      <label>
+                        <span>速度</span>
+                        <select
+                          aria-label="速度"
+                          value={selection?.speed ?? "standard"}
+                          disabled={busy || !selection}
+                          onChange={(e) =>
+                            void action(() =>
+                              choose({
+                                ...selection!,
+                                speed: e.target.value as ModelChoice["speed"],
+                              }),
+                            )
+                          }
+                        >
+                          <option value="standard">標準</option>
+                          <option value="fast">高速</option>
+                        </select>
+                      </label>
+                      <p className="hint">変更は次の依頼から適用します。</p>
+                    </div>
+                  )}
+                </Popup>
+              </div>
+            </div>
+            {active ? (
               <button
+                className="send stop"
                 type="button"
-                disabled={busy || r.retryCount >= 2 || !!active}
+                aria-label="現在の作業を停止"
+                disabled={busy || active.phase === "stopping"}
                 onClick={() =>
                   void action(async () => {
-                    await write(`/api/chat-requests/${r.id}/resume`, {});
+                    await write(`/api/chat-requests/${active.id}/stop`, {});
                     await refresh();
                   })
                 }
               >
-                この依頼を再開
+                {active.phase === "stopping" ? "…" : "■"}
+              </button>
+            ) : (
+              <button
+                className="send"
+                type="submit"
+                aria-label={
+                  side
+                    ? "相談を送信"
+                    : !hasImages && (sendMode === "record" || forceRecord)
+                      ? "記録として送信"
+                      : "Codexへ送信"
+                }
+                disabled={
+                  busy ||
+                  images.busy ||
+                  images.items.some((item) => !item.uploaded) ||
+                  (!hasImages && (sendMode === "record" || forceRecord)
+                    ? recordDisabled
+                    : !status?.authenticated || !model) ||
+                  (!draft.trim() && !hasImages)
+                }
+              >
+                <Icon name="send" />
               </button>
             )}
-          </article>
-        ))}
+          </div>
+        </form>
       </div>
-      <form className="composer" onSubmit={send}>
-        <label htmlFor={bodyId}>Codexへのメッセージ</label>
-        <textarea
-          id={bodyId}
-          value={draft}
-          rows={4}
-          maxLength={200000}
-          onChange={(e) => setDraft(e.target.value)}
-          disabled={busy}
-        />
-        <div className="composer-footer">
-          <button
-            className="primary"
-            disabled={
-              busy ||
-              !!active ||
-              !status?.authenticated ||
-              !model ||
-              !draft.trim()
-            }
-          >
-            Codexへ送信
-          </button>
-          {active && (
-            <button
-              type="button"
-              onClick={() =>
-                void action(async () => {
-                  await write(`/api/chat-requests/${active.id}/stop`, {});
-                  await refresh();
-                })
-              }
-            >
-              停止
-            </button>
-          )}
-        </div>
-      </form>
     </section>
   );
 }
