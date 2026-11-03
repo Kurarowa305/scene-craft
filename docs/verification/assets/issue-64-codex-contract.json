@@ -1,5 +1,6 @@
 {
-  "checkedAt": "2026-11-03T07:51:04.949Z",
+  "targetCommit": "5a924948eab853dd8ef1821b3b40bdc506ee1f53",
+  "checkedAt": "2026-11-03T07:58:36.123Z",
   "runtime": "scene_craft/0.166.0 (Ubuntu 22.4.0; x86_64) unknown (scene_craft; 0.1.0)",
   "expected": "distinct threads; main 8 tools; side 3 reference tools; execution bypass features disabled",
   "actual": {

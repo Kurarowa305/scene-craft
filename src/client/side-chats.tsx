@@ -29,7 +29,11 @@ export function SideChats({
     ])
       .then(([s, data]) => {
         if (current) {
-          setSides(s);
+          setSides((previous) => [
+            ...new Map(
+              [...s, ...previous].map((side) => [side.conversationId, side]),
+            ).values(),
+          ]);
           setStates(data.states);
         }
       })

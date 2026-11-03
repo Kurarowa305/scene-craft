@@ -1,6 +1,52 @@
 import { test, expect } from "@playwright/test";
 import { readFileSync } from "node:fs";
 
+test("遅い相談一覧を受信しても新しく作った相談を失わない", async ({ page }) => {
+  const git = JSON.parse(readFileSync("test-results/git-fixture.json", "utf8"));
+  await page.goto("/");
+  await page.getByLabel("定義のフルコミット").fill(git.definition);
+  await page
+    .getByRole("button", { name: "既定定義を保存", exact: true })
+    .click();
+  let release = () => {};
+  const gate = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  let fetched = () => {};
+  const ready = new Promise<void>((resolve) => {
+    fetched = resolve;
+  });
+  await page.route("**/api/conversations/*/side-chats", async (route) => {
+    if (route.request().method() !== "GET") return route.continue();
+    const response = await route.fetch();
+    fetched();
+    await gate;
+    await route.fulfill({ response });
+  });
+  await page.getByLabel("作品名", { exact: true }).fill("相談一覧遅延");
+  await page.getByRole("button", { name: "作品を作成", exact: true }).click();
+  await page
+    .getByRole("button", { name: "相談一覧遅延に新しいチャット" })
+    .click();
+  await ready;
+  const panel = page.getByRole("complementary", { name: "右側タブ" });
+  await panel.getByLabel("メインの話題").fill("新しく作る相談");
+  await panel.getByRole("button", { name: "相談を開始", exact: true }).click();
+  await expect(
+    panel.getByRole("tab", { name: "新しく作る相談", exact: true }),
+  ).toBeVisible();
+  release();
+  await panel
+    .getByRole("button", { name: "タブを閉じる", exact: true })
+    .click();
+  await expect(
+    panel.getByRole("button", {
+      name: "相談を再表示: 新しく作る相談",
+      exact: true,
+    }),
+  ).toBeVisible();
+});
+
 test("右タブの相談を閉じても継続し、再表示・停止・再読み込みで原文を保持する", async ({
   page,
 }) => {
