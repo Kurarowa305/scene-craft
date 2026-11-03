@@ -42,9 +42,9 @@
 
 ## バックエンドHTTP API
 
-明示登録は40操作。表はパスの辞書順、同一パスはメソッド順（GET→POST）で並べる。追加時も該当パスの位置へ行を挿入する。[基本・作品・ファイル・Git API](../src/server/app.ts)、[Codex・会話・実行API](../src/server/chat.ts)、[共通schema](../src/server/http-schema.ts)。
+明示登録は41操作。表はパスの辞書順、同一パスはメソッド順（GET→POST）で並べる。追加時も該当パスの位置へ行を挿入する。[基本・作品・ファイル・Git API](../src/server/app.ts)、[Codex・会話・実行API](../src/server/chat.ts)、[共通schema](../src/server/http-schema.ts)、[ブラウザー添付](../src/server/attachments.ts)。
 
-同一localhost originを使用する。GET/HEAD以外はOrigin・HttpOnlyセッションcookie・`x-csrf-token`・`application/json`が必要。本文上限は1MiB。POSTは`/api/shutdown`を除き`requestKey`（8〜128文字、英数字・`_`・`-`）を必須とし、表はそれ以外の入力を記載する。`:id`と`:fileId`はUUID。追加本文プロパティは拒否する。業務エラーはHTTP状態コードと`{error:コード}`を返す。`reconcile`等、schema上のrequestKeyを処理の冪等キーとして使わない操作もある。
+同一localhost originを使用する。GET/HEAD以外はOrigin・HttpOnlyセッションcookie・`x-csrf-token`が必要。通常は`application/json`、本文上限1MiB。添付受け渡しだけは`application/octet-stream`で最大8GiBをストリーム保存する。POSTは`/api/shutdown`と添付受け渡しを除き`requestKey`（8〜128文字、英数字・`_`・`-`）を必須とし、表はそれ以外の入力を記載する。`:id`と`:fileId`はUUID。追加本文プロパティは拒否する。業務エラーはHTTP状態コードと`{error:コード}`を返す。`reconcile`等、schema上のrequestKeyを処理の冪等キーとして使わない操作もある。
 
 | メソッド | パス | 入力 | 結果・副作用 |
 | --- | --- | --- | --- |
@@ -54,10 +54,11 @@
 | POST | `/api/chat-requests/:id/stop` | 依頼ID、追加本文項目なし | 停止要求を保存し、非同期で実行turnを中断 |
 | GET | `/api/codex` | なし | `{configured,authenticated,runtime,models}`。未接続時も利用可否を返す |
 | POST | `/api/codex/login` | 追加本文項目なし | ChatGPT専用ログインの `{authUrl}` |
+| POST | `/api/conversations/:id/attachments/:fileId` | メイン会話ID・添付UUID、query `name`（最大240文字かつUTF-8 240 bytes、区切り・制御文字・非対応拡張子拒否）、binary本文（1 byte〜8GiB）。requestKeyなし、添付UUIDが再送識別子 | ファイル領域設定時だけ登録。`{file:SourceFile,size,sha256}`。DB変更なし、会話の存在と相談専用制限を検査。同じID・名前・bytesは同じ応答、異内容409、処理中の同じIDは409。部分受信は公開しない。絶対パスは受け付けず返さない |
 | POST | `/api/conversations/:id/auxiliary/resume` | 会話ID、追加本文項目なし | 通常完了した最新依頼で、失敗等の命名・未要約分を明示再実行。停止・エラー・未確定の依頼では拒否。同一requestKeyの再送は重複起動しない。停止した制作依頼は既存resumeまたは新しい依頼で再開 |
 | GET | `/api/conversations/:id/chat` | 会話ID | `ChatView {session,requests,revision,auxiliary,sideNames}`。補助モデル設定・会話名・処理履歴・根拠付き要約・未要約原文を含む。`sideNames`は配下サイドの会話ID→現在名/nullの表示用辞書。未選択なら利用可能な既定モデルを初期選択 |
 | GET | `/api/conversations/:id/events` | 会話ID、任意header `Last-Event-ID` | SSE `event: chat`、`id: revision`、`data: ChatView`。15秒ごとkeepalive。サイドの命名等でもメインのrevisionを進めて`sideNames`を配信し、閉じたサイドごとの接続を作らず一覧名を更新 |
-| POST | `/api/conversations/:id/imports` | 会話ID、`body,application,beforeStateId,files`。任意`render,reason`（旧互換） | `{operationId,id,state,record}`。制作ファイルを管理下へ固定し保存状態・記録を確定。サイド会話では403 |
+| POST | `/api/conversations/:id/imports` | 会話ID、`body,application,beforeStateId,files`。任意`render,reason`（旧互換） | `{operationId,id,state,record}`。制作ファイルを管理下へ固定し保存状態・記録を確定。サイド会話では403。`browser_uploads`参照は当該会話の受け渡し済み添付だけ許可し、確定後に受け渡し用実体を除去 |
 | POST | `/api/conversations/:id/messages` | 会話ID、`body`（1〜200000文字・空白のみ不可）、任意`role`（1〜100文字、既定none） | `ChatRequest`を受付。固定文脈・版・工程で非同期実行。サイドは工程consultationのみ（省略時自動適用）、開始時の版・文脈を継続しメインとは別thread。メインと並行受付可能、同じサイド内の未確定依頼は拒否 |
 | POST | `/api/conversations/:id/model` | 会話ID、`model`（最大200文字）、`effort`（最大30文字）、`speed: standard/fast` | 利用可能なモデル・強度を検査して選択を保存 |
 | POST | `/api/conversations/:id/name` | 会話ID、`name`（1〜100文字・空白のみ不可） | 人間の会話名を保存。後着の自動命名では上書きしない |
@@ -90,6 +91,12 @@
 | GET | `/api/works/:id/versions` | 作品ID | 新規依頼用の既定定義・作品の固定作風と利用可否 |
 
 GETにはFastifyによるHEADも自動登録される。`staticRoot`設定時の静的ファイル配信もFastify pluginが登録する。これらは表の明示HTTP APIとは分けて扱う。内部Codex app-serverのJSON-RPCメソッドは、本バックエンドのHTTP APIではない。
+
+### ブラウザーからの添付受け渡し
+
+受け渡し用の実体と再送照合用receiptは`dataDirectory/browser-uploads/<conversation-id>/<attachment-id>/`へ固定する。`receipt.json`は`file {rootId,relativePath,role}`・size・sha256を保持し、DBテーブルは追加しない。`browser_uploads`は予約ルートIDで、設定された取り込み元一覧には追加表示しない。対応形式は.blend、.psd/.psb、.png/.jpg/.jpeg/.webp、.exr/.tif/.tiff。依存ファイルの自動探索・プレビュー生成を受け渡し完了とは扱わない。
+
+受信中は同じ会話配下の一時ディレクトリへ書き、size/hashとreceiptを確定してから公開する。中断・失敗の一時領域は当該要求の終了時に除去する。取り込みのDB確定後に受け渡し用の実体を削除し、再送の照合に使うreceiptは保持する。取り込み前に画面を閉じた添付・実行プロセスの強制終了で残った一時領域は自動削除しない。これらを制作の保存状態として表示しない。バックアップ・全体削除の運用は後続Issueの範囲とする。
 
 ### ファイル取り込みの入力詳細
 

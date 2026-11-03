@@ -1,3 +1,11 @@
+import { sendRecord } from "./ui-helpers";
+import {
+  openWorkDialog,
+  openSettings,
+  choosePanel,
+  openArtifacts,
+  openChatUtilities,
+} from "./ui-helpers";
 import { test, expect } from "@playwright/test";
 import { mkdtemp, mkdir, writeFile, chmod } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -37,6 +45,21 @@ test.afterAll(async () => {
   if (directory) await cleanGitFixture(directory);
 });
 
+async function createMain(page: import("@playwright/test").Page, name: string) {
+  await openSettings(page);
+  await page.getByLabel("定義のフルコミット").fill(definition);
+  await page
+    .getByRole("button", { name: "既定定義を保存", exact: true })
+    .click();
+  await openWorkDialog(page);
+  await page.getByLabel("作品名", { exact: true }).fill(name);
+  await page
+    .getByRole("dialog", { name: "作品を作成" })
+    .getByRole("button", { name: "作品を作成", exact: true })
+    .click();
+  await page.getByRole("button", { name: `${name}に新しいチャット` }).click();
+}
+
 test("保存済みサイドが8件あってもメインのAPI要求を妨げない", async ({
   page,
 }) => {
@@ -67,31 +90,26 @@ test("保存済みサイドが8件あってもメインのAPI要求を妨げな�
   await page
     .getByRole("button", { name: "未命名のチャット 1", exact: true })
     .click();
+  await choosePanel(page, "サイドチャット");
   await expect(
     page.getByRole("button", { name: /^相談を再表示:/ }),
   ).toHaveCount(8);
-  const status = await page.evaluate(async () => {
-    try {
-      return (await fetch("/api/works", { signal: AbortSignal.timeout(2000) }))
-        .status;
-    } catch {
-      return "timeout";
-    }
-  });
-  expect(status).toBe(200);
+  expect(
+    await page.evaluate(
+      async () =>
+        (await fetch("/api/works", { signal: AbortSignal.timeout(2000) }))
+          .status,
+    ),
+  ).toBe(200);
 });
 
 test("遅い相談一覧を受信しても新しく作った相談を失わない", async ({ page }) => {
   await page.goto("/");
-  await page.getByLabel("定義のフルコミット").fill(definition);
-  await page
-    .getByRole("button", { name: "既定定義を保存", exact: true })
-    .click();
-  let release = () => {};
+  let release = () => {},
+    fetched = () => {};
   const gate = new Promise<void>((resolve) => {
     release = resolve;
   });
-  let fetched = () => {};
   const ready = new Promise<void>((resolve) => {
     fetched = resolve;
   });
@@ -102,12 +120,9 @@ test("遅い相談一覧を受信しても新しく作った相談を失わな�
     await gate;
     await route.fulfill({ response });
   });
-  await page.getByLabel("作品名", { exact: true }).fill("相談一覧遅延");
-  await page.getByRole("button", { name: "作品を作成", exact: true }).click();
-  await page
-    .getByRole("button", { name: "相談一覧遅延に新しいチャット" })
-    .click();
+  await createMain(page, "相談一覧遅延");
   await ready;
+  await choosePanel(page, "サイドチャット");
   const panel = page.getByRole("complementary", { name: "右側タブ" });
   await expect(panel.getByLabel("メインの話題")).toHaveCount(0);
   await panel.getByRole("button", { name: "相談を開始", exact: true }).click();
@@ -116,8 +131,12 @@ test("遅い相談一覧を受信しても新しく作った相談を失わな�
   ).toBeVisible();
   release();
   await panel
-    .getByRole("button", { name: "タブを閉じる", exact: true })
+    .getByRole("button", {
+      name: "未命名のサイドチャット 1を閉じる",
+      exact: true,
+    })
     .click();
+  await choosePanel(page, "サイドチャット");
   await expect(
     panel.getByRole("button", {
       name: "相談を再表示: 未命名のサイドチャット 1",
@@ -130,61 +149,63 @@ test("右タブの相談を閉じても継続し、再表示・停止・再読�
   page,
 }) => {
   await page.goto("/");
-  await page.getByLabel("定義のフルコミット").fill(definition);
-  await page
-    .getByRole("button", { name: "既定定義を保存", exact: true })
-    .click();
-  await expect(
-    page.getByText(`新規依頼の既定定義: ${definition}`, { exact: true }),
-  ).toBeVisible();
-  await page.getByLabel("作品名", { exact: true }).fill("サイド確認");
-  await page.getByRole("button", { name: "作品を作成", exact: true }).click();
-  await page
-    .getByRole("button", { name: "サイド確認に新しいチャット" })
-    .click();
+  await createMain(page, "サイド確認");
   const main = page.getByRole("region", { name: "Codexとの会話", exact: true });
-  await expect(main.getByLabel("会話モデル", { exact: true })).toBeEnabled();
+  const panel = page.getByRole("complementary", { name: "右側タブ" });
   await main
     .getByLabel("会話モデル", { exact: true })
     .selectOption("fixture-a");
+  await openChatUtilities(page);
   await main.getByText("保存用要約・根拠・補助モデル", { exact: true }).click();
   await main
     .getByLabel("命名・要約モデル", { exact: true })
     .selectOption("fixture-a");
-  const panel = page.getByRole("complementary", { name: "右側タブ" });
-  await expect(
-    panel.getByLabel("参照する保存済み成果物").locator("option"),
-  ).toHaveCount(0);
-  await page.getByText("制作ファイルを添付して記録", { exact: true }).click();
-  await page.getByLabel("作業アプリ").selectOption("Photoshop");
+  await page.getByRole("button", { name: "成果物・ファイルを添付" }).click();
   await page
-    .getByLabel("PSD / PSBファイル（フォルダー内の相対パス）")
-    .fill("drawing.psd");
-  await page.getByLabel("ファイル記録の本文").fill("相談開始直前の成果物");
-  await page
-    .getByRole("button", { name: "ファイルと本文を記録", exact: true })
+    .getByRole("button", {
+      name: "コンピューターからファイルを添付",
+      exact: true,
+    })
     .click();
-  const outputs = panel.getByLabel("参照する保存済み成果物");
-  await expect(outputs.locator("option")).toHaveCount(1);
-  await outputs.selectOption({ index: 0 });
-  await main.getByLabel("Codexへのメッセージ").fill("メインの制作相談");
-  await main.getByRole("button", { name: "Codexへ送信", exact: true }).click();
-  await expect(panel.getByLabel("タブの種類")).toHaveValue("サイドチャット");
+  await page
+    .getByLabel("コンピューターからファイルを選択", { exact: true })
+    .setInputFiles({
+      name: "drawing.psd",
+      mimeType: "application/octet-stream",
+      buffer: Buffer.from("saved file fixture"),
+    });
+  await expect(page.getByText("drawing.psd", { exact: true })).toBeVisible();
+  await main
+    .getByLabel("メッセージ", { exact: true })
+    .fill("相談開始直前の成果物");
+  await sendRecord(page);
+  await openArtifacts(page);
+  await panel.getByRole("button", { name: /drawing.psd.*Photoshop/ }).click();
+  await choosePanel(page, "サイドチャット");
   await expect(panel.getByLabel("メインの話題")).toHaveCount(0);
+  await main.getByLabel("メッセージ", { exact: true }).fill("メインの制作相談");
+  await main.getByRole("button", { name: "Codexへ送信", exact: true }).click();
   await panel.getByRole("button", { name: "相談を開始", exact: true }).click();
   const side = panel.getByRole("region", { name: "サイドチャットの会話" });
   await expect(side.getByLabel("会話モデル", { exact: true })).toHaveValue(
     "fixture-a",
   );
-  await expect(side.getByLabel("工程", { exact: true })).toHaveCount(0);
+  await expect(side.getByLabel("エージェント", { exact: true })).toHaveCount(0);
+  await expect(
+    side.getByRole("button", { name: "記録として送信", exact: true }),
+  ).toHaveCount(0);
   await side
-    .getByLabel("Codexへのメッセージ")
+    .getByLabel("サイドチャットのメッセージ", { exact: true })
     .fill("ライトを調整する操作を教えて");
-  await side.getByRole("button", { name: "Codexへ送信", exact: true }).click();
+  await side.getByRole("button", { name: "相談を送信", exact: true }).click();
   await expect(side.getByText("応答中", { exact: true })).toBeVisible();
   await panel
-    .getByRole("button", { name: "タブを閉じる", exact: true })
+    .getByRole("button", {
+      name: /未命名のサイドチャット 1を閉じる|港の光の検討を閉じる/,
+      exact: true,
+    })
     .click();
+  await choosePanel(page, "サイドチャット");
   await panel
     .getByRole("button", { name: "相談を再表示: 港の光の検討", exact: true })
     .click();
@@ -192,9 +213,13 @@ test("右タブの相談を閉じても継続し、再表示・停止・再読�
   await expect(
     side.getByText("ライトを調整する操作を教えて", { exact: true }),
   ).toHaveCount(1);
-  await side.getByLabel("Codexへのメッセージ").fill("止める相談");
-  await side.getByRole("button", { name: "Codexへ送信", exact: true }).click();
-  await side.getByRole("button", { name: "停止", exact: true }).click();
+  await side
+    .getByLabel("サイドチャットのメッセージ", { exact: true })
+    .fill("止める相談");
+  await side.getByRole("button", { name: "相談を送信", exact: true }).click();
+  await side
+    .getByRole("button", { name: "現在の作業を停止", exact: true })
+    .click();
   await expect(side.getByText("停止しました", { exact: true })).toBeVisible();
   await page.reload();
   await page.getByRole("button", { name: "サイド確認", exact: true }).click();
@@ -202,6 +227,7 @@ test("右タブの相談を閉じても継続し、再表示・停止・再読�
     .getByRole("navigation", { name: "作品とチャット" })
     .getByRole("button", { name: /港の光の検討|未命名のチャット 1/ })
     .click();
+  await choosePanel(page, "サイドチャット");
   await panel
     .getByRole("button", { name: "相談を再表示: 港の光の検討", exact: true })
     .click();

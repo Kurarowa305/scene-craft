@@ -1,14 +1,29 @@
+import {
+  openWorkDialog,
+  openSettings,
+  openArtifacts,
+  openChatUtilities,
+  choosePanel,
+} from "./ui-helpers";
 import { test, expect } from "@playwright/test";
 
 test("制作ファイルを取り込み、手修正の変更前後と任意理由を開き直して確認する", async ({
   page,
 }) => {
   await page.goto("/");
+  await openWorkDialog(page);
   await page.getByLabel("作品名").fill("ファイル取り込みの作品");
-  await page.getByRole("button", { name: "作品を作成", exact: true }).click();
   await page
-    .getByRole("button", { name: "ファイル取り込みの作品に新しいチャット" })
+    .getByRole("dialog", { name: "作品を作成" })
+    .getByRole("button", { name: "作品を作成", exact: true })
     .click();
+  await page
+    .getByRole("button", {
+      name: "ファイル取り込みの作品に新しいチャット",
+      exact: true,
+    })
+    .click();
+  await openArtifacts(page);
   await page.getByText("制作ファイルを添付して記録", { exact: true }).click();
   await page.getByLabel("作業アプリ").selectOption("Photoshop");
   await page
@@ -41,6 +56,7 @@ test("制作ファイルを取り込み、手修正の変更前後と任意理�
   await page
     .getByRole("button", { name: "未命名のチャット 1", exact: true })
     .click();
+  await openArtifacts(page);
   await expect(page.locator(".saved-state").nth(1)).toContainText(
     "暖かくしたい",
   );
@@ -55,11 +71,19 @@ test("失敗時は入力と未完成を保ち、中止後に修正したファ�
   page,
 }) => {
   await page.goto("/");
+  await openWorkDialog(page);
   await page.getByLabel("作品名").fill("取り込みの失敗");
-  await page.getByRole("button", { name: "作品を作成", exact: true }).click();
   await page
-    .getByRole("button", { name: "取り込みの失敗に新しいチャット" })
+    .getByRole("dialog", { name: "作品を作成" })
+    .getByRole("button", { name: "作品を作成", exact: true })
     .click();
+  await page
+    .getByRole("button", {
+      name: "取り込みの失敗に新しいチャット",
+      exact: true,
+    })
+    .click();
+  await openArtifacts(page);
   await page.getByText("制作ファイルを添付して記録", { exact: true }).click();
   await page
     .getByLabel("PSD / PSBファイル（フォルダー内の相対パス）")

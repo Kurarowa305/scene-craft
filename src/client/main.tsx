@@ -1,14 +1,38 @@
 import { StrictMode, useEffect, useRef, useState, type FormEvent } from "react";
 import { createRoot } from "react-dom/client";
+import type {
+  SourceFile,
+  ImportInput,
+  SavedState,
+  ImportOperation,
+} from "../shared/files";
 import type { Work, Conversation, BodyRecord } from "../shared/contracts";
-import { read, write } from "./api";
+import { read, write, uploadFile, SaveError } from "./api";
 import { FileRecords } from "./file-records";
 import { VersionSettings, WorkVersions } from "./versions";
 import { Chat } from "./chat";
 import { SideChats } from "./side-chats";
+import { Icon, Modal, ResizeHandle, Unavailable, shellStyle } from "./ui";
 import "./style.css";
 
 function App() {
+  const fileInput = useRef<HTMLInputElement>(null);
+  const [uploads, setUploads] = useState<Record<string, SourceFile[]>>({});
+  const [selectedFiles, setSelectedFiles] = useState<
+    { id: string; file: File }[]
+  >([]);
+  const [uploading, setUploading] = useState(false);
+  const pendingImports = useRef<Record<string, ImportInput>>({});
+  const [pendingImport, setPendingImport] = useState(false);
+  const [modal, setModal] = useState<"work" | "settings" | "reflection" | null>(
+    null,
+  );
+  const [settingsTab, setSettingsTab] = useState("version");
+  const [sidebarWidth, setSidebarWidth] = useState(235);
+  const [mainWidth, setMainWidth] = useState(590);
+  const [showPanel, setShowPanel] = useState(false);
+  const [attachOpen, setAttachOpen] = useState(false);
+  const [statuses, setStatuses] = useState<Record<string, string>>({});
   const [works, setWorks] = useState<Work[]>([]);
   const [worksLoaded, setWorksLoaded] = useState(false);
   const [workId, setWorkId] = useState("");
@@ -122,6 +146,7 @@ function App() {
       );
       setConversationId("");
       setWorkId(created.id);
+      setModal(null);
       setName("");
       setIntent("");
     });
@@ -144,20 +169,104 @@ function App() {
       setConversationId(created.id);
     });
   }
-  function submitRecord(event: FormEvent) {
-    event.preventDefault();
+  async function transferFiles(items: { id: string; file: File }[]) {
+    setUploading(true);
+    setError("");
     const target = conversationId;
-    void action(async () => {
+    try {
+      const files: SourceFile[] = [];
+      for (const item of items)
+        files.push((await uploadFile(target, item.id, item.file)).file);
+      setUploads((previous) => ({ ...previous, [target]: files }));
+      setSelectedFiles([]);
+    } catch (failure) {
+      setError((failure as Error).message);
+    } finally {
+      setUploading(false);
+    }
+  }
+  async function submitRecord(body: string) {
+    const target = conversationId;
+    const attached = uploads[target] ?? [];
+    if (attached.length) {
+      let input = pendingImports.current[target];
+      if (!input) {
+        const current = await read<{ currentStateId: string | null }>(
+          `/api/works/${workId}/states`,
+        );
+        input = {
+          requestKey: crypto.randomUUID(),
+          body,
+          files: attached,
+          application: attached.some((f) => f.role === "blend")
+            ? "Blender"
+            : attached.some((f) => f.role === "psd")
+              ? "Photoshop"
+              : "Other",
+          beforeStateId: current.currentStateId,
+        };
+        pendingImports.current[target] = input;
+        setPendingImport(true);
+      }
+      let result: { record: BodyRecord; state: SavedState };
+      try {
+        result = await write<{ record: BodyRecord; state: SavedState }>(
+          `/api/conversations/${target}/imports`,
+          input as unknown as Record<string, unknown>,
+          false,
+        );
+      } catch (failure) {
+        if (
+          failure instanceof SaveError &&
+          [400, 403, 404, 409].includes(failure.status ?? 0)
+        ) {
+          const operations = await read<ImportOperation[]>(
+            `/api/works/${workId}/imports`,
+          );
+          if (!operations.some((op) => op.requestKey === input.requestKey)) {
+            delete pendingImports.current[target];
+            setPendingImport(false);
+          }
+        }
+        throw failure;
+      }
+      delete pendingImports.current[target];
+      setPendingImport(false);
+      setUploads((previous) => ({ ...previous, [target]: [] }));
+      setRecordRevision((value) => value + 1);
+      setRecords((previous) =>
+        previous.some((item) => item.id === result.record.id)
+          ? previous
+          : [...previous, result.record],
+      );
+    } else {
       const created = await write<BodyRecord>(
         `/api/conversations/${target}/records`,
-        { body: draft },
+        { body },
       );
       setRecords((previous) =>
         previous.some((item) => item.id === created.id)
           ? previous
           : [...previous, created],
       );
-      setDrafts((previous) => ({ ...previous, [target]: "" }));
+    }
+  }
+  async function abandonAttachment() {
+    await action(async () => {
+      const input = pendingImports.current[conversationId];
+      const operations = await read<ImportOperation[]>(
+        `/api/works/${workId}/imports`,
+      );
+      const op = operations.find(
+        (item) => item.requestKey === input?.requestKey,
+      );
+      if (!op || op.phase !== "incomplete")
+        throw new Error(
+          "照合が必要です。同じ内容で再送し、保存結果を確認してください。",
+        );
+      await write(`/api/imports/${op.id}/abandon`, {});
+      delete pendingImports.current[conversationId];
+      setPendingImport(false);
     });
   }
   if (stopped)
@@ -170,105 +279,447 @@ function App() {
       </main>
     );
   return (
-    <div className="app">
-      <header className="app-header">
-        <div>
-          <span className="brand">scene-craft</span>
-          <span className="edition">制作ノート</span>
+    <div
+      className={`shell ${showPanel ? "mobile-panel" : ""}`}
+      style={shellStyle(sidebarWidth, mainWidth)}
+    >
+      <aside className="sidebar">
+        <div className="brand">
+          <span className="brand-mark">s</span>
+          <span className="brand-name">scene-craft</span>
+          <small>WORKSPACE</small>
         </div>
-        <button
-          className="quiet"
-          disabled={busy}
-          onClick={() =>
-            void action(async () => {
-              await write("/api/shutdown", {}, false);
-              setStopped(true);
-            })
-          }
-        >
-          アプリ終了
-        </button>
-      </header>
-      <div className="workspace">
-        <aside className="sidebar">
-          <div className="section-heading">
-            <h2>作品</h2>
-            <span>{works.length}</span>
-          </div>
-          <nav aria-label="作品とチャット">
-            {works.map((item) => (
-              <section className="work-entry" key={item.id}>
-                <div className="work-row">
+        <div className="sidebar-tools">
+          <button className="nav-button" onClick={() => setModal("work")}>
+            <Icon name="plus" />
+            <span>作品を作成</span>
+          </button>
+          <button className="nav-button" onClick={() => setModal("reflection")}>
+            <Icon name="history" />
+            <span>作品を振り返る</span>
+          </button>
+        </div>
+        <div className="nav-label">作品とチャット</div>
+        <nav className="projects" aria-label="作品とチャット">
+          {!worksLoaded && <p className="hint">作品を読み込み中…</p>}
+          {works.map((item) => (
+            <section className="project" key={item.id}>
+              <div className="project-heading">
+                <button
+                  className="project-title"
+                  disabled={busy || loading || uploading || pendingImport}
+                  onClick={() => {
+                    setError("");
+                    setConversationId("");
+                    setWorkId(item.id);
+                  }}
+                >
+                  <Icon name="folder" />
+                  <span>{item.name}</span>
+                </button>
+                <button
+                  className="icon project-new-chat"
+                  aria-label={`${item.name}に新しいチャット`}
+                  title="新しいチャット"
+                  disabled={busy || loading || uploading || pendingImport}
+                  onClick={() => createConversation(item.id)}
+                >
+                  <Icon name="plus" />
+                </button>
+              </div>
+              {workId === item.id &&
+                conversations.map((chat, index) => (
                   <button
-                    className={
-                      workId === item.id ? "work-name selected" : "work-name"
-                    }
-                    disabled={busy || loading}
+                    aria-label={chat.title ?? `未命名のチャット ${index + 1}`}
+                    className={`chat-link ${conversationId === chat.id ? "active" : ""}`}
+                    key={chat.id}
+                    disabled={busy || loading || uploading || pendingImport}
                     onClick={() => {
                       setError("");
-                      setConversationId("");
-                      setWorkId(item.id);
+                      setConversationId(chat.id);
+                      setAttachOpen(false);
+                      setShowPanel(false);
                     }}
                   >
-                    {item.name}
+                    <span className="chat-title">
+                      {chat.title ?? `未命名のチャット ${index + 1}`}
+                    </span>
+                    <span
+                      className={`state-icon ${statuses[chat.id] ?? ""}`}
+                      aria-label={
+                        statuses[chat.id] === "running"
+                          ? "処理中"
+                          : statuses[chat.id] === "attention"
+                            ? "確認が必要"
+                            : statuses[chat.id] === "stopped"
+                              ? "停止中"
+                              : "通常"
+                      }
+                    >
+                      {statuses[chat.id] === "attention"
+                        ? "!"
+                        : statuses[chat.id] === "stopped"
+                          ? "Ⅱ"
+                          : ""}
+                    </span>
                   </button>
-                  <button
-                    className="new-chat"
-                    aria-label={`${item.name}に新しいチャット`}
-                    title="新しいチャット"
-                    disabled={busy || loading}
-                    onClick={() => createConversation(item.id)}
-                  >
-                    ＋
-                  </button>
-                </div>
-                {workId === item.id && (
-                  <div className="chat-list">
-                    {conversations.map((chat, index) => (
+                ))}
+            </section>
+          ))}
+        </nav>
+        <div className="sidebar-footer">
+          <button className="nav-button" onClick={() => setModal("settings")}>
+            <Icon name="settings" />
+            <span>設定・保存データ</span>
+          </button>
+          <button
+            className="nav-button"
+            disabled={busy}
+            onClick={() =>
+              void action(async () => {
+                await write("/api/shutdown", {}, false);
+                setStopped(true);
+              })
+            }
+          >
+            <span className="icon">⏻</span>
+            <span>アプリ終了</span>
+          </button>
+          <div className="profile">
+            <span className="avatar">S</span>
+            <span>制作ワークスペース</span>
+          </div>
+        </div>
+      </aside>
+      <ResizeHandle
+        label="作品一覧の幅"
+        value={sidebarWidth}
+        onChange={setSidebarWidth}
+        min={180}
+        max={360}
+      />
+      <div className="workspace">
+        <div className="workspace-body">
+          <main className="main-chat" aria-label="メインチャット">
+            <header className="chat-header">
+              <h1>
+                {conversationId
+                  ? (conversations.find((c) => c.id === conversationId)
+                      ?.title ??
+                    `未命名のチャット ${conversations.findIndex((c) => c.id === conversationId) + 1}`)
+                  : (work?.name ?? "scene-craft")}
+              </h1>
+              <button
+                className="icon mobile-toggle"
+                aria-label="右タブを表示"
+                onClick={() => setShowPanel(true)}
+              >
+                ⇄
+              </button>
+            </header>
+            {error && modal !== "work" && (
+              <p className="error" role="alert">
+                {error}
+              </p>
+            )}
+            {conversationId && work ? (
+              <>
+                <Chat
+                  key={conversationId}
+                  conversationId={conversationId}
+                  recordDraft={draft}
+                  onDraftChange={(value) =>
+                    setDrafts((previous) => ({
+                      ...previous,
+                      [conversationId]: value,
+                    }))
+                  }
+                  onRecord={submitRecord}
+                  recordDisabled={
+                    busy || loading || uploading || !recordsLoaded
+                  }
+                  draftLocked={pendingImport}
+                  forceRecord={!!uploads[conversationId]?.length}
+                  onStatusChange={(value) =>
+                    setStatuses((previous) => ({
+                      ...previous,
+                      [conversationId]: value,
+                    }))
+                  }
+                  attachment={
+                    <div className="attachment-anchor">
                       <button
-                        className={
-                          conversationId === chat.id ? "chat selected" : "chat"
-                        }
-                        key={chat.id}
-                        disabled={busy || loading}
-                        onClick={() => {
-                          setError("");
-                          setConversationId(chat.id);
-                        }}
+                        type="button"
+                        disabled={uploading || pendingImport}
+                        className="icon"
+                        aria-label="成果物・ファイルを添付"
+                        aria-expanded={attachOpen}
+                        onClick={() => setAttachOpen(!attachOpen)}
                       >
-                        {chat.title ?? `未命名のチャット ${index + 1}`}
+                        <Icon name="plus" />
                       </button>
-                    ))}
-                  </div>
+                      {attachOpen && (
+                        <div className="attachment-menu">
+                          <div className="menu-heading">
+                            制作ファイルと保存状態
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setShowPanel(true);
+                              document.dispatchEvent(
+                                new CustomEvent("open-artifacts"),
+                              );
+                              setAttachOpen(false);
+                            }}
+                          >
+                            保存済み成果物を開く
+                          </button>
+                          <button
+                            type="button"
+                            className="attach-computer"
+                            onClick={() => {
+                              fileInput.current?.click();
+                              setAttachOpen(false);
+                            }}
+                          >
+                            コンピューターからファイルを添付
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  }
+                  composerExtra={
+                    <>
+                      <input
+                        className="sr-only"
+                        ref={fileInput}
+                        type="file"
+                        aria-label="コンピューターからファイルを選択"
+                        multiple
+                        accept=".blend,.psd,.psb,.png,.jpg,.jpeg,.webp,.exr,.tif,.tiff"
+                        onChange={(e) => {
+                          const items = Array.from(
+                            e.target.files ?? [],
+                            (file) => ({ id: crypto.randomUUID(), file }),
+                          );
+                          setSelectedFiles(items);
+                          if (items.length) void transferFiles(items);
+                          e.target.value = "";
+                        }}
+                      />
+                      {uploading && (
+                        <p className="hint" role="status">
+                          ファイルを受け渡し中…
+                        </p>
+                      )}
+                      {!uploading && selectedFiles.length > 0 && (
+                        <button
+                          type="button"
+                          onClick={() => void transferFiles(selectedFiles)}
+                        >
+                          同じファイルで再送
+                        </button>
+                      )}
+                      {!!uploads[conversationId]?.length && (
+                        <div className="attachments">
+                          {uploads[conversationId]!.map((file) => (
+                            <span
+                              className="source-chip"
+                              key={file.relativePath}
+                            >
+                              <span>{file.relativePath.split("/").at(-1)}</span>
+                              <button
+                                type="button"
+                                aria-label={`${file.relativePath.split("/").at(-1)}を外す`}
+                                disabled={pendingImport}
+                                onClick={() =>
+                                  setUploads((previous) => ({
+                                    ...previous,
+                                    [conversationId]: previous[
+                                      conversationId
+                                    ]!.filter((f) => f !== file),
+                                  }))
+                                }
+                              >
+                                ×
+                              </button>
+                            </span>
+                          ))}
+                          <p>保存済みファイルを本文と一緒に記録します。</p>
+                        </div>
+                      )}
+                      {pendingImport && (
+                        <div className="note">
+                          <p role="status">
+                            保存結果の確認待ちです。入力を保持して、同じ内容で再送します。
+                          </p>
+                          <button
+                            type="button"
+                            disabled={busy}
+                            onClick={() => void abandonAttachment()}
+                          >
+                            未完成の添付記録を中止
+                          </button>
+                        </div>
+                      )}
+                    </>
+                  }
+                  onSideNamesChanged={setSideNames}
+                  onNameChanged={(name) =>
+                    setConversations((previous) =>
+                      previous.map((c) =>
+                        c.id === conversationId ? { ...c, title: name } : c,
+                      ),
+                    )
+                  }
+                  onRecordsChanged={(items, nextIntent, revision) => {
+                    ++recordsFetch.current;
+                    setRecords(items);
+                    setRecordsLoaded(true);
+                    setLoadingRecords(false);
+                    setRecordRevision(revision);
+                    setWorks((previous) =>
+                      previous.map((w) =>
+                        w.id === workId ? { ...w, intent: nextIntent } : w,
+                      ),
+                    );
+                  }}
+                >
+                  {loading ? (
+                    <p className="empty">読み込み中…</p>
+                  ) : !recordsLoaded ? (
+                    <p className="empty">記録を取得できません。</p>
+                  ) : records.length === 0 ? (
+                    <p className="empty">まだ記録はありません。</p>
+                  ) : (
+                    records.map((record) => (
+                      <article className="message manual" key={record.id}>
+                        <div className="message-label">
+                          手作業の記録{" "}
+                          <time dateTime={record.createdAt}>
+                            {new Date(record.createdAt).toLocaleString("ja-JP")}
+                          </time>
+                        </div>
+                        <p className="record-body message-body">
+                          {record.body}
+                        </p>
+                        {record.summary && <p>要約: {record.summary}</p>}
+                      </article>
+                    ))
+                  )}
+                </Chat>
+              </>
+            ) : (
+              <div className="new-chat-intro">
+                <span className="assistant-dot">s</span>
+                <h2>{work ? "作品の記録を始める" : "何をつくりますか？"}</h2>
+                <p>
+                  {work
+                    ? "作品名の右の ＋ から、新しいチャットを開いてください。"
+                    : "作品を選ぶか、新しい作品を作成してください。"}
+                </p>
+                {!work && (
+                  <button
+                    className="secondary"
+                    onClick={() => setModal("work")}
+                  >
+                    新しい作品
+                  </button>
                 )}
-              </section>
-            ))}
-          </nav>
+              </div>
+            )}
+          </main>
+          <ResizeHandle
+            label="チャットと右タブの幅"
+            value={mainWidth}
+            onChange={setMainWidth}
+            min={315}
+            max={1000}
+          />
+          <SideChats
+            key={conversationId || workId}
+            mainId={conversationId}
+            workId={workId}
+            recordRevision={recordRevision + records.length}
+            names={sideNames}
+            onMobileBack={() => setShowPanel(false)}
+            styleContent={
+              work ? (
+                <>
+                  <h2>作風・制作方針</h2>
+                  <p className="intro">
+                    作品の制作意図は、一般的な制作方針より優先します。
+                  </p>
+                  <div className="list-row">
+                    <div>
+                      <strong>この作品の制作意図</strong>
+                      <p>{work.intent ?? "未入力"}</p>
+                    </div>
+                  </div>
+                  <WorkVersions workId={workId} revision={versionRevision} />
+                  <label className="field">
+                    この作品に適用する版
+                    <select disabled>
+                      <option>{work.style?.commit ?? "作風なし"}</option>
+                    </select>
+                  </label>
+                  <button disabled className="secondary">
+                    選んだ版を作品に適用
+                  </button>
+                  <Unavailable>作風の変更・制作方針の採用</Unavailable>
+                </>
+              ) : undefined
+            }
+            filesContent={
+              conversationId && workId ? (
+                <FileRecords
+                  recordRevision={recordRevision}
+                  onBusy={setBusy}
+                  workId={workId}
+                  conversationId={conversationId}
+                  disabled={busy || loading || uploading || pendingImport}
+                  onRecord={(record) => {
+                    setRecords((previous) =>
+                      previous.some((item) => item.id === record.id)
+                        ? previous
+                        : [...previous, record],
+                    );
+                    setRecordRevision((value) => value + 1);
+                  }}
+                />
+              ) : undefined
+            }
+          />
+        </div>
+      </div>
+      {modal === "work" && (
+        <Modal title="作品を作成" close={() => !busy && setModal(null)}>
           <form className="create-work" onSubmit={createWork}>
-            <h3>新しい作品</h3>
-            <label>
+            <label className="field">
               作品名
               <input
                 required
                 maxLength={200}
                 value={name}
-                onChange={(event) => setName(event.target.value)}
+                onChange={(e) => setName(e.target.value)}
                 disabled={busy}
+                autoFocus
                 placeholder="例：夕暮れの港"
               />
             </label>
-            <label>
+            <label className="field">
               制作意図（任意）
               <textarea
                 maxLength={20000}
                 value={intent}
-                onChange={(event) => setIntent(event.target.value)}
+                onChange={(e) => setIntent(e.target.value)}
                 disabled={busy}
                 rows={3}
                 placeholder="この作品で表現したいこと"
               />
             </label>
-            <label>
+            <label className="field">
               作品の作風
               <select
                 aria-label="作品の作風"
@@ -281,7 +732,7 @@ function App() {
               </select>
             </label>
             {styleChoice === "commit" && (
-              <label>
+              <label className="field">
                 作風のフルコミット
                 <input
                   required
@@ -292,184 +743,108 @@ function App() {
                 />
               </label>
             )}
-            <button
-              className="primary"
-              disabled={busy || !worksLoaded || !name.trim()}
-            >
-              作品を作成
-            </button>
-          </form>
-          <VersionSettings
-            onChange={() => setVersionRevision((value) => value + 1)}
-          />
-        </aside>
-        <main className="main">
-          {error && (
-            <div className="error" role="alert">
-              {error}
+            <p className="hint">
+              空の作品を作成します。制作ファイルはチャットの＋から添付できます。
+            </p>
+            {error && (
+              <p className="error" role="alert">
+                {error}
+              </p>
+            )}
+            <div className="dialog-footer">
+              <button
+                type="button"
+                className="secondary"
+                onClick={() => setModal(null)}
+                disabled={busy}
+              >
+                キャンセル
+              </button>
+              <button
+                className="primary"
+                disabled={busy || !worksLoaded || !name.trim()}
+              >
+                作品を作成
+              </button>
             </div>
-          )}
-          {work ? (
+          </form>
+        </Modal>
+      )}
+      {modal === "reflection" && (
+        <Modal title="作品を振り返る" close={() => setModal(null)}>
+          <p className="intro">対象作品の全履歴を振り返ります。</p>
+          <div className="reflection-list">
+            {works.map((w) => (
+              <label key={w.id}>
+                <input type="checkbox" />
+                {w.name}
+              </label>
+            ))}
+          </div>
+          <Unavailable>振り返り</Unavailable>
+          <div className="dialog-footer">
+            <button disabled className="primary">
+              振り返りを始める
+            </button>
+          </div>
+        </Modal>
+      )}
+      {modal === "settings" && (
+        <Modal title="設定・保存データ" close={() => setModal(null)}>
+          <nav className="settings-nav">
+            {[
+              ["backup", "バックアップ"],
+              ["data", "保存データ"],
+              ["version", "版とGit"],
+            ].map(([id, label]) => (
+              <button
+                key={id}
+                className={settingsTab === id ? "active" : ""}
+                onClick={() => setSettingsTab(id)}
+              >
+                {label}
+              </button>
+            ))}
+          </nav>
+          {settingsTab === "version" ? (
+            <VersionSettings
+              onChange={() => setVersionRevision((v) => v + 1)}
+            />
+          ) : settingsTab === "backup" ? (
             <>
-              <div className="work-header">
-                <div className="eyebrow">
-                  作品 / {work.style ? `作風 ${work.style.commit}` : "作風なし"}
-                </div>
-                <h1>{work.name}</h1>
-                {work.intent && <p className="intent">{work.intent}</p>}
-              </div>
-              <WorkVersions
-                key={workId}
-                workId={workId}
-                revision={versionRevision}
-              />
-              {conversationId ? (
-                <>
-                  <div className="conversation-heading">
-                    <h2>
-                      {conversations.find((c) => c.id === conversationId)
-                        ?.title ??
-                        `未命名のチャット ${
-                          conversations.findIndex(
-                            (item) => item.id === conversationId,
-                          ) + 1
-                        }`}
-                    </h2>
-                    <span>本文の記録</span>
-                  </div>
-                  <div
-                    className="records"
-                    aria-live="polite"
-                    aria-busy={loading}
-                  >
-                    {loading ? (
-                      <p className="empty">読み込み中…</p>
-                    ) : !recordsLoaded ? (
-                      <p className="empty">記録を取得できません。</p>
-                    ) : records.length === 0 ? (
-                      <p className="empty">まだ記録はありません。</p>
-                    ) : (
-                      records.map((record) => (
-                        <article className="record" key={record.id}>
-                          <div className="record-meta">
-                            <strong>手作業の記録</strong>
-                            <time dateTime={record.createdAt}>
-                              {new Date(record.createdAt).toLocaleString(
-                                "ja-JP",
-                              )}
-                            </time>
-                          </div>
-                          <p className="record-body">{record.body}</p>
-                          {record.summary && <p>要約: {record.summary}</p>}
-                        </article>
-                      ))
-                    )}
-                  </div>
-                  <Chat
-                    key={`chat-${conversationId}`}
-                    onSideNamesChanged={setSideNames}
-                    conversationId={conversationId}
-                    onNameChanged={(name) =>
-                      setConversations((previous) =>
-                        previous.map((c) =>
-                          c.id === conversationId ? { ...c, title: name } : c,
-                        ),
-                      )
-                    }
-                    onRecordsChanged={(items, nextIntent, revision) => {
-                      ++recordsFetch.current;
-                      setRecords(items);
-                      setRecordsLoaded(true);
-                      setLoadingRecords(false);
-                      setRecordRevision(revision);
-                      setWorks((previous) =>
-                        previous.map((w) =>
-                          w.id === workId ? { ...w, intent: nextIntent } : w,
-                        ),
-                      );
-                    }}
-                  />
-                  <FileRecords
-                    recordRevision={recordRevision}
-                    onBusy={setBusy}
-                    key={conversationId}
-                    workId={workId}
-                    conversationId={conversationId}
-                    disabled={busy || loading}
-                    onRecord={(record) =>
-                      setRecords((previous) =>
-                        previous.some((item) => item.id === record.id)
-                          ? previous
-                          : [...previous, record],
-                      )
-                    }
-                  />
-                  <form className="composer" onSubmit={submitRecord}>
-                    <label htmlFor="record-body">記録する本文</label>
-                    <textarea
-                      id="record-body"
-                      rows={5}
-                      required
-                      maxLength={200000}
-                      value={draft}
-                      onChange={(event) =>
-                        setDrafts((previous) => ({
-                          ...previous,
-                          [conversationId]: event.target.value,
-                        }))
-                      }
-                      disabled={busy || loading}
-                      placeholder="作業内容や判断の理由を、そのまま残せます。"
-                    />
-                    <div className="composer-footer">
-                      <p className="hint">AIを使わず、原文を保存します。</p>
-                      <button
-                        className="primary"
-                        disabled={
-                          busy || loading || !recordsLoaded || !draft.trim()
-                        }
-                      >
-                        {busy ? "保存中…" : "記録として送信"}
-                      </button>
-                    </div>
-                  </form>
-                </>
-              ) : (
-                <div className="empty welcome">
-                  <h2>作品の記録を始める</h2>
-                  <p>作品名の右の ＋ から、新しいチャットを開いてください。</p>
-                </div>
-              )}
+              <h3>全体バックアップ</h3>
+              <label className="field">
+                バックアップ先
+                <input disabled placeholder="保存先フォルダー" />
+              </label>
+              <button className="secondary" disabled>
+                バックアップを作成
+              </button>
+              <div className="rule" />
+              <h3>バックアップから復元</h3>
+              <label className="field">
+                復元先
+                <input disabled placeholder="空の保存先フォルダー" />
+              </label>
+              <button className="secondary" disabled>
+                復元する
+              </button>
+              <Unavailable>バックアップ・復元</Unavailable>
             </>
           ) : (
-            <div className="welcome">
-              <div className="eyebrow">YOUR CREATIVE PROCESS</div>
-              <h1>
-                制作の過程を、
-                <br />
-                作品とともに。
-              </h1>
-              <p>
-                作品を作成し、チャットに手作業の内容や
-                <br />
-                考えたことを残していきましょう。
+            <>
+              <h3>保存データ管理</h3>
+              <p className="intro">
+                制作データの容量と、削除が影響する保存状態を確認します。
               </p>
-              <span className="welcome-note">
-                作品を選ぶか、左から新しい作品を作成してください。
-              </span>
-            </div>
+              <button className="secondary" disabled>
+                保存データを確認
+              </button>
+              <Unavailable>保存実体の削除・形式移行</Unavailable>
+            </>
           )}
-        </main>
-        {conversationId && workId && (
-          <SideChats
-            key={conversationId}
-            mainId={conversationId}
-            workId={workId}
-            recordRevision={recordRevision + records.length}
-            names={sideNames}
-          />
-        )}
-      </div>
+        </Modal>
+      )}
     </div>
   );
 }

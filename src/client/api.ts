@@ -62,3 +62,38 @@ export async function write<T>(
     throw new SaveError(status, code);
   }
 }
+
+/** Browser File bytes are streamed separately from the JSON record/import contract. */
+export async function uploadFile(
+  conversationId: string,
+  id: string,
+  file: File,
+): Promise<{
+  file: import("../shared/files").SourceFile;
+  size: number;
+  sha256: string;
+}> {
+  if (!csrfToken)
+    csrfToken = (await read<{ csrfToken: string }>("/api/session")).csrfToken;
+  const response = await fetch(
+    `/api/conversations/${conversationId}/attachments/${id}?name=${encodeURIComponent(file.name)}`,
+    {
+      method: "POST",
+      credentials: "same-origin",
+      headers: {
+        "content-type": "application/octet-stream",
+        "x-csrf-token": csrfToken,
+      },
+      body: file,
+    },
+  );
+  if (!response.ok) {
+    if (response.status === 403) csrfToken = undefined;
+    throw new Error(
+      response.status === 413
+        ? "添付できるファイルは1件8GiBまでです。"
+        : "ファイルを受け渡しできません。選択内容は保持しています。同じファイルで再送してください。",
+    );
+  }
+  return response.json();
+}

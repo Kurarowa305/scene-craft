@@ -1,3 +1,10 @@
+import {
+  openWorkDialog,
+  openSettings,
+  openArtifacts,
+  openChatUtilities,
+  choosePanel,
+} from "./ui-helpers";
 import { test, expect } from "@playwright/test";
 import { mkdtemp, chmod } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -34,15 +41,24 @@ test("画面で補助モデル・会話名・根拠付き要約の訂正と再�
   page,
 }) => {
   await page.goto("/");
+  await openSettings(page);
   await page.getByLabel("定義のフルコミット").fill(definition);
   await page
     .getByRole("button", { name: "既定定義を保存", exact: true })
     .click();
+  await openWorkDialog(page);
   await page.getByLabel("作品名", { exact: true }).fill("命名と要約確認");
-  await page.getByRole("button", { name: "作品を作成", exact: true }).click();
   await page
-    .getByRole("button", { name: "命名と要約確認に新しいチャット" })
+    .getByRole("dialog", { name: "作品を作成" })
+    .getByRole("button", { name: "作品を作成", exact: true })
     .click();
+  await page
+    .getByRole("button", {
+      name: "命名と要約確認に新しいチャット",
+      exact: true,
+    })
+    .click();
+  await openChatUtilities(page);
   await page.getByText("保存用要約・根拠・補助モデル", { exact: true }).click();
   await expect(
     page.getByLabel("命名・要約モデル", { exact: true }),
@@ -51,7 +67,7 @@ test("画面で補助モデル・会話名・根拠付き要約の訂正と再�
     .getByLabel("命名・要約モデル", { exact: true })
     .selectOption("fixture-a");
   await page
-    .getByLabel("Codexへのメッセージ")
+    .getByLabel("メッセージ", { exact: true })
     .fill("夕暮れの港の光について相談したい");
   await page.getByRole("button", { name: "Codexへ送信", exact: true }).click();
   await expect(
@@ -93,6 +109,7 @@ test("画面で補助モデル・会話名・根拠付き要約の訂正と再�
   await page
     .getByRole("button", { name: "人間が付けた港の相談", exact: true })
     .click();
+  await openChatUtilities(page);
   await page.getByText("保存用要約・根拠・補助モデル", { exact: true }).click();
   await expect(
     page.getByText("港の光を比較中。人間はまだ採用していない。", {

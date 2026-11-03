@@ -1,0 +1,149 @@
+import { useEffect, useRef, type ReactNode, type CSSProperties } from "react";
+
+export function Icon({
+  name,
+}: {
+  name:
+    | "plus"
+    | "chat"
+    | "leaf"
+    | "settings"
+    | "folder"
+    | "history"
+    | "shield"
+    | "image"
+    | "attach";
+}) {
+  const paths = {
+    plus: "M8 2v12M2 8h12",
+    chat: "M2 3h12v9H6l-4 3z",
+    leaf: "M3 13C0 5 6 1 14 2c0 8-3 13-11 11ZM3 13l8-8",
+    settings:
+      "M8 5a3 3 0 1 0 0 6 3 3 0 0 0 0-6ZM8 1v2m0 10v2M1 8h2m10 0h2M3 3l1 1m8 8 1 1M3 13l1-1m8-8 1-1",
+    folder: "M1 4h5l2 2h7v8H1z",
+    history: "M3 4a6 6 0 1 1-1 5M1 1v4h4M8 4v4l3 2",
+    shield: "M8 1 14 4v5c0 3-6 6-6 6S2 12 2 9V4zM5 8l2 2 4-4",
+    image: "M1 2h14v12H1zM2 11l4-4 3 3 2-2 4 4M11 5h.1",
+    attach: "m5 8 5-5a3 3 0 0 1 4 4l-7 7a4 4 0 0 1-6-6l7-7m-4 9 7-7",
+  };
+  return (
+    <span className="icon" aria-hidden="true">
+      <svg viewBox="0 0 16 16">
+        <path d={paths[name]} />
+      </svg>
+    </span>
+  );
+}
+export function Modal({
+  title,
+  children,
+  close,
+}: {
+  title: string;
+  children: ReactNode;
+  close: () => void;
+}) {
+  const ref = useRef<HTMLDialogElement>(null);
+  useEffect(() => {
+    ref.current?.showModal();
+  }, []);
+  return (
+    <dialog
+      ref={ref}
+      aria-label={title}
+      onCancel={close}
+      onClick={(e) => {
+        if (e.target === e.currentTarget) {
+          const r = e.currentTarget.getBoundingClientRect();
+          if (
+            e.clientX < r.left ||
+            e.clientX > r.right ||
+            e.clientY < r.top ||
+            e.clientY > r.bottom
+          )
+            close();
+        }
+      }}
+    >
+      <div className="row between">
+        <h2>{title}</h2>
+        <button
+          type="button"
+          className="icon"
+          aria-label="閉じる"
+          onClick={close}
+        >
+          ×
+        </button>
+      </div>
+      {children}
+    </dialog>
+  );
+}
+export function ResizeHandle({
+  label,
+  value,
+  onChange,
+  min,
+  max,
+}: {
+  label: string;
+  value: number;
+  onChange: (n: number) => void;
+  min: number;
+  max: number;
+}) {
+  return (
+    <div
+      className="resize-handle"
+      role="separator"
+      aria-label={label}
+      aria-orientation="vertical"
+      tabIndex={0}
+      aria-valuenow={Math.round(value)}
+      aria-valuemin={min}
+      aria-valuemax={max}
+      onKeyDown={(e) => {
+        if (["ArrowLeft", "ArrowRight", "Home", "End"].includes(e.key)) {
+          e.preventDefault();
+          onChange(
+            e.key === "Home"
+              ? min
+              : e.key === "End"
+                ? max
+                : Math.max(
+                    min,
+                    Math.min(max, value + (e.key === "ArrowRight" ? 20 : -20)),
+                  ),
+          );
+        }
+      }}
+      onPointerDown={(e) => {
+        e.currentTarget.setPointerCapture(e.pointerId);
+      }}
+      onPointerMove={(e) => {
+        if (e.currentTarget.hasPointerCapture(e.pointerId)) {
+          const rect = e.currentTarget.parentElement!.getBoundingClientRect();
+          onChange(Math.max(min, Math.min(max, e.clientX - rect.left)));
+        }
+      }}
+      onPointerUp={(e) => {
+        if (e.currentTarget.hasPointerCapture(e.pointerId))
+          e.currentTarget.releasePointerCapture(e.pointerId);
+      }}
+    />
+  );
+}
+export function Unavailable({ children }: { children: ReactNode }) {
+  return (
+    <p className="note" role="status">
+      {children}は未実装です。現在は画面の外観のみ確認できます。
+    </p>
+  );
+}
+export function shellStyle(sidebar: number, main: number): CSSProperties {
+  return {
+    "--sidebar": `${sidebar}px`,
+    "--main": `${main}px`,
+  } as CSSProperties;
+}
