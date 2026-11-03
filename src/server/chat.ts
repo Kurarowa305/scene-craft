@@ -71,7 +71,7 @@ export function registerChat(
         request,
         {
           intent: typeof intent === "string" ? intent : null,
-          records: store.context.recordTargets(request.workId),
+          records: store.context.recordTargets(request.workId, request.body),
         },
         stillCurrent,
       );

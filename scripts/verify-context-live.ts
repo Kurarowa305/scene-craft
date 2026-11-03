@@ -63,7 +63,6 @@ if (conversationId) {
   conversationId = conversation.id;
 }
 const before = await read(`/api/works/${workId}/context`);
-const history = await read(`/api/works/${workId}/record-history`);
 const expectedRecord = "Photoshopで空の色を調整した";
 const expectedReason = "静けさを出すため";
 const currentRecords = await read(
@@ -75,7 +74,7 @@ const expectedEditedIntent = before.work.intent?.replace(
   "接続診断",
   "実機確認",
 );
-const previousRecordId = history.records.at(-1)?.id;
+const previousRecordId = currentRecords.at(-1)?.id;
 if (
   ["natural-amend", "record-edit", "record-create"].includes(scenario) &&
   !previousRecordId

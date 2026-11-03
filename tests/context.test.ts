@@ -1004,3 +1004,39 @@ test(
     }
   },
 );
+
+test(
+  "最新50件より前の手作業もID指定の自然文UPDATEで編集できる",
+  { timeout: 10000 },
+  async () => {
+    const f = await chatFixture(true);
+    let client: Awaited<ReturnType<typeof mcp>> | undefined;
+    try {
+      const original = await f.post(`/api/conversations/${f.chat.id}/records`, {
+        body: "空を調整した。落ち着かせるため。",
+      });
+      for (let i = 0; i < 50; i++)
+        await f.post(`/api/conversations/${f.chat.id}/records`, {
+          body: `後続の記録${i}`,
+        });
+      const request = await f.post(`/api/conversations/${f.chat.id}/messages`, {
+        body: `記録${original.id}の「空」を「海」に変更して`,
+      });
+      client = await mcp(f);
+      const current = await client.current();
+      const result = await client.call("update_manual_record", {
+        contextRef: current.contextRef,
+        sourceRequestId: request.id,
+      });
+      assert.equal(
+        result.result?.revision.body,
+        "海を調整した。落ち着かせるため。",
+        JSON.stringify(result),
+      );
+      assert.equal(result.result.revision.targetId, original.id);
+    } finally {
+      client?.close();
+      await f.close();
+    }
+  },
+);

@@ -63,12 +63,16 @@ export function explicitInstruction(body: string): RecordInstruction | null {
 }
 
 export function contextStore(db: DatabaseSync) {
-  function operation(directive: RecordInstruction) {
-    const action =
+  function actionOf(directive: RecordInstruction) {
+    return (
       directive.action ??
       (directive.mode === "append" || directive.mode === "edit"
         ? "update"
-        : "create");
+        : "create")
+    );
+  }
+  function operation(directive: RecordInstruction) {
+    const action = actionOf(directive);
     if (directive.field === "intent")
       return action === "create" ? "create_work_intent" : "update_work_intent";
     if (directive.field === "body")
@@ -258,9 +262,7 @@ export function contextStore(db: DatabaseSync) {
       field: directive.field,
       body: nextBody,
       mode,
-      action:
-        directive.action ??
-        (mode === "append" || mode === "edit" ? "update" : "create"),
+      action: actionOf(directive),
       ...(directive.field === "body"
         ? { format: "unified-record-v1" as const }
         : {}),
@@ -281,14 +283,31 @@ export function contextStore(db: DatabaseSync) {
       );
     return { operationId: revision.id, complete: true, revision };
   }
-  function recordTargets(workId: string) {
-    return db
+  function recordTargets(workId: string, source = "") {
+    const recent = db
       .prepare(
         `SELECT r.id, r.body FROM records r JOIN conversations c ON c.id = r.conversation_id
-      WHERE c.work_id = ? ORDER BY r.sequence DESC LIMIT 50`,
+       WHERE c.work_id = ? ORDER BY r.sequence DESC LIMIT 50`,
       )
-      .all(workId)
-      .map((row) => latest({ id: row.id as string, body: row.body as string }));
+      .all(workId);
+    // Explicit IDs may identify older notes; scope all added targets to this work.
+    const ids = [
+      ...source.matchAll(
+        /[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/gi,
+      ),
+    ].map((match) => match[0].toLowerCase());
+    const explicit = db
+      .prepare(
+        `SELECT r.id, r.body FROM records r JOIN conversations c ON c.id = r.conversation_id
+       WHERE c.work_id = ? AND r.id IN (SELECT value FROM json_each(?)) ORDER BY r.sequence DESC`,
+      )
+      .all(workId, JSON.stringify(ids));
+    const records = new Map(
+      [...recent, ...explicit].map((row) => [row.id, row]),
+    );
+    return [...records.values()].map((row) =>
+      latest({ id: row.id as string, body: row.body as string }),
+    );
   }
   return { context, history, apply, latest, recordTargets, recordText };
 }

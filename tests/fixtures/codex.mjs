@@ -154,7 +154,23 @@ createInterface({ input: process.stdin }).on("line", (line) => {
         join(process.env.CODEX_HOME, "fixture-interpretation-started.json"),
         JSON.stringify({ request: p.clientUserMessageId }),
       );
+      const explicitTarget = input.currentHumanMessage.match(
+        /^記録([a-f0-9-]{36})の「空」を「海」に変更して$/,
+      )?.[1];
       const examples = {
+        ...(explicitTarget
+          ? {
+              [input.currentHumanMessage]: {
+                tool: "update_manual_record",
+                field: "body",
+                mode: "edit",
+                targetId: explicitTarget,
+                body: input.recentRecords
+                  .find((record) => record.id === explicitTarget)
+                  ?.body.replace("空", "海"),
+              },
+            }
+          : {}),
         "制作意図の「静かな」を「賑やかな」に変更して": {
           tool: "update_work_intent",
           field: "intent",
