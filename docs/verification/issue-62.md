@@ -18,7 +18,7 @@ Node 24.19.0、Codex CLI 0.166.0。`generate-json-schema --experimental`でTurnS
 
 ## 実機確認
 
-未実施。利用者がWindowsで[操作手順](../implementation-62.md)を実施する。`Test-Local.ps1`に工程切替・専用MCP、明示記録・訂正、設定探索制限・cold resumeの手動項目を追加した。結果JSONにはコミット・環境・期待/実結果・証跡・状態とランチャーハッシュを記録する。
+一部実施。利用者がWindowsで[操作手順](../implementation-62.md)を実施し、制作意図更新が承認ポリシーで拒否される不具合を報告した。下記の追補で修正・実接続による再確認を記録する。`Test-Local.ps1`に工程切替・専用MCP、明示記録・訂正、設定探索制限・cold resumeの手動項目を追加した。結果JSONにはコミット・環境・期待/実結果・証跡・状態とランチャーハッシュを記録する。
 
 保護の実適用・解除、編集案の採否、制作ファイル操作は後続機能として拒否する。未実装機能を利用可能と表示しない。
 
@@ -39,3 +39,13 @@ Node 24.19.0、Playwright 1.64.1。型検査、自動試験44件、画面試験9
 初回CIでは、外部Codex fixtureがthread設定ファイルを作る前にMCP試験が読み込む競合で1件が失敗した。固定時間の待機へ依存せず、外部設定の準備完了を確認してからMCPを起動するよう試験を修正した。
 
 Windowsの`%LOCALAPPDATA%\scene-craft`へ`Launcher.ps1`と`Test-Local.ps1`を配置し、ソースとのSHA-256一致を確認した。既存ファイルは日時付きで退避し、`launcher.json`は変更していない。ランチャーは`0EB24306D0894EB5EAB93CD0DFB8355C1AE9B033A27F8A86F96542E3E6B97A2E`、確認スクリプトは`1A9404A8A924CB6404A03C43279F4AA4E2E9DD2BF441DCBA360623D0723CBCED`。ブラウザ試験の画面も目視確認した。実Windows受け入れは未実施。
+
+## 実機で見つかったMCP承認拒否の修正（2026-11-03）
+
+`approval_policy=never`・read-onlyでも、承認モードを指定していないMCPツールは呼出前に承認を要求し、拒否される。初期の非推論RPC・stdio直接呼出の成功では、モデル経由の承認判定を通していなかった。
+
+公開HTTPから実ChatGPT接続を通る診断作品で、承認に言及する返答・制作意図未更新・訂正0件を再現した。仮説はMCP承認設定不足、既存thread設定残留、バックエンド明示指示判定の3点。新規threadでも再現し、操作がバックエンドへ届いていないことから承認設定を一変数として変更した。専用MCPに既定`prompt`と公開7ツールごとの`approve`を明示し、`never`・read-only・業務認可は維持した。契約識別値も更新し、旧会話のcold resume対象とした。
+
+利用者がWindowsから手動再起動後、同じ公開HTTP→実モデル→MCP→SQLiteの経路で、新しい診断会話と以前失敗した診断会話の両方で制作意図更新・訂正1件の保存が成功した。以前の診断会話は同じthread IDを維持した。元の制作作品は更新していない。[証跡](evidence/issue-62-mcp-approval.json)。`scripts/verify-context-live.ts`を実接続回帰確認として残した。認証コピー・APIキー・別providerを利用しない。
+
+非推論プローブも`config/read`で7ツールの有効承認モード、既定`prompt`、`approval_policy=never`、read-onlyを検査するよう更新した。[公式MCP設定](https://learn.chatgpt.com/docs/extend/mcp)と導入済みCodex 0.166.0の有効設定を照合した。Windowsでの全受け入れ、工程切替全般やシェル等の迂回試験は引き続き未完了。

@@ -1,7 +1,16 @@
 {
-  "checkedAt": "2026-11-03T02:07:04.342Z",
+  "checkedAt": "2026-11-03T02:32:52.571Z",
   "runtime": "scene_craft/0.166.0 (Ubuntu 22.4.0; x86_64) unknown (scene_craft; 0.1.0)",
   "instructionSourceCount": 0,
+  "toolApprovalModes": {
+    "get_execution_context": "approve",
+    "find_records": "approve",
+    "read_records": "approve",
+    "update_work_context": "approve",
+    "record_manual_work": "approve",
+    "amend_record": "approve",
+    "record_human_decision": "approve"
+  },
   "skillCounts": [
     {
       "count": 5,
@@ -14,11 +23,11 @@
       "tools": [
         "update_work_context",
         "amend_record",
-        "read_records",
-        "find_records",
-        "record_human_decision",
+        "record_manual_work",
         "get_execution_context",
-        "record_manual_work"
+        "record_human_decision",
+        "read_records",
+        "find_records"
       ]
     }
   ],

@@ -74,5 +74,16 @@
 - 工程の指示・手順は受付時の固定Git blobから解決し、turnのapplication contextへ渡す。共通指示はアプリ管理とし、工程変更で書き換えない。更新は厳密なメッセージ全体の書式で原文から解決し、モデル生成の本文・対象・作品ID・役割を受け取らない。
 - 同作品の未終端依頼を一つに制限する既存処理を継承する。この範囲のMCP処理は同期トランザクションで終端し、長時間の外部制作操作を開始しない。次turnへ持ち越す制作操作は存在しない。
 - 設定は専用CODEX_HOME、専用cwd、`project_doc_max_bytes=0`、shell/apps/plugins/hooks等の無効化、requiredな専用MCPのみ。空のCODEX_HOMEにも同梱skillsが存在するため、起動時に`skills/list`→`skills/config/write`で全件を無効にし、再列挙で照合する。不成立なら接続を利用可能にしない。実モデルが見る有効ツール・設定探索・共通指示切替は別途受け入れる。
+- `approval_policy=never`だけではMCPツールの実行を許可しない。専用サーバーの既定承認モードを`prompt`とし、公開を許可した7ツールだけを`approval_mode=approve`へ固定する。操作ごとの明示原文・会話別資格・現在turnの検査は引き続きバックエンドで行う。ツール契約の識別値を更新し、旧設定の会話は同じthreadでcold resumeする。全体の承認ポリシーやsandboxは緩めない。
+
+## 実接続の回帰確認
+
+起動・専用ログイン済みのアプリへ、次の手順で実モデルを通して確認できる。ラベル付きの診断作品を作り、元の作品は変更しない。実際の契約枠を利用するため、CIの模擬試験とは別の手動開始コマンドとする。結果にはIDと判定だけを出し、接続資格や原文を診断ログへ出さない。
+
+```sh
+node --import tsx scripts/verify-context-live.ts http://localhost:4317
+```
+
+制作意図の現在値だけでなく、その依頼IDを根拠とした訂正記録が保存されたことを合格条件とする。失敗時は終了コード1。過去の診断会話IDを第2引数へ指定すると、同じthreadの継続も確認する。診断ラベルのない作品へは送信しない。
 
 根拠: [#62](https://github.com/Kurarowa305/scene-craft/issues/62)、[検証](verification/issue-62.md)、[公式app-server文書](https://learn.chatgpt.com/docs/app-server)。

@@ -1,0 +1,30 @@
+{
+  "checkedOn": "2026-11-03 JST",
+  "runtime": "Codex CLI 0.166.0 / Node 24.19.0 / WSL Ubuntu",
+  "beforeCommit": "85f69244876bcdce37b2bb064d3b09ee262d06af",
+  "before": {
+    "requestId": "a27c67ec-73ab-4fa3-9a70-350c528a47ff",
+    "phase": "completed",
+    "approvalMention": true,
+    "updated": false,
+    "revisionCount": 0
+  },
+  "afterNewConversation": {
+    "requestId": "c5e5d806-ea57-4573-bf14-af7ed6a37bff",
+    "phase": "completed",
+    "approvalMention": false,
+    "updated": true,
+    "revisionCount": 1
+  },
+  "afterExistingConversation": {
+    "requestId": "ef69b493-143a-4f1a-ba31-a6c5de3b13b5",
+    "phase": "completed",
+    "approvalMention": false,
+    "updated": true,
+    "recorded": true,
+    "sameThread": true,
+    "revisionCount": 1
+  },
+  "scope": "Real authenticated HTTP -> Codex model -> dedicated MCP -> SQLite. Labelled diagnostic works only; no original production work updated. User manually restarted the Windows launcher after the fix.",
+  "regressionCommand": "node --import tsx scripts/verify-context-live.ts http://localhost:4317 [diagnostic-conversation-id]"
+}
