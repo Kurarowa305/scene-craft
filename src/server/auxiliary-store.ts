@@ -289,7 +289,7 @@ export function auxiliaryStore(
     context(workId: string) {
       return db
         .prepare(
-          "SELECT id FROM conversations WHERE work_id=? ORDER BY sequence",
+          "SELECT id FROM conversations WHERE work_id=? AND id NOT IN (SELECT conversation_id FROM side_chats) ORDER BY sequence",
         )
         .all(workId)
         .map((row) => {

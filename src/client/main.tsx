@@ -5,6 +5,7 @@ import { read, write } from "./api";
 import { FileRecords } from "./file-records";
 import { VersionSettings, WorkVersions } from "./versions";
 import { Chat } from "./chat";
+import { SideChats } from "./side-chats";
 import "./style.css";
 
 function App() {
@@ -22,6 +23,7 @@ function App() {
   const [styleCommit, setStyleCommit] = useState("");
   const [versionRevision, setVersionRevision] = useState(0);
   const [recordRevision, setRecordRevision] = useState(0);
+  const [sideNames, setSideNames] = useState<Record<string, string | null>>({});
   const [drafts, setDrafts] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState(false);
   const [loadingChats, setLoadingChats] = useState(false);
@@ -365,6 +367,7 @@ function App() {
                   </div>
                   <Chat
                     key={`chat-${conversationId}`}
+                    onSideNamesChanged={setSideNames}
                     conversationId={conversationId}
                     onNameChanged={(name) =>
                       setConversations((previous) =>
@@ -457,6 +460,15 @@ function App() {
             </div>
           )}
         </main>
+        {conversationId && workId && (
+          <SideChats
+            key={conversationId}
+            mainId={conversationId}
+            workId={workId}
+            recordRevision={recordRevision + records.length}
+            names={sideNames}
+          />
+        )}
       </div>
     </div>
   );

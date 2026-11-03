@@ -106,17 +106,17 @@ export function contextStore(db: DatabaseSync) {
         `SELECT r.id, r.sequence, r.conversation_id AS conversationId,
       r.body, r.created_at AS createdAt FROM records r
       JOIN conversations c ON c.id = r.conversation_id
-      WHERE c.work_id = ? AND r.sequence > ? ORDER BY r.sequence LIMIT 50`,
+      WHERE c.work_id = ? AND c.id NOT IN (SELECT conversation_id FROM side_chats) AND r.sequence > ? ORDER BY r.sequence LIMIT 50`,
       )
       .all(workId, after);
     const conversations = db
       .prepare(
-        "SELECT id FROM conversations WHERE work_id = ? ORDER BY sequence",
+        "SELECT id FROM conversations WHERE work_id = ? AND id NOT IN (SELECT conversation_id FROM side_chats) ORDER BY sequence",
       )
       .all(workId);
     const requestRows = db
       .prepare(
-        "SELECT sequence, data FROM chat_requests WHERE work_id = ? AND sequence > ? ORDER BY sequence LIMIT 50",
+        "SELECT sequence, data FROM chat_requests WHERE work_id = ? AND conversation_id NOT IN (SELECT conversation_id FROM side_chats) AND sequence > ? ORDER BY sequence LIMIT 50",
       )
       .all(workId, afterRequests);
     const requests = requestRows.map((row) => JSON.parse(row.data as string));

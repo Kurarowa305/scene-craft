@@ -67,6 +67,7 @@ export interface ChatRequest {
   previousAttempt: string | null;
 }
 export interface ChatView {
+  sideNames: Record<string, string | null>;
   auxiliary: import("./auxiliary.js").AuxiliaryView;
   session: ChatSession;
   requests: ChatRequest[];

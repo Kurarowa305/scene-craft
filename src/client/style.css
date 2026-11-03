@@ -455,3 +455,49 @@ p {
 .codex-chat a {
   margin: 0 1rem;
 }
+.workspace:has(.side-panel) {
+  grid-template-columns: 240px minmax(360px, 1fr) minmax(340px, 0.85fr);
+}
+.side-panel {
+  min-width: 0;
+  padding: 20px;
+  border-left: 1px solid #ddd;
+  overflow: auto;
+  flex-shrink: 0;
+}
+.side-panel [role="tablist"] {
+  display: flex;
+  gap: 6px;
+  overflow: auto;
+  padding-bottom: 12px;
+}
+.side-panel [role="tab"][aria-selected="true"] {
+  background: #e1e9e5;
+}
+.side-panel label {
+  display: block;
+  margin: 12px 0;
+}
+.side-panel select,
+.side-panel textarea {
+  display: block;
+  max-width: 100%;
+  width: 100%;
+}
+@media (max-width: 1100px) {
+  .workspace:has(.side-panel) {
+    grid-template-columns: 220px minmax(0, 1fr);
+  }
+  .side-panel {
+    grid-column: 2;
+    border-top: 1px solid #ddd;
+  }
+}
+@media (max-width: 520px) {
+  .workspace:has(.side-panel) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .side-panel {
+    grid-column: 1;
+  }
+}

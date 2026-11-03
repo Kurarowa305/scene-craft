@@ -461,6 +461,7 @@ export async function createApp(options: AppOptions) {
       },
     },
     async (request) => {
+      store.sides.requireMain(request.params.id);
       if (!files) throw new OperationError(409, "FILE_STORAGE_NOT_CONFIGURED");
       const extensions: Record<string, RegExp> = {
         blend: /\.blend$/i,

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, useId, type FormEvent } from "react";
 import type { BodyRecord } from "../shared/contracts";
 import type { ChatModel, ChatView, ModelChoice } from "../shared/chat";
 import { read, write } from "./api";
@@ -37,8 +37,12 @@ export function Chat({
   conversationId,
   onNameChanged,
   onRecordsChanged,
+  side = false,
+  onSideNamesChanged,
 }: {
   conversationId: string;
+  side?: boolean;
+  onSideNamesChanged?: (names: Record<string, string | null>) => void;
   onNameChanged: (name: string | null) => void;
   onRecordsChanged: (
     records: BodyRecord[],
@@ -46,6 +50,7 @@ export function Chat({
     revision: number,
   ) => void;
 }) {
+  const bodyId = useId();
   const alive = useRef(false);
   const contextFetch = useRef(0);
   const contextRevision = useRef(-1);
@@ -53,6 +58,9 @@ export function Chat({
   useEffect(() => {
     if (view) onNameChanged(view.auxiliary.name);
   }, [view?.auxiliary.name]);
+  useEffect(() => {
+    if (view) onSideNamesChanged?.(view.sideNames);
+  }, [view?.sideNames]);
   function applyView(next: ChatView) {
     setView((previous) =>
       previous && previous.revision > next.revision ? previous : next,
@@ -77,6 +85,7 @@ export function Chat({
     }[];
   }>();
   async function refreshContext(v: ChatView) {
+    if (side) return;
     if (!alive.current || v.revision < contextRevision.current) return;
     contextRevision.current = v.revision;
     const sequence = ++contextFetch.current;
@@ -177,7 +186,7 @@ export function Chat({
     void action(async () => {
       await write(`/api/conversations/${conversationId}/messages`, {
         body: draft,
-        role,
+        ...(side ? {} : { role }),
       });
       setDraft("");
       await refresh();
@@ -185,9 +194,12 @@ export function Chat({
   }
   const model = status?.models.find((m) => m.model === selection?.model);
   return (
-    <section className="codex-chat" aria-label="Codexとの会話">
+    <section
+      className="codex-chat"
+      aria-label={side ? "サイドチャットの会話" : "Codexとの会話"}
+    >
       <div className="section-heading">
-        <h3>Codexとの会話</h3>
+        <h3>{side ? "相談専用サイドチャット" : "Codexとの会話"}</h3>
         <span>
           {status?.authenticated
             ? "ChatGPT認証済み"
@@ -197,7 +209,9 @@ export function Chat({
         </span>
       </div>
       <p className="hint">
-        工程ごとの相談・文脈参照と、明示した文章の記録ができます。制作ファイル操作・保護の適用・採否は準備中です。
+        {side
+          ? "開始時の文脈で相談します。制作・採否・記録・制作意図や保護の変更・メインへの依頼受け渡しはできません。"
+          : "工程ごとの相談・文脈参照と、明示した文章の記録ができます。制作ファイル操作・保護の適用・採否は準備中です。"}
       </p>
       <button
         type="button"
@@ -224,7 +238,7 @@ export function Chat({
         接続状態を更新
       </button>
       {error && <p role="alert">{error}</p>}
-      {view && (
+      {view && !side && (
         <Auxiliary
           value={view.auxiliary}
           models={status?.models ?? []}
@@ -235,22 +249,24 @@ export function Chat({
         />
       )}
       <div className="chat-settings">
-        <label>
-          工程
-          <select
-            aria-label="工程"
-            value={role}
-            disabled={busy || !!active}
-            onChange={(e) => setRole(e.target.value)}
-          >
-            <option value="none">なし</option>
-            {roles.map((r) => (
-              <option key={r.id} value={r.id}>
-                {r.description}（相談・記録）
-              </option>
-            ))}
-          </select>
-        </label>
+        {!side && (
+          <label>
+            工程
+            <select
+              aria-label="工程"
+              value={role}
+              disabled={busy || !!active}
+              onChange={(e) => setRole(e.target.value)}
+            >
+              <option value="none">なし</option>
+              {roles.map((r) => (
+                <option key={r.id} value={r.id}>
+                  {r.description}（相談・記録）
+                </option>
+              ))}
+            </select>
+          </label>
+        )}
         <label>
           会話モデル
           <select
@@ -321,28 +337,31 @@ export function Chat({
         </label>
       </div>
       <p className="hint">選択の変更は次の依頼から適用します。</p>
-      <details>
-        <summary>記録の指示方法</summary>
-        <p>
-          自然な文章から全文の作成・置き換え（CREATE）か、既存内容への追記・編集（UPDATE）を判断します。対象や内容が曖昧なときは確認します。引用の紹介や通常の相談だけでは更新しません。
-        </p>
-        <p>制作意図を「夕暮れの静かな港」に変えてください</p>
-        <p>制作意図に「夕方の光を重視」を追記して</p>
-        <p>制作意図の「夕暮れ」を「夜明け」に変更して</p>
-        <p>手作業で「Photoshopで空の色を調整した」を記録して</p>
-        <p>直前の記録に「静けさを出すため、照明も調整した」を追記して</p>
-        <p>
-          直前の記録の全文を「空と照明を調整した。落ち着いた雰囲気にするため。」に変更して
-        </p>
-        <p>直前の記録の「空」を「海」に変更して</p>
-        <p>従来の省略書式も利用できます。</p>
-        <p>記録を訂正: 記録ID body 変更後の全文</p>
-        <p>
-          訂正項目は
-          body（手作業の文章）・summary（要約）です。理由も手作業の文章へ含めて記録できます。追記は「記録に追記:
-          記録ID 追加文」とも指示できます。記録IDは下の更新履歴で確認できます。
-        </p>
-      </details>
+      {!side && (
+        <details>
+          <summary>記録の指示方法</summary>
+          <p>
+            自然な文章から全文の作成・置き換え（CREATE）か、既存内容への追記・編集（UPDATE）を判断します。対象や内容が曖昧なときは確認します。引用の紹介や通常の相談だけでは更新しません。
+          </p>
+          <p>制作意図を「夕暮れの静かな港」に変えてください</p>
+          <p>制作意図に「夕方の光を重視」を追記して</p>
+          <p>制作意図の「夕暮れ」を「夜明け」に変更して</p>
+          <p>手作業で「Photoshopで空の色を調整した」を記録して</p>
+          <p>直前の記録に「静けさを出すため、照明も調整した」を追記して</p>
+          <p>
+            直前の記録の全文を「空と照明を調整した。落ち着いた雰囲気にするため。」に変更して
+          </p>
+          <p>直前の記録の「空」を「海」に変更して</p>
+          <p>従来の省略書式も利用できます。</p>
+          <p>記録を訂正: 記録ID body 変更後の全文</p>
+          <p>
+            訂正項目は
+            body（手作業の文章）・summary（要約）です。理由も手作業の文章へ含めて記録できます。追記は「記録に追記:
+            記録ID
+            追加文」とも指示できます。記録IDは下の更新履歴で確認できます。
+          </p>
+        </details>
+      )}
       {context && (
         <details>
           <summary>共有情報と更新履歴</summary>
@@ -428,9 +447,9 @@ export function Chat({
         ))}
       </div>
       <form className="composer" onSubmit={send}>
-        <label htmlFor="chat-body">Codexへのメッセージ</label>
+        <label htmlFor={bodyId}>Codexへのメッセージ</label>
         <textarea
-          id="chat-body"
+          id={bodyId}
           value={draft}
           rows={4}
           maxLength={200000}

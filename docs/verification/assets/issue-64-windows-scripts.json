@@ -1,0 +1,29 @@
+{
+  "targetCommit": "853e7868aeca4cc8e82181ce2e1ff6c47cb56c22",
+  "checkedAt": "2026-11-03T09:07:27.3596469Z",
+  "inference": "not_run",
+  "launcherConfiguration": "preserved (before/after hash checked)",
+  "scripts": [
+    {
+      "sha256": "0EB24306D0894EB5EAB93CD0DFB8355C1AE9B033A27F8A86F96542E3E6B97A2E",
+      "syntax": "passed",
+      "matchesSource": true,
+      "name": "Launcher.ps1"
+    },
+    {
+      "sha256": "FB8D8A7F4E0BE11347627F773BE3E7F11B1D232399B52033944559150E8919E2",
+      "syntax": "passed",
+      "matchesSource": true,
+      "name": "Test-Local.ps1"
+    },
+    {
+      "sha256": "9156A723F8A03B0DD73F5054762CD18964AA97627092E332EB9C6DFF9A109BC1",
+      "syntax": "passed",
+      "matchesSource": true,
+      "name": "Install-Shortcut.ps1"
+    }
+  ],
+  "installation": "%LOCALAPPDATA%\\scene-craft",
+  "browserHumanVerification": "not_run",
+  "windows": "Microsoft Windows NT 10.0.26300.0"
+}

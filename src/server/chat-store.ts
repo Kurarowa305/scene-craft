@@ -68,6 +68,19 @@ export function chatStore(
   function unsettled(r: ChatRequest) {
     return ["accepted", "running", "stopping", "unknown"].includes(r.phase);
   }
+  function side(id: string) {
+    return !!db
+      .prepare("SELECT 1 FROM side_chats WHERE conversation_id=?")
+      .get(id);
+  }
+  function conflicts(other: ChatRequest, id: string, workId: string) {
+    return (
+      unsettled(other) &&
+      (side(id)
+        ? other.conversationId === id
+        : other.workId === workId && !side(other.conversationId))
+    );
+  }
   // Process ownership was lost. Never replay a turn on startup.
   for (const r of requests())
     if (["accepted", "running", "stopping"].includes(r.phase)) {
@@ -123,7 +136,9 @@ export function chatStore(
         const workId = db
           .prepare("SELECT work_id FROM conversations WHERE id = ?")
           .get(id)!.work_id as string;
-        if (requests().some((r) => r.workId === workId && unsettled(r)))
+        if (side(id) && role !== "consultation")
+          throw new OperationError(403, "SIDE_CHAT_READ_ONLY");
+        if (requests().some((r) => conflicts(r, id, workId)))
           throw new OperationError(409, "CHAT_RECONCILIATION_REQUIRED");
         const r: ChatRequest = {
           role,
@@ -178,7 +193,7 @@ export function chatStore(
         if (
           requests().some(
             (other) =>
-              other.workId === r.workId && other.id !== id && unsettled(other),
+              other.id !== id && conflicts(other, r.conversationId, r.workId),
           )
         )
           throw new OperationError(409, "CHAT_RECONCILIATION_REQUIRED");

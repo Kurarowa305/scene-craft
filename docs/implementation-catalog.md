@@ -11,7 +11,7 @@
 
 ## MCPツール
 
-専用stdio MCPは8ツールを公開する。処理は会話別資格付きUnix socket RPCを経由し、DBを所有するバックエンドで実行する。MCPと内部RPCはHTTP APIとは別の入口。[公開定義](../src/server/mcp.ts)、[ツール一覧・認可・分岐](../src/server/context-rpc.ts)、[保存処理](../src/server/context-store.ts)。
+専用stdio MCPはメインに8ツール、サイドチャットに参照専用3ツール（`get_execution_context/find_records/read_records`）を公開する。サイドの接続設定・stdio公開一覧を絞り、バックエンドでも更新・制作・採否・保護・メイン受け渡し・shell等を拒否する。処理は会話別資格付きUnix socket RPCを経由し、DBを所有するバックエンドで実行する。MCPと内部RPCはHTTP APIとは別の入口。[公開定義](../src/server/mcp.ts)、[ツール一覧・認可・分岐](../src/server/context-rpc.ts)、[保存処理](../src/server/context-store.ts)。
 
 | ツール名 | 状態 | 操作・結果 | 主なDB参照／変更 |
 | --- | --- | --- | --- |
@@ -31,16 +31,18 @@
 | `contextRef` | string、全ツール必須 | アプリが発行した現在の依頼文脈。会話別接続資格・世代・試行・thread・現在turn・停止状態を別途照合 |
 | `operationId` | string、全ツール必須 | 再送に同じIDを使用。実行時は8〜100文字の英数字・ハイフンを検査。モデルには安定したUUIDを案内 |
 | `sourceRequestId` | string、書き込み操作で実行時必須 | 現在の利用者指示原文ID。公開schemaは任意プロパティだがバックエンドで一致を要求 |
-| `after` | integer ≥ 0、find_records/read_recordsのみ任意、既定0 | 記録sequenceの後続カーソル |
-| `afterRequests` | integer ≥ 0、同上 | 依頼sequenceの後続カーソル |
+| `after` | integer ≥ 0、find_records/read_recordsのみ任意、既定0 | メインは記録sequence、サイドは固定配列の後続オフセット |
+| `afterRequests` | integer ≥ 0、同上 | メインは依頼sequence、サイドは固定配列の後続オフセット |
 
 更新ツールは新本文・対象IDを引数として受け取らず、保存済みの指示原文から解決する。自然文は同じ選択モデルのツールなし解釈処理でCREATE/UPDATE・対象・本文を構造化し、UPDATEの編集元全文を保存時に照合する。手作業は作業内容と任意の理由を一つの本文として扱う。対象不明時は`{complete:false,needsClarification:true,question}`、保存確定時は`{operationId,complete:true,revision}`を返す。
 
 成功した参照・更新操作はcontext_operationsとreceiptsに保存する。更新依頼の解釈結果はchat_requests.dataにも保存する。同じ明示指示の更新は操作IDを変えても一度だけ確定する。未実装の人間判断操作は保存しない。MCP応答のtext contentにはRPC結果の`{result:...}`または`{error:...}`をJSONで載せる。
 
+サイドの`get_execution_context`は`requestId,role:consultation,fixed:SideReference,execution,plan,readOnly:true`を返す。開始時の作品情報・作風・現在保存状態ID・選択成果物のID/hash・最後のメイン原文の最大4000文字の抜粋・履歴件数だけを渡す。全原文と過去のsnapshotは各turnへ展開しない。最新共有情報・後続のメイン発言を追加しない。`find_records/read_records`は開始時の固定履歴から各50件まで返し、`fixedAt`を付ける。取得結果は`context_operations`に保存。メインの履歴検索・共有要約からサイド会話を除外し、自動的な依頼受け渡しを作らない。
+
 ## バックエンドHTTP API
 
-明示登録は37操作。表はパスの辞書順、同一パスはメソッド順（GET→POST）で並べる。追加時も該当パスの位置へ行を挿入する。[基本・作品・ファイル・Git API](../src/server/app.ts)、[Codex・会話・実行API](../src/server/chat.ts)、[共通schema](../src/server/http-schema.ts)。
+明示登録は40操作。表はパスの辞書順、同一パスはメソッド順（GET→POST）で並べる。追加時も該当パスの位置へ行を挿入する。[基本・作品・ファイル・Git API](../src/server/app.ts)、[Codex・会話・実行API](../src/server/chat.ts)、[共通schema](../src/server/http-schema.ts)。
 
 同一localhost originを使用する。GET/HEAD以外はOrigin・HttpOnlyセッションcookie・`x-csrf-token`・`application/json`が必要。本文上限は1MiB。POSTは`/api/shutdown`を除き`requestKey`（8〜128文字、英数字・`_`・`-`）を必須とし、表はそれ以外の入力を記載する。`:id`と`:fileId`はUUID。追加本文プロパティは拒否する。業務エラーはHTTP状態コードと`{error:コード}`を返す。`reconcile`等、schema上のrequestKeyを処理の冪等キーとして使わない操作もある。
 
@@ -53,14 +55,17 @@
 | GET | `/api/codex` | なし | `{configured,authenticated,runtime,models}`。未接続時も利用可否を返す |
 | POST | `/api/codex/login` | 追加本文項目なし | ChatGPT専用ログインの `{authUrl}` |
 | POST | `/api/conversations/:id/auxiliary/resume` | 会話ID、追加本文項目なし | 通常完了した最新依頼で、失敗等の命名・未要約分を明示再実行。停止・エラー・未確定の依頼では拒否。同一requestKeyの再送は重複起動しない。停止した制作依頼は既存resumeまたは新しい依頼で再開 |
-| GET | `/api/conversations/:id/chat` | 会話ID | `ChatView {session,requests,revision,auxiliary}`。補助モデル設定・会話名・処理履歴・根拠付き要約・未要約原文を含む。未選択なら利用可能な既定モデルを初期選択 |
-| GET | `/api/conversations/:id/events` | 会話ID、任意header `Last-Event-ID` | SSE `event: chat`、`id: revision`、`data: ChatView`。15秒ごとkeepalive |
-| POST | `/api/conversations/:id/imports` | 会話ID、`body,application,beforeStateId,files`。任意`render,reason`（旧互換） | `{operationId,id,state,record}`。制作ファイルを管理下へ固定し保存状態・記録を確定 |
-| POST | `/api/conversations/:id/messages` | 会話ID、`body`（1〜200000文字・空白のみ不可）、任意`role`（1〜100文字、既定none） | `ChatRequest`を受付。固定文脈・版・工程で非同期実行 |
+| GET | `/api/conversations/:id/chat` | 会話ID | `ChatView {session,requests,revision,auxiliary,sideNames}`。補助モデル設定・会話名・処理履歴・根拠付き要約・未要約原文を含む。`sideNames`は配下サイドの会話ID→現在名/nullの表示用辞書。未選択なら利用可能な既定モデルを初期選択 |
+| GET | `/api/conversations/:id/events` | 会話ID、任意header `Last-Event-ID` | SSE `event: chat`、`id: revision`、`data: ChatView`。15秒ごとkeepalive。サイドの命名等でもメインのrevisionを進めて`sideNames`を配信し、閉じたサイドごとの接続を作らず一覧名を更新 |
+| POST | `/api/conversations/:id/imports` | 会話ID、`body,application,beforeStateId,files`。任意`render,reason`（旧互換） | `{operationId,id,state,record}`。制作ファイルを管理下へ固定し保存状態・記録を確定。サイド会話では403 |
+| POST | `/api/conversations/:id/messages` | 会話ID、`body`（1〜200000文字・空白のみ不可）、任意`role`（1〜100文字、既定none） | `ChatRequest`を受付。固定文脈・版・工程で非同期実行。サイドは工程consultationのみ（省略時自動適用）、開始時の版・文脈を継続しメインとは別thread。メインと並行受付可能、同じサイド内の未確定依頼は拒否 |
 | POST | `/api/conversations/:id/model` | 会話ID、`model`（最大200文字）、`effort`（最大30文字）、`speed: standard/fast` | 利用可能なモデル・強度を検査して選択を保存 |
 | POST | `/api/conversations/:id/name` | 会話ID、`name`（1〜100文字・空白のみ不可） | 人間の会話名を保存。後着の自動命名では上書きしない |
 | GET | `/api/conversations/:id/records` | 会話ID | 最新表示の `BodyRecord[]`。元本文・旧理由を保持し現在本文を返す |
-| POST | `/api/conversations/:id/records` | 会話ID、`body`（1〜200000文字・空白のみ不可） | LLMを使わず原文を記録し `BodyRecord` を返す |
+| POST | `/api/conversations/:id/records` | 会話ID、`body`（1〜200000文字・空白のみ不可） | LLMを使わず原文を記録し `BodyRecord` を返す。サイド会話では403 |
+| GET | `/api/conversations/:id/side-chats` | メイン会話ID | 保存済みの`SideChatView[]`。`conversation_names`から現在の`title`（未命名はnull）を付加する。タブ閉鎖では削除・停止しない |
+| POST | `/api/conversations/:id/side-chats` | メイン会話ID、`selectedStateIds`（重複なしUUID配列、0〜50件） | 話題入力なしで開始文脈・メイン原文・選択成果物・版を固定し相談会話を作成。同じrequestKeyは同じ会話。別作品の保存状態は拒否。LLMはまだ呼ばない |
+| GET | `/api/conversations/:id/side-context` | サイド会話ID | 保存済みの開始参照`SideChat`。存在しなければ404 |
 | POST | `/api/conversations/:id/summaries/:summaryId` | 会話IDと要約改訂ID（UUID）、`body`（1〜200000文字・空白のみ不可） | LLMなしで人間の訂正を追加。旧要約・根拠原文・作成者と時刻・訂正元を保持。別会話の要約は404、既に訂正済みの版は409 |
 | GET | `/api/file-roots` | なし | `{sources:[{id}],configured}`。実パスは返さない |
 | POST | `/api/imports/:id/abandon` | 取り込み操作ID、追加本文項目なし | 明示中止した取り込み操作。照合が必要な完成実体は先に照合 |
@@ -75,7 +80,7 @@
 | GET | `/api/works` | なし | `Work[]`（確定順） |
 | POST | `/api/works` | `name`（1〜200文字・空白のみ不可）、任意`intent`（最大20000文字）、任意`styleCommit`（commit/null） | 作成した `Work` |
 | GET | `/api/works/:id/context` | 作品ID | 現在の作品 `{id,name,intent}` と文章改訂 `revisions` |
-| GET | `/api/works/:id/conversations` | 作品ID | `Conversation[]`（確定順） |
+| GET | `/api/works/:id/conversations` | 作品ID | メインの`Conversation[]`（確定順）。サイドは専用一覧で返す |
 | POST | `/api/works/:id/conversations` | 作品ID、追加本文項目なし | 空の `Conversation` を作成 |
 | GET | `/api/works/:id/imports` | 作品ID | `ImportOperation[]` |
 | GET | `/api/works/:id/record-history` | 作品ID | 原文記録・会話ID・依頼・文章改訂・次カーソル。HTTP側は先頭ページ |
@@ -102,7 +107,7 @@ GETにはFastifyによるHEADも自動登録される。`staticRoot`設定時の
 
 ## DBテーブル・物理カラム
 
-保存先はアプリの`dataDirectory/records.sqlite`。アプリ用22テーブル・77カラム。[DDL・移行・トランザクション](../src/server/store.ts)、[会話保存](../src/server/chat-store.ts)、[文章改訂](../src/server/context-store.ts)を参照する。`PRAGMA user_version`は1。追加機能の移行は対象テーブルの有無で判定し、追加前に`records.before-imports.sqlite`・`records.before-git-versions.sqlite`・`records.before-chat.sqlite`・`records.before-context.sqlite`・`records.before-auxiliary.sqlite`へ退避する。
+保存先はアプリの`dataDirectory/records.sqlite`。アプリ用23テーブル・80カラム。[DDL・移行・トランザクション](../src/server/store.ts)、[会話保存](../src/server/chat-store.ts)、[文章改訂](../src/server/context-store.ts)を参照する。`PRAGMA user_version`は1。追加機能の移行は対象テーブルの有無で判定し、追加前に`records.before-imports.sqlite`・`records.before-git-versions.sqlite`・`records.before-chat.sqlite`・`records.before-context.sqlite`・`records.before-auxiliary.sqlite`・`records.before-side-chats.sqlite`へ退避する。
 
 制約欄はDDLで明示したPK・UNIQUE・NOT NULL・AUTOINCREMENT・外部キーを記載する。空欄相当の「—」は明示制約なし。JSON中のキーは物理カラムには数えない。全カラムともSQL DEFAULT指定はない。外部キー検査はON、busy_timeoutは3000ms。
 
@@ -129,6 +134,7 @@ GETにはFastifyによるHEADも自動登録される。`staticRoot`設定時の
 | `receipts` | 冪等受付の入力と確定結果 | [カラム一覧](#receipts) |
 | `records` | LLM不要の記録原文・手作業原文 | [カラム一覧](#records) |
 | `saved_states` | 確定した制作ファイルの保存状態 | [カラム一覧](#saved_states) |
+| `side_chats` | 相談会話・開始時の固定参照 | [カラム一覧](#side_chats) |
 | `summary_revisions` | 根拠付き要約と人間の訂正履歴 | [カラム一覧](#summary_revisions) |
 | `text_revisions` | 制作意図・手作業文章・要約等の改訂 | [カラム一覧](#text_revisions) |
 | `version_plans` | 依頼用の固定Git参照 | [カラム一覧](#version_plans) |
@@ -384,6 +390,27 @@ LLM不要の記録原文・手作業原文。
 
 filesは`id,rootId,relativePath,role,source{rootId,relativePath},size,sha256`、missingは`source,reason`（not_found/cycle/outside_root/inspection_pending）。保存済みrenderは`{stateId,fileId}`またはnull。`SavedState.recordBody`は読み取り時に付加する表示用の最新本文であり、物理カラムでも保存JSON項目でもない。
 
+#### side_chats
+
+[DDL・保存処理](../src/server/side-store.ts)。追加前に退避し、トランザクションで作成。既存の会話・記録は変更しない。
+
+| カラム | SQLite型 | 制約 | 用途 |
+| --- | --- | --- | --- |
+| `conversation_id` | TEXT | PK、FK→conversations.id | サイド会話ID |
+| `main_conversation_id` | TEXT | NOT NULL、FK→conversations.id | 開始元のメイン会話ID |
+| `data` | TEXT | NOT NULL | 下記JSON |
+
+| JSON項目 | 保存内容 |
+| --- | --- |
+| `conversationId,mainConversationId,createdAt` | 会話・開始元・固定日時 |
+| `topic`（旧データのみ任意） | 以前に入力された話題。既存の固定文脈として保持し、新規相談では保存しない |
+| `plan,snapshot` | 開始時の固定Git版、作品共有情報・文章改訂・保存状態・メインの会話要約と未要約原文・作風 |
+| `selectedStates[]` | 同じ作品の選択済み保存状態（ファイルID・管理下相対パス・hash・不足を含む）。実体を新規複製しない |
+| `mainMessages[]` | 開始元会話の依頼`id,body,items`。開始時点の途中返答もそのまま固定 |
+| `history` | 開始時の`records,requests,conversations,revisions`全ページ。requestsは原文・返答・試行・工程・状態・日時・計画IDを保持し、過去の文脈snapshotを再帰展開しない。後続発言・更新は転送しない |
+
+サイドのタブ名は最初のサイド発言から既存の補助Codexで一度だけ命名し、`conversation_names`に保存する。命名までは未命名、失敗しても相談を継続する。表示用`SideChatView.title`は読み取り時の付加項目で`side_chats.data`へは保存しない。サイドの原文・返答・試行・停止は既存`chat_requests`、threadは`chat_sessions`へ保存。参照操作は`context_operations`、要約は`summary_revisions`を使用する。[型](../src/shared/side-chat.ts)。
+
 #### summary_revisions
 
 | カラム | SQLite型 | 制約 | 用途 |
@@ -466,7 +493,7 @@ GitReferenceの構造は[git_settings](#git_settings)を参照。`Work.style/pla
 
 ### インデックスとSQLite内部テーブル
 
-追加の明示インデックスは`conversations_work(work_id,sequence)`、`records_conversation(conversation_id,sequence)`、`text_revisions_work(work_id,sequence)`。PK/UNIQUE用の自動インデックスはSQLiteが管理する。SQLite内部の`sqlite_sequence(name,seq)`はAUTOINCREMENT連番を保持し、アプリ用テーブル数に含めない。
+追加の明示インデックスは`side_chats_main(main_conversation_id)`、`conversations_work(work_id,sequence)`、`records_conversation(conversation_id,sequence)`、`text_revisions_work(work_id,sequence)`。PK/UNIQUE用の自動インデックスはSQLiteが管理する。SQLite内部の`sqlite_sequence(name,seq)`はAUTOINCREMENT連番を保持し、アプリ用テーブル数に含めない。
 
 ## ソースとの照合
 

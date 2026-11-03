@@ -12,6 +12,7 @@ import type { GitReference, VersionPlan } from "../shared/versions.js";
 import { chatStore } from "./chat-store.js";
 import { contextStore } from "./context-store.js";
 import { auxiliaryStore } from "./auxiliary-store.js";
+import { sideStore } from "./side-store.js";
 
 export class OperationError extends Error {
   constructor(
@@ -202,6 +203,7 @@ export function openStore(directory: string) {
       CREATE TABLE context_operations (sequence INTEGER PRIMARY KEY AUTOINCREMENT, id TEXT NOT NULL UNIQUE, request_id TEXT NOT NULL REFERENCES chat_requests(id), data TEXT NOT NULL);
       COMMIT;`);
   }
+  const sides = sideStore(db, directory, once);
   const context = contextStore(db);
   function stateView(state: SavedState): SavedState {
     const text = context.recordText(state.recordId);
@@ -222,6 +224,7 @@ export function openStore(directory: string) {
     .all())
     chat.session(row.id as string);
   return {
+    sides,
     context,
     auxiliary,
     contextOperation: (
@@ -511,7 +514,7 @@ export function openStore(directory: string) {
       requireEntity("works", workId);
       const result = db
         .prepare(
-          `SELECT ${conversationColumns} FROM conversations WHERE work_id = ? ORDER BY sequence`,
+          `SELECT ${conversationColumns} FROM conversations WHERE work_id = ? AND id NOT IN (SELECT conversation_id FROM side_chats) ORDER BY sequence`,
         )
         .all(workId) as unknown as Conversation[];
       return result.map((c) => ({ ...c, title: auxiliary.name(c.id) }));
@@ -545,6 +548,7 @@ export function openStore(directory: string) {
     createRecord: (key: string, conversationId: string, body: string) =>
       once(key, ["record", conversationId, body], () => {
         requireEntity("conversations", conversationId);
+        sides.requireMain(conversationId);
         const id = randomUUID();
         db.prepare(
           "INSERT INTO records (id, conversation_id, body, created_at) VALUES (?, ?, ?, ?)",

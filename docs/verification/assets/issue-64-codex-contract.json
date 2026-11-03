@@ -1,0 +1,29 @@
+{
+  "targetCommit": "5a924948eab853dd8ef1821b3b40bdc506ee1f53",
+  "checkedAt": "2026-11-03T07:58:36.123Z",
+  "runtime": "scene_craft/0.166.0 (Ubuntu 22.4.0; x86_64) unknown (scene_craft; 0.1.0)",
+  "expected": "distinct threads; main 8 tools; side 3 reference tools; execution bypass features disabled",
+  "actual": {
+    "distinctThreads": true,
+    "mainTools": [
+      "create_manual_record",
+      "create_work_intent",
+      "find_records",
+      "get_execution_context",
+      "read_records",
+      "record_human_decision",
+      "update_manual_record",
+      "update_work_intent"
+    ],
+    "sideTools": [
+      "find_records",
+      "get_execution_context",
+      "read_records"
+    ],
+    "coldResume": "not_run: requires persisted real turn",
+    "executionBypass": "disabled"
+  },
+  "status": "passed",
+  "inference": "not_run",
+  "windowsHumanVerification": "not_run"
+}
