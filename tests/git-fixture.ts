@@ -7,6 +7,17 @@ export const definitionManifest = {
   runtime: "scene-craft.v1",
   roles: [
     {
+      id: "planning",
+      description: "シーン計画",
+      instructions: ["instructions.md"],
+      procedures: [],
+      code: [],
+      context: ["work.intent"],
+      tools: [],
+      operations: [],
+      outputs: ["text"],
+    },
+    {
       id: "reference",
       description: "参考調査",
       instructions: ["instructions.md"],

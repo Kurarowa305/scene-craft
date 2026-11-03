@@ -12,6 +12,7 @@ import type { GitReference, VersionPlan } from "../shared/versions.js";
 import { chatStore } from "./chat-store.js";
 import { contextStore } from "./context-store.js";
 import { auxiliaryStore } from "./auxiliary-store.js";
+import { scenePlanStore } from "./scene-plan-store.js";
 import { referenceStore } from "./reference-store.js";
 import { sideStore } from "./side-store.js";
 
@@ -228,6 +229,7 @@ export function openStore(directory: string, referenceImageRoot?: string) {
   return {
     sides,
     references,
+    scenePlans: scenePlanStore(db, directory),
     context,
     auxiliary,
     cachedContextOperation(

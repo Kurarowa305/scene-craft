@@ -693,7 +693,7 @@ test(
             sourceRequestId: r.id,
           })
         ).error,
-        "FEATURE_UNAVAILABLE",
+        "INVALID_SCENE_PLAN_ARGUMENTS",
       );
       assert.equal(
         (await client.rpc("tools/call", { name: "shell", arguments: {} })).error
@@ -948,7 +948,7 @@ test(
 );
 
 test(
-  "MCPは現行11ツールだけを公開し、削除した互換ツール名を拒否する",
+  "MCPは現行12ツールだけを公開し、削除した互換ツール名を拒否する",
   { timeout: 10000 },
   async () => {
     const f = await chatFixture(true);
@@ -970,6 +970,7 @@ test(
           "create_manual_record",
           "update_manual_record",
           "record_human_decision",
+          "save_scene_plan",
           "fetch_reference_page",
           "save_reference",
           "select_reference",
