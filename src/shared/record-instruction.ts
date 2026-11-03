@@ -6,10 +6,7 @@ export interface RecordInstruction {
     | "create_work_intent"
     | "update_work_intent"
     | "create_manual_record"
-    | "update_manual_record"
-    | "update_work_context"
-    | "record_manual_work"
-    | "amend_record";
+    | "update_manual_record";
   field: "intent" | "body" | "reason" | "summary";
   body: string;
   targetId?: string;

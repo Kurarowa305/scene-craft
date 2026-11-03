@@ -27,7 +27,7 @@ export function explicitInstruction(body: string): RecordInstruction | null {
   const intentAppend = /^制作意図に追記: ([\s\S]+)$/.exec(body);
   if (intentAppend)
     return {
-      tool: "update_work_context",
+      tool: "update_work_intent",
       field: "intent",
       mode: "append",
       body: intentAppend[1],
@@ -35,7 +35,7 @@ export function explicitInstruction(body: string): RecordInstruction | null {
   const recordAppend = /^記録に追記: ([a-f0-9-]{36}) ([\s\S]+)$/.exec(body);
   if (recordAppend)
     return {
-      tool: "amend_record",
+      tool: "update_manual_record",
       field: "body",
       mode: "append",
       targetId: recordAppend[1],
@@ -43,10 +43,10 @@ export function explicitInstruction(body: string): RecordInstruction | null {
     };
   const intent = /^制作意図を更新: ([\s\S]+)$/.exec(body);
   if (intent)
-    return { tool: "update_work_context", field: "intent", body: intent[1] };
+    return { tool: "create_work_intent", field: "intent", body: intent[1] };
   const record = /^手作業を記録: ([\s\S]+)$/.exec(body);
   if (record)
-    return { tool: "record_manual_work", field: "body", body: record[1] };
+    return { tool: "create_manual_record", field: "body", body: record[1] };
   const amend =
     /^記録を訂正: ([a-f0-9-]{36}) (body|reason|summary) ([\s\S]+)$/.exec(body);
   if (
@@ -54,7 +54,11 @@ export function explicitInstruction(body: string): RecordInstruction | null {
     (amend[2] === "body" || amend[2] === "reason" || amend[2] === "summary")
   )
     return {
-      tool: "amend_record",
+      tool:
+        amend[2] === "body" ? "create_manual_record" : "update_manual_record",
+      ...(amend[2] === "body"
+        ? {}
+        : { action: "update" as const, mode: "edit" as const }),
       targetId: amend[1],
       field: amend[2],
       body: amend[3],
@@ -79,18 +83,7 @@ export function contextStore(db: DatabaseSync) {
       return action === "create"
         ? "create_manual_record"
         : "update_manual_record";
-    return "legacy_amend";
-  }
-  function acceptsTool(tool: string, directive: RecordInstruction) {
-    const op = operation(directive);
-    return (
-      tool === op ||
-      (tool === "update_work_context" && directive.field === "intent") ||
-      (tool === "record_manual_work" && op === "create_manual_record") ||
-      (tool === "amend_record" &&
-        Boolean(directive.targetId) &&
-        directive.field !== "intent")
-    );
+    return "update_manual_record";
   }
   function revisions(workId: string): TextRevision[] {
     return db
@@ -201,7 +194,7 @@ export function contextStore(db: DatabaseSync) {
     const directive = explicitInstruction(r.body) ?? resolved?.instruction;
     if (
       !directive ||
-      !acceptsTool(tool, directive) ||
+      tool !== operation(directive) ||
       args.sourceRequestId !== r.id
     )
       throw new OperationError(403, "EXPLICIT_INSTRUCTION_REQUIRED");

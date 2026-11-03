@@ -22,10 +22,7 @@ test("工程なしでも明示した制作意図更新を共通の記録指示�
     );
     assert.equal(context.role, "none");
     assert.equal(context.sourceRequestId, request.id);
-    assert.equal(
-      context.explicitRecordInstruction?.tool,
-      "update_work_context",
-    );
+    assert.equal(context.explicitRecordInstruction?.tool, "create_work_intent");
   } finally {
     await f.close();
   }
@@ -43,7 +40,7 @@ test(
       });
       client = await mcp(f);
       const current = await client.current();
-      const pending = client.call("record_manual_work", {
+      const pending = client.call("create_manual_record", {
         contextRef: current.contextRef,
         sourceRequestId: r.id,
       });
@@ -88,7 +85,7 @@ test(
       const current = await client.current();
       assert.equal(
         (
-          await client.call("record_manual_work", {
+          await client.call("create_manual_record", {
             contextRef: current.contextRef,
             sourceRequestId: r.id,
           })
@@ -126,7 +123,7 @@ test(
         join(f.directory, "codex/hold-interpretation-start"),
         "hold",
       );
-      const pending = client.call("record_manual_work", {
+      const pending = client.call("create_manual_record", {
         contextRef: current.contextRef,
         sourceRequestId: r.id,
       });
@@ -173,7 +170,7 @@ test(
       });
       client = await mcp(f);
       let current = await client.current();
-      await client.call("update_work_context", {
+      await client.call("create_work_intent", {
         contextRef: current.contextRef,
         sourceRequestId: request.id,
       });
@@ -188,7 +185,7 @@ test(
         contextRef: current.contextRef,
         sourceRequestId: request.id,
       };
-      const added = await client.call("update_work_context", args);
+      const added = await client.call("update_work_intent", args);
       assert.equal(
         added.result?.revision.body,
         "静かな港\n夕方の光を重視",
@@ -197,7 +194,7 @@ test(
       assert.equal(added.result.revision.previousBody, "静かな港");
       assert.equal(added.result.revision.mode, "append");
       assert.equal(added.result.revision.addedText, "夕方の光を重視");
-      await client.call("update_work_context", args);
+      await client.call("update_work_intent", args);
       assert.equal(
         (await f.read(`/api/works/${f.work.id}/context`)).work.intent,
         "静かな港\n夕方の光を重視",
@@ -234,7 +231,7 @@ test(
         contextRef: current.contextRef,
         sourceRequestId: request.id,
       };
-      const added = await client.call("amend_record", args);
+      const added = await client.call("update_manual_record", args);
       assert.equal(
         added.result.revision.body,
         "空の色を調整した\n静けさを出すため\n照明も調整した。影を柔らかくするため。",
@@ -243,7 +240,7 @@ test(
         added.result.revision.previousBody,
         "空の色を調整した\n静けさを出すため",
       );
-      await client.call("amend_record", args);
+      await client.call("update_manual_record", args);
       await waitFor(async () =>
         Boolean((await f.view()).requests.at(-1).terminal),
       );
@@ -251,7 +248,7 @@ test(
         body: `記録を訂正: ${imported.state.recordId} body 完成記録。明暗を整えた。`,
       });
       current = await client.current();
-      await client.call("amend_record", {
+      await client.call("create_manual_record", {
         contextRef: current.contextRef,
         sourceRequestId: request.id,
       });
@@ -423,7 +420,7 @@ test(
       });
       client = await mcp(f);
       const current = await client.current();
-      const result = await client.call("record_manual_work", {
+      const result = await client.call("create_manual_record", {
         contextRef: current.contextRef,
         sourceRequestId: request.id,
       });
@@ -436,7 +433,7 @@ test(
       const records = await f.read(`/api/conversations/${f.chat.id}/records`);
       assert.equal(records.length, 1);
       assert.equal(records[0].body, "Photoshopで空の色を調整した");
-      const again = await client.call("record_manual_work", {
+      const again = await client.call("create_manual_record", {
         contextRef: current.contextRef,
         sourceRequestId: request.id,
       });
@@ -472,7 +469,7 @@ test(
       const current = await client.current();
       assert.equal(
         (
-          await client.call("update_work_context", {
+          await client.call("create_work_intent", {
             contextRef: current.contextRef,
             sourceRequestId: r.id,
           })
@@ -487,7 +484,7 @@ test(
         { body: "制作意図に「夕方の光を重視」を追記して" },
       );
       const intentContext = await client.current();
-      const appendedIntent = await client.call("update_work_context", {
+      const appendedIntent = await client.call("update_work_intent", {
         contextRef: intentContext.contextRef,
         sourceRequestId: intentAppend.id,
       });
@@ -503,7 +500,7 @@ test(
         { body: "直前の記録に「静けさを出すため」を追記して" },
       );
       const next = await client.current();
-      const changed = await client.call("amend_record", {
+      const changed = await client.call("update_manual_record", {
         contextRef: next.contextRef,
         sourceRequestId: amendment.id,
       });
@@ -545,7 +542,7 @@ for (const message of [
         });
         client = await mcp(f);
         const current = await client.current();
-        const reply = await client.call("record_manual_work", {
+        const reply = await client.call("create_manual_record", {
           contextRef: current.contextRef,
           sourceRequestId: r.id,
         });
@@ -573,7 +570,7 @@ test(
       });
       client = await mcp(f);
       const current = await client.current();
-      const reply = await client.call("amend_record", {
+      const reply = await client.call("update_manual_record", {
         contextRef: current.contextRef,
         sourceRequestId: r.id,
       });
@@ -587,7 +584,7 @@ test(
         body: "原文にない文章を返す故障を検査",
       });
       const next = await client.current();
-      const refused = await client.call("record_manual_work", {
+      const refused = await client.call("create_manual_record", {
         contextRef: next.contextRef,
         sourceRequestId: faulty.id,
       });
@@ -618,19 +615,19 @@ test(
       client = await mcp(f);
       const current = await client.current();
       const args = { contextRef: current.contextRef, sourceRequestId: r.id };
-      const changed = await client.call("update_work_context", args);
+      const changed = await client.call("create_work_intent", args);
       assert.equal(
         changed.result?.revision.body,
         "静かな港",
         JSON.stringify(changed),
       );
-      const duplicate = await client.call("update_work_context", args);
+      const duplicate = await client.call("create_work_intent", args);
       assert.equal(duplicate.result.operationId, changed.result.operationId);
       assert.equal(
         (await f.read(`/api/works/${f.work.id}/context`)).work.intent,
         "静かな港",
       );
-      const forged = await client.call("update_work_context", {
+      const forged = await client.call("create_work_intent", {
         ...args,
         workId: crypto.randomUUID(),
       });
@@ -645,7 +642,7 @@ test(
         "PERMISSION_DENIED",
       );
       assert.equal(
-        (await client.call("record_manual_work", args)).error,
+        (await client.call("create_manual_record", args)).error,
         "EXPLICIT_INSTRUCTION_REQUIRED",
       );
       const contextRead = await client.call("get_execution_context", {
@@ -664,7 +661,7 @@ test(
         body: "制作意図を更新: 明るい港",
       });
       const revised = await client.current();
-      const revisedResult = await client.call("update_work_context", {
+      const revisedResult = await client.call("create_work_intent", {
         contextRef: revised.contextRef,
         sourceRequestId: revised.sourceRequestId,
       });
@@ -690,7 +687,7 @@ test(
         ).error,
         "STALE_CONTEXT",
       );
-      const recorded = await client.call("record_manual_work", {
+      const recorded = await client.call("create_manual_record", {
         contextRef: manual.contextRef,
         sourceRequestId: manual.sourceRequestId,
       });
@@ -703,7 +700,7 @@ test(
       });
       await new Promise((resolve) => setTimeout(resolve, 80));
       const amendment = await client.current();
-      const amended = await client.call("amend_record", {
+      const amended = await client.call("update_manual_record", {
         contextRef: amendment.contextRef,
         sourceRequestId: amendment.sourceRequestId,
       });
@@ -758,7 +755,7 @@ test(
       const current = await client.current();
       assert.equal(
         (
-          await client.call("update_work_context", {
+          await client.call("create_work_intent", {
             contextRef: current.contextRef,
             sourceRequestId: r.id,
           })
@@ -909,7 +906,7 @@ test(
       });
       client = await mcp(f);
       const current = await client.current();
-      const changed = await client.call("amend_record", {
+      const changed = await client.call("update_manual_record", {
         contextRef: current.contextRef,
         sourceRequestId: r.id,
       });
@@ -1034,6 +1031,46 @@ test(
         JSON.stringify(result),
       );
       assert.equal(result.result.revision.targetId, original.id);
+    } finally {
+      client?.close();
+      await f.close();
+    }
+  },
+);
+
+test(
+  "MCPは現行8ツールだけを公開し、削除した互換ツール名を拒否する",
+  { timeout: 10000 },
+  async () => {
+    const f = await chatFixture(true);
+    let client: Awaited<ReturnType<typeof mcp>> | undefined;
+    try {
+      await f.post(`/api/conversations/${f.chat.id}/messages`, {
+        body: "相談",
+      });
+      client = await mcp(f);
+      const listed = await client.rpc("tools/list");
+      assert.deepEqual(
+        listed.result.tools.map((tool: { name: string }) => tool.name).sort(),
+        [
+          "get_execution_context",
+          "find_records",
+          "read_records",
+          "create_work_intent",
+          "update_work_intent",
+          "create_manual_record",
+          "update_manual_record",
+          "record_human_decision",
+        ].sort(),
+      );
+      for (const name of [
+        "update_work_context",
+        "record_manual_work",
+        "amend_record",
+      ]) {
+        const reply = await client.rpc("tools/call", { name, arguments: {} });
+        assert.equal(reply.error?.code, -32601, JSON.stringify(reply));
+      }
     } finally {
       client?.close();
       await f.close();

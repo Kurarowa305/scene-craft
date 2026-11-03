@@ -67,7 +67,7 @@
 | `receipts` | 既存カラムへ追加 | 操作IDの同内容再送結果。同じ明示指示は別操作IDでも一度だけ保存 |
 | `chat_events` | 既存カラムへ追加 | 工程付き依頼と更新後の会話の永続revision |
 
-`text_revisions.data`は`id, workId, targetId, field, body, previousId, previousBody, sourceRequestId, author, createdAt`。制作意図のtargetIdは作品ID、それ以外は記録ID。sourceRequestIdに原文が残る。今回の拡張では物理テーブル・カラムの追加削除はない。`text_revisions.data`に`action`（create/update）、`mode`（replace/append/edit）、追記時の`addedText`、統一本文を示す`format: unified-record-v1`を保存する。`body`は操作後の全文、`previousBody`は操作前の全文。旧`records.body`と`saved_states.data.reason`は原データとして保持し、最新表示は結合した一つの本文を返す。保存状態APIの`recordBody`は表示用の最新本文であり物理カラムではない。`chat_requests.data.recordInterpretation.instruction`にはaction/modeとUPDATE時の`baseText`を保持し、保存時に現在本文と一致を確認する。旧ツール名と旧理由コマンドは互換用に残す。
+`text_revisions.data`は`id, workId, targetId, field, body, previousId, previousBody, sourceRequestId, author, createdAt`。制作意図のtargetIdは作品ID、それ以外は記録ID。sourceRequestIdに原文が残る。今回の拡張では物理テーブル・カラムの追加削除はない。`text_revisions.data`に`action`（create/update）、`mode`（replace/append/edit）、追記時の`addedText`、統一本文を示す`format: unified-record-v1`を保存する。`body`は操作後の全文、`previousBody`は操作前の全文。旧`records.body`と`saved_states.data.reason`は原データとして保持し、最新表示は結合した一つの本文を返す。保存状態APIの`recordBody`は表示用の最新本文であり物理カラムではない。`chat_requests.data.recordInterpretation.instruction`にはaction/modeとUPDATE時の`baseText`を保持し、保存時に現在本文と一致を確認する。公開する文章更新ツールはCREATE/UPDATEの4種類に統一する。省略入力の本文置換はCREATE、追記・要約・旧理由の訂正はUPDATEに対応付ける。旧理由データと履歴は維持する。
 
 `context_operations.data`は`input {tool,args}, result, createdAt`。`id`はMCPが提示した永続操作ID。接続資格は保存しない。contextRef自体は認証資格ではなく、有効な接続・世代・依頼・試行・thread・現在turnの照合を別途必要とする。起動資格と有効な照合表はプロセス寿命で失効し、復元・再起動で有効化しない。
 
@@ -78,7 +78,7 @@
 - 工程の指示・手順は受付時の固定Git blobから解決し、turnのapplication contextへ渡す。共通指示はアプリ管理とし、工程変更で書き換えない。更新ツールは原文ID・現在の文脈参照・操作IDだけを受け取る。自然な文章の依頼は、バックエンドが別のツールなしthreadで解釈し、検査した結果だけを保存処理へ渡す。
 - 同作品の未終端依頼を一つに制限する既存処理を継承する。自然文解釈を待つ間も停止・現在turnを照合し、保存前に再検査する。DBの更新・訂正・受付結果は同期トランザクションで確定する。長時間の外部制作操作を開始しない。
 - 設定は専用CODEX_HOME、専用cwd、`project_doc_max_bytes=0`、shell/apps/plugins/hooks等の無効化、requiredな専用MCPのみ。空のCODEX_HOMEにも同梱skillsが存在するため、起動時に`skills/list`→`skills/config/write`で全件を無効にし、再列挙で照合する。不成立なら接続を利用可能にしない。実モデルが見る有効ツール・設定探索・共通指示切替は別途受け入れる。
-- `approval_policy=never`だけではMCPツールの実行を許可しない。専用サーバーの既定承認モードを`prompt`とし、公開を許可した11ツールだけを`approval_mode=approve`へ固定する。操作ごとの明示原文・会話別資格・現在turnの検査は引き続きバックエンドで行う。ツール契約の識別値を更新し、旧設定の会話は同じthreadでcold resumeする。全体の承認ポリシーやsandboxは緩めない。
+- `approval_policy=never`だけではMCPツールの実行を許可しない。専用サーバーの既定承認モードを`prompt`とし、公開を許可した8ツールだけを`approval_mode=approve`へ固定する。操作ごとの明示原文・会話別資格・現在turnの検査は引き続きバックエンドで行う。ツール契約の識別値を更新し、旧設定の会話は同じthreadでcold resumeする。全体の承認ポリシーやsandboxは緩めない。
 
 ## 実接続の回帰確認
 

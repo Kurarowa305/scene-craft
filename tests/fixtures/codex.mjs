@@ -12,16 +12,11 @@ async function recordInstruction(context, body, threadId) {
     "制作意図に「夕方の光を重視」を追記して": "update_work_intent",
   };
   const tool =
+    context.explicitRecordInstruction?.tool ??
     naturalTools[body] ??
     (body === "手作業で「Photoshopで空の色を調整した」を記録して"
       ? "create_manual_record"
-      : body.startsWith("制作意図を更新: ")
-        ? "update_work_context"
-        : body.startsWith("手作業を記録: ")
-          ? "record_manual_work"
-          : body.startsWith("記録を訂正: ")
-            ? "amend_record"
-            : null);
+      : null);
   if (!tool) return "保存される返答";
   const config = readFileSync(
     join(process.env.CODEX_HOME, "config.toml"),

@@ -11,7 +11,7 @@
 
 ## MCPツール
 
-専用stdio MCPは11ツールを公開する。処理は会話別資格付きUnix socket RPCを経由し、DBを所有するバックエンドで実行する。MCPと内部RPCはHTTP APIとは別の入口。[公開定義](../src/server/mcp.ts)、[ツール一覧・認可・分岐](../src/server/context-rpc.ts)、[保存処理](../src/server/context-store.ts)。
+専用stdio MCPは8ツールを公開する。処理は会話別資格付きUnix socket RPCを経由し、DBを所有するバックエンドで実行する。MCPと内部RPCはHTTP APIとは別の入口。[公開定義](../src/server/mcp.ts)、[ツール一覧・認可・分岐](../src/server/context-rpc.ts)、[保存処理](../src/server/context-store.ts)。
 
 | ツール名 | 状態 | 操作・結果 | 主なDB参照／変更 |
 | --- | --- | --- | --- |
@@ -21,10 +21,7 @@
 | `create_work_intent` | 実装済み | CREATE：新しい全文で制作意図を作成・全置換 | works.intent更新、text_revisions追加 |
 | `update_work_intent` | 実装済み | UPDATE：既存意図への追記・部分編集・書き直し | 同上 |
 | `create_manual_record` | 実装済み | CREATE：新規手作業文章、または明示された既存記録の全文置換 | 新規時records追加、text_revisions追加 |
-| `update_manual_record` | 実装済み | UPDATE：既存手作業本文への追記・部分編集・書き直し | text_revisions追加。records原文は保持 |
-| `update_work_context` | 互換用・実装済み | 制作意図の旧操作名。原文に対応したCREATE/UPDATEを実行 | works.intent更新、text_revisions追加 |
-| `record_manual_work` | 互換用・実装済み | 手作業CREATEの旧操作名 | records／text_revisions追加 |
-| `amend_record` | 互換用・実装済み | 指定記録の本文・旧理由・要約を訂正、本文へ追記 | text_revisions追加 |
+| `update_manual_record` | 実装済み | UPDATE：既存手作業本文への追記・部分編集・書き直し。省略入力で指定した要約・旧理由の訂正もこのツールで処理 | text_revisions追加。records原文は保持 |
 | `record_human_decision` | 公開済み・未実装 | `FEATURE_UNAVAILABLE`を返す | 変更なし |
 
 ### MCP共通引数・保存条件
@@ -407,7 +404,7 @@ GitReferenceの構造は[git_settings](#git_settings)を参照。`Work.style/pla
 
 更新時は次を確認する。更新の必須条件は[開発フロー](agents/development-workflow.md#実装一覧の更新)を正とする。
 
-1. MCP：contextTools、mcp.tsのtools/list、context-rpc.tsの分岐・引数検査を照合する。互換名と未実装公開ツールも載せる。
+1. MCP：contextTools、mcp.tsのtools/list、context-rpc.tsの分岐・引数検査を照合する。公開中の未実装ツールも載せ、削除したツールは公開一覧と呼び出し経路から外れていることを確認する。
 2. HTTP：app.tsとchat.tsの全ルートを照合する。ループ生成のstop/reconcile/resume、条件付きinstance、SSE、schemaと応答を確認する。
 3. DB：store.tsの全CREATE/ALTER・移行を確認し、新規の隔離保存先で生成したDBのsqlite_master、PRAGMA table_info / foreign_key_list / index_listと照合する。既存の制作DBを検証用に変更しない。
 4. JSON：sharedの型と各保存処理を照合し、保存項目と表示時だけ付加する項目を区別する。APIレスポンスだけから物理カラムを推定しない。

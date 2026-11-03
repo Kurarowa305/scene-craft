@@ -89,3 +89,10 @@ Codexアダプター境界でnoneの明示更新指示が渡る回帰試験を�
 
 
 最終の実接続では、制作意図のCREATE・追記UPDATE・部分編集UPDATE、手作業の新規CREATE・追記UPDATE・部分編集UPDATE・既存IDへの全文CREATE、引用/実行禁止の無更新が成功した。全操作で同じ診断チャット/threadを維持し、保存した依頼IDとの対応と、通常records APIの最終本文を検査した。部分編集の初回に不要な確認が返ったため、唯一の部分文字列はその部分だけ変更し他の文・理由・改行を保持する規則を明記し、実モデル解釈を反復確認した後、利用者の再起動後の保存も成功させた。対象commit・各依頼ID・tool/action/mode・失敗と修正の区別は[証跡](evidence/issue-62-create-update.json)。Windows全体の受け入れは別途継続する。
+
+
+## 互換用MCPツールの削除（2026-11-03）
+
+利用者の指示に従い、update_work_context・record_manual_work・amend_recordを専用MCP公開一覧、RPC分岐、内部の指示型、共通指示、現行一覧・設計から削除した。文章操作はcreate_work_intent/update_work_intent/create_manual_record/update_manual_recordへ統一する。省略入力の意図・本文の全文作成/置換はCREATE、追記・要約・旧理由の明示訂正はUPDATEを選ぶ。既存の保存データ・改訂履歴は変更しない。
+
+公開stdio MCP試験で削除前の11ツール列挙を失敗として確認後、8ツールだけの列挙と旧3名それぞれのtools/callに対する-32601を確認した。既存試験も現行ツールへ移し、型検査・自動60件・画面9件・ビルドが成功した。導入済みCodex 0.166.0の非推論RPCでも専用8ツール、承認モード、instructionSources 0、同梱skills有効0を確認した。[証跡](evidence/issue-62-without-aliases.json)。実モデルの更新と既存threadのcold resumeは、非推論プローブの成功とは分けて扱う。
