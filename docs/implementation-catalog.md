@@ -173,31 +173,6 @@ JSON保存項目は、対応する物理カラム表の直下に記載する。`
 | `id` | INTEGER | PK、CHECK(id=1) | 単一設定行 |
 | `model` | TEXT | NOT NULL | 初期値gpt-6-luna。今後受付の補助処理へ適用 |
 
-#### conversation_names
-
-| カラム | SQLite型 | 制約 | 用途 |
-| --- | --- | --- | --- |
-| `conversation_id` | TEXT | PK、FK→conversations.id | 会話 |
-| `name` | TEXT | NOT NULL | 確定した表示名。会話一覧のtitleにも付加 |
-| `author` | TEXT | NOT NULL | human/assistant。人間名の後着上書きを禁止 |
-| `created_at` | TEXT | NOT NULL | 設定時刻 |
-
-#### summary_revisions
-
-| カラム | SQLite型 | 制約 | 用途 |
-| --- | --- | --- | --- |
-| `sequence` | INTEGER | PK、AUTOINCREMENT | 要約・訂正の追加順 |
-| `id` | TEXT | UNIQUE、NOT NULL | 要約改訂ID |
-| `conversation_id` | TEXT | NOT NULL、FK→conversations.id | 会話 |
-| `data` | TEXT | NOT NULL | 下記JSON |
-
-| JSON項目 | 保存内容 |
-| --- | --- |
-| `id,jobId,body,sources[]` | 改訂ID・起点補助処理・要約本文・固定した根拠原文（auxiliary_jobs.sourcesと同じ構造） |
-| `previousId,author,createdAt` | 訂正元ID、human/assistant、時刻。旧要約と原文を削除・置換しない |
-
-未要約は保存された原文と全要約の対象ID差分から表示時に計算する。`AuxiliaryView {model,name,nameAuthor,jobs,summaries,pending}`は表示用。次の依頼の`contextSnapshot.conversationSummaries`とMCP `get_execution_context`の`conversationSummaries`には作品内各会話の訂正後の要約・未要約原文を分離して含め、現在の制作意図等を要約で置換しない。HTTP/SSEのrevisionは補助結果・訂正・命名・記録専用送信・取り込みでも更新する。
-
 #### chat_events
 
 会話更新の永続revision。
@@ -279,6 +254,15 @@ selectionは[chat_selections](#chat_selections)のModelChoiceまたはnull。
 | 保存場所 | 保存項目・構造 | 根拠 |
 | --- | --- | --- |
 | `context_operations.data` | `input:{tool,args},result,createdAt`。接続資格は保存しない | store.ts のcontextOperation |
+
+#### conversation_names
+
+| カラム | SQLite型 | 制約 | 用途 |
+| --- | --- | --- | --- |
+| `conversation_id` | TEXT | PK、FK→conversations.id | 会話 |
+| `name` | TEXT | NOT NULL | 確定した表示名。会話一覧のtitleにも付加 |
+| `author` | TEXT | NOT NULL | human/assistant。人間名の後着上書きを禁止 |
+| `created_at` | TEXT | NOT NULL | 設定時刻 |
 
 #### conversations
 
@@ -399,6 +383,22 @@ LLM不要の記録原文・手作業原文。
 | `saved_states.data` | `id,workId,recordId,beforeStateId,changeKind,application,reason,render,historyBeforeImport,files,missing,createdAt`。changeKindはimport/manual、historyBeforeImportはunknown/recorded | SavedState |
 
 filesは`id,rootId,relativePath,role,source{rootId,relativePath},size,sha256`、missingは`source,reason`（not_found/cycle/outside_root/inspection_pending）。保存済みrenderは`{stateId,fileId}`またはnull。`SavedState.recordBody`は読み取り時に付加する表示用の最新本文であり、物理カラムでも保存JSON項目でもない。
+
+#### summary_revisions
+
+| カラム | SQLite型 | 制約 | 用途 |
+| --- | --- | --- | --- |
+| `sequence` | INTEGER | PK、AUTOINCREMENT | 要約・訂正の追加順 |
+| `id` | TEXT | UNIQUE、NOT NULL | 要約改訂ID |
+| `conversation_id` | TEXT | NOT NULL、FK→conversations.id | 会話 |
+| `data` | TEXT | NOT NULL | 下記JSON |
+
+| JSON項目 | 保存内容 |
+| --- | --- |
+| `id,jobId,body,sources[]` | 改訂ID・起点補助処理・要約本文・固定した根拠原文（auxiliary_jobs.sourcesと同じ構造） |
+| `previousId,author,createdAt` | 訂正元ID、human/assistant、時刻。旧要約と原文を削除・置換しない |
+
+未要約は保存された原文と全要約の対象ID差分から表示時に計算する。`AuxiliaryView {model,name,nameAuthor,jobs,summaries,pending}`は表示用。次の依頼の`contextSnapshot.conversationSummaries`とMCP `get_execution_context`の`conversationSummaries`には作品内各会話の訂正後の要約・未要約原文を分離して含め、現在の制作意図等を要約で置換しない。HTTP/SSEのrevisionは補助結果・訂正・命名・記録専用送信・取り込みでも更新する。
 
 #### text_revisions
 
