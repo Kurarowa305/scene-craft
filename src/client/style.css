@@ -435,3 +435,22 @@ p {
   max-height: 320px;
   overflow: auto;
 }
+.codex-chat {
+  margin: 1rem 0;
+  padding: 1rem;
+  border: 1px solid #cbd5d1;
+  border-radius: 12px;
+}
+.chat-settings {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+.chat-settings label {
+  display: grid;
+  gap: 0.4rem;
+}
+.codex-chat a {
+  margin: 0 1rem;
+}

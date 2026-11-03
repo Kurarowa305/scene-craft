@@ -59,6 +59,7 @@ async function main() {
       "data-dir": { type: "string" },
       "file-roots": { type: "string" },
       "git-repository": { type: "string" },
+      "codex-binary": { type: "string" },
       "probe-only": { type: "boolean" },
       port: { type: "string", default: "4317" },
     },
@@ -108,6 +109,7 @@ async function main() {
   try {
     const secret = randomBytes(32).toString("hex");
     app = await createApp({
+      codexBinary: values["codex-binary"],
       directory,
       port,
       instanceSecret: secret,

@@ -30,7 +30,12 @@ $nodeVersion = (& wsl.exe --distribution $settings.distribution --exec $settings
 $report = [ordered]@{
   commit=$commit; timestamp=(Get-Date -Format o); windows=[Environment]::OSVersion.VersionString
   distribution=$settings.distribution; node=$nodeVersion
+  codex=$(if ($settings.codexBinary) { (& wsl.exe --distribution $settings.distribution --exec $settings.codexBinary --version) -join '' } else { 'not configured' })
   automatic=@(); manual=@(
+    @{name='dedicated ChatGPT login and model selection'; expected='login uses isolated file credentials; first default or previous selection appears; no API key path'; actual=''; status='not_run'; evidence=''},
+    @{name='Codex conversation and browser reconnect'; expected='original text and final response reopen once; same thread continues; actual/requested model and runtime recorded'; actual=''; status='not_run'; evidence=''},
+    @{name='Codex stop and explicit resume'; expected='stop is saved immediately; no new turn while stopping; terminal verified before explicit resume'; actual=''; status='not_run'; evidence=''},
+    @{name='Codex history pagination and cold resume'; expected='after first real turn, full history reconciles across restart without another turn/start'; actual=''; status='not_run'; evidence=''},
     @{name='shortcut opens browser'; expected='scene-craft opens in the default browser'; actual=''; status='not_run'; evidence=''},
     @{name='browser and invoking terminal closed'; expected='manager retains wsl.exe; reopen and read same IDs'; actual=''; status='not_run'; evidence=''},
     @{name='duplicate shortcut'; expected='existing instance opens; no second writer'; actual=''; status='not_run'; evidence=''},

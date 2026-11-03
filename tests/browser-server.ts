@@ -2,6 +2,8 @@ import { spawn } from "node:child_process";
 import { mkdtemp, mkdir, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { resolve } from "node:path";
+import { chmod } from "node:fs/promises";
 import { gitFixture, cleanGitFixture } from "./git-fixture.js";
 const directory = await mkdtemp(join(tmpdir(), "scene-browser-"));
 const source = join(directory, "source");
@@ -24,6 +26,7 @@ await writeFile(
     managed: { id: "production", path: managed },
   }),
 );
+await chmod("tests/fixtures/codex.mjs", 0o700);
 const child = spawn(
   process.execPath,
   [
@@ -36,6 +39,8 @@ const child = spawn(
     roots,
     "--git-repository",
     git.repository,
+    "--codex-binary",
+    resolve("tests/fixtures/codex.mjs"),
   ],
   { stdio: "inherit" },
 );

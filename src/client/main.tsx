@@ -4,6 +4,7 @@ import type { Work, Conversation, BodyRecord } from "../shared/contracts";
 import { read, write } from "./api";
 import { FileRecords } from "./file-records";
 import { VersionSettings, WorkVersions } from "./versions";
+import { Chat } from "./chat";
 import "./style.css";
 
 function App() {
@@ -353,6 +354,10 @@ function App() {
                       ))
                     )}
                   </div>
+                  <Chat
+                    key={`chat-${conversationId}`}
+                    conversationId={conversationId}
+                  />
                   <FileRecords
                     onBusy={setBusy}
                     key={conversationId}
