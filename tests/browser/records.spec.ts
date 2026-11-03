@@ -181,3 +181,62 @@ test("初期作品一覧の遅延中は作成を待ち、古い一覧で作成�
     page.getByRole("heading", { name: "一覧取得後の作品", exact: true }),
   ).toBeVisible();
 });
+
+test("本文の保存応答を待つ間は会話を切り替えず、別会話へ記録を混ぜない", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await openWorkDialog(page);
+  await page.getByLabel("作品名", { exact: true }).fill("保存中の切替確認");
+  await page
+    .getByRole("dialog", { name: "作品を作成" })
+    .getByRole("button", { name: "作品を作成", exact: true })
+    .click();
+  const create = page.getByRole("button", {
+    name: "保存中の切替確認に新しいチャット",
+    exact: true,
+  });
+  await create.click();
+  await expect(page.getByLabel("メッセージ", { exact: true })).toBeEnabled();
+  await create.click();
+  await expect(
+    page.getByRole("heading", { name: "未命名のチャット 2", exact: true }),
+  ).toBeVisible();
+  let release = () => {},
+    fetched = () => {};
+  const gate = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  const ready = new Promise<void>((resolve) => {
+    fetched = resolve;
+  });
+  await page.route("**/api/conversations/*/records", async (route) => {
+    if (route.request().method() !== "POST") return route.continue();
+    const response = await route.fetch();
+    fetched();
+    await gate;
+    await route.fulfill({ response });
+  });
+  await page
+    .getByLabel("メッセージ", { exact: true })
+    .fill("チャット2にだけ保存する本文");
+  await sendRecord(page);
+  await ready;
+  const first = page.getByRole("button", {
+    name: "未命名のチャット 1",
+    exact: true,
+  });
+  try {
+    await expect(first).toBeDisabled();
+  } finally {
+    release();
+  }
+  await expect(page.locator(".record-body")).toHaveText(
+    "チャット2にだけ保存する本文",
+  );
+  await first.click();
+  await expect(
+    page.getByText("まだ記録はありません。", { exact: true }),
+  ).toBeVisible();
+  await expect(page.locator(".record-body")).toHaveCount(0);
+});

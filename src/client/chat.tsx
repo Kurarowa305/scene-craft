@@ -143,15 +143,15 @@ export function Chat({
   useEffect(() => {
     if (!view) return;
     const requests = view.requests;
-    const state = requests.some((r) => ["unknown", "blocked"].includes(r.phase))
-      ? "attention"
-      : requests.some((r) =>
-            ["accepted", "running", "stopping"].includes(r.phase),
-          )
-        ? "running"
-        : requests.at(-1)?.phase === "interrupted"
-          ? "stopped"
-          : "";
+    const latest = requests.at(-1);
+    const state =
+      latest && ["unknown", "blocked"].includes(latest.phase)
+        ? "attention"
+        : latest && ["accepted", "running", "stopping"].includes(latest.phase)
+          ? "running"
+          : latest?.phase === "interrupted"
+            ? "stopped"
+            : "";
     onStatusChange?.(state);
   }, [view]);
   async function refresh() {

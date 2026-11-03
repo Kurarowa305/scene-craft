@@ -19,8 +19,8 @@ function App() {
   const fileInput = useRef<HTMLInputElement>(null);
   const [uploads, setUploads] = useState<Record<string, SourceFile[]>>({});
   const [selectedFiles, setSelectedFiles] = useState<
-    { id: string; file: File }[]
-  >([]);
+    Record<string, { id: string; file: File }[]>
+  >({});
   const [uploading, setUploading] = useState(false);
   const pendingImports = useRef<Record<string, ImportInput>>({});
   const [pendingImport, setPendingImport] = useState(false);
@@ -177,8 +177,18 @@ function App() {
       const files: SourceFile[] = [];
       for (const item of items)
         files.push((await uploadFile(target, item.id, item.file)).file);
-      setUploads((previous) => ({ ...previous, [target]: files }));
-      setSelectedFiles([]);
+      setUploads((previous) => ({
+        ...previous,
+        [target]: [
+          ...new Map(
+            [...(previous[target] ?? []), ...files].map((file) => [
+              file.relativePath,
+              file,
+            ]),
+          ).values(),
+        ],
+      }));
+      setSelectedFiles((previous) => ({ ...previous, [target]: [] }));
     } catch (failure) {
       setError((failure as Error).message);
     } finally {
@@ -186,69 +196,74 @@ function App() {
     }
   }
   async function submitRecord(body: string) {
-    const target = conversationId;
-    const attached = uploads[target] ?? [];
-    if (attached.length) {
-      let input = pendingImports.current[target];
-      if (!input) {
-        const current = await read<{ currentStateId: string | null }>(
-          `/api/works/${workId}/states`,
-        );
-        input = {
-          requestKey: crypto.randomUUID(),
-          body,
-          files: attached,
-          application: attached.some((f) => f.role === "blend")
-            ? "Blender"
-            : attached.some((f) => f.role === "psd")
-              ? "Photoshop"
-              : "Other",
-          beforeStateId: current.currentStateId,
-        };
-        pendingImports.current[target] = input;
-        setPendingImport(true);
-      }
-      let result: { record: BodyRecord; state: SavedState };
-      try {
-        result = await write<{ record: BodyRecord; state: SavedState }>(
-          `/api/conversations/${target}/imports`,
-          input as unknown as Record<string, unknown>,
-          false,
-        );
-      } catch (failure) {
-        if (
-          failure instanceof SaveError &&
-          [400, 403, 404, 409].includes(failure.status ?? 0)
-        ) {
-          const operations = await read<ImportOperation[]>(
-            `/api/works/${workId}/imports`,
+    setBusy(true);
+    try {
+      const target = conversationId;
+      const attached = uploads[target] ?? [];
+      if (attached.length) {
+        let input = pendingImports.current[target];
+        if (!input) {
+          const current = await read<{ currentStateId: string | null }>(
+            `/api/works/${workId}/states`,
           );
-          if (!operations.some((op) => op.requestKey === input.requestKey)) {
-            delete pendingImports.current[target];
-            setPendingImport(false);
-          }
+          input = {
+            requestKey: crypto.randomUUID(),
+            body,
+            files: attached,
+            application: attached.some((f) => f.role === "blend")
+              ? "Blender"
+              : attached.some((f) => f.role === "psd")
+                ? "Photoshop"
+                : "Other",
+            beforeStateId: current.currentStateId,
+          };
+          pendingImports.current[target] = input;
+          setPendingImport(true);
         }
-        throw failure;
+        let result: { record: BodyRecord; state: SavedState };
+        try {
+          result = await write<{ record: BodyRecord; state: SavedState }>(
+            `/api/conversations/${target}/imports`,
+            input as unknown as Record<string, unknown>,
+            false,
+          );
+        } catch (failure) {
+          if (
+            failure instanceof SaveError &&
+            [400, 403, 404, 409].includes(failure.status ?? 0)
+          ) {
+            const operations = await read<ImportOperation[]>(
+              `/api/works/${workId}/imports`,
+            );
+            if (!operations.some((op) => op.requestKey === input.requestKey)) {
+              delete pendingImports.current[target];
+              setPendingImport(false);
+            }
+          }
+          throw failure;
+        }
+        delete pendingImports.current[target];
+        setPendingImport(false);
+        setUploads((previous) => ({ ...previous, [target]: [] }));
+        setRecordRevision((value) => value + 1);
+        setRecords((previous) =>
+          previous.some((item) => item.id === result.record.id)
+            ? previous
+            : [...previous, result.record],
+        );
+      } else {
+        const created = await write<BodyRecord>(
+          `/api/conversations/${target}/records`,
+          { body },
+        );
+        setRecords((previous) =>
+          previous.some((item) => item.id === created.id)
+            ? previous
+            : [...previous, created],
+        );
       }
-      delete pendingImports.current[target];
-      setPendingImport(false);
-      setUploads((previous) => ({ ...previous, [target]: [] }));
-      setRecordRevision((value) => value + 1);
-      setRecords((previous) =>
-        previous.some((item) => item.id === result.record.id)
-          ? previous
-          : [...previous, result.record],
-      );
-    } else {
-      const created = await write<BodyRecord>(
-        `/api/conversations/${target}/records`,
-        { body },
-      );
-      setRecords((previous) =>
-        previous.some((item) => item.id === created.id)
-          ? previous
-          : [...previous, created],
-      );
+    } finally {
+      setBusy(false);
     }
   }
   async function abandonAttachment() {
@@ -290,7 +305,11 @@ function App() {
           <small>WORKSPACE</small>
         </div>
         <div className="sidebar-tools">
-          <button className="nav-button" onClick={() => setModal("work")}>
+          <button
+            className="nav-button"
+            disabled={busy || uploading || pendingImport}
+            onClick={() => setModal("work")}
+          >
             <Icon name="plus" />
             <span>作品を作成</span>
           </button>
@@ -503,7 +522,10 @@ function App() {
                             e.target.files ?? [],
                             (file) => ({ id: crypto.randomUUID(), file }),
                           );
-                          setSelectedFiles(items);
+                          setSelectedFiles((previous) => ({
+                            ...previous,
+                            [conversationId]: items,
+                          }));
                           if (items.length) void transferFiles(items);
                           e.target.value = "";
                         }}
@@ -513,14 +535,19 @@ function App() {
                           ファイルを受け渡し中…
                         </p>
                       )}
-                      {!uploading && selectedFiles.length > 0 && (
-                        <button
-                          type="button"
-                          onClick={() => void transferFiles(selectedFiles)}
-                        >
-                          同じファイルで再送
-                        </button>
-                      )}
+                      {!uploading &&
+                        (selectedFiles[conversationId]?.length ?? 0) > 0 && (
+                          <button
+                            type="button"
+                            onClick={() =>
+                              void transferFiles(
+                                selectedFiles[conversationId] ?? [],
+                              )
+                            }
+                          >
+                            同じファイルで再送
+                          </button>
+                        )}
                       {!!uploads[conversationId]?.length && (
                         <div className="attachments">
                           {uploads[conversationId]!.map((file) => (
@@ -622,6 +649,7 @@ function App() {
                 {!work && (
                   <button
                     className="secondary"
+                    disabled={busy || uploading || pendingImport}
                     onClick={() => setModal("work")}
                   >
                     新しい作品
@@ -762,7 +790,13 @@ function App() {
               </button>
               <button
                 className="primary"
-                disabled={busy || !worksLoaded || !name.trim()}
+                disabled={
+                  busy ||
+                  uploading ||
+                  pendingImport ||
+                  !worksLoaded ||
+                  !name.trim()
+                }
               >
                 作品を作成
               </button>

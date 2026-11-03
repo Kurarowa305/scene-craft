@@ -144,6 +144,9 @@ test("添付記録の応答が失われても同じ内容で再送し、保存�
   );
   await sendRecord(page);
   await expect(page.getByLabel("メッセージ", { exact: true })).toBeDisabled();
+  await expect(
+    page.getByRole("button", { name: "作品を作成", exact: true }),
+  ).toBeDisabled();
   await expect(page.getByLabel("メッセージ", { exact: true })).toHaveValue(
     "一度だけ保存する記録",
   );
@@ -205,4 +208,96 @@ test("タブの追加・閉鎖と幅の調整、未実装画面を確認でき�
     page.getByRole("button", { name: "バックアップを作成", exact: true }),
   ).toBeDisabled();
   await page.screenshot({ path: "test-results/issue-102-settings.png" });
+});
+
+test("受け渡しに失敗した添付は元の会話に保持して再送する", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("button", { name: "作品を作成", exact: true }).click();
+  const dialog = page.getByRole("dialog", { name: "作品を作成" });
+  await dialog
+    .getByLabel("作品名", { exact: true })
+    .fill("添付先を保持する作品");
+  await dialog.getByRole("button", { name: "作品を作成", exact: true }).click();
+  const create = page.getByRole("button", {
+    name: "添付先を保持する作品に新しいチャット",
+    exact: true,
+  });
+  await create.click();
+  await expect(page.getByLabel("メッセージ", { exact: true })).toBeEnabled();
+  await page.route(
+    "**/api/conversations/*/attachments/*?*",
+    async (route) => {
+      await route.fetch();
+      await route.abort("failed");
+    },
+    { times: 1 },
+  );
+  await page
+    .getByLabel("コンピューターからファイルを選択", { exact: true })
+    .setInputFiles({
+      name: "retry.psd",
+      mimeType: "application/octet-stream",
+      buffer: Buffer.from("retry bytes"),
+    });
+  await expect(
+    page.getByRole("button", { name: "同じファイルで再送", exact: true }),
+  ).toBeVisible();
+  await create.click();
+  await expect(
+    page.getByRole("heading", { name: "未命名のチャット 2", exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "同じファイルで再送", exact: true }),
+  ).toHaveCount(0);
+  await page
+    .getByRole("button", { name: "未命名のチャット 1", exact: true })
+    .click();
+  await page
+    .getByRole("button", { name: "同じファイルで再送", exact: true })
+    .click();
+  await expect(page.getByText("retry.psd", { exact: true })).toBeVisible();
+});
+
+test("作品の保存中にEscapeを押しても失敗した入力とエラーを確認できる", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await page.getByRole("button", { name: "作品を作成", exact: true }).click();
+  const dialog = page.getByRole("dialog", { name: "作品を作成" });
+  await dialog.getByLabel("作品名", { exact: true }).fill("Escape後も残す入力");
+  let release = () => {},
+    fetched = () => {};
+  const gate = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  const ready = new Promise<void>((resolve) => {
+    fetched = resolve;
+  });
+  await page.route("**/api/works", async (route) => {
+    if (route.request().method() !== "POST") return route.continue();
+    fetched();
+    await gate;
+    await route.fulfill({
+      status: 500,
+      contentType: "application/json",
+      body: '{"error":"SAVE_FAILED"}',
+    });
+  });
+  await dialog.getByRole("button", { name: "作品を作成", exact: true }).click();
+  await ready;
+  await page.keyboard.press("Escape");
+  try {
+    await expect(dialog).toBeVisible();
+  } finally {
+    release();
+  }
+  await expect(dialog.getByRole("alert")).toContainText("確認できません");
+  await expect(dialog.getByLabel("作品名", { exact: true })).toHaveValue(
+    "Escape後も残す入力",
+  );
+  await dialog.getByRole("button", { name: "閉じる", exact: true }).click();
+  await page.getByRole("button", { name: "作品を作成", exact: true }).click();
+  await expect(dialog.getByLabel("作品名", { exact: true })).toHaveValue(
+    "Escape後も残す入力",
+  );
 });
