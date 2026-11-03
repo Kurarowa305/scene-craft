@@ -1,11 +1,6 @@
 import { StrictMode, useEffect, useRef, useState, type FormEvent } from "react";
 import { createRoot } from "react-dom/client";
-import type {
-  SourceFile,
-  ImportInput,
-  SavedState,
-  ImportOperation,
-} from "../shared/files";
+import type { ImportInput, ImportOperation } from "../shared/files";
 import type { Work, Conversation, BodyRecord } from "../shared/contracts";
 import { read, write, uploadFile, SaveError } from "./api";
 import { SavedImageSubmenu } from "./saved-image-menu";
@@ -26,14 +21,7 @@ import "./style.css";
 import { usePaneLayout } from "./pane-layout";
 
 function App() {
-  const fileInput = useRef<HTMLInputElement>(null);
-  const [uploads, setUploads] = useState<Record<string, SourceFile[]>>({});
-  const [selectedFiles, setSelectedFiles] = useState<
-    Record<string, { id: string; file: File }[]>
-  >({});
   const [uploading, setUploading] = useState(false);
-  const pendingImports = useRef<Record<string, ImportInput>>({});
-  const [pendingImport, setPendingImport] = useState(false);
   const [modal, setModal] = useState<
     "work" | "settings" | "reflection" | "works" | null
   >(null);
@@ -260,120 +248,22 @@ function App() {
       setConversationId(created.id);
     });
   }
-  async function transferFiles(items: { id: string; file: File }[]) {
-    setUploading(true);
-    setError("");
-    const target = conversationId;
-    try {
-      const files: SourceFile[] = [];
-      for (const item of items)
-        files.push((await uploadFile(target, item.id, item.file)).file);
-      setUploads((previous) => ({
-        ...previous,
-        [target]: [
-          ...new Map(
-            [...(previous[target] ?? []), ...files].map((file) => [
-              file.relativePath,
-              file,
-            ]),
-          ).values(),
-        ],
-      }));
-      setSelectedFiles((previous) => ({ ...previous, [target]: [] }));
-    } catch (failure) {
-      setError((failure as Error).message);
-    } finally {
-      setUploading(false);
-    }
-  }
   async function submitRecord(body: string) {
     setBusy(true);
     try {
-      const target = conversationId;
-      const attached = uploads[target] ?? [];
-      if (attached.length) {
-        let input = pendingImports.current[target];
-        if (!input) {
-          const current = await read<{ currentStateId: string | null }>(
-            `/api/works/${workId}/states`,
-          );
-          input = {
-            requestKey: crypto.randomUUID(),
-            body,
-            files: attached,
-            application: attached.some((f) => f.role === "blend")
-              ? "Blender"
-              : attached.some((f) => f.role === "psd")
-                ? "Photoshop"
-                : "Other",
-            beforeStateId: current.currentStateId,
-          };
-          pendingImports.current[target] = input;
-          setPendingImport(true);
-        }
-        let result: { record: BodyRecord; state: SavedState };
-        try {
-          result = await write<{ record: BodyRecord; state: SavedState }>(
-            `/api/conversations/${target}/imports`,
-            input as unknown as Record<string, unknown>,
-            false,
-          );
-        } catch (failure) {
-          if (
-            failure instanceof SaveError &&
-            [400, 403, 404, 409].includes(failure.status ?? 0)
-          ) {
-            const operations = await read<ImportOperation[]>(
-              `/api/works/${workId}/imports`,
-            );
-            if (!operations.some((op) => op.requestKey === input.requestKey)) {
-              delete pendingImports.current[target];
-              setPendingImport(false);
-            }
-          }
-          throw failure;
-        }
-        delete pendingImports.current[target];
-        setPendingImport(false);
-        setUploads((previous) => ({ ...previous, [target]: [] }));
-        setRecordRevision((value) => value + 1);
-        setRecords((previous) =>
-          previous.some((item) => item.id === result.record.id)
-            ? previous
-            : [...previous, result.record],
-        );
-      } else {
-        const created = await write<BodyRecord>(
-          `/api/conversations/${target}/records`,
-          { body },
-        );
-        setRecords((previous) =>
-          previous.some((item) => item.id === created.id)
-            ? previous
-            : [...previous, created],
-        );
-      }
+      const created = await write<BodyRecord>(
+        `/api/conversations/${conversationId}/records`,
+        { body },
+      );
+      setRecords((previous) =>
+        previous.some((item) => item.id === created.id)
+          ? previous
+          : [...previous, created],
+      );
+      setRecordRevision((value) => value + 1);
     } finally {
       setBusy(false);
     }
-  }
-  async function abandonAttachment() {
-    await action(async () => {
-      const input = pendingImports.current[conversationId];
-      const operations = await read<ImportOperation[]>(
-        `/api/works/${workId}/imports`,
-      );
-      const op = operations.find(
-        (item) => item.requestKey === input?.requestKey,
-      );
-      if (!op || op.phase !== "incomplete")
-        throw new Error(
-          "照合が必要です。同じ内容で再送し、保存結果を確認してください。",
-        );
-      await write(`/api/imports/${op.id}/abandon`, {});
-      delete pendingImports.current[conversationId];
-      setPendingImport(false);
-    });
   }
   if (stopped)
     return (
@@ -416,7 +306,7 @@ function App() {
         <div className="sidebar-tools">
           <button
             className="nav-button"
-            disabled={busy || uploading || pendingImport}
+            disabled={busy || uploading}
             aria-label="作品を作成"
             onClick={() => setModal("work")}
           >
@@ -426,7 +316,7 @@ function App() {
           <button
             className="nav-button mobile-toggle"
             aria-label="作品を選択"
-            disabled={busy || uploading || pendingImport}
+            disabled={busy || uploading}
             onClick={() => setModal("works")}
           >
             <Icon name="folder" />
@@ -448,7 +338,7 @@ function App() {
               <div className="project-heading">
                 <button
                   className="project-title"
-                  disabled={busy || loading || uploading || pendingImport}
+                  disabled={busy || loading || uploading}
                   onClick={() => {
                     setError("");
                     setConversationId("");
@@ -462,7 +352,7 @@ function App() {
                   className="icon project-new-chat"
                   aria-label={`${item.name}に新しいチャット`}
                   title="新しいチャット"
-                  disabled={busy || loading || uploading || pendingImport}
+                  disabled={busy || loading || uploading}
                   onClick={() => createConversation(item.id)}
                 >
                   <Icon name="plus" />
@@ -476,7 +366,7 @@ function App() {
                     title={chat.title ?? `未命名のチャット ${index + 1}`}
                     selected={conversationId === chat.id}
                     status={statuses[chat.id] ?? ""}
-                    disabled={busy || loading || uploading || pendingImport}
+                    disabled={busy || loading || uploading}
                     onSelect={() => {
                       setError("");
                       setConversationId(chat.id);
@@ -562,8 +452,7 @@ function App() {
                   recordDisabled={
                     busy || loading || uploading || !recordsLoaded
                   }
-                  draftLocked={pendingImport}
-                  forceRecord={!!uploads[conversationId]?.length}
+                  onImageBusyChange={setUploading}
                   onStatusChange={(value) =>
                     setStatuses((previous) => ({
                       ...previous,
@@ -571,123 +460,39 @@ function App() {
                     }))
                   }
                   connectionRevision={connectionRevision}
-                  attachment={
+                  attachment={({
+                    selectImages,
+                    addImages,
+                    busy: imageBusy,
+                  }) => (
                     <Popup
                       label="成果物・ファイルを添付"
                       className="attachment-anchor"
                       icon={<Icon name="plus" />}
-                      disabled={uploading || pendingImport}
+                      disabled={uploading || imageBusy}
                     >
                       {(close) => (
                         <>
-                          <div className="menu-heading">
-                            制作ファイルと保存状態
-                          </div>
+                          <div className="menu-heading">画像を添付</div>
                           <SavedImageSubmenu
                             workId={workId}
-                            onSelect={(file) =>
-                              transferFiles([{ id: crypto.randomUUID(), file }])
-                            }
+                            onSelect={(file) => addImages([file])}
                             onDone={close}
                           />
                           <button
                             type="button"
                             role="menuitem"
                             onClick={() => {
-                              fileInput.current?.click();
+                              selectImages();
                               close();
                             }}
                           >
-                            コンピューターからファイルを添付
+                            コンピューターから画像を添付
                           </button>
                         </>
                       )}
                     </Popup>
-                  }
-                  composerExtra={
-                    <>
-                      <input
-                        className="sr-only"
-                        ref={fileInput}
-                        type="file"
-                        aria-label="コンピューターからファイルを選択"
-                        multiple
-                        accept=".blend,.psd,.psb,.png,.jpg,.jpeg,.webp,.exr,.tif,.tiff"
-                        onChange={(e) => {
-                          const items = Array.from(
-                            e.target.files ?? [],
-                            (file) => ({ id: crypto.randomUUID(), file }),
-                          );
-                          setSelectedFiles((previous) => ({
-                            ...previous,
-                            [conversationId]: items,
-                          }));
-                          if (items.length) void transferFiles(items);
-                          e.target.value = "";
-                        }}
-                      />
-                      {uploading && (
-                        <p className="hint" role="status">
-                          ファイルを受け渡し中…
-                        </p>
-                      )}
-                      {!uploading &&
-                        (selectedFiles[conversationId]?.length ?? 0) > 0 && (
-                          <button
-                            type="button"
-                            onClick={() =>
-                              void transferFiles(
-                                selectedFiles[conversationId] ?? [],
-                              )
-                            }
-                          >
-                            同じファイルで再送
-                          </button>
-                        )}
-                      {!!uploads[conversationId]?.length && (
-                        <div className="attachments">
-                          {uploads[conversationId]!.map((file) => (
-                            <span
-                              className="source-chip"
-                              key={file.relativePath}
-                            >
-                              <span>{file.relativePath.split("/").at(-1)}</span>
-                              <button
-                                type="button"
-                                aria-label={`${file.relativePath.split("/").at(-1)}を外す`}
-                                disabled={pendingImport}
-                                onClick={() =>
-                                  setUploads((previous) => ({
-                                    ...previous,
-                                    [conversationId]: previous[
-                                      conversationId
-                                    ]!.filter((f) => f !== file),
-                                  }))
-                                }
-                              >
-                                ×
-                              </button>
-                            </span>
-                          ))}
-                          <p>保存済みファイルを本文と一緒に記録します。</p>
-                        </div>
-                      )}
-                      {pendingImport && (
-                        <div className="note">
-                          <p role="status">
-                            保存結果の確認待ちです。入力を保持して、同じ内容で再送します。
-                          </p>
-                          <button
-                            type="button"
-                            disabled={busy}
-                            onClick={() => void abandonAttachment()}
-                          >
-                            未完成の添付記録を中止
-                          </button>
-                        </div>
-                      )}
-                    </>
-                  }
+                  )}
                   onSideNamesChanged={setSideNames}
                   onNameChanged={(name) =>
                     setConversations((previous) =>
@@ -722,7 +527,7 @@ function App() {
                 {!work && (
                   <button
                     className="secondary"
-                    disabled={busy || uploading || pendingImport}
+                    disabled={busy || uploading}
                     onClick={() => setModal("work")}
                   >
                     新しい作品
@@ -893,13 +698,7 @@ function App() {
               </button>
               <button
                 className="primary"
-                disabled={
-                  busy ||
-                  uploading ||
-                  pendingImport ||
-                  !worksLoaded ||
-                  !name.trim()
-                }
+                disabled={busy || uploading || !worksLoaded || !name.trim()}
               >
                 {creation.current ? "同じ内容で再試行" : "作品を作成"}
               </button>

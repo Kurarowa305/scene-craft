@@ -1,3 +1,4 @@
+import { useChatImages, SentImages, type ImageControls } from "./chat-images";
 import {
   useEffect,
   useRef,
@@ -56,13 +57,15 @@ export function Chat({
   forceRecord,
   draftLocked,
   connectionRevision = 0,
+  onImageBusyChange,
 }: {
   conversationId: string;
   composerExtra?: ReactNode;
   forceRecord?: boolean;
   draftLocked?: boolean;
   connectionRevision?: number;
-  attachment?: ReactNode;
+  attachment?: ReactNode | ((controls: ImageControls) => ReactNode);
+  onImageBusyChange?: (busy: boolean) => void;
   recordDraft?: string;
   onDraftChange?: (draft: string) => void;
   onRecord?: (body: string) => Promise<void>;
@@ -78,6 +81,10 @@ export function Chat({
   ) => void;
 }) {
   const bodyId = useId();
+  const imageInput = useRef<HTMLInputElement>(null);
+  const images = useChatImages(conversationId, onImageBusyChange);
+  const hasImages = images.items.length > 0;
+
   const alive = useRef(false);
   const contextFetch = useRef(0);
   const contextRevision = useRef(-1);
@@ -225,9 +232,11 @@ export function Chat({
       const submitter = (e.nativeEvent as SubmitEvent)
         .submitter as HTMLButtonElement | null;
       if (
+        !hasImages &&
         !side &&
         onRecord &&
-        (submitter?.value === "record" || sendMode === "record" || forceRecord)
+        (submitter?.value === "record" ||
+          (!hasImages && (sendMode === "record" || forceRecord)))
       ) {
         await onRecord(draft);
         setDraft("");
@@ -235,9 +244,11 @@ export function Chat({
       }
       await write(`/api/conversations/${conversationId}/messages`, {
         body: draft,
+        ...(hasImages ? { imageIds: images.items.map((item) => item.id) } : {}),
         ...(side ? {} : { role }),
       });
       setDraft("");
+      images.clear();
       await refresh();
     });
   }
@@ -264,7 +275,13 @@ export function Chat({
             <article className="message exchange" key={r.id}>
               <div className="message user">
                 <div className="message-label">あなた</div>
-                <p className="record-body message-body">{r.body}</p>
+                {!!r.images?.length && (
+                  <SentImages
+                    conversationId={conversationId}
+                    images={r.images}
+                  />
+                )}
+                {r.body && <p className="record-body message-body">{r.body}</p>}
               </div>
               <div className="message-label">
                 <span className="assistant-dot">s</span>scene-craft{" "}
@@ -354,9 +371,62 @@ export function Chat({
             }
           />
           {composerExtra}
+          <input
+            ref={imageInput}
+            className="sr-only"
+            type="file"
+            accept="image/png,image/jpeg,image/webp"
+            multiple
+            aria-label="LLMに添付する画像を選択"
+            onChange={(event) => {
+              const files = Array.from(event.target.files ?? []);
+              event.target.value = "";
+              void images
+                .addImages(files)
+                .catch((failure) => setError(failure.message));
+            }}
+          />
+          {hasImages && (
+            <div className="draft-images" aria-label="添付画像">
+              {images.items.map((item) => (
+                <div key={item.id} className="draft-image">
+                  <img src={item.preview} alt={item.file.name} />
+                  <button
+                    type="button"
+                    aria-label={`${item.file.name}を外す`}
+                    disabled={busy || images.busy}
+                    onClick={() => void images.remove(item.id)}
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+          {images.error && (
+            <p role="alert" className="error">
+              {images.error}
+            </p>
+          )}
+          {images.items.some((item) => !item.uploaded) && (
+            <button
+              type="button"
+              disabled={busy || images.busy}
+              onClick={() => void images.retry().catch(() => {})}
+            >
+              同じ画像で再試行
+            </button>
+          )}
+
           <div className="composer-tools">
             <div className="row">
-              {attachment}
+              {typeof attachment === "function"
+                ? attachment({
+                    busy: images.busy,
+                    addImages: images.addImages,
+                    selectImages: () => imageInput.current?.click(),
+                  })
+                : attachment}
               <div className="composer-selects">
                 {!side && (
                   <label>
@@ -413,8 +483,10 @@ export function Chat({
                 {!side && onRecord && (
                   <select
                     aria-label="送信方法"
-                    value={forceRecord ? "record" : sendMode}
-                    disabled={forceRecord || draftLocked}
+                    value={
+                      hasImages ? "chat" : forceRecord ? "record" : sendMode
+                    }
+                    disabled={hasImages || forceRecord || draftLocked}
                     onChange={(e) => setSendMode(e.target.value)}
                   >
                     <option value="chat">会話で送信</option>
@@ -494,16 +566,18 @@ export function Chat({
                 aria-label={
                   side
                     ? "相談を送信"
-                    : sendMode === "record" || forceRecord
+                    : !hasImages && (sendMode === "record" || forceRecord)
                       ? "記録として送信"
                       : "Codexへ送信"
                 }
                 disabled={
                   busy ||
-                  (sendMode === "record" || forceRecord
+                  images.busy ||
+                  images.items.some((item) => !item.uploaded) ||
+                  (!hasImages && (sendMode === "record" || forceRecord)
                     ? recordDisabled
                     : !status?.authenticated || !model) ||
-                  !draft.trim()
+                  (!draft.trim() && !hasImages)
                 }
               >
                 <Icon name="send" />

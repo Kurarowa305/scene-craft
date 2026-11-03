@@ -1,3 +1,4 @@
+import { registerChatImages, chatImageRoute } from "./chat-images.js";
 import {
   attachmentRoute,
   attachmentRootId,
@@ -64,6 +65,19 @@ export async function createApp(options: AppOptions) {
         store.records(id);
       })
     : null;
+  const chatImages = await registerChatImages(
+    app,
+    options.directory,
+    (id) => {
+      store.chat.session(id);
+    },
+    (id, imageId) =>
+      store.chat
+        .requests(id)
+        .some((request) =>
+          request.images?.some((image) => image.id === imageId),
+        ),
+  );
   const files = options.fileRoots
     ? fileService(
         store,
@@ -156,6 +170,7 @@ export async function createApp(options: AppOptions) {
         instructions,
       };
     },
+    chatImages,
   );
   app.get("/api/roles", async () => {
     const ref = store.defaultDefinition();
@@ -208,10 +223,11 @@ export async function createApp(options: AppOptions) {
       ) {
         return reply.code(403).send({ error: "INVALID_SESSION" });
       }
-      const expectedType =
-        request.routeOptions.url === attachmentRoute
-          ? "application/octet-stream"
-          : "application/json";
+      const expectedType = [attachmentRoute, chatImageRoute].includes(
+        request.routeOptions.url ?? "",
+      )
+        ? "application/octet-stream"
+        : "application/json";
       if (request.headers["content-type"]?.split(";")[0] !== expectedType)
         return reply.code(415).send({
           error:

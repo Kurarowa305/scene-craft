@@ -1738,3 +1738,42 @@ dialog .dialog-footer {
 .artifact-submenu span {
   overflow-wrap: anywhere;
 }
+
+.draft-images,
+.sent-images {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 8px 0;
+}
+.draft-image {
+  position: relative;
+  width: 84px;
+  height: 84px;
+}
+.draft-image img,
+.sent-images img {
+  width: 84px;
+  height: 84px;
+  object-fit: cover;
+  border-radius: 9px;
+  border: 1px solid var(--line);
+}
+.draft-image button {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  background: #252725;
+  border-radius: 50%;
+}
+.sent-images {
+  justify-content: flex-end;
+}
+.sent-images img {
+  width: 150px;
+  height: 120px;
+  object-fit: contain;
+}

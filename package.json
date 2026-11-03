@@ -18,7 +18,8 @@
     "@fastify/static": "10.1.8",
     "fastify": "5.12.7",
     "react": "19.3.1",
-    "react-dom": "19.3.1"
+    "react-dom": "19.3.1",
+    "sharp": "0.35.5"
   },
   "devDependencies": {
     "@playwright/test": "1.64.1",

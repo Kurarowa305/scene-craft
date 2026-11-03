@@ -97,3 +97,33 @@ export async function uploadFile(
   }
   return response.json();
 }
+
+export async function uploadChatImage(
+  conversationId: string,
+  id: string,
+  file: File,
+): Promise<import("../shared/chat-image").ChatImage> {
+  if (!csrfToken)
+    csrfToken = (await read<{ csrfToken: string }>("/api/session")).csrfToken;
+  const response = await fetch(
+    `/api/conversations/${conversationId}/images/${id}?name=${encodeURIComponent(file.name)}`,
+    {
+      method: "POST",
+      credentials: "same-origin",
+      headers: {
+        "content-type": "application/octet-stream",
+        "x-csrf-token": csrfToken,
+      },
+      body: file,
+    },
+  );
+  if (!response.ok) {
+    if (response.status === 403) csrfToken = undefined;
+    throw new Error(
+      response.status === 413
+        ? "画像は1枚20MiBまでです。"
+        : "画像を受け渡しできません。PNG・JPEG・WebPの静止画を選ぶか、同じ画像で再試行してください。",
+    );
+  }
+  return response.json();
+}

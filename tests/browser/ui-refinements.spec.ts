@@ -185,26 +185,16 @@ test("成果物を選び直した後も、相談作成の応答喪失を初回�
   await openWorkDialog(page);
   await page.getByLabel("作品名", { exact: true }).fill("相談の再試行入力");
   await page
-    .getByRole("dialog", { name: "作品を作成" })
-    .getByRole("button", { name: "作品を作成", exact: true })
-    .click();
-  await page
-    .getByRole("button", {
-      name: "相談の再試行入力に新しいチャット",
-      exact: true,
-    })
-    .click();
-  await page
-    .getByLabel("コンピューターからファイルを選択", { exact: true })
+    .getByLabel("既存ファイルから始める", { exact: false })
     .setInputFiles({
       name: "context.psd",
       mimeType: "application/octet-stream",
       buffer: Buffer.from("saved file"),
     });
-  await expect(page.getByText("context.psd", { exact: true })).toBeVisible();
-  await page.getByLabel("メッセージ", { exact: true }).fill("相談用の状態");
-  await sendRecord(page);
-  await expect(page.getByLabel("メッセージ", { exact: true })).toHaveValue("");
+  await page
+    .getByRole("dialog", { name: "作品を作成" })
+    .getByRole("button", { name: "作品を作成", exact: true })
+    .click();
   await page.route(
     "**/api/conversations/*/side-chats",
     async (route) => {

@@ -1,6 +1,19 @@
+import { readFileSync } from "node:fs";
 import { recordBodies } from "./ui-helpers";
 import { sendRecord } from "./ui-helpers";
 import { test, expect } from "@playwright/test";
+
+async function prepareImageChat(page: import("@playwright/test").Page) {
+  const { definition } = JSON.parse(
+    readFileSync("test-results/git-fixture.json", "utf8"),
+  );
+  const { csrfToken } = await (await page.request.get("/api/session")).json();
+  const response = await page.request.post("/api/versions/default", {
+    headers: { origin: new URL(page.url()).origin, "x-csrf-token": csrfToken },
+    data: { requestKey: crypto.randomUUID(), commit: definition },
+  });
+  expect(response.ok()).toBe(true);
+}
 
 test("採用済みの3領域で作品を作り、記録を保存して開き直せる", async ({
   page,
@@ -38,55 +51,69 @@ test("採用済みの3領域で作品を作り、記録を保存して開き直�
   await expect(page.getByText("シナリオ選択", { exact: true })).toHaveCount(0);
 });
 
-test("入力欄の＋でOSのファイルを選び、本文と一緒に記録する", async ({
+test("入力欄の＋で画像をLLMに添付し、送信前と発言直上にプレビューする", async ({
   page,
 }) => {
   await page.goto("/");
+  await prepareImageChat(page);
   await page.getByRole("button", { name: "作品を作成", exact: true }).click();
-  const dialog = page.getByRole("dialog", { name: "作品を作成" });
-  await dialog.getByLabel("作品名", { exact: true }).fill("添付導線の作品");
+  const dialog = page.getByRole("dialog");
+  await dialog.getByLabel("作品名", { exact: true }).fill("画像相談の作品");
   await dialog.getByRole("button", { name: "作品を作成", exact: true }).click();
   await page
     .getByRole("button", {
-      name: "添付導線の作品に新しいチャット",
+      name: "画像相談の作品に新しいチャット",
       exact: true,
     })
     .click();
-  await page.getByRole("button", { name: "成果物・ファイルを添付" }).click();
-  const chooserPromise = page.waitForEvent("filechooser");
+  await page
+    .getByRole("button", { name: "成果物・ファイルを添付", exact: true })
+    .click();
+  const choosing = page.waitForEvent("filechooser");
   await page
     .getByRole("menuitem", {
-      name: "コンピューターからファイルを添付",
+      name: "コンピューターから画像を添付",
       exact: true,
     })
     .click();
-  const chooser = await chooserPromise;
-  await chooser.setFiles({
-    name: "retouch.psd",
-    mimeType: "application/octet-stream",
-    buffer: Buffer.from("Photoshop saved file"),
+  await (
+    await choosing
+  ).setFiles({
+    name: "reference.png",
+    mimeType: "image/png",
+    buffer: readFileSync(
+      new URL("../fixtures/chat-reference.png", import.meta.url),
+    ),
   });
-  await expect(page.getByText("retouch.psd", { exact: true })).toBeVisible();
-  await page.getByLabel("メッセージ", { exact: true }).fill("空の色を調整した");
-  await sendRecord(page);
-  await expect
-    .poll(() => recordBodies(page, "添付導線の作品"))
-    .toEqual(["空の色を調整した"]);
-  await page.getByRole("button", { name: "成果物・ファイルを添付" }).click();
-  await page
-    .getByRole("menuitem", { name: "保存済み成果物を開く", exact: true })
-    .click();
-  const artifact = page.getByRole("button", { name: /retouch.psd.*Photoshop/ });
-  await expect(artifact).toBeVisible();
-  await artifact.click();
+  await expect(page.locator(".draft-images img")).toBeVisible();
+  await page.screenshot({ path: "test-results/chat-image-draft.png" });
   await expect(
-    page.getByText("このファイルの画像プレビューは未取得です。", {
-      exact: true,
-    }),
-  ).toBeVisible();
-  const download = page.waitForEvent("download");
-  await page.getByRole("link", { name: "ファイルを開く", exact: true }).click();
-  await download;
+    page.getByRole("button", { name: "Codexへ送信", exact: true }),
+  ).toBeEnabled();
+  await page
+    .getByLabel("メッセージ", { exact: true })
+    .fill("この画像の色を教えて");
+  await page.getByLabel("メッセージ", { exact: true }).press("Enter");
+  await expect(page.locator(".message.user .sent-images img")).toBeVisible();
+  await expect(page.locator(".draft-images img")).toHaveCount(0);
+  const bounds = await page
+    .locator(".message.user")
+    .first()
+    .evaluate((item) => ({
+      image: item.querySelector("img")!.getBoundingClientRect().bottom,
+      body: item.querySelector("p")!.getBoundingClientRect().top,
+    }));
+  expect(bounds.image).toBeLessThanOrEqual(bounds.body);
+  await expect.poll(() => recordBodies(page, "画像相談の作品")).toEqual([]);
+  const works = await (await page.request.get("/api/works")).json();
+  const work = works.find(
+    (item: { name: string }) => item.name === "画像相談の作品",
+  );
+  expect(
+    (await (await page.request.get(`/api/works/${work.id}/states`)).json())
+      .states,
+  ).toEqual([]);
+  await page.screenshot({ path: "test-results/chat-image-previews.png" });
 });
 
 test("未実装の参考資料検索は外観のみで、検索APIを呼ばない", async ({
@@ -110,58 +137,52 @@ test("未実装の参考資料検索は外観のみで、検索APIを呼ばな�
   expect(requests).toEqual([]);
 });
 
-test("添付記録の応答が失われても同じ内容で再送し、保存状態を重複させない", async ({
+test("画像の送信受付応答を失っても本文と画像を保持し、再試行で重複しない", async ({
   page,
 }) => {
   await page.goto("/");
+  await prepareImageChat(page);
   await page.getByRole("button", { name: "作品を作成", exact: true }).click();
-  const dialog = page.getByRole("dialog", { name: "作品を作成" });
-  await dialog.getByLabel("作品名", { exact: true }).fill("添付再送の作品");
+  const dialog = page.getByRole("dialog");
+  await dialog.getByLabel("作品名", { exact: true }).fill("画像再送の作品");
   await dialog.getByRole("button", { name: "作品を作成", exact: true }).click();
   await page
     .getByRole("button", {
-      name: "添付再送の作品に新しいチャット",
+      name: "画像再送の作品に新しいチャット",
       exact: true,
     })
     .click();
   await page
-    .getByLabel("コンピューターからファイルを選択", { exact: true })
+    .getByLabel("LLMに添付する画像を選択", { exact: true })
     .setInputFiles({
-      name: "lost-response.psd",
-      mimeType: "application/octet-stream",
-      buffer: Buffer.from("saved bytes"),
+      name: "lost.png",
+      mimeType: "image/png",
+      buffer: readFileSync(
+        new URL("../fixtures/chat-reference.png", import.meta.url),
+      ),
     });
-  await expect(
-    page.getByText("lost-response.psd", { exact: true }),
-  ).toBeVisible();
+  const send = page.getByRole("button", { name: "Codexへ送信", exact: true });
+  await expect(send).toBeEnabled();
   await page
     .getByLabel("メッセージ", { exact: true })
-    .fill("一度だけ保存する記録");
+    .fill("画像を一度だけ送る");
   await page.route(
-    "**/api/conversations/*/imports",
+    "**/api/conversations/*/messages",
     async (route) => {
       await route.fetch();
       await route.abort("failed");
     },
     { times: 1 },
   );
-  await sendRecord(page);
-  await expect(page.getByLabel("メッセージ", { exact: true })).toBeDisabled();
-  await expect(
-    page.getByRole("button", { name: "作品を作成", exact: true }),
-  ).toBeDisabled();
+  await send.click();
+  await expect(page.locator(".draft-images img")).toBeVisible();
   await expect(page.getByLabel("メッセージ", { exact: true })).toHaveValue(
-    "一度だけ保存する記録",
+    "画像を一度だけ送る",
   );
-  await sendRecord(page);
-  await expect
-    .poll(() => recordBodies(page, "添付再送の作品"))
-    .toEqual(["一度だけ保存する記録"]);
-  await page.getByRole("button", { name: "成果物・ファイルを添付" }).click();
-  await page
-    .getByRole("menuitem", { name: "保存済み成果物を開く", exact: true })
-    .click();
-  await expect(page.locator(".saved-state")).toHaveCount(1);
+  await expect(send).toBeEnabled({ timeout: 15000 });
+  await send.click();
+  await expect(page.locator(".draft-images img")).toHaveCount(0);
+  await expect(page.locator(".message.user .sent-images img")).toHaveCount(1);
 });
 
 test("タブの追加・閉鎖と幅の調整、未実装画面を確認できる", async ({ page }) => {
@@ -215,52 +236,64 @@ test("タブの追加・閉鎖と幅の調整、未実装画面を確認でき�
   await page.screenshot({ path: "test-results/issue-102-settings.png" });
 });
 
-test("受け渡しに失敗した添付は元の会話に保持して再送する", async ({ page }) => {
+test("画像の受け渡し失敗後も元の会話にプレビューを保持して同じ画像で再試行できる", async ({
+  page,
+}) => {
   await page.goto("/");
+  await prepareImageChat(page);
   await page.getByRole("button", { name: "作品を作成", exact: true }).click();
-  const dialog = page.getByRole("dialog", { name: "作品を作成" });
-  await dialog
-    .getByLabel("作品名", { exact: true })
-    .fill("添付先を保持する作品");
+  const dialog = page.getByRole("dialog");
+  await dialog.getByLabel("作品名", { exact: true }).fill("画像保持の作品");
   await dialog.getByRole("button", { name: "作品を作成", exact: true }).click();
   const create = page.getByRole("button", {
-    name: "添付先を保持する作品に新しいチャット",
+    name: "画像保持の作品に新しいチャット",
     exact: true,
   });
   await create.click();
-  await expect(page.getByLabel("メッセージ", { exact: true })).toBeEnabled();
+  const ids: string[] = [];
   await page.route(
-    "**/api/conversations/*/attachments/*?*",
+    "**/api/conversations/*/images/*?*",
     async (route) => {
+      ids.push(route.request().url());
       await route.fetch();
       await route.abort("failed");
     },
     { times: 1 },
   );
   await page
-    .getByLabel("コンピューターからファイルを選択", { exact: true })
+    .getByLabel("LLMに添付する画像を選択", { exact: true })
     .setInputFiles({
-      name: "retry.psd",
-      mimeType: "application/octet-stream",
-      buffer: Buffer.from("retry bytes"),
+      name: "retry.png",
+      mimeType: "image/png",
+      buffer: readFileSync(
+        new URL("../fixtures/chat-reference.png", import.meta.url),
+      ),
     });
   await expect(
-    page.getByRole("button", { name: "同じファイルで再送", exact: true }),
+    page.getByRole("button", { name: "同じ画像で再試行", exact: true }),
   ).toBeVisible();
   await create.click();
-  await expect(
-    page.getByRole("heading", { name: "未命名のチャット 2", exact: true }),
-  ).toBeVisible();
-  await expect(
-    page.getByRole("button", { name: "同じファイルで再送", exact: true }),
-  ).toHaveCount(0);
+  await expect(page.locator(".draft-images img")).toHaveCount(0);
   await page
     .getByRole("button", { name: "未命名のチャット 1", exact: true })
     .click();
+  await expect(page.locator(".draft-images img")).toBeVisible();
+  await page.route("**/api/conversations/*/images/*?*", async (route) => {
+    ids.push(route.request().url());
+    await route.continue();
+  });
   await page
-    .getByRole("button", { name: "同じファイルで再送", exact: true })
+    .getByRole("button", { name: "同じ画像で再試行", exact: true })
     .click();
-  await expect(page.getByText("retry.psd", { exact: true })).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "同じ画像で再試行", exact: true }),
+  ).toHaveCount(0);
+  expect(ids).toHaveLength(2);
+  expect(ids[1]).toBe(ids[0]);
+  await page
+    .getByRole("button", { name: "retry.pngを外す", exact: true })
+    .click();
+  await expect(page.locator(".draft-images img")).toHaveCount(0);
 });
 
 test("作品の保存中にEscapeを押しても失敗した入力とエラーを確認できる", async ({
