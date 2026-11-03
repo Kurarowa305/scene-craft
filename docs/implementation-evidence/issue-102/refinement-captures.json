@@ -1,0 +1,32 @@
+{
+  "environment": "WSL Linux, Node 24.19.0, Playwright Chromium; Codex protocol fixture",
+  "captures": [
+    {
+      "file": "chat-name.png",
+      "sourceCommit": "6d6ae42a5ea0205797c84811bc3b029187ba7e7b",
+      "viewport": {
+        "width": 1512,
+        "height": 960
+      },
+      "test": "tests/browser/ui-refinements.spec.ts"
+    },
+    {
+      "file": "chat-settings.png",
+      "sourceCommit": "6d6ae42a5ea0205797c84811bc3b029187ba7e7b",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "test": "tests/browser/auxiliary.spec.ts"
+    },
+    {
+      "file": "side-settings.png",
+      "sourceCommit": "6d6ae42a5ea0205797c84811bc3b029187ba7e7b",
+      "viewport": {
+        "width": 1512,
+        "height": 960
+      },
+      "test": "tests/browser/ui-refinements.spec.ts"
+    }
+  ]
+}
