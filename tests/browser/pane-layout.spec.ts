@@ -4,6 +4,8 @@ import { test, expect } from "@playwright/test";
 test("一覧は最小幅で一度止まってから折りたたみ、戻せる", async ({ page }) => {
   await page.setViewportSize({ width: 1512, height: 960 });
   await page.goto("/");
+  await page.clock.install({ time: new Date("2026-11-03T00:00:00Z") });
+  await page.clock.pauseAt(new Date("2026-11-03T00:00:01Z"));
   const handle = page.getByRole("separator", { name: "作品一覧の幅" });
   const box = (await handle.boundingBox())!;
   const minimum = Number(await handle.getAttribute("aria-valuemin"));
@@ -11,10 +13,14 @@ test("一覧は最小幅で一度止まってから折りたたみ、戻せる",
   await page.mouse.down();
   await page.mouse.move(minimum - 30, box.y + 100);
   await expect(handle).toHaveAttribute("aria-valuenow", String(minimum));
+  await page.clock.runFor(179);
+  await expect(page.locator(".brand-name")).toBeVisible();
+  await page.clock.runFor(1);
   await expect(
     page.getByRole("button", { name: "チャット一覧を表示", exact: true }),
   ).toBeVisible();
   await page.mouse.up();
+  await page.screenshot({ path: "test-results/issue-102-collapsed-pane.png" });
   await page
     .getByRole("button", { name: "チャット一覧を表示", exact: true })
     .click();
@@ -110,7 +116,8 @@ test("最小幅から戻したドラッグや終了したドラッグは遅れ�
 }) => {
   await page.setViewportSize({ width: 1512, height: 960 });
   await page.goto("/");
-  await page.clock.install();
+  await page.clock.install({ time: new Date("2026-11-03T00:00:00Z") });
+  await page.clock.pauseAt(new Date("2026-11-03T00:00:01Z"));
   const handle = page.getByRole("separator", { name: "作品一覧の幅" });
   const box = (await handle.boundingBox())!;
   const minimum = Number(await handle.getAttribute("aria-valuemin"));

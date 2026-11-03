@@ -27,6 +27,24 @@
         "height": 960
       },
       "test": "tests/browser/ui-refinements.spec.ts"
+    },
+    {
+      "file": "pane-layout.png",
+      "sourceCommit": "ab3d7123cbae133c5b0722f004f4bd35e3359d4d",
+      "viewport": {
+        "width": 2200,
+        "height": 960
+      },
+      "test": "tests/browser/pane-layout.spec.ts"
+    },
+    {
+      "file": "collapsed-pane.png",
+      "sourceCommit": "ab3d7123cbae133c5b0722f004f4bd35e3359d4d",
+      "viewport": {
+        "width": 1512,
+        "height": 960
+      },
+      "test": "tests/browser/pane-layout.spec.ts"
     }
   ]
 }
