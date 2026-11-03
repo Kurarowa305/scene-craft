@@ -79,7 +79,6 @@ export function sideStore(
     create(
       key: string,
       mainId: string,
-      topic: string,
       selectedStateIds: string[],
       capture: (
         workId: string,
@@ -88,7 +87,7 @@ export function sideStore(
         "conversationId" | "mainConversationId" | "topic" | "createdAt"
       >,
     ) {
-      return once(key, ["side-chat", mainId, topic, selectedStateIds], () => {
+      return once(key, ["side-chat", mainId, selectedStateIds], () => {
         const main = db
           .prepare("SELECT work_id FROM conversations WHERE id=?")
           .get(mainId);
@@ -99,7 +98,6 @@ export function sideStore(
           ...fixed,
           conversationId: randomUUID(),
           mainConversationId: mainId,
-          topic,
           createdAt: new Date().toISOString(),
         };
         db.prepare(

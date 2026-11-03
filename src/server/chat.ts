@@ -66,7 +66,10 @@ export function registerChat(
     async (req) => {
       chat.session(req.params.id);
       store.sides.requireMain(req.params.id);
-      return store.sides.list(req.params.id);
+      return store.sides.list(req.params.id).map((side) => ({
+        ...side,
+        title: store.auxiliary.name(side.conversationId),
+      }));
     },
   );
   app.get<{ Params: { id: string } }>(
@@ -80,7 +83,7 @@ export function registerChat(
   );
   app.post<{
     Params: { id: string };
-    Body: { requestKey: string; topic: string; selectedStateIds: string[] };
+    Body: { requestKey: string; selectedStateIds: string[] };
   }>(
     "/api/conversations/:id/side-chats",
     {
@@ -88,12 +91,6 @@ export function registerChat(
         params,
         body: body(
           {
-            topic: {
-              type: "string",
-              minLength: 1,
-              maxLength: 20000,
-              pattern: "\\S",
-            },
             selectedStateIds: {
               type: "array",
               maxItems: 50,
@@ -101,16 +98,15 @@ export function registerChat(
               items: { type: "string", format: "uuid" },
             },
           },
-          ["topic", "selectedStateIds"],
+          ["selectedStateIds"],
         ),
       },
     },
     async (req) => {
-      const { requestKey, topic, selectedStateIds } = req.body;
+      const { requestKey, selectedStateIds } = req.body;
       const side = store.sides.create(
         requestKey,
         req.params.id,
-        topic,
         selectedStateIds,
         (workId) => {
           const plan = {

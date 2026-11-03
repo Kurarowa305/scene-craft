@@ -27,7 +27,6 @@ test("メイン実行中に別threadで相談し、開始文脈と原文を開�
     });
     await f.send();
     const side = await f.post(`/api/conversations/${f.chat.id}/side-chats`, {
-      topic: "港の照明",
       selectedStateIds: [],
     });
     const request = await f.post(
@@ -98,11 +97,42 @@ async function waitFor(condition: () => Promise<unknown>) {
   assert.fail("timed out");
 }
 
+test("話題入力なしで作成し、最初のサイド原文から補助Codexで命名して再起動後も一覧に返す", async () => {
+  const f = await chatFixture(true);
+  try {
+    await f.post("/api/auxiliary/model", { model: "fixture-a" });
+    const side = await f.post(`/api/conversations/${f.chat.id}/side-chats`, {
+      selectedStateIds: [],
+    });
+    assert.equal(side.topic, undefined);
+    const listing = () => f.read(`/api/conversations/${f.chat.id}/side-chats`);
+    assert.equal((await listing())[0].title, null);
+    const before = await f.read(
+      `/api/conversations/${side.conversationId}/chat`,
+    );
+    assert.equal(before.auxiliary.jobs.length, 0);
+    const request = await f.post(
+      `/api/conversations/${side.conversationId}/messages`,
+      { body: "港のライトについて相談" },
+    );
+    await waitFor(async () => (await listing())[0].title === "港の光の検討");
+    const view = await f.read(`/api/conversations/${side.conversationId}/chat`);
+    const job = view.auxiliary.jobs.find((j: any) => j.kind === "name");
+    assert.equal(job.model, "fixture-a");
+    assert.equal(job.sources[0].body, "港のライトについて相談");
+    assert.notEqual(job.threadId, view.session.threadId);
+    assert.equal(job.sourceRequestId, request.id);
+    await f.restart();
+    assert.equal((await listing())[0].title, "港の光の検討");
+  } finally {
+    await f.close();
+  }
+});
+
 test("サイド相談は更新・制作・shell迂回を拒否し、停止後の参照と別接続の参照を失効させる", async () => {
   const f = await chatFixture();
   try {
     const side = await f.post(`/api/conversations/${f.chat.id}/side-chats`, {
-      topic: "権限検査",
       selectedStateIds: [],
     });
     const r = await f.post(
@@ -211,7 +241,6 @@ test("選択成果物と50件超の参照を固定し、同じ開始要求は一
     });
     const input = {
       requestKey: randomUUID(),
-      topic: "固定する相談",
       selectedStateIds: [imported.state.id],
     };
     const side = await f.post(

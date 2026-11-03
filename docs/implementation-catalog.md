@@ -63,8 +63,8 @@
 | POST | `/api/conversations/:id/name` | 会話ID、`name`（1〜100文字・空白のみ不可） | 人間の会話名を保存。後着の自動命名では上書きしない |
 | GET | `/api/conversations/:id/records` | 会話ID | 最新表示の `BodyRecord[]`。元本文・旧理由を保持し現在本文を返す |
 | POST | `/api/conversations/:id/records` | 会話ID、`body`（1〜200000文字・空白のみ不可） | LLMを使わず原文を記録し `BodyRecord` を返す。サイド会話では403 |
-| GET | `/api/conversations/:id/side-chats` | メイン会話ID | 保存済みの`SideChat[]`。タブ閉鎖では削除・停止しない |
-| POST | `/api/conversations/:id/side-chats` | メイン会話ID、`topic`（1〜20000文字・空白のみ不可）、`selectedStateIds`（重複なしUUID配列、0〜50件） | 開始文脈・メイン原文・選択成果物・版を固定し相談会話を作成。同じrequestKeyは同じ会話。別作品の保存状態は拒否。LLMはまだ呼ばない |
+| GET | `/api/conversations/:id/side-chats` | メイン会話ID | 保存済みの`SideChatView[]`。`conversation_names`から現在の`title`（未命名はnull）を付加する。タブ閉鎖では削除・停止しない |
+| POST | `/api/conversations/:id/side-chats` | メイン会話ID、`selectedStateIds`（重複なしUUID配列、0〜50件） | 話題入力なしで開始文脈・メイン原文・選択成果物・版を固定し相談会話を作成。同じrequestKeyは同じ会話。別作品の保存状態は拒否。LLMはまだ呼ばない |
 | GET | `/api/conversations/:id/side-context` | サイド会話ID | 保存済みの開始参照`SideChat`。存在しなければ404 |
 | POST | `/api/conversations/:id/summaries/:summaryId` | 会話IDと要約改訂ID（UUID）、`body`（1〜200000文字・空白のみ不可） | LLMなしで人間の訂正を追加。旧要約・根拠原文・作成者と時刻・訂正元を保持。別会話の要約は404、既に訂正済みの版は409 |
 | GET | `/api/file-roots` | なし | `{sources:[{id}],configured}`。実パスは返さない |
@@ -402,13 +402,14 @@ filesは`id,rootId,relativePath,role,source{rootId,relativePath},size,sha256`、
 
 | JSON項目 | 保存内容 |
 | --- | --- |
-| `conversationId,mainConversationId,topic,createdAt` | 会話・開始元・話題・固定日時 |
+| `conversationId,mainConversationId,createdAt` | 会話・開始元・固定日時 |
+| `topic`（旧データのみ任意） | 以前に入力された話題。既存の固定文脈として保持し、新規相談では保存しない |
 | `plan,snapshot` | 開始時の固定Git版、作品共有情報・文章改訂・保存状態・メインの会話要約と未要約原文・作風 |
 | `selectedStates[]` | 同じ作品の選択済み保存状態（ファイルID・管理下相対パス・hash・不足を含む）。実体を新規複製しない |
 | `mainMessages[]` | 開始元会話の依頼`id,body,items`。開始時点の途中返答もそのまま固定 |
 | `history` | 開始時の`records,requests,conversations,revisions`全ページ。requestsは原文・返答・試行・工程・状態・日時・計画IDを保持し、過去の文脈snapshotを再帰展開しない。後続発言・更新は転送しない |
 
-サイドの原文・返答・試行・停止は既存`chat_requests`、threadは`chat_sessions`へ保存。参照操作は`context_operations`、要約は`summary_revisions`を使用する。[型](../src/shared/side-chat.ts)。
+サイドのタブ名は最初のサイド発言から既存の補助Codexで一度だけ命名し、`conversation_names`に保存する。命名までは未命名、失敗しても相談を継続する。表示用`SideChatView.title`は読み取り時の付加項目で`side_chats.data`へは保存しない。サイドの原文・返答・試行・停止は既存`chat_requests`、threadは`chat_sessions`へ保存。参照操作は`context_operations`、要約は`summary_revisions`を使用する。[型](../src/shared/side-chat.ts)。
 
 #### summary_revisions
 

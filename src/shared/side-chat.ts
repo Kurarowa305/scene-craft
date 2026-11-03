@@ -4,7 +4,8 @@ import type { SavedState } from "./files.js";
 export interface SideChat {
   conversationId: string;
   mainConversationId: string;
-  topic: string;
+  /** Historical user-entered topic; retained on existing snapshots only. */
+  topic?: string;
   createdAt: string;
   plan: VersionPlan;
   snapshot: unknown;
@@ -16,4 +17,9 @@ export interface SideChat {
     conversations: unknown[];
     revisions: unknown[];
   };
+}
+
+export interface SideChatView extends SideChat {
+  /** Display value from conversation_names; not saved in side_chats.data. */
+  title: string | null;
 }

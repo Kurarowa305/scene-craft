@@ -1,10 +1,45 @@
 import { test, expect } from "@playwright/test";
-import { readFileSync } from "node:fs";
+import { mkdtemp, mkdir, writeFile, chmod } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join, resolve } from "node:path";
+import { createApp } from "../../src/server/app.js";
+import { gitFixture, cleanGitFixture } from "../git-fixture.js";
+
+test.use({ baseURL: "http://localhost:4519" });
+let app: Awaited<ReturnType<typeof createApp>>;
+let directory: string;
+let definition: string;
+test.beforeAll(async () => {
+  directory = await mkdtemp(join(tmpdir(), "side-browser-"));
+  const git = await gitFixture(directory);
+  definition = git.definition;
+  const source = join(directory, "source"),
+    managed = join(directory, "managed");
+  await mkdir(source);
+  await mkdir(managed);
+  await writeFile(join(source, "drawing.psd"), "browser saved file fixture");
+  await chmod("tests/fixtures/codex.mjs", 0o700);
+  app = await createApp({
+    directory,
+    port: 4519,
+    gitRepository: git.repository,
+    codexBinary: resolve("tests/fixtures/codex.mjs"),
+    staticRoot: resolve("dist/client"),
+    fileRoots: {
+      sources: [{ id: "source", path: source }],
+      managed: { id: "production", path: managed },
+    },
+  });
+  await app.listen({ host: "127.0.0.1", port: 4519 });
+});
+test.afterAll(async () => {
+  await app?.close();
+  if (directory) await cleanGitFixture(directory);
+});
 
 test("遅い相談一覧を受信しても新しく作った相談を失わない", async ({ page }) => {
-  const git = JSON.parse(readFileSync("test-results/git-fixture.json", "utf8"));
   await page.goto("/");
-  await page.getByLabel("定義のフルコミット").fill(git.definition);
+  await page.getByLabel("定義のフルコミット").fill(definition);
   await page
     .getByRole("button", { name: "既定定義を保存", exact: true })
     .click();
@@ -30,10 +65,10 @@ test("遅い相談一覧を受信しても新しく作った相談を失わな�
     .click();
   await ready;
   const panel = page.getByRole("complementary", { name: "右側タブ" });
-  await panel.getByLabel("メインの話題").fill("新しく作る相談");
+  await expect(panel.getByLabel("メインの話題")).toHaveCount(0);
   await panel.getByRole("button", { name: "相談を開始", exact: true }).click();
   await expect(
-    panel.getByRole("tab", { name: "新しく作る相談", exact: true }),
+    panel.getByRole("tab", { name: "未命名のサイドチャット 1", exact: true }),
   ).toBeVisible();
   release();
   await panel
@@ -41,7 +76,7 @@ test("遅い相談一覧を受信しても新しく作った相談を失わな�
     .click();
   await expect(
     panel.getByRole("button", {
-      name: "相談を再表示: 新しく作る相談",
+      name: "相談を再表示: 未命名のサイドチャット 1",
       exact: true,
     }),
   ).toBeVisible();
@@ -50,14 +85,13 @@ test("遅い相談一覧を受信しても新しく作った相談を失わな�
 test("右タブの相談を閉じても継続し、再表示・停止・再読み込みで原文を保持する", async ({
   page,
 }) => {
-  const git = JSON.parse(readFileSync("test-results/git-fixture.json", "utf8"));
   await page.goto("/");
-  await page.getByLabel("定義のフルコミット").fill(git.definition);
+  await page.getByLabel("定義のフルコミット").fill(definition);
   await page
     .getByRole("button", { name: "既定定義を保存", exact: true })
     .click();
   await expect(
-    page.getByText(`新規依頼の既定定義: ${git.definition}`, { exact: true }),
+    page.getByText(`新規依頼の既定定義: ${definition}`, { exact: true }),
   ).toBeVisible();
   await page.getByLabel("作品名", { exact: true }).fill("サイド確認");
   await page.getByRole("button", { name: "作品を作成", exact: true }).click();
@@ -68,6 +102,10 @@ test("右タブの相談を閉じても継続し、再表示・停止・再読�
   await expect(main.getByLabel("会話モデル", { exact: true })).toBeEnabled();
   await main
     .getByLabel("会話モデル", { exact: true })
+    .selectOption("fixture-a");
+  await main.getByText("保存用要約・根拠・補助モデル", { exact: true }).click();
+  await main
+    .getByLabel("命名・要約モデル", { exact: true })
     .selectOption("fixture-a");
   const panel = page.getByRole("complementary", { name: "右側タブ" });
   await expect(
@@ -88,7 +126,7 @@ test("右タブの相談を閉じても継続し、再表示・停止・再読�
   await main.getByLabel("Codexへのメッセージ").fill("メインの制作相談");
   await main.getByRole("button", { name: "Codexへ送信", exact: true }).click();
   await expect(panel.getByLabel("タブの種類")).toHaveValue("サイドチャット");
-  await panel.getByLabel("メインの話題").fill("港の照明方法");
+  await expect(panel.getByLabel("メインの話題")).toHaveCount(0);
   await panel.getByRole("button", { name: "相談を開始", exact: true }).click();
   const side = panel.getByRole("region", { name: "サイドチャットの会話" });
   await expect(side.getByLabel("会話モデル", { exact: true })).toHaveValue(
@@ -104,7 +142,7 @@ test("右タブの相談を閉じても継続し、再表示・停止・再読�
     .getByRole("button", { name: "タブを閉じる", exact: true })
     .click();
   await panel
-    .getByRole("button", { name: "相談を再表示: 港の照明方法", exact: true })
+    .getByRole("button", { name: "相談を再表示: 港の光の検討", exact: true })
     .click();
   await expect(side.getByText("保存される返答", { exact: true })).toBeVisible();
   await expect(
@@ -121,7 +159,7 @@ test("右タブの相談を閉じても継続し、再表示・停止・再読�
     .getByRole("button", { name: /港の光の検討|未命名のチャット 1/ })
     .click();
   await panel
-    .getByRole("button", { name: "相談を再表示: 港の照明方法", exact: true })
+    .getByRole("button", { name: "相談を再表示: 港の光の検討", exact: true })
     .click();
   await expect(side.getByText("停止しました", { exact: true })).toBeVisible();
   await expect(
