@@ -23,9 +23,24 @@ test("右タブの相談を閉じても継続し、再表示・停止・再読�
   await main
     .getByLabel("会話モデル", { exact: true })
     .selectOption("fixture-a");
+  const panel = page.getByRole("complementary", { name: "右側タブ" });
+  await expect(
+    panel.getByLabel("参照する保存済み成果物").locator("option"),
+  ).toHaveCount(0);
+  await page.getByText("制作ファイルを添付して記録", { exact: true }).click();
+  await page.getByLabel("作業アプリ").selectOption("Photoshop");
+  await page
+    .getByLabel("PSD / PSBファイル（フォルダー内の相対パス）")
+    .fill("drawing.psd");
+  await page.getByLabel("ファイル記録の本文").fill("相談開始直前の成果物");
+  await page
+    .getByRole("button", { name: "ファイルと本文を記録", exact: true })
+    .click();
+  const outputs = panel.getByLabel("参照する保存済み成果物");
+  await expect(outputs.locator("option")).toHaveCount(1);
+  await outputs.selectOption({ index: 0 });
   await main.getByLabel("Codexへのメッセージ").fill("メインの制作相談");
   await main.getByRole("button", { name: "Codexへ送信", exact: true }).click();
-  const panel = page.getByRole("complementary", { name: "右側タブ" });
   await expect(panel.getByLabel("タブの種類")).toHaveValue("サイドチャット");
   await panel.getByLabel("メインの話題").fill("港の照明方法");
   await panel.getByRole("button", { name: "相談を開始", exact: true }).click();

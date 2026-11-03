@@ -15,6 +15,7 @@ import { runAuxiliary } from "./auxiliary.js";
 import type { AuxiliaryJob } from "../shared/auxiliary.js";
 import { explicitInstruction } from "./context-store.js";
 import { interpretRecordInstruction } from "./record-interpreter.js";
+import { sideReference } from "./side-store.js";
 
 export const commonInstructions = `You are scene-craft's assistant. Use only the dedicated scene_craft MCP tools and text answers.
 The application context on each turn fixes the current role, instructions, sourceRequestId and contextRef. Earlier roles/references are history only.
@@ -31,7 +32,7 @@ const instructionKey = createHash("sha256")
   .digest("hex");
 const consultationInstructions = `You are scene-craft's consultation-only side chat. Answer questions using the fixed starting context and reference tools only.
 Never perform production, adoption, recording, intent confirmation, protection changes or hand requests to the main chat, even when explicitly instructed. Explain that these require the main chat.
-No shell, filesystem, external MCP or other execution tools are permitted. Later main messages are not forwarded. The starting snapshot is historical, not live current state.`;
+No shell, filesystem, external MCP or other execution tools are permitted. Later main messages are not forwarded. The starting snapshot is historical, not live current state. Fetch original history in pages with read_records/find_records when relevant; the latest main message in the initial context is only an excerpt.`;
 const blockingErrors = new Set([
   "MODEL_REROUTED",
   "USAGE_LIMIT",
@@ -125,8 +126,19 @@ export function registerChat(
             return state;
           });
           const page = store.context.history(workId);
+          const original = (r: ChatRequest) => ({
+            id: r.id,
+            conversationId: r.conversationId,
+            body: r.body,
+            items: r.items,
+            attempts: r.attempts,
+            role: r.role,
+            phase: r.phase,
+            createdAt: r.createdAt,
+            planId: r.plan.id,
+          });
           const records: unknown[] = [...page.records],
-            requests: unknown[] = [...page.requests];
+            requests: unknown[] = page.requests.map(original);
           let after = page.nextAfter,
             afterRequests = page.nextRequestAfter;
           while (after != null) {
@@ -140,7 +152,7 @@ export function registerChat(
               0,
               Number(afterRequests),
             );
-            requests.push(...next.requests);
+            requests.push(...next.requests.map(original));
             afterRequests = next.nextRequestAfter;
           }
           return {
@@ -947,7 +959,10 @@ export function registerChat(
         side ? "consultation" : (req.body.role ?? "none"),
         (workId, plan) =>
           side
-            ? { snapshot: side, instructions: consultationInstructions }
+            ? {
+                snapshot: sideReference(side),
+                instructions: consultationInstructions,
+              }
             : fixedContext(workId, plan, req.body.role ?? "none"),
       );
       schedule(r, "name");

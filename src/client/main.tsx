@@ -463,6 +463,7 @@ function App() {
             key={conversationId}
             mainId={conversationId}
             workId={workId}
+            recordRevision={recordRevision + records.length}
           />
         )}
       </div>

@@ -7,6 +7,7 @@ import { OperationError, type openStore } from "./store.js";
 import type { ChatRequest } from "../shared/chat.js";
 import { explicitInstruction } from "./context-store.js";
 import type { RecordInterpretation } from "../shared/record-instruction.js";
+import { sideReference } from "./side-store.js";
 
 export const writeContextTools = [
   "create_work_intent",
@@ -175,7 +176,7 @@ export async function startContextRpc(store: ReturnType<typeof openStore>) {
           ? {
               requestId: r.id,
               role: "consultation",
-              fixed: side,
+              fixed: sideReference(side),
               execution: bindings.get(args.contextRef),
               plan: r.plan,
               readOnly: true,

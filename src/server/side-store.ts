@@ -5,6 +5,43 @@ import { join } from "node:path";
 import type { SideChat } from "../shared/side-chat.js";
 import { OperationError } from "./store.js";
 
+/** Keep frozen originals behind read_records instead of putting them in every turn. */
+export function sideReference(side: SideChat) {
+  const shared = side.snapshot as {
+    work: unknown;
+    states: { currentStateId: string | null };
+    style: unknown;
+  };
+  const latest = side.mainMessages.at(-1);
+  return {
+    conversationId: side.conversationId,
+    mainConversationId: side.mainConversationId,
+    topic: side.topic,
+    fixedAt: side.createdAt,
+    work: shared.work,
+    currentStateId: shared.states.currentStateId,
+    style: shared.style,
+    selectedStates: side.selectedStates.map((s) => ({
+      id: s.id,
+      application: s.application,
+      files: s.files.map((f) => ({ id: f.id, role: f.role, sha256: f.sha256 })),
+      missing: s.missing,
+    })),
+    latestMainMessage: latest
+      ? {
+          id: latest.id,
+          excerpt: latest.body.slice(0, 4000),
+          excerptOnly: true,
+        }
+      : null,
+    originals: {
+      tool: "read_records",
+      recordCount: side.history.records.length,
+      requestCount: side.history.requests.length,
+    },
+  };
+}
+
 export function sideStore(
   db: DatabaseSync,
   directory: string,

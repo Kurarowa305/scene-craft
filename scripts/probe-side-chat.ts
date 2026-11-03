@@ -3,6 +3,7 @@ import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import assert from "node:assert/strict";
+import { execFileSync } from "node:child_process";
 import { openStore } from "../dist/server/store.js";
 import {
   startContextRpc,
@@ -76,6 +77,9 @@ try {
   assert.equal(effective.config.web_search, "disabled");
   assert.equal(effective.config.approval_policy, "never");
   const result = {
+    targetCommit: execFileSync("git", ["rev-parse", "HEAD"], {
+      encoding: "utf8",
+    }).trim(),
     checkedAt: new Date().toISOString(),
     runtime: connection.runtime,
     expected:

@@ -44,6 +44,8 @@ test("メイン実行中に別threadで相談し、開始文脈と原文を開�
     assert.notEqual(view.session.threadId, main.threadId);
     assert.equal(main.phase, "running");
     assert.equal(view.requests[0].role, "consultation");
+    assert.equal("history" in view.requests[0].contextSnapshot, false);
+    assert.equal("mainMessages" in view.requests[0].contextSnapshot, false);
     await f.post(`/api/conversations/${f.chat.id}/records`, {
       body: "後からの資料",
     });
@@ -130,7 +132,9 @@ test("サイド相談は更新・制作・shell迂回を拒否し、停止後の
         operationId: randomUUID(),
         ...args,
       });
-    assert.equal((await call("get_execution_context")).result.readOnly, true);
+    const reference = (await call("get_execution_context")).result;
+    assert.equal(reference.readOnly, true);
+    assert.equal("history" in reference.fixed, false);
     for (const tool of [
       "create_work_intent",
       "update_work_intent",

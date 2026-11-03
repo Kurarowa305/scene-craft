@@ -7,9 +7,11 @@ import { Chat } from "./chat";
 export function SideChats({
   mainId,
   workId,
+  recordRevision,
 }: {
   mainId: string;
   workId: string;
+  recordRevision: number;
 }) {
   const [sides, setSides] = useState<SideChat[]>([]);
   const [states, setStates] = useState<SavedState[]>([]);
@@ -37,7 +39,7 @@ export function SideChats({
     return () => {
       current = false;
     };
-  }, [mainId, workId]);
+  }, [mainId, workId, recordRevision]);
   function show(id: string) {
     setOpen((previous) =>
       previous.includes(id) ? previous : [...previous, id],
