@@ -58,6 +58,14 @@ export function registerChat(
   const view = (id: string) => ({
     ...chat.view(id),
     auxiliary: store.auxiliary.view(id),
+    sideNames: Object.fromEntries(
+      store.sides
+        .list(id)
+        .map((side) => [
+          side.conversationId,
+          store.auxiliary.name(side.conversationId),
+        ]),
+    ),
   });
   const executing = new Set<string>();
   app.get<{ Params: { id: string } }>(
@@ -168,6 +176,7 @@ export function registerChat(
         },
       );
       chat.session(side.conversationId);
+      publish(req.params.id);
       return side;
     },
   );
@@ -179,6 +188,8 @@ export function registerChat(
   function publish(id: string) {
     chat.saveSession(chat.session(id));
     for (const fn of subscribers.get(id) ?? []) fn();
+    const side = store.sides.get(id);
+    if (side) publish(side.mainConversationId);
   }
   app.addHook("onResponse", async (req, reply) => {
     if (

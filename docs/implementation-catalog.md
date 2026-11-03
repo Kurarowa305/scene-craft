@@ -55,8 +55,8 @@
 | GET | `/api/codex` | なし | `{configured,authenticated,runtime,models}`。未接続時も利用可否を返す |
 | POST | `/api/codex/login` | 追加本文項目なし | ChatGPT専用ログインの `{authUrl}` |
 | POST | `/api/conversations/:id/auxiliary/resume` | 会話ID、追加本文項目なし | 通常完了した最新依頼で、失敗等の命名・未要約分を明示再実行。停止・エラー・未確定の依頼では拒否。同一requestKeyの再送は重複起動しない。停止した制作依頼は既存resumeまたは新しい依頼で再開 |
-| GET | `/api/conversations/:id/chat` | 会話ID | `ChatView {session,requests,revision,auxiliary}`。補助モデル設定・会話名・処理履歴・根拠付き要約・未要約原文を含む。未選択なら利用可能な既定モデルを初期選択 |
-| GET | `/api/conversations/:id/events` | 会話ID、任意header `Last-Event-ID` | SSE `event: chat`、`id: revision`、`data: ChatView`。15秒ごとkeepalive |
+| GET | `/api/conversations/:id/chat` | 会話ID | `ChatView {session,requests,revision,auxiliary,sideNames}`。補助モデル設定・会話名・処理履歴・根拠付き要約・未要約原文を含む。`sideNames`は配下サイドの会話ID→現在名/nullの表示用辞書。未選択なら利用可能な既定モデルを初期選択 |
+| GET | `/api/conversations/:id/events` | 会話ID、任意header `Last-Event-ID` | SSE `event: chat`、`id: revision`、`data: ChatView`。15秒ごとkeepalive。サイドの命名等でもメインのrevisionを進めて`sideNames`を配信し、閉じたサイドごとの接続を作らず一覧名を更新 |
 | POST | `/api/conversations/:id/imports` | 会話ID、`body,application,beforeStateId,files`。任意`render,reason`（旧互換） | `{operationId,id,state,record}`。制作ファイルを管理下へ固定し保存状態・記録を確定。サイド会話では403 |
 | POST | `/api/conversations/:id/messages` | 会話ID、`body`（1〜200000文字・空白のみ不可）、任意`role`（1〜100文字、既定none） | `ChatRequest`を受付。固定文脈・版・工程で非同期実行。サイドは工程consultationのみ（省略時自動適用）、開始時の版・文脈を継続しメインとは別thread。メインと並行受付可能、同じサイド内の未確定依頼は拒否 |
 | POST | `/api/conversations/:id/model` | 会話ID、`model`（最大200文字）、`effort`（最大30文字）、`speed: standard/fast` | 利用可能なモデル・強度を検査して選択を保存 |

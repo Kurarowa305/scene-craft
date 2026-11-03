@@ -111,11 +111,15 @@ test("話題入力なしで作成し、最初のサイド原文から補助Codex
       `/api/conversations/${side.conversationId}/chat`,
     );
     assert.equal(before.auxiliary.jobs.length, 0);
+    const mainRevision = (await f.view()).revision;
     const request = await f.post(
       `/api/conversations/${side.conversationId}/messages`,
       { body: "港のライトについて相談" },
     );
     await waitFor(async () => (await listing())[0].title === "港の光の検討");
+    const mainView = await f.view();
+    assert.equal(mainView.sideNames[side.conversationId], "港の光の検討");
+    assert.ok(mainView.revision > mainRevision);
     const view = await f.read(`/api/conversations/${side.conversationId}/chat`);
     const job = view.auxiliary.jobs.find((j: any) => j.kind === "name");
     assert.equal(job.model, "fixture-a");

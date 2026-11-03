@@ -1,6 +1,5 @@
 import { useEffect, useState, type FormEvent } from "react";
 import type { SideChat, SideChatView } from "../shared/side-chat";
-import type { ChatView } from "../shared/chat";
 import type { SavedState } from "../shared/files";
 import { read, write } from "./api";
 import { Chat } from "./chat";
@@ -9,16 +8,17 @@ export function SideChats({
   mainId,
   workId,
   recordRevision,
+  names,
 }: {
   mainId: string;
   workId: string;
   recordRevision: number;
+  names: Record<string, string | null>;
 }) {
   const [sides, setSides] = useState<SideChatView[]>([]);
   const [states, setStates] = useState<SavedState[]>([]);
   const [open, setOpen] = useState<string[]>([]);
   const [active, setActive] = useState("");
-  const [names, setNames] = useState<Record<string, string | null>>({});
   const [selected, setSelected] = useState<string[]>([]);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
@@ -45,11 +45,6 @@ export function SideChats({
       current = false;
     };
   }, [mainId, workId, recordRevision]);
-  function named(id: string, name: string | null) {
-    setNames((previous) =>
-      previous[id] === name ? previous : { ...previous, [id]: name },
-    );
-  }
   function title(id: string) {
     return (
       names[id] ??
@@ -57,26 +52,6 @@ export function SideChats({
       `未命名のサイドチャット ${sides.findIndex((s) => s.conversationId === id) + 1}`
     );
   }
-  // Closed tabs still receive naming results without mounting their full chat UI.
-  const closedIds = sides
-    .filter((s) => !open.includes(s.conversationId))
-    .map((s) => s.conversationId)
-    .join(",");
-  useEffect(() => {
-    const sources = closedIds
-      ? closedIds.split(",").map((id) => {
-          const source = new EventSource(`/api/conversations/${id}/events`);
-          source.addEventListener("chat", (event) => {
-            const view: ChatView = JSON.parse((event as MessageEvent).data);
-            named(id, view.auxiliary.name);
-          });
-          return source;
-        })
-      : [];
-    return () => {
-      for (const source of sources) source.close();
-    };
-  }, [closedIds]);
   function show(id: string) {
     setOpen((previous) =>
       previous.includes(id) ? previous : [...previous, id],
@@ -189,7 +164,7 @@ export function SideChats({
             <Chat
               conversationId={id}
               side
-              onNameChanged={(name) => named(id, name)}
+              onNameChanged={() => {}}
               onRecordsChanged={() => {}}
             />
           </div>

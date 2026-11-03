@@ -37,6 +37,50 @@ test.afterAll(async () => {
   if (directory) await cleanGitFixture(directory);
 });
 
+test("保存済みサイドが8件あってもメインのAPI要求を妨げない", async ({
+  page,
+}) => {
+  const session = await (await page.request.get("/api/session")).json();
+  const headers = {
+    origin: "http://localhost:4519",
+    "x-csrf-token": session.csrfToken,
+  };
+  const post = async (path: string, body = {}) => {
+    const response = await page.request.post(path, {
+      headers,
+      data: { requestKey: crypto.randomUUID(), ...body },
+    });
+    expect(response.ok()).toBeTruthy();
+    return response.json();
+  };
+  await post("/api/versions/default", { commit: definition });
+  const work = await post("/api/works", { name: "相談8件の作品" });
+  const main = await post(`/api/works/${work.id}/conversations`);
+  for (let i = 0; i < 8; i++)
+    await post(`/api/conversations/${main.id}/side-chats`, {
+      selectedStateIds: [],
+    });
+  await page.goto("/");
+  await page
+    .getByRole("button", { name: "相談8件の作品", exact: true })
+    .click();
+  await page
+    .getByRole("button", { name: "未命名のチャット 1", exact: true })
+    .click();
+  await expect(
+    page.getByRole("button", { name: /^相談を再表示:/ }),
+  ).toHaveCount(8);
+  const status = await page.evaluate(async () => {
+    try {
+      return (await fetch("/api/works", { signal: AbortSignal.timeout(2000) }))
+        .status;
+    } catch {
+      return "timeout";
+    }
+  });
+  expect(status).toBe(200);
+});
+
 test("遅い相談一覧を受信しても新しく作った相談を失わない", async ({ page }) => {
   await page.goto("/");
   await page.getByLabel("定義のフルコミット").fill(definition);

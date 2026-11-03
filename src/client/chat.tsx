@@ -38,9 +38,11 @@ export function Chat({
   onNameChanged,
   onRecordsChanged,
   side = false,
+  onSideNamesChanged,
 }: {
   conversationId: string;
   side?: boolean;
+  onSideNamesChanged?: (names: Record<string, string | null>) => void;
   onNameChanged: (name: string | null) => void;
   onRecordsChanged: (
     records: BodyRecord[],
@@ -56,6 +58,9 @@ export function Chat({
   useEffect(() => {
     if (view) onNameChanged(view.auxiliary.name);
   }, [view?.auxiliary.name]);
+  useEffect(() => {
+    if (view) onSideNamesChanged?.(view.sideNames);
+  }, [view?.sideNames]);
   function applyView(next: ChatView) {
     setView((previous) =>
       previous && previous.revision > next.revision ? previous : next,
