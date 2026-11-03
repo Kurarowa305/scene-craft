@@ -33,8 +33,16 @@ export function useChatImages(
   }
   async function transfer(next: DraftImage[]) {
     for (const item of next.filter((item) => !item.uploaded)) {
-      item.uploaded = await uploadChatImage(conversationId, item.id, item.file);
-      update([...next]);
+      const uploaded = await uploadChatImage(
+        conversationId,
+        item.id,
+        item.file,
+      );
+      update(
+        (drafts.get(conversationId) ?? []).map((current) =>
+          current.id === item.id ? { ...current, uploaded } : current,
+        ),
+      );
     }
   }
   async function operate(action: () => Promise<void>) {
@@ -110,9 +118,12 @@ export function useChatImages(
         }
         update(current.filter((item) => item.id !== id));
       }).catch(() => {}),
-    clear() {
-      drafts.delete(conversationId);
-      setItems([]);
+    clear(sentIds: string[]) {
+      update(
+        (drafts.get(conversationId) ?? []).filter(
+          (item) => !sentIds.includes(item.id),
+        ),
+      );
       setError("");
     },
   };

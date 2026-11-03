@@ -107,6 +107,7 @@ export function Chat({
   const [sendMode, setSendMode] = useState("chat");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+  const actionGate = useRef<Promise<void> | null>(null);
   const [roles, setRoles] = useState<{ id: string; description: string }[]>([]);
   const [role, setRole] = useState("none");
   type WorkContext = { work: { intent: string | null }; revisions: unknown[] };
@@ -209,6 +210,11 @@ export function Chat({
     });
   }, [connectionRevision]);
   async function action(fn: () => Promise<void>) {
+    let release!: () => void;
+    const gate = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    actionGate.current = gate;
     setBusy(true);
     setError("");
     try {
@@ -217,7 +223,14 @@ export function Chat({
       setError((e as Error).message);
     } finally {
       setBusy(false);
+      if (actionGate.current === gate) actionGate.current = null;
+      release();
     }
+  }
+  async function addImages(files: File[]) {
+    // A saved-image download may finish after the message send has started.
+    while (actionGate.current) await actionGate.current;
+    await images.addImages(files);
   }
   async function choose(s: ModelChoice) {
     await write(
@@ -242,13 +255,14 @@ export function Chat({
         setDraft("");
         return;
       }
+      const sentImageIds = images.items.map((item) => item.id);
       await write(`/api/conversations/${conversationId}/messages`, {
         body: draft,
-        ...(hasImages ? { imageIds: images.items.map((item) => item.id) } : {}),
+        ...(sentImageIds.length ? { imageIds: sentImageIds } : {}),
         ...(side ? {} : { role }),
       });
       setDraft("");
-      images.clear();
+      images.clear(sentImageIds);
       await refresh();
     });
   }
@@ -377,13 +391,14 @@ export function Chat({
             type="file"
             accept="image/png,image/jpeg,image/webp"
             multiple
+            disabled={busy || images.busy}
             aria-label="LLMに添付する画像を選択"
             onChange={(event) => {
               const files = Array.from(event.target.files ?? []);
               event.target.value = "";
-              void images
-                .addImages(files)
-                .catch((failure) => setError(failure.message));
+              void addImages(files).catch((failure) =>
+                setError(failure.message),
+              );
             }}
           />
           {hasImages && (
@@ -395,7 +410,7 @@ export function Chat({
                     type="button"
                     aria-label={`${item.file.name}を外す`}
                     disabled={busy || images.busy}
-                    onClick={() => void images.remove(item.id).catch(() => {})}
+                    onClick={() => void images.remove(item.id)}
                   >
                     ×
                   </button>
@@ -422,8 +437,8 @@ export function Chat({
             <div className="row">
               {typeof attachment === "function"
                 ? attachment({
-                    busy: images.busy,
-                    addImages: images.addImages,
+                    busy: busy || images.busy,
+                    addImages,
                     selectImages: () => imageInput.current?.click(),
                   })
                 : attachment}

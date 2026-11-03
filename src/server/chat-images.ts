@@ -110,6 +110,21 @@ export async function registerChatImages(
             limitInputPixels: 20_000_000,
             failOn: "warning",
           });
+          // Sharp decodes APNG as a single PNG frame without exposing metadata.pages.
+          if (
+            bytes
+              .subarray(0, 8)
+              .equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]))
+          ) {
+            for (let offset = 8; offset + 12 <= bytes.length;) {
+              const length = bytes.readUInt32BE(offset);
+              if (length > bytes.length - offset - 12) throw new Error();
+              const type = bytes.toString("ascii", offset + 4, offset + 8);
+              if (type === "acTL") throw new Error();
+              offset += length + 12;
+              if (type === "IEND") break;
+            }
+          }
           metadata = await image.metadata();
           if (
             !metadata.width ||

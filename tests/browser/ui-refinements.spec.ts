@@ -209,7 +209,7 @@ test("成果物を選び直した後も、相談作成の応答喪失を初回�
     page.getByRole("button", { name: "再試行", exact: true }),
   ).toBeVisible();
   await choosePanel(page, "成果物");
-  await page.getByRole("button", { name: /context.psd.*Photoshop/ }).click();
+  await page.getByRole("button", { name: /context[.]psd/ }).click();
   await page.getByRole("tab", { name: "サイドチャット", exact: true }).click();
   await page.getByRole("button", { name: "再試行", exact: true }).click();
   await expect(

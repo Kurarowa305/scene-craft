@@ -65,6 +65,15 @@ test("画像の同内容再送と形式検査、別会話の拒否、未送信�
     );
     assert.equal((await f.upload(`${url}?name=note.jpg`, png)).statusCode, 400);
     assert.equal((await f.upload(`${url}?name=note.psd`, png)).statusCode, 400);
+    assert.equal(
+      (
+        await f.upload(
+          `/api/conversations/${f.chat.id}/images/${crypto.randomUUID()}?name=animated.png`,
+          await readFile("tests/fixtures/chat-animated.png"),
+        )
+      ).statusCode,
+      400,
+    );
     const other = await f.post(`/api/works/${f.work.id}/conversations`);
     assert.equal(
       (

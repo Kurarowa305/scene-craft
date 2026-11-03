@@ -120,7 +120,9 @@ test("画像のサブメニューが右に開き、成果物はタイトルと�
   expect(unchanged.states).toHaveLength(1);
   await openArtifacts(page);
   await expect(
-    page.getByRole("button", { name: /reference.png/ }),
+    page
+      .getByRole("complementary", { name: "右側タブ", exact: true })
+      .getByRole("button", { name: /reference.png/ }),
   ).toBeVisible();
   await expect(
     page.getByRole("heading", { name: "保存状態", exact: true }),
@@ -196,4 +198,55 @@ test("保存済み画像がなくてもEscapeは子メニューだけを閉じ�
   await expect(
     page.getByRole("menu", { name: "成果物・ファイルを添付", exact: true }),
   ).toBeVisible();
+});
+
+test("送信受付待ちの間は画像追加を止め、送信した画像だけを履歴へ移す", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await openSettings(page);
+  const git = JSON.parse(readFileSync("test-results/git-fixture.json", "utf8"));
+  await page.getByLabel("定義のフルコミット").fill(git.definition);
+  await page
+    .getByRole("button", { name: "既定定義を保存", exact: true })
+    .click();
+  await openWorkDialog(page);
+  await page.getByLabel("作品名", { exact: true }).fill("送信中の画像追加");
+  await page
+    .getByRole("dialog")
+    .getByRole("button", { name: "作品を作成", exact: true })
+    .click();
+  await page
+    .getByRole("button", {
+      name: "送信中の画像追加に新しいチャット",
+      exact: true,
+    })
+    .click();
+  await page
+    .getByLabel("LLMに添付する画像を選択")
+    .setInputFiles("tests/fixtures/chat-reference.png");
+  await page
+    .getByLabel("メッセージ", { exact: true })
+    .fill("この画像を説明して");
+  let release!: () => void;
+  const held = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  await page.route("**/api/conversations/*/messages", async (route) => {
+    const response = await route.fetch();
+    await held;
+    await route.fulfill({ response });
+  });
+  try {
+    await page
+      .getByRole("button", { name: "Codexへ送信", exact: true })
+      .click();
+    await expect(
+      page.getByRole("button", { name: "成果物・ファイルを添付", exact: true }),
+    ).toBeDisabled();
+  } finally {
+    release();
+  }
+  await expect(page.locator(".draft-images img")).toHaveCount(0);
+  await expect(page.locator(".sent-images img")).toHaveCount(1);
 });
