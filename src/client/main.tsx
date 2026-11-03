@@ -164,6 +164,15 @@ function App() {
           name,
           styleCommit: styleChoice === "none" ? null : styleCommit,
           ...(intent ? { intent } : {}),
+        }).catch((failure) => {
+          if (
+            failure instanceof SaveError &&
+            failure.status &&
+            failure.status >= 400 &&
+            failure.status < 500
+          )
+            creation.current = null;
+          throw failure;
         }));
       if (attempt && initialFile) {
         attempt.work = created;

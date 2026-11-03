@@ -124,3 +124,37 @@ test("初期ファイルの受け渡しが失敗しても作成済み作品を�
   await expect(page.getByLabel("作品名", { exact: true })).toBeEnabled();
   await expect(page.getByLabel("作品名", { exact: true })).toHaveValue("");
 });
+
+test("作品作成が明示的に拒否されたらファイルを保持したまま入力を修正できる", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await openWorkDialog(page);
+  await page.getByLabel("作品名", { exact: true }).fill("作成拒否の原文");
+  await page
+    .getByLabel("既存ファイルから始める", { exact: false })
+    .setInputFiles({
+      name: "start.psd",
+      mimeType: "application/octet-stream",
+      buffer: Buffer.from("saved source"),
+    });
+  let reject = true;
+  await page.route("**/api/works", (route) => {
+    if (route.request().method() !== "POST" || !reject) return route.continue();
+    reject = false;
+    return route.fulfill({
+      status: 400,
+      contentType: "application/json",
+      body: JSON.stringify({ error: "INVALID_INPUT" }),
+    });
+  });
+  const dialog = page.getByRole("dialog");
+  await dialog.getByRole("button", { name: "作品を作成", exact: true }).click();
+  await expect(dialog.getByRole("alert")).toBeVisible();
+  await expect(page.getByLabel("作品名", { exact: true })).toBeEnabled();
+  await page.getByLabel("作品名", { exact: true }).fill("入力修正後の作品");
+  await dialog.getByRole("button", { name: "作品を作成", exact: true }).click();
+  await expect(dialog).toHaveCount(0);
+  await openArtifacts(page);
+  await expect(page.locator(".saved-state")).toHaveCount(1);
+});
