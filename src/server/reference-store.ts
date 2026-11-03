@@ -121,7 +121,10 @@ export function referenceStore(
         selected,
         pages: data.pages.filter((p) =>
           selected.some(
-            (c) => c.pageId === p.id || c.image.permissionPageId === p.id,
+            (c) =>
+              c.pageId === p.id ||
+              c.usage?.pageId === p.id ||
+              c.image.permissionPageId === p.id,
           ),
         ),
         selections: data.selections,

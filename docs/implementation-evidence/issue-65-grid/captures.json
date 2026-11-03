@@ -1,0 +1,12 @@
+{
+  "sourceBase": "c32a8d8",
+  "test": "tests/browser/references.spec.ts",
+  "environment": "WSL / Chromium / Codex and HTTP adapters",
+  "fixtures": "20 synthetic one-pixel PNG candidates; not real Web search results",
+  "screens": {
+    "reference-grid.png": "New Tab -> References, 20 listitems, retained thumbnails",
+    "reference-preview.png": "Click candidate -> shared ImagePreview, zoom120%, fit100%, live selection and reload"
+  },
+  "realCodex": "not_run",
+  "windowsHumanCheck": "not_run"
+}

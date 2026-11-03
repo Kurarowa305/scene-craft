@@ -140,6 +140,15 @@ export function referenceService(
         };
       }
       const page = refs.page(r.workId, args.pageId);
+      const usagePage = args.usagePageId
+        ? refs.page(r.workId, args.usagePageId)
+        : page;
+      if (
+        args.usageQuote &&
+        (usagePage.status !== "available" ||
+          !usagePage.text.includes(args.usageQuote))
+      )
+        throw new OperationError(409, "REFERENCE_USAGE_UNVERIFIED");
       const c: ReferenceCandidate = {
         ...refs.source(r),
         id: randomUUID(),
@@ -148,34 +157,32 @@ export function referenceService(
         author: args.author ?? null,
         element: args.element,
         intentRelation: args.intentRelation,
+        usage: {
+          terms: args.usageTerms,
+          pageId: usagePage.id,
+          quote: args.usageQuote ?? null,
+          checkedAt: new Date().toISOString(),
+        },
         image: {
           status: args.imageUrl ? "not_retained" : "url_only",
           url: args.imageUrl ? publicReferenceUrl(args.imageUrl) : null,
           sha256: null,
           size: null,
           mime: null,
-          permissionPageId: args.permissionPageId ?? null,
-          permissionQuote: args.permissionQuote ?? null,
+          permissionPageId: null,
+          permissionQuote: null,
           error: null,
         },
       };
       let bytes: Buffer | undefined;
-      if (args.permissionPageId || args.permissionQuote) {
-        if (!args.imageUrl || !args.permissionPageId || !args.permissionQuote)
-          throw new OperationError(400, "IMAGE_PERMISSION_REQUIRED");
-        const permission = refs.page(r.workId, args.permissionPageId);
-        if (
-          permission.status !== "available" ||
-          !permission.text.includes(args.permissionQuote)
-        )
-          throw new OperationError(409, "IMAGE_PERMISSION_UNVERIFIED");
+      if (args.imageUrl) {
         if (!refs.canStoreImage) {
           c.image.status = "not_retained";
           c.image.error = "FILE_STORAGE_NOT_CONFIGURED";
           current();
           return () => refs.save(c);
         }
-        // The acting research model must verify this exact quote permits copying the image.
+        // Personal research images are retained independently of usage-term availability.
         try {
           const response = await fetcher(c.image.url!, controller.signal);
           const mime = imageMime(response.bytes);

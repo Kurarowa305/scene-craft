@@ -12,6 +12,16 @@ test("参考調査のWeb検索を依頼・turn・itemに結び、空結果と失
     for (let i = 0; i < 100 && !(await f.view()).requests[0].turnId; i++)
       await new Promise((r) => setTimeout(r, 10));
     const running = (await f.view()).requests[0];
+    const started = f.calls.find((c) => c.method === "turn/start")!;
+    const context = JSON.parse(
+      started.params.additionalContext["scene-craft"].value,
+    );
+    assert.deepEqual(context.referenceDefaults, { candidateCount: 20 });
+    assert.match(
+      f.calls.find((c) => c.method === "thread/start")!.params.baseInstructions,
+      /explicit requested count takes priority/,
+    );
+
     f.notify("item/completed", {
       turnId: running.turnId,
       item: {
@@ -135,6 +145,7 @@ test("専用MCPで出典付き候補を保存し、人間の選択原文と画�
       contextRef: c.contextRef,
       operationId: crypto.randomUUID(),
       pageId: page.result.page.id,
+      usageTerms: "不明（ページに利用条件なし）",
       title: "港の写真 (v1).[1]",
       element: "石造りの岸壁",
       intentRelation: "夕暮れの静けさ",
@@ -177,7 +188,7 @@ test("専用MCPで出典付き候補を保存し、人間の選択原文と画�
   }
 });
 
-test("保存条件の根拠と画像を固定し、切れた画像・未選択候補・欠落でも本文と選択を保つ", async () => {
+test("利用条件を記録して保存条件の確認なしに画像を固定し、切れた画像・未選択候補・欠落でも本文と選択を保つ", async () => {
   const png = Buffer.from(
     "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAADElEQVQImWP4//8/AAX+Av5Y8msOAAAAAElFTkSuQmCC",
     "base64",
@@ -224,9 +235,9 @@ test("保存条件の根拠と画像を固定し、切れた画像・未選択�
       element: "岸壁",
       intentRelation: "静けさ",
       imageUrl: "https://example.org/harbor.png",
-      permissionPageId: page.id,
-      permissionQuote:
-        "This harbor image may be downloaded and retained as a reference.",
+      usageTerms: "No production use permitted.",
+      usagePageId: page.id,
+      usageQuote: "No production use permitted.",
     };
     const key = crypto.randomUUID();
     const saved = await client.call("save_reference", {
@@ -239,6 +250,14 @@ test("保存条件の根拠と画像を固定し、切れた画像・未選択�
       JSON.stringify(saved),
     );
     assert.equal(saved.result.candidate.image.size, png.length);
+    assert.equal(
+      saved.result.candidate.usage.terms,
+      "No production use permitted.",
+    );
+    assert.equal(
+      saved.result.candidate.usage.quote,
+      "No production use permitted.",
+    );
     await client.call("save_reference", { ...args, operationId: key });
     assert.equal(imageRequests, 1);
     assert.equal(
@@ -249,16 +268,25 @@ test("保存条件の根拠と画像を固定し、切れた画像・未選択�
     );
     const broken = await client.call("save_reference", {
       ...args,
+      usageTerms: "不明（ページに利用条件なし）",
       title: "リンク切れの港",
       imageUrl: "https://example.org/missing.png",
     });
     assert.equal(broken.result.candidate.image.status, "broken");
     const unknown = await client.call("save_reference", {
       ...args,
-      permissionQuote: "invented permission",
+      usageQuote: "invented terms",
     });
-    assert.equal(unknown.error, "IMAGE_PERMISSION_UNVERIFIED");
+    assert.equal(unknown.error, "REFERENCE_USAGE_UNVERIFIED");
     assert.equal(imageRequests, 2);
+    const unchecked = await client.call("save_reference", {
+      ...args,
+      usageTerms: "不明",
+      usageQuote: undefined,
+    });
+    assert.equal(unchecked.result.candidate.image.status, "stored");
+    assert.equal(unchecked.result.candidate.usage.terms, "不明");
+
     const image = await f.response(
       `/api/references/${saved.result.candidate.id}/image`,
     );
@@ -281,12 +309,13 @@ test("保存条件の根拠と画像を固定し、切れた画像・未選択�
     );
     const corrupt = await client.call("save_reference", {
       ...args,
+      usageTerms: "不明（ページに利用条件なし）",
       title: "破損画像",
       imageUrl: "https://example.org/corrupt.png",
     });
     assert.equal(corrupt.result.candidate.image.status, "failed");
     const view = await f.read(`/api/works/${f.work.id}/references`);
-    assert.equal(view.candidates.length, 3);
+    assert.equal(view.candidates.length, 4);
     assert.deepEqual(view.selections, []);
   } finally {
     client?.close();
@@ -335,6 +364,7 @@ test("ページ取得中の停止は停止記録を残し、新たな参考資�
         await client.call("save_reference", {
           contextRef: c.contextRef,
           pageId: view.pages[0].id,
+          usageTerms: "不明（ページに利用条件なし）",
           title: "late",
           element: "壁",
           intentRelation: "港",
@@ -451,6 +481,7 @@ test("公開URL以外の取得・存在しない候補参照・選択してい�
       await client.call("save_reference", {
         contextRef: c.contextRef,
         pageId: page.id,
+        usageTerms: "不明（ページに利用条件なし）",
         title: "港資料",
         element: "岸壁",
         intentRelation: "港の静けさ",

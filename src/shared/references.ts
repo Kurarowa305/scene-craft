@@ -1,3 +1,4 @@
+export const DEFAULT_REFERENCE_COUNT = 20;
 export interface ReferencePage {
   id: string;
   workId: string;
@@ -29,6 +30,12 @@ export interface ReferenceCandidate {
   element: string;
   intentRelation: string;
   checkedAt: string;
+  usage?: {
+    terms: string;
+    pageId: string;
+    quote: string | null;
+    checkedAt: string;
+  };
   image: {
     status:
       "url_only" | "not_retained" | "stored" | "broken" | "failed" | "stopped";

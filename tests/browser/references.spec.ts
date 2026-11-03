@@ -4,18 +4,29 @@ import { mcp, waitFor } from "../mcp-fixture";
 import { choosePanel } from "./ui-helpers";
 import { resolve } from "node:path";
 
-test("チャットの参考リンクと右タブに出典・画像未保持・選択原文を再表示する", async ({
+test("参考画像20件をグリッド表示し、成果物と共通の拡大プレビューと利用条件・選択を開き直す", async ({
   page,
 }) => {
   const f = await chatFixture(
     true,
-    false,
-    async (url) => ({
-      url,
-      status: 200,
-      mime: "text/plain",
-      bytes: Buffer.from("Harbor reference text"),
-    }),
+    true,
+    async (url) =>
+      url.endsWith(".png")
+        ? {
+            url,
+            status: 200,
+            mime: "image/png",
+            bytes: Buffer.from(
+              "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAADElEQVQImWP4//8/AAX+Av5Y8msOAAAAAElFTkSuQmCC",
+              "base64",
+            ),
+          }
+        : {
+            url,
+            status: 200,
+            mime: "text/plain",
+            bytes: Buffer.from("Harbor reference text"),
+          },
     4520,
     resolve("dist/client"),
   );
@@ -39,11 +50,29 @@ test("チャットの参考リンクと右タブに出典・画像未保持・�
         contextRef: c.contextRef,
         pageId: source.id,
         title: "港の資料",
+        usageTerms: "不明（ページに記載なし）",
         element: "岸壁の構造",
         intentRelation: "静かな港",
-        imageUrl: "https://example.org/harbor.jpg",
+        imageUrl: "https://example.org/harbor.png",
       })
     ).result.candidate;
+    await Promise.all(
+      Array.from({ length: 19 }, (_, i) =>
+        client!
+          .call("save_reference", {
+            contextRef: c.contextRef,
+            pageId: source.id,
+            title: `参考画像 ${i + 2}`,
+            element: "岸壁",
+            intentRelation: "港の構造",
+            usageTerms: "個人の参考用、制作への利用条件は不明",
+            imageUrl: `https://example.org/harbor-${i + 2}.png`,
+          })
+          .then((result) =>
+            expect(result.result?.candidate.image.status).toBe("stored"),
+          ),
+      ),
+    );
     await waitFor(async () =>
       Boolean((await f.view()).requests.at(-1).terminal),
     );
@@ -66,11 +95,23 @@ test("チャットの参考リンクと右タブに出典・画像未保持・�
       page.getByRole("tab", { name: "港の資料", exact: true }),
     ).toHaveAttribute("aria-selected", "true");
     const panel = page.getByRole("region", { name: "参考資料の詳細" });
+    await expect(panel.locator(".preview-canvas img")).toBeVisible();
+    await expect
+      .poll(() =>
+        panel
+          .locator(".preview-canvas img")
+          .evaluate((image: HTMLImageElement) => image.naturalWidth),
+      )
+      .toBeGreaterThan(0);
+    await panel.getByRole("button", { name: "拡大", exact: true }).click();
+    await expect(panel.getByText("120%", { exact: true })).toBeVisible();
+    await panel.getByRole("button", { name: "フィット", exact: true }).click();
+    await expect(panel.getByText("100%", { exact: true })).toBeVisible();
     await expect(
       panel.getByText("参考要素: 岸壁の構造", { exact: true }),
     ).toBeVisible();
     await expect(
-      panel.getByText("画像: 画像未保持（保存条件未確認）", { exact: true }),
+      panel.getByText("画像: 管理下に保存済み", { exact: true }),
     ).toBeVisible();
     await expect(
       panel.getByText("未選択（不採用ではありません）", { exact: true }),
@@ -117,6 +158,15 @@ test("チャットの参考リンクと右タブに出典・画像未保持・�
       .getByRole("button", { name: "未命名のチャット 1", exact: true })
       .click();
     await choosePanel(page, "参考資料");
+    const gallery = page.getByRole("list", { name: "参考画像のグリッド" });
+    await expect(gallery.getByRole("listitem")).toHaveCount(20);
+    await expect(
+      gallery.getByRole("img", { name: "港の資料", exact: true }),
+    ).toBeVisible();
+    await page.screenshot({
+      path: "test-results/issue-65-reference-grid.png",
+      fullPage: true,
+    });
     await page
       .getByRole("region", { name: "参考資料の一覧" })
       .getByRole("button", { name: "港の資料", exact: true })
@@ -124,6 +174,7 @@ test("チャットの参考リンクと右タブに出典・画像未保持・�
     await expect(
       panel.getByText("参考として選択済み", { exact: true }),
     ).toBeVisible();
+    await panel.locator(".preview-canvas").scrollIntoViewIfNeeded();
     await page.screenshot({
       path: "test-results/issue-65-reference-panel.png",
       fullPage: true,

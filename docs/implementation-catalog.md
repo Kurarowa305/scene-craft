@@ -23,17 +23,17 @@
 | `create_manual_record` | 実装済み | CREATE：新規手作業文章、または明示された既存記録の全文置換 | 新規時records追加、text_revisions追加 |
 | `update_manual_record` | 実装済み | UPDATE：既存手作業本文への追記・部分編集・書き直し。省略入力で指定した要約・旧理由の訂正もこのツールで処理 | text_revisions追加。records原文は保持 |
 | `fetch_reference_page` | 実装済み・参考工程のみ | 公開URLを取得し、目的・取得先・確認日時・本文・hashまたは失敗を固定 | reference_pages追加、context_operations・receipts追加 |
-| `save_reference` | 実装済み・参考工程のみ | 取得済みページから候補を保存。出典・参考要素・意図との関係と条件根拠を保持。条件が不明なら画像未保持。明示条件を調査モデルが確認し、取得成功したPNG/JPEG/WebPのみ管理ルートへ固定 | reference_pages参照、reference_candidates追加、context_operations・receipts追加 |
+| `save_reference` | 実装済み・参考工程のみ | 取得済みページから候補を保存。出典・参考要素・意図との関係と条件根拠を保持。利用条件を情報として記録（不明も保持）。imageUrlがあれば保存条件の調査なしで取得し、検査成功したPNG/JPEG/WebPを管理ルートへ固定 | reference_pages参照、reference_candidates追加、context_operations・receipts追加 |
 | `select_reference` | 実装済み・メインのみ | 現在の人間原文全文と作品内候補を、同じ選択モデルのツールなし解釈threadへ渡して直接の参考選択を判定。対象が一致するときだけ参考として選択。曖昧・否定・質問・翻訳依頼等は保存せず確認待ち。原文に任意理由を含めて保持し、未選択は不採用にしない | reference_candidates参照、reference_selections追加、context_operations・receipts追加 |
 | `record_human_decision` | 公開済み・未実装 | `FEATURE_UNAVAILABLE`を返す | 変更なし |
 
 ### 参考調査MCPの引数・取得契約
 
-全操作でcontextRef/operationIdが必須。fetch_reference_pageは`url,purpose`、save_referenceは`pageId,title,element,intentRelation`が必須、任意`author,imageUrl,permissionPageId,permissionQuote`。select_referenceは`referenceId,sourceRequestId`が必須。URLは最大4000文字、タイトル/作者は500文字、IDは100文字、参考要素等は20000文字。未知の引数は拒否する。
+全操作でcontextRef/operationIdが必須。fetch_reference_pageは`url,purpose`、save_referenceは`pageId,title,element,intentRelation,usageTerms`が必須、任意`author,imageUrl,usagePageId,usageQuote`。select_referenceは`referenceId,sourceRequestId`が必須。URLは最大4000文字、タイトル/作者は500文字、IDは100文字、参考要素等は20000文字。未知の引数は拒否する。
 
 ページ取得は`{complete,page,purpose}`、候補保存は`{complete:true,candidate,link}`、選択は`{complete:true,selection}`または確認待ち。ページは最大1MiB、本文はテキスト化後最大100000文字、画像は8MiB・1600万画素まで、Sharp 0.35.5で全画素をデコードして破損/切断を検査（5秒上限、アニメーションは全フレームの合計画素数）。12秒の取得制限、最大5回のリダイレクト、各接続のDNS検査と検査済みアドレスへの固定を行う。localhost・プライベートIP・認証付きURL・80/443以外のポート等は拒否。取得先に認証情報を送らず、本文は実行しない。
 
-画像保存には取得済み条件ページIDと、その本文に実在する許可引用が必要。引用が対象画像の保存を認めるかの意味判断は参考調査モデルが担う。管理下ルートが未設定なら画像未保持。制作素材としての利用許可は別途未確認。実体は`managed/reference-images/<candidate-id>`へ固定し、読出時にサイズ/hashを検査する。欠落・破損でも候補・本文・選択を保持する。
+参考画像は趣味の参考調査として保存し、保存条件の調査や許可引用を要求しない。利用条件はusageTermsへ記録し、不明なら不明と残す。任意のusagePageId/usageQuoteは同じ作品の取得済みページと本文内引用を照合する。管理下ルートが未設定なら画像未保持。画像取得と利用条件の判明を分離する。制作素材への用途変更時は別途条件を確認する。実体は`managed/reference-images/<candidate-id>`へ固定し、読出時にサイズ/hashを検査する。欠落・破損でも候補・本文・選択を保持する。
 
 取得中も停止・現在turn・試行を検査し、停止後は候補や選択を確定しない。ページ取得中の停止結果だけをreference_pagesへ残す。操作IDの同一内容再送は外部再取得なしで同じ確定結果を返す。異内容再送は拒否。参考工程のthread/start/resumeだけ`web_search=live`、工程なし・他工程・サイドはdisabled。組込Web検索はMCPではなくCodexのitem通知/履歴から記録する。
 
@@ -165,7 +165,7 @@ GETにはFastifyによるHEADも自動登録される。`staticRoot`設定時の
 | `import_operations` | 制作ファイル取り込みの状態 | [カラム一覧](#import_operations) |
 | `receipts` | 冪等受付の入力と確定結果 | [カラム一覧](#receipts) |
 | `records` | LLM不要の記録原文・手作業原文 | [カラム一覧](#records) |
-| `reference_candidates` | 出典・参考要素・画像保存条件を持つ候補 | [カラム一覧](#reference_candidates) |
+| `reference_candidates` | 出典・参考要素・利用条件と画像保持情報を持つ候補 | [カラム一覧](#reference_candidates) |
 | `reference_pages` | ページ取得本文・目的・失敗 | [カラム一覧](#reference_pages) |
 | `reference_searches` | Codex組込Web検索と依頼/turn/item | [カラム一覧](#reference_searches) |
 | `reference_selections` | 人間の参考選択原文・任意理由 | [カラム一覧](#reference_selections) |
@@ -424,7 +424,7 @@ LLM不要の記録原文・手作業原文。
 
 | JSON保存項目 | 内容 |
 | --- | --- |
-| `data` | `id,workId,requestId,conversationId,threadId,turnId,attempt,pageId,title,author,element,intentRelation,checkedAt,image`。imageは`status,url,sha256,size,mime,permissionPageId,permissionQuote,error`。statusはurl_only/not_retained/stored/broken/failed/stopped。実体パスはIDから解決し保存JSONに個人パスを含めない |
+| `data` | `id,workId,requestId,conversationId,threadId,turnId,attempt,pageId,title,author,element,intentRelation,checkedAt,usage,image`。usageは`terms,pageId,quote,checkedAt`（旧記録では未設定）。imageは`status,url,sha256,size,mime,permissionPageId,permissionQuote,error`。permissionPageId/permissionQuoteは旧記録の互換保存項目で、新規保存はnull。statusはurl_only/not_retained/stored/broken/failed/stopped。実体パスはIDから解決し保存JSONに個人パスを含めない |
 
 #### reference_pages
 
@@ -610,4 +610,4 @@ GitReferenceの構造は[git_settings](#git_settings)を参照。`Work.style/pla
 
 ## 参考資料の画面接続（2026-11-04）
 
-mainの3領域UIへ接続した。メイン返答内の参考候補リンクは要求元requestIdで対応付け、同じ作品の候補IDを固定した右詳細タブを開く。右タブの「＋→参考資料」は一覧を開き、タイトルから詳細タブへ進む。参考資料一覧・詳細は既存GET `/api/works/:id/references`を会話SSEのrevision変更で再取得し、文章改訂の件数が変わらない保存・選択も反映する。詳細タブの閉鎖で参照や選択を削除せず、再表示/再読込で保持する。画像添付は会話専用画像APIのまま維持し、参考候補や制作素材の取り込みと混同しない。MCP・HTTP・DBの参考操作は既存契約を維持し、main由来の画像添付APIと合わせて47 HTTP操作・27テーブル・101物理カラムを管理する。
+mainの3領域UIへ接続した。メイン返答内の参考候補リンクは要求元requestIdで対応付け、同じ作品の候補IDを固定した右詳細タブを開く。右タブの「＋→参考資料」は一覧を開き、タイトルから詳細タブへ進む。参考資料一覧・詳細は既存GET `/api/works/:id/references`を会話SSEのrevision変更で再取得し、文章改訂の件数が変わらない保存・選択も反映する。詳細タブの閉鎖で参照や選択を削除せず、再表示/再読込で保持する。画像添付は会話専用画像APIのまま維持し、参考候補や制作素材の取り込みと混同しない。参考画像はグリッドから成果物と共通の大きなプレビューへ開く。件数未指定時の20件を共通指示とturnのreferenceDefaults.candidateCountへ渡し、モデルが明示件数を優先して調査する。結果不足は実件数とともに示す。MCPの参考保存は利用条件記録と自動画像取得へ変更し、main由来の画像添付APIと合わせて47 HTTP操作・27テーブル・101物理カラムを管理する。
