@@ -1576,3 +1576,92 @@ dialog .dialog-footer {
     padding: 10px 0;
   }
 }
+
+/* Pane content stays centered as either boundary moves. */
+.tab-region {
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+.tab-region > .inspector {
+  height: 100%;
+}
+.composer-selects {
+  flex-wrap: nowrap;
+}
+.composer-tools > .row,
+.composer-selects,
+.composer-selects > *,
+.composer-tools .send {
+  flex-shrink: 0;
+}
+.messages > *,
+.composer-area {
+  width: 100%;
+  max-width: 780px;
+  margin-inline: auto;
+}
+.panel-page {
+  width: 100%;
+  max-width: 780px;
+  margin-inline: auto;
+}
+.pane-restore {
+  width: 32px;
+  height: 36px;
+  margin: 8px auto;
+  padding: 0;
+  font-size: 19px;
+  flex: none;
+}
+@media (min-width: 801px) {
+  .shell {
+    grid-template-columns: var(--sidebar) 4px minmax(0, 1fr);
+  }
+  .workspace-body {
+    grid-template-columns: var(--main) 5px minmax(0, 1fr);
+  }
+  .pane-collapsed {
+    padding: 0;
+    background: var(--panel);
+  }
+  .pane-collapsed > :not(.pane-restore) {
+    display: none;
+  }
+  .brand {
+    white-space: nowrap;
+  }
+  .brand > * {
+    flex-shrink: 0;
+  }
+}
+@media (max-width: 800px) {
+  .pane-restore {
+    display: none;
+  }
+  .tab-region {
+    display: none;
+  }
+  .mobile-panel .tab-region {
+    display: block;
+  }
+  .composer-tools > .row,
+  .composer-selects,
+  .composer-selects > * {
+    flex-shrink: 1;
+  }
+}
+
+.messages .exchange {
+  margin-inline: auto;
+}
+@media (min-width: 801px) {
+  .sidebar {
+    container-type: inline-size;
+  }
+  @container (max-width: 210px) {
+    .brand small {
+      display: none;
+    }
+  }
+}

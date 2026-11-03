@@ -97,13 +97,18 @@ export function ResizeHandle({
   onChange,
   min,
   max,
+  onDragStart,
+  onDragEnd,
 }: {
   label: string;
   value: number;
   onChange: (n: number) => void;
   min: number;
   max: number;
+  onDragStart?: () => void;
+  onDragEnd?: () => void;
 }) {
+  const start = useRef({ x: 0, value: 0 });
   return (
     <div
       className="resize-handle"
@@ -113,35 +118,39 @@ export function ResizeHandle({
       tabIndex={0}
       aria-valuenow={Math.round(value)}
       aria-valuemin={min}
-      aria-valuemax={max}
+      aria-valuemax={Math.round(max)}
       onKeyDown={(e) => {
-        if (["ArrowLeft", "ArrowRight", "Home", "End"].includes(e.key)) {
-          e.preventDefault();
-          onChange(
-            e.key === "Home"
-              ? min
-              : e.key === "End"
-                ? max
-                : Math.max(
-                    min,
-                    Math.min(max, value + (e.key === "ArrowRight" ? 20 : -20)),
-                  ),
-          );
-        }
+        if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(e.key)) return;
+        e.preventDefault();
+        onChange(
+          e.key === "Home"
+            ? min
+            : e.key === "End"
+              ? max
+              : Math.max(
+                  min,
+                  Math.min(max, value + (e.key === "ArrowRight" ? 20 : -20)),
+                ),
+        );
       }}
       onPointerDown={(e) => {
+        if (e.button !== 0) return;
+        e.preventDefault();
+        start.current = { x: e.clientX, value };
+        onDragStart?.();
         e.currentTarget.setPointerCapture(e.pointerId);
       }}
       onPointerMove={(e) => {
-        if (e.currentTarget.hasPointerCapture(e.pointerId)) {
-          const rect = e.currentTarget.parentElement!.getBoundingClientRect();
-          onChange(Math.max(min, Math.min(max, e.clientX - rect.left)));
-        }
+        if (e.currentTarget.hasPointerCapture(e.pointerId))
+          onChange(start.current.value + e.clientX - start.current.x);
       }}
       onPointerUp={(e) => {
         if (e.currentTarget.hasPointerCapture(e.pointerId))
           e.currentTarget.releasePointerCapture(e.pointerId);
+        onDragEnd?.();
       }}
+      onLostPointerCapture={() => onDragEnd?.()}
+      onPointerCancel={() => onDragEnd?.()}
     />
   );
 }

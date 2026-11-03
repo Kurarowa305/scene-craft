@@ -23,6 +23,7 @@ import {
   shellStyle,
 } from "./ui";
 import "./style.css";
+import { usePaneLayout } from "./pane-layout";
 
 function App() {
   const fileInput = useRef<HTMLInputElement>(null);
@@ -37,21 +38,8 @@ function App() {
     "work" | "settings" | "reflection" | "works" | null
   >(null);
   const [settingsTab, setSettingsTab] = useState("version");
-  const [sidebarWidth, setSidebarWidth] = useState(235);
-  const [mainWidth, setMainWidth] = useState(590);
-  const [viewport, setViewport] = useState(window.innerWidth);
-  const maxMainWidth = Math.max(
-    315,
-    Math.min(1000, viewport - sidebarWidth - 309),
-  );
-  useEffect(() => {
-    const resize = () => setViewport(window.innerWidth);
-    window.addEventListener("resize", resize);
-    return () => window.removeEventListener("resize", resize);
-  }, []);
-  useEffect(() => {
-    setMainWidth((width) => Math.min(width, maxMainWidth));
-  }, [maxMainWidth]);
+  const shell = useRef<HTMLDivElement>(null);
+  const panes = usePaneLayout(shell);
   const [showPanel, setShowPanel] = useState(false);
   const [connectionRevision, setConnectionRevision] = useState(0);
   const [statuses, setStatuses] = useState<Record<string, string>>({});
@@ -317,10 +305,22 @@ function App() {
     );
   return (
     <div
+      ref={shell}
       className={`shell ${showPanel ? "mobile-panel" : ""}`}
-      style={shellStyle(sidebarWidth, mainWidth)}
+      style={shellStyle(panes.widths[0], panes.widths[1])}
     >
-      <aside className="sidebar">
+      <aside
+        className={`sidebar ${panes.collapsed[0] ? "pane-collapsed" : ""}`}
+      >
+        {panes.collapsed[0] && (
+          <button
+            className="pane-restore"
+            aria-label="チャット一覧を表示"
+            onClick={() => panes.restore(0)}
+          >
+            ☰
+          </button>
+        )}
         <div className="brand">
           <span className="brand-mark">s</span>
           <span className="brand-name">scene-craft</span>
@@ -431,16 +431,22 @@ function App() {
           </button>
         </div>
       </aside>
-      <ResizeHandle
-        label="作品一覧の幅"
-        value={sidebarWidth}
-        onChange={setSidebarWidth}
-        min={180}
-        max={360}
-      />
+      <ResizeHandle label="作品一覧の幅" {...panes.handle(0)} />
       <div className="workspace">
         <div className="workspace-body">
-          <main className="main-chat" aria-label="メインチャット">
+          <main
+            className={`main-chat ${panes.collapsed[1] ? "pane-collapsed" : ""}`}
+            aria-label="メインチャット"
+          >
+            {panes.collapsed[1] && (
+              <button
+                className="pane-restore"
+                aria-label="メインチャットを表示"
+                onClick={() => panes.restore(1)}
+              >
+                ▤
+              </button>
+            )}
             <header className="chat-header">
               <h1>
                 {conversationId
@@ -503,6 +509,7 @@ function App() {
                             type="button"
                             role="menuitem"
                             onClick={() => {
+                              panes.restore(2);
                               setShowPanel(true);
                               document.dispatchEvent(
                                 new CustomEvent("open-artifacts"),
@@ -653,68 +660,75 @@ function App() {
               </div>
             )}
           </main>
-          <ResizeHandle
-            label="チャットと右タブの幅"
-            value={mainWidth}
-            onChange={setMainWidth}
-            min={315}
-            max={maxMainWidth}
-          />
-          <SideChats
-            key={conversationId || workId}
-            mainId={conversationId}
-            connectionRevision={connectionRevision}
-            workId={workId}
-            recordRevision={recordRevision + records.length}
-            names={sideNames}
-            onMobileBack={() => setShowPanel(false)}
-            styleContent={
-              work ? (
-                <>
-                  <h2>作風・制作方針</h2>
-                  <p className="intro">
-                    作品の制作意図は、一般的な制作方針より優先します。
-                  </p>
-                  <div className="list-row">
-                    <div>
-                      <strong>この作品の制作意図</strong>
-                      <p>{work.intent ?? "未入力"}</p>
+          <ResizeHandle label="チャットと右タブの幅" {...panes.handle(1)} />
+          <div
+            className={`tab-region ${panes.collapsed[2] ? "pane-collapsed" : ""}`}
+          >
+            {panes.collapsed[2] && (
+              <button
+                className="pane-restore"
+                aria-label="右タブを表示"
+                onClick={() => panes.restore(2)}
+              >
+                ▣
+              </button>
+            )}
+            <SideChats
+              key={conversationId || workId}
+              mainId={conversationId}
+              connectionRevision={connectionRevision}
+              workId={workId}
+              recordRevision={recordRevision + records.length}
+              names={sideNames}
+              onMobileBack={() => setShowPanel(false)}
+              styleContent={
+                work ? (
+                  <>
+                    <h2>作風・制作方針</h2>
+                    <p className="intro">
+                      作品の制作意図は、一般的な制作方針より優先します。
+                    </p>
+                    <div className="list-row">
+                      <div>
+                        <strong>この作品の制作意図</strong>
+                        <p>{work.intent ?? "未入力"}</p>
+                      </div>
                     </div>
-                  </div>
-                  <WorkVersions workId={workId} revision={versionRevision} />
-                  <label className="field">
-                    この作品に適用する版
-                    <select disabled>
-                      <option>{work.style?.commit ?? "作風なし"}</option>
-                    </select>
-                  </label>
-                  <button disabled className="secondary">
-                    選んだ版を作品に適用
-                  </button>
-                  <Unavailable>作風の変更・制作方針の採用</Unavailable>
-                </>
-              ) : undefined
-            }
-            filesContent={
-              conversationId && workId ? (
-                <FileRecords
-                  recordRevision={recordRevision}
-                  onBusy={setBusy}
-                  workId={workId}
-                  conversationId={conversationId}
-                  disabled={busy || loading || uploading || pendingImport}
-                  onRecord={(record) => {
-                    setRecords((previous) =>
-                      previous.some((item) => item.id === record.id)
-                        ? previous
-                        : [...previous, record],
-                    );
-                    setRecordRevision((value) => value + 1);
-                  }}
-                />
-              ) : undefined
-            }
-          />
+                    <WorkVersions workId={workId} revision={versionRevision} />
+                    <label className="field">
+                      この作品に適用する版
+                      <select disabled>
+                        <option>{work.style?.commit ?? "作風なし"}</option>
+                      </select>
+                    </label>
+                    <button disabled className="secondary">
+                      選んだ版を作品に適用
+                    </button>
+                    <Unavailable>作風の変更・制作方針の採用</Unavailable>
+                  </>
+                ) : undefined
+              }
+              filesContent={
+                conversationId && workId ? (
+                  <FileRecords
+                    recordRevision={recordRevision}
+                    onBusy={setBusy}
+                    workId={workId}
+                    conversationId={conversationId}
+                    disabled={busy || loading || uploading || pendingImport}
+                    onRecord={(record) => {
+                      setRecords((previous) =>
+                        previous.some((item) => item.id === record.id)
+                          ? previous
+                          : [...previous, record],
+                      );
+                      setRecordRevision((value) => value + 1);
+                    }}
+                  />
+                ) : undefined
+              }
+            />
+          </div>
         </div>
       </div>
       {modal === "works" && (
