@@ -14,10 +14,13 @@ export const writeContextTools = [
   "create_manual_record",
   "update_manual_record",
 ] as const;
-export const contextTools = [
+export const readContextTools = [
   "get_execution_context",
   "find_records",
   "read_records",
+] as const;
+export const contextTools = [
+  ...readContextTools,
   ...writeContextTools,
   "record_human_decision",
 ] as const;
@@ -91,6 +94,9 @@ export async function startContextRpc(store: ReturnType<typeof openStore>) {
     let r = authorize(input);
     const args = input.args;
     const tool = input.tool;
+    const side = store.sides.get(r.conversationId);
+    if (side && !readContextTools.includes(tool))
+      throw new OperationError(403, "SIDE_CHAT_READ_ONLY");
     if (!contextTools.includes(tool))
       throw new OperationError(403, "PERMISSION_DENIED");
     if (
@@ -164,24 +170,51 @@ export async function startContextRpc(store: ReturnType<typeof openStore>) {
     )
       throw new OperationError(400, "INVALID_CURSOR");
     return store.contextOperation(args.operationId, r.id, { tool, args }, () =>
-      tool === "get_execution_context"
-        ? {
-            requestId: r.id,
-            role: r.role ?? "none",
-            execution: bindings.get(args.contextRef),
-            fixed: r.contextSnapshot,
-            current: store.context.context(r.workId),
-            conversationSummaries: store.auxiliary.context(r.workId),
-            plan: r.plan,
-            remainingRetries: 2 - r.retryCount,
-            unavailable: [
-              "production",
-              "protection",
-              "human_decision",
-              "file_attachment",
-            ],
-          }
-        : store.context.history(r.workId, after, afterRequests),
+      side
+        ? tool === "get_execution_context"
+          ? {
+              requestId: r.id,
+              role: "consultation",
+              fixed: side,
+              execution: bindings.get(args.contextRef),
+              plan: r.plan,
+              readOnly: true,
+            }
+          : {
+              records: side.history.records.slice(after, after + 50),
+              requests: side.history.requests.slice(
+                afterRequests,
+                afterRequests + 50,
+              ),
+              conversations: side.history.conversations,
+              revisions: side.history.revisions,
+              nextAfter:
+                after + 50 < side.history.records.length ? after + 50 : null,
+              nextRequestAfter:
+                afterRequests + 50 < side.history.requests.length
+                  ? afterRequests + 50
+                  : null,
+              originalText: true,
+              fixedAt: side.createdAt,
+            }
+        : tool === "get_execution_context"
+          ? {
+              requestId: r.id,
+              role: r.role ?? "none",
+              execution: bindings.get(args.contextRef),
+              fixed: r.contextSnapshot,
+              current: store.context.context(r.workId),
+              conversationSummaries: store.auxiliary.context(r.workId),
+              plan: r.plan,
+              remainingRetries: 2 - r.retryCount,
+              unavailable: [
+                "production",
+                "protection",
+                "human_decision",
+                "file_attachment",
+              ],
+            }
+          : store.context.history(r.workId, after, afterRequests),
     );
   }
   const server = createServer((socket) => {
@@ -232,16 +265,20 @@ export async function startContextRpc(store: ReturnType<typeof openStore>) {
     setInterpreter(value: NonNullable<typeof interpret>) {
       interpret = value;
     },
-    configuration(conversationId: string) {
+    configuration(conversationId: string, readOnly = false) {
       let credential = connections.get(conversationId);
       if (!credential) {
         credential = randomBytes(32).toString("hex");
         connections.set(conversationId, credential);
       }
       return {
+        "mcp_servers.scene_craft.enabled_tools": readOnly
+          ? [...readContextTools]
+          : [...contextTools],
         "mcp_servers.scene_craft.env": {
           SCENE_CRAFT_RPC_SOCKET: endpoint.socketPath,
           SCENE_CRAFT_RPC_CREDENTIAL: credential,
+          SCENE_CRAFT_READ_ONLY: readOnly ? "1" : "0",
         },
       };
     },

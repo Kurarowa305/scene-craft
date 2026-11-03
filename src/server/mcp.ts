@@ -1,6 +1,8 @@
 import { createInterface } from "node:readline";
 import { createConnection } from "node:net";
-import { contextTools } from "./context-rpc.js";
+import { contextTools, readContextTools } from "./context-rpc.js";
+const availableTools: readonly string[] =
+  process.env.SCENE_CRAFT_READ_ONLY === "1" ? readContextTools : contextTools;
 
 // Dedicated stdio adapter: no DB, filesystem updates, shell or production process.
 const socketPath = process.env.SCENE_CRAFT_RPC_SOCKET;
@@ -54,7 +56,7 @@ lines.on("line", async (line) => {
     else if (message.method === "ping") result = {};
     else if (message.method === "tools/list")
       result = {
-        tools: contextTools.map((name) => ({
+        tools: availableTools.map((name) => ({
           name,
           description:
             name === "record_human_decision"
@@ -88,7 +90,7 @@ lines.on("line", async (line) => {
       };
     else if (
       message.method === "tools/call" &&
-      contextTools.includes(message.params?.name)
+      availableTools.includes(message.params?.name)
     ) {
       const value: any = await invoke(
         message.params.name,

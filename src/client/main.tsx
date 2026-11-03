@@ -5,6 +5,7 @@ import { read, write } from "./api";
 import { FileRecords } from "./file-records";
 import { VersionSettings, WorkVersions } from "./versions";
 import { Chat } from "./chat";
+import { SideChats } from "./side-chats";
 import "./style.css";
 
 function App() {
@@ -457,6 +458,13 @@ function App() {
             </div>
           )}
         </main>
+        {conversationId && workId && (
+          <SideChats
+            key={conversationId}
+            mainId={conversationId}
+            workId={workId}
+          />
+        )}
       </div>
     </div>
   );
