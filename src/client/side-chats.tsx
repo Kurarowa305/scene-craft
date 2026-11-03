@@ -37,7 +37,6 @@ export function SideChats({
   workId,
   recordRevision,
   names,
-  filesContent,
   styleContent,
   onMobileBack,
 }: {
@@ -46,7 +45,6 @@ export function SideChats({
   workId: string;
   recordRevision: number;
   names: Record<string, string | null>;
-  filesContent?: ReactNode;
   styleContent?: ReactNode;
   onMobileBack: () => void;
 }) {
@@ -231,7 +229,6 @@ export function SideChats({
             {t.kind === "catalog" && (
               <div className="panel-page">
                 <h2>成果物</h2>
-                <p className="intro">この作品の保存済みファイル</p>
                 {!states.length && (
                   <p className="muted">成果物はまだありません。</p>
                 )}
@@ -245,7 +242,7 @@ export function SideChats({
                         show({
                           id: `file-${s.id}-${f.id}`,
                           kind: "artifact",
-                          title: f.source.relativePath,
+                          title: f.source.relativePath.split("/").at(-1)!,
                           state: s,
                           file: f,
                         });
@@ -253,17 +250,14 @@ export function SideChats({
                     >
                       <Icon name="image" />
                       <span>
-                        <strong>{f.source.relativePath}</strong>
-                        <small>
-                          {new Date(s.createdAt).toLocaleString("ja-JP")} ·{" "}
-                          {s.application}
-                        </small>
+                        <strong>
+                          {f.source.relativePath.split("/").at(-1)}
+                        </strong>
                       </span>
                       <span className="arrow">↗</span>
                     </button>
                   )),
                 )}
-                {filesContent}
               </div>
             )}
             {t.kind === "artifact" && t.state && t.file && (

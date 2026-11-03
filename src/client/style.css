@@ -1524,8 +1524,8 @@ dialog .dialog-footer {
   height: 32px;
 }
 .model-options .icon svg {
-  width: 21px;
-  height: 21px;
+  width: 17px;
+  height: 17px;
 }
 .chat-entry-row {
   display: flex;
@@ -1664,4 +1664,77 @@ dialog .dialog-footer {
       display: none;
     }
   }
+}
+
+/* Low contrast scrollbars and geometrically centered composer actions. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #62656270 transparent;
+}
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #62656270;
+  border-radius: 8px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #777a7780;
+}
+.send {
+  display: grid;
+  place-items: center;
+  padding: 0;
+}
+.send > .icon {
+  width: 16px;
+  height: 16px;
+}
+.send > .icon svg {
+  width: 16px;
+  height: 16px;
+}
+.submenu-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 9px 12px;
+  text-align: left;
+  border-radius: 6px;
+}
+.artifact-submenu {
+  position: fixed;
+  z-index: 1001;
+  width: 260px;
+  max-height: min(360px, calc(100dvh - 16px));
+  overflow: auto;
+  padding: 6px;
+  border: 1px solid #ffffff25;
+  border-radius: 10px;
+  background: #262c24;
+  box-shadow: 0 10px 45px #0007;
+}
+.artifact-submenu > button {
+  display: flex;
+  width: 100%;
+  gap: 10px;
+  align-items: center;
+  padding: 8px;
+  text-align: left;
+  border-radius: 6px;
+}
+.artifact-submenu img {
+  width: 36px;
+  height: 36px;
+  object-fit: cover;
+  border-radius: 5px;
+  flex: none;
+}
+.artifact-submenu span {
+  overflow-wrap: anywhere;
 }

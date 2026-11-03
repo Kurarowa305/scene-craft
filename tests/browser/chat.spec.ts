@@ -191,9 +191,13 @@ test("モデル選択・SSE再接続・会話継続・停止を画面から行�
     .fill(`記録を訂正: ${imported.state.recordId} reason 明暗差を整えるため`);
   await page.getByRole("button", { name: "Codexへ送信", exact: true }).click();
   await openArtifacts(page);
-  await expect(
-    page.locator(".saved-state-text").filter({ hasText: "明暗差を整えるため" }),
-  ).toBeVisible();
+  await expect
+    .poll(async () =>
+      (await recordBodies(page, "Codex確認")).some((body) =>
+        body.includes("明暗差を整えるため"),
+      ),
+    )
+    .toBe(true);
   releaseInitial();
   await Promise.all(returned);
   await expect
@@ -203,9 +207,13 @@ test("モデル選択・SSE再接続・会話継続・停止を画面から行�
       ),
     )
     .toBe(true);
-  await expect(
-    page.locator(".saved-state-text").filter({ hasText: "明暗差を整えるため" }),
-  ).toBeVisible();
+  await expect
+    .poll(async () =>
+      (await recordBodies(page, "Codex確認")).some((body) =>
+        body.includes("明暗差を整えるため"),
+      ),
+    )
+    .toBe(true);
   await page
     .getByLabel("メッセージ", { exact: true })
     .fill("手作業で「Photoshopで空の色を調整した」を記録して");

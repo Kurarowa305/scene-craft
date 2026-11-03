@@ -8,7 +8,7 @@ import type {
 } from "../shared/files";
 import type { Work, Conversation, BodyRecord } from "../shared/contracts";
 import { read, write, uploadFile, SaveError } from "./api";
-import { FileRecords } from "./file-records";
+import { SavedImageSubmenu } from "./saved-image-menu";
 import { VersionSettings, WorkVersions } from "./versions";
 import { Chat } from "./chat";
 import { ChatEntry } from "./chat-entry";
@@ -583,20 +583,13 @@ function App() {
                           <div className="menu-heading">
                             制作ファイルと保存状態
                           </div>
-                          <button
-                            type="button"
-                            role="menuitem"
-                            onClick={() => {
-                              panes.restore(2);
-                              setShowPanel(true);
-                              document.dispatchEvent(
-                                new CustomEvent("open-artifacts"),
-                              );
-                              close();
-                            }}
-                          >
-                            保存済み成果物を開く
-                          </button>
+                          <SavedImageSubmenu
+                            workId={workId}
+                            onSelect={(file) =>
+                              transferFiles([{ id: crypto.randomUUID(), file }])
+                            }
+                            onDone={close}
+                          />
                           <button
                             type="button"
                             role="menuitem"
@@ -790,17 +783,6 @@ function App() {
                     </button>
                     <Unavailable>作風の変更・制作方針の採用</Unavailable>
                   </>
-                ) : undefined
-              }
-              filesContent={
-                conversationId && workId ? (
-                  <FileRecords
-                    recordRevision={recordRevision}
-                    onSaved={() => setRecordRevision((value) => value + 1)}
-                    onBusy={setBusy}
-                    workId={workId}
-                    disabled={busy || loading || uploading || pendingImport}
-                  />
                 ) : undefined
               }
             />

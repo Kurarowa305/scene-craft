@@ -506,14 +506,11 @@ export function Chat({
                   !draft.trim()
                 }
               >
-                ↑
+                <Icon name="send" />
               </button>
             )}
           </div>
         </form>
-        {side && (
-          <p className="composer-footnote">制作データ・記録は変更しません</p>
-        )}
       </div>
     </section>
   );

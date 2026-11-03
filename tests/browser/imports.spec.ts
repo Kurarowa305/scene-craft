@@ -30,10 +30,10 @@ test("作品作成で既存ファイルを選んで取り込み、成果物タ�
   await expect(
     page.getByText("制作ファイルを添付して記録", { exact: true }),
   ).toHaveCount(0);
-  await expect(page.locator(".saved-state")).toHaveCount(1);
-  await expect(page.locator(".saved-state")).toContainText(
-    "取り込み前の経緯は不明",
-  );
+  await expect(page.getByRole("button", { name: /drawing.psd/ })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "保存状態", exact: true }),
+  ).toHaveCount(0);
   await expect
     .poll(() => recordBodies(page, "最初のファイルから開始"))
     .toEqual(["drawing.psdを取り込みました。"]);
@@ -45,7 +45,9 @@ test("作品作成で既存ファイルを選んで取り込み、成果物タ�
     .getByRole("button", { name: "未命名のチャット 1", exact: true })
     .click();
   await openArtifacts(page);
-  await expect(page.locator(".saved-state")).toHaveCount(1);
+  await expect(
+    page.getByRole("button", { name: /drawing[.]psd/ }),
+  ).toBeVisible();
 });
 
 test("初期取り込みの応答を失っても同じ作品と会話で再試行する", async ({
@@ -90,7 +92,9 @@ test("初期取り込みの応答を失っても同じ作品と会話で再試�
   ).json();
   expect(chats).toHaveLength(1);
   await openArtifacts(page);
-  await expect(page.locator(".saved-state")).toHaveCount(1);
+  await expect(
+    page.getByRole("button", { name: /start[.]blend/ }),
+  ).toBeVisible();
 });
 
 test("初期ファイルの受け渡しが失敗しても作成済み作品を開いて続けられる", async ({
@@ -119,7 +123,9 @@ test("初期ファイルの受け渡しが失敗しても作成済み作品を�
   await expect(page.getByRole("dialog")).toHaveCount(0);
   await expect(page.getByLabel("メッセージ", { exact: true })).toBeVisible();
   await openArtifacts(page);
-  await expect(page.locator(".saved-state")).toHaveCount(0);
+  await expect(
+    page.getByText("成果物はまだありません。", { exact: true }),
+  ).toBeVisible();
   await openWorkDialog(page);
   await expect(page.getByLabel("作品名", { exact: true })).toBeEnabled();
   await expect(page.getByLabel("作品名", { exact: true })).toHaveValue("");
@@ -156,7 +162,7 @@ test("作品作成が明示的に拒否されたらファイルを保持した�
   await dialog.getByRole("button", { name: "作品を作成", exact: true }).click();
   await expect(dialog).toHaveCount(0);
   await openArtifacts(page);
-  await expect(page.locator(".saved-state")).toHaveCount(1);
+  await expect(page.getByRole("button", { name: /start[.]psd/ })).toBeVisible();
 });
 
 test("取り込みの結果がまだ不明なら中止済みとしてモーダルを閉じない", async ({
@@ -192,74 +198,4 @@ test("取り込みの結果がまだ不明なら中止済みとしてモーダ�
     .click();
   await expect(dialog).toBeVisible();
   await expect(dialog.getByRole("alert")).toContainText("保存状態を確認中");
-});
-
-test("再読み込み後も保存済みの未確定取り込み入力で再送できる", async ({
-  page,
-}) => {
-  await page.goto("/");
-  await openWorkDialog(page);
-  await page.getByLabel("作品名", { exact: true }).fill("取り込み復旧入口");
-  await page
-    .getByRole("dialog")
-    .getByRole("button", { name: "作品を作成", exact: true })
-    .click();
-  await page
-    .getByRole("button", {
-      name: "取り込み復旧入口に新しいチャット",
-      exact: true,
-    })
-    .click();
-  const works = await (await page.request.get("/api/works")).json();
-  const work = works.find(
-    (item: { name: string }) => item.name === "取り込み復旧入口",
-  );
-  const [chat] = await (
-    await page.request.get(`/api/works/${work.id}/conversations`)
-  ).json();
-  const { csrfToken } = await (await page.request.get("/api/session")).json();
-  const pending = {
-    requestKey: crypto.randomUUID(),
-    body: "復旧対象の保存済み入力",
-    application: "Photoshop",
-    beforeStateId: null,
-    files: [{ rootId: "source", relativePath: "absent.psd", role: "psd" }],
-  };
-  const failure = await page.request.post(
-    `/api/conversations/${chat.id}/imports`,
-    {
-      headers: {
-        "x-csrf-token": csrfToken,
-        origin: new URL(page.url()).origin,
-      },
-      data: pending,
-    },
-  );
-  expect(failure.ok()).toBe(false);
-  await page.reload();
-  await page
-    .getByRole("button", { name: "取り込み復旧入口", exact: true })
-    .click();
-  await page
-    .getByRole("button", { name: "未命名のチャット 1", exact: true })
-    .click();
-  await openArtifacts(page);
-  let resent: unknown;
-  await page.route(`**/api/conversations/${chat.id}/imports`, async (route) => {
-    resent = route.request().postDataJSON();
-    await route.continue();
-  });
-  await page
-    .getByRole("button", { name: "同じ内容で再送", exact: true })
-    .click();
-  await expect.poll(() => resent).toEqual(pending);
-  await expect(
-    page.getByRole("button", { name: "未完成の登録を中止", exact: true }),
-  ).toBeVisible();
-  await page
-    .getByRole("button", { name: "未完成の登録を中止", exact: true })
-    .click();
-  await expect(
-    page.getByRole("button", { name: "同じ内容で再送", exact: true }),
-  ).toHaveCount(0);
 });
