@@ -176,6 +176,7 @@ export function Popup({
   const [open, setOpen] = useState(false);
   const [position, setPosition] = useState({ left: 0, top: 0, maxWidth: 240 });
   const anchor = useRef<HTMLDivElement>(null);
+  const trigger = useRef<HTMLButtonElement>(null);
   const panel = useRef<HTMLDivElement>(null);
   useLayoutEffect(() => {
     if (!open || !anchor.current || !panel.current) return;
@@ -207,9 +208,17 @@ export function Popup({
         setOpen(false);
     }
     function escape(event: KeyboardEvent) {
-      if (event.key === "Escape") setOpen(false);
+      if (event.key === "Escape") {
+        setOpen(false);
+        trigger.current?.focus();
+      }
     }
     place();
+    panel.current
+      .querySelector<HTMLElement>(
+        "button:not(:disabled), select:not(:disabled), input:not(:disabled), [tabindex='0']",
+      )
+      ?.focus();
     window.addEventListener("resize", place);
     document.addEventListener("pointerdown", dismiss, true);
     document.addEventListener("focusin", dismiss);
@@ -226,6 +235,7 @@ export function Popup({
       <button
         type="button"
         className="icon popup-trigger"
+        ref={trigger}
         aria-label={label}
         aria-haspopup="menu"
         aria-expanded={open}

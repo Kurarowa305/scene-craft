@@ -31,10 +31,18 @@ test("手作業記録と空表示を会話から外し、三点メニューで�
   await expect(
     page.getByText("チャットに表示しない手作業本文", { exact: true }),
   ).toHaveCount(0);
+  const nameMenu = page.getByRole("button", {
+    name: "未命名のチャット 1のメニュー",
+    exact: true,
+  });
+  await nameMenu.focus();
+  await nameMenu.press("Enter");
+  await expect(
+    page.getByRole("menuitem", { name: "編集", exact: true }),
+  ).toBeFocused();
   await page
-    .getByRole("button", { name: "未命名のチャット 1のメニュー", exact: true })
-    .click();
-  await page.getByRole("menuitem", { name: "編集", exact: true }).click();
+    .getByRole("menuitem", { name: "編集", exact: true })
+    .press("Enter");
   const input = page.getByRole("textbox", {
     name: "チャット名を編集",
     exact: true,
@@ -124,9 +132,10 @@ test("Enter送信・Shift Enter改行と、外側を押して閉じるポップ�
   await expect(
     page.getByRole("menu", { name: "モデルの詳細設定", exact: true }),
   ).toBeVisible();
-  await page
-    .getByRole("heading", { name: "未命名のチャット 1", exact: true })
-    .click();
+  await page.keyboard.press("Escape");
+  await expect(
+    page.getByRole("button", { name: "モデルの詳細設定", exact: true }),
+  ).toBeFocused();
   await expect(
     page.getByRole("menu", { name: "モデルの詳細設定", exact: true }),
   ).toHaveCount(0);
@@ -161,4 +170,76 @@ test("Enter送信・Shift Enter改行と、外側を押して閉じるポップ�
       .getByRole("button", { name: "新しいタブ", exact: true })
       .boundingBox();
   expect(add!.x - (last!.x + last!.width)).toBeLessThanOrEqual(12);
+});
+
+test("成果物を選び直した後も、相談作成の応答喪失を初回の入力で回復する", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await openSettings(page);
+  const git = JSON.parse(readFileSync("test-results/git-fixture.json", "utf8"));
+  await page.getByLabel("定義のフルコミット").fill(git.definition);
+  await page
+    .getByRole("button", { name: "既定定義を保存", exact: true })
+    .click();
+  await openWorkDialog(page);
+  await page.getByLabel("作品名", { exact: true }).fill("相談の再試行入力");
+  await page
+    .getByRole("dialog", { name: "作品を作成" })
+    .getByRole("button", { name: "作品を作成", exact: true })
+    .click();
+  await page
+    .getByRole("button", {
+      name: "相談の再試行入力に新しいチャット",
+      exact: true,
+    })
+    .click();
+  await page
+    .getByLabel("コンピューターからファイルを選択", { exact: true })
+    .setInputFiles({
+      name: "context.psd",
+      mimeType: "application/octet-stream",
+      buffer: Buffer.from("saved file"),
+    });
+  await expect(page.getByText("context.psd", { exact: true })).toBeVisible();
+  await page.getByLabel("メッセージ", { exact: true }).fill("相談用の状態");
+  await sendRecord(page);
+  await expect(page.getByLabel("メッセージ", { exact: true })).toHaveValue("");
+  await page.route(
+    "**/api/conversations/*/side-chats",
+    async (route) => {
+      if (route.request().method() !== "POST") return route.continue();
+      await route.fetch();
+      await route.abort("failed");
+    },
+    { times: 1 },
+  );
+  await choosePanel(page, "サイドチャット");
+  await expect(
+    page.getByRole("button", { name: "再試行", exact: true }),
+  ).toBeVisible();
+  await choosePanel(page, "成果物");
+  await page.getByRole("button", { name: /context.psd.*Photoshop/ }).click();
+  await page.getByRole("tab", { name: "サイドチャット", exact: true }).click();
+  await page.getByRole("button", { name: "再試行", exact: true }).click();
+  await expect(
+    page.getByRole("region", { name: "サイドチャットの会話" }),
+  ).toBeVisible();
+  const works = await (await page.request.get("/api/works")).json();
+  const work = works.find(
+    (w: { name: string }) => w.name === "相談の再試行入力",
+  );
+  const main = (
+    await (await page.request.get(`/api/works/${work.id}/conversations`)).json()
+  )[0];
+  const sides = await (
+    await page.request.get(`/api/conversations/${main.id}/side-chats`)
+  ).json();
+  expect(sides).toHaveLength(1);
+  const context = await (
+    await page.request.get(
+      `/api/conversations/${sides[0].conversationId}/side-context`,
+    )
+  ).json();
+  expect(context.selectedStates).toEqual([]);
 });

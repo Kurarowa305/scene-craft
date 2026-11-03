@@ -54,7 +54,9 @@ export function SideChats({
     {},
   );
   const creating = useRef(new Set<string>());
-  const creationKeys = useRef(new Map<string, string>());
+  const creationInputs = useRef(
+    new Map<string, { requestKey: string; selectedStateIds: string[] }>(),
+  );
   const [states, setStates] = useState<SavedState[]>([]);
   const [tabs, setTabs] = useState<Tab[]>([
     { id: "new", kind: "new", title: "新しいタブ" },
@@ -122,12 +124,14 @@ export function SideChats({
     creating.current.add(target);
     setError("");
     try {
-      const requestKey =
-        creationKeys.current.get(target) ?? crypto.randomUUID();
-      creationKeys.current.set(target, requestKey);
+      const input = creationInputs.current.get(target) ?? {
+        requestKey: crypto.randomUUID(),
+        selectedStateIds: selectedState ? [selectedState] : [],
+      };
+      creationInputs.current.set(target, input);
       const side = await write<SideChat>(
         `/api/conversations/${mainId}/side-chats`,
-        { requestKey, selectedStateIds: selectedState ? [selectedState] : [] },
+        input,
         false,
       );
       setTabs((previous) =>
