@@ -14,7 +14,7 @@
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File '\\wsl.localhost\Ubuntu\home\oyadomaritaiki\scene-craft\scripts\windows\Update-Installation.ps1'
 ```
 
-起動中なら左下の「設定・保存データ」→「アプリ終了」を押す。終了後にデスクトップの`scene-craft`または`scene-craft UI #102`をダブルクリックする。2026-11-04に両入口を統合済みチェックアウトへ更新した。最新版のLauncherは新規バックエンドの起動前に、そのチェックアウトを自動ビルドする。起動中の旧プロセスは自動置換しない。ビルド失敗は`BUILD_FAILED`で停止する。設定の既定定義Git版は自動で変更しない。
+起動中なら左下の「アプリ終了」を押す。終了後にデスクトップの`scene-craft`または`scene-craft UI #102`をダブルクリックする。2026-11-04に両入口を統合済みチェックアウトへ更新した。最新版のLauncherは新規バックエンドの起動前に、そのチェックアウトを自動ビルドする。起動中の旧プロセスは自動置換しない。ビルド失敗は`BUILD_FAILED`で停止する。設定の既定定義Git版は自動で変更しない。
 
 隔離した実機確認を行う場合は次を使う。既存アプリを終了してポートを空ける。通常の制作フォルダーと別のWindows管理フォルダー・WSL DBを作り、対象コミットと環境、各手動項目の未実施状態をJSONへ残す。
 
@@ -72,3 +72,5 @@ Windows更新入口は`-Config`で別の起動設定も指定できる。既存�
 ```powershell
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File '\\wsl.localhost\Ubuntu\home\oyadomaritaiki\scene-craft\scripts\windows\Update-Installation.ps1' -Config "$env:LOCALAPPDATA\scene-craft\ui-102\launcher.json"
 ```
+
+統合後確認：`npm run check`で型検査・API/保存84件・画面36件・ビルド成功。仕様軸・規約軸レビューは指摘なし。[統合UIの画面](../implementation-evidence/issue-65-ui/reference-panel.png)、[Windows配信確認](../implementation-evidence/issue-65-ui/windows-smoke.json)を保存した。Windows確認は一時DB・専用ポート4339で行い、標準の制作DBへ作品・会話・画像を追加していない。通常版とUI #102のWindows起動スクリプトを更新し、既存UI #102設定のrepositoryを統合チェックアウトへ変更した。実Codex推論・人間の実機操作の未実施とは区別する。
