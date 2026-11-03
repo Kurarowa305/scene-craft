@@ -159,6 +159,24 @@ createInterface({ input: process.stdin }).on("line", (line) => {
       send({ id: m.id, result: { turn } });
       return;
     }
+    if (p.outputSchema?.properties?.planId) {
+      const input = JSON.parse(p.input[0].text);
+      // Recorded semantic results at the external Codex boundary.
+      const actions = {
+        "「港の計画」を採用して。構図が合うため。": "accept",
+        "「港の計画」の仮説backを採用して。": "accept",
+        "「港の計画」の仮説backは保留して。": "hold",
+        "「港の計画」を修正して。岸壁の幅を12mにして。": "revise",
+      };
+      const status = actions[input.currentHumanMessage] ?? "not_requested";
+      turn.status = "completed";
+      turn.items = [{ id: "item-" + turn.id, type: "agentMessage", text: JSON.stringify({
+        status, planId: status === "not_requested" ? null : input.requestedPlanId,
+        hypothesisId: status === "not_requested" ? null : input.requestedHypothesisId, question: null,
+      }) }];
+      send({ id: m.id, result: { turn } });
+      return;
+    }
     if (p.outputSchema?.properties?.referenceId) {
       const input = JSON.parse(p.input[0].text);
       const selected = [

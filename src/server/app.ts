@@ -162,6 +162,7 @@ export async function createApp(options: AppOptions) {
           conversationSummaries: store.auxiliary.context(workId),
           states: store.states(workId),
           references: store.references.context(workId),
+          scenePlans: store.scenePlans.view(workId),
           plan,
           style: plan.style
             ? JSON.parse(
@@ -205,6 +206,27 @@ export async function createApp(options: AppOptions) {
       return reply
         .type(c.image.mime ?? "application/octet-stream")
         .send(store.references.image(c));
+    },
+  );
+  app.get<{ Params: { id: string } }>(
+    "/api/works/:id/scene-plans",
+    { schema: { params: idParams } },
+    async (req) => {
+      store.context.context(req.params.id);
+      return store.scenePlans.view(req.params.id);
+    },
+  );
+  app.get<{ Params: { id: string } }>(
+    "/api/scene-plans/:id",
+    { schema: { params: idParams } },
+    async (req) => {
+      const plan = store.scenePlans.find(req.params.id);
+      return {
+        plan,
+        decisions: store.scenePlans
+          .view(plan.workId)
+          .decisions.filter((d) => d.planId === plan.id),
+      };
     },
   );
   app.get("/api/roles", async () => {

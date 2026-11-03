@@ -3,6 +3,7 @@ import type { SideChat } from "../shared/side-chat";
 import type { SavedState, FixedFile } from "../shared/files";
 import { read, write } from "./api";
 import { ImagePreview } from "./image-preview";
+import { ScenePlans } from "./scene-plans";
 import { References } from "./references";
 import { Chat } from "./chat";
 import { Icon, Unavailable } from "./ui";
@@ -16,17 +17,21 @@ type Kind =
   | "style"
   | "reference"
   | "artifact"
-  | "reference-detail";
+  | "reference-detail"
+  | "planning"
+  | "plan-detail";
 interface Tab {
   id: string;
   kind: Kind;
   title: string;
   referenceId?: string;
+  planId?: string;
   sideId?: string;
   state?: SavedState;
   file?: FixedFile;
 }
 const choices = [
+  ["planning", "image", "シーン計画", "部品・概寸・仮説とその判断を確認"],
   ["catalog", "image", "成果物", "この作品のファイル・編集案を開く"],
   ["side", "chat", "サイドチャット", "制作と並行して、気になることを相談"],
   ["history", "history", "制作履歴", "分岐と手修正のつながりを見る"],
@@ -106,6 +111,23 @@ export function SideChats({
     }
     document.addEventListener("open-reference", open);
     return () => document.removeEventListener("open-reference", open);
+  }, [workId, onReveal]);
+  useEffect(() => {
+    function open(event: Event) {
+      const detail = (
+        event as CustomEvent<{ id: string; title: string; workId: string }>
+      ).detail;
+      if (!detail || detail.workId !== workId) return;
+      show({
+        id: "plan-" + detail.id,
+        kind: "plan-detail",
+        title: detail.title,
+        planId: detail.id,
+      });
+      onReveal();
+    }
+    document.addEventListener("open-scene-plan", open);
+    return () => document.removeEventListener("open-scene-plan", open);
   }, [workId, onReveal]);
   function sideTitle(id: string) {
     return names[id] ?? sideTitles[id] ?? "未命名のサイドチャット";
@@ -367,6 +389,13 @@ export function SideChats({
                   ここから別作品を作成
                 </button>
               </div>
+            )}
+            {(t.kind === "planning" || t.kind === "plan-detail") && (
+              <ScenePlans
+                workId={workId}
+                revision={recordRevision}
+                planId={t.planId}
+              />
             )}
             {(t.kind === "reference" || t.kind === "reference-detail") && (
               <References

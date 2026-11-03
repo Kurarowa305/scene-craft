@@ -6,6 +6,11 @@ import {
   referenceToolRequired,
   referenceToolDescriptions,
 } from "../shared/reference-tools.js";
+import {
+  planToolProperties,
+  planToolRequired,
+  planToolDescriptions,
+} from "../shared/scene-plans.js";
 const availableTools: readonly string[] =
   process.env.SCENE_CRAFT_READ_ONLY === "1" ? readContextTools : contextTools;
 
@@ -64,6 +69,7 @@ lines.on("line", async (line) => {
         tools: availableTools.map((name) => ({
           name,
           description:
+            planToolDescriptions[name] ??
             referenceToolDescriptions[name] ??
             (name === "record_human_decision"
               ? "Unavailable: downstream decision handling is not implemented."
@@ -74,7 +80,7 @@ lines.on("line", async (line) => {
             required: [
               "contextRef",
               "operationId",
-              ...(referenceToolRequired[name] ?? []),
+              ...(planToolRequired[name] ?? referenceToolRequired[name] ?? []),
             ],
             properties: {
               contextRef: { type: "string" },
@@ -82,7 +88,8 @@ lines.on("line", async (line) => {
                 type: "string",
                 description: "Stable UUID for retransmission",
               },
-              ...(referenceToolProperties[name] ??
+              ...(planToolProperties[name] ??
+                referenceToolProperties[name] ??
                 ([
                   "get_execution_context",
                   "find_records",

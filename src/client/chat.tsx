@@ -10,6 +10,7 @@ import {
 import type { BodyRecord } from "../shared/contracts";
 import type { ChatModel, ChatView, ModelChoice } from "../shared/chat";
 import { read, write } from "./api";
+import { PlanLinks, useScenePlans } from "./scene-plans";
 import { ReferenceLinks, useReferences } from "./references";
 import { Icon, Popup } from "./ui";
 
@@ -91,6 +92,10 @@ export function Chat({
   const contextRevision = useRef(-1);
   const [view, setView] = useState<ChatView>();
   const references = useReferences(
+    side ? undefined : view?.requests[0]?.workId,
+    view?.revision ?? 0,
+  );
+  const scenePlans = useScenePlans(
     side ? undefined : view?.requests[0]?.workId,
     view?.revision ?? 0,
   );
@@ -336,6 +341,15 @@ export function Chat({
                   candidates={
                     references.view?.candidates.filter(
                       (c) => c.requestId === r.id,
+                    ) ?? []
+                  }
+                />
+              )}
+              {!side && (
+                <PlanLinks
+                  plans={
+                    scenePlans.view?.plans.filter(
+                      (p) => p.source.requestId === r.id,
                     ) ?? []
                   }
                 />

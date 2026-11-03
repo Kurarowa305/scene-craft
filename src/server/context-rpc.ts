@@ -10,6 +10,8 @@ import type { RecordInterpretation } from "../shared/record-instruction.js";
 import { referenceService } from "./references.js";
 import { referenceToolProperties } from "../shared/reference-tools.js";
 import type { ReferenceFetcher } from "./reference-fetch.js";
+import { planToolProperties } from "../shared/scene-plans.js";
+import { scenePlanService, type PlanInterpreter } from "./scene-plans.js";
 import { sideReference } from "./side-store.js";
 
 export const writeContextTools = [
@@ -27,6 +29,7 @@ export const contextTools = [
   ...readContextTools,
   ...writeContextTools,
   "record_human_decision",
+  "save_scene_plan",
   "fetch_reference_page",
   "save_reference",
   "select_reference",
@@ -54,6 +57,12 @@ export async function startContextRpc(
       throw new OperationError(409, "REFERENCE_INTERPRETATION_FAILED");
     return referenceInterpreter(r, id, current);
   });
+  let planInterpreter: PlanInterpreter | undefined;
+  const plans = scenePlanService(store, (...args) => {
+    if (!planInterpreter)
+      throw new OperationError(409, "PLAN_INTERPRETATION_FAILED");
+    return planInterpreter(...args);
+  });
   const fetching = new Map<
     string,
     { input: string; promise: Promise<unknown> }
@@ -70,6 +79,7 @@ export async function startContextRpc(
     }
   >();
   const connections = new Map<string, string>();
+  let changed: (conversationId: string) => void = () => {};
   let generation = randomUUID();
   const sockets = new Set<Socket>();
   let interpret:
@@ -125,7 +135,7 @@ export async function startContextRpc(
       !/^[a-zA-Z0-9-]{8,100}$/.test(args.operationId)
     )
       throw new OperationError(400, "INVALID_OPERATION_ID");
-    if (tool in referenceToolProperties) {
+    if (tool in referenceToolProperties || tool in planToolProperties) {
       const fixedRequest = r;
       const current = () => {
         const latest = authorize(input);
@@ -146,14 +156,21 @@ export async function startContextRpc(
         return pending.promise;
       }
       const promise = (async () => {
-        const commit = await references(r, tool, args, current);
+        const commit = await (tool in planToolProperties ? plans : references)(
+          r,
+          tool,
+          args,
+          current,
+        );
         current();
-        return store.contextOperation(
+        const result = store.contextOperation(
           args.operationId,
           r.id,
           { tool, args },
           commit,
         );
+        changed(r.conversationId);
+        return result;
       })();
       fetching.set(args.operationId, { input: serialized, promise });
       try {
@@ -210,8 +227,6 @@ export async function startContextRpc(
             : store.context.apply(r, tool, args),
       );
     }
-    if (tool === "record_human_decision")
-      throw new OperationError(409, "FEATURE_UNAVAILABLE");
     const keys = [
       "contextRef",
       "operationId",
@@ -265,6 +280,7 @@ export async function startContextRpc(
               conversationSummaries: store.auxiliary.context(r.workId),
               plan: r.plan,
               references: store.references.context(r.workId),
+              scenePlans: store.scenePlans.view(r.workId),
               ...(r.role === "reference"
                 ? { referenceCandidates: store.references.view(r.workId) }
                 : {}),
@@ -324,6 +340,12 @@ export async function startContextRpc(
   await chmod(endpoint.socketPath, 0o600);
   return {
     endpoint,
+    onChange(callback: (conversationId: string) => void) {
+      changed = callback;
+    },
+    setPlanInterpreter(value: PlanInterpreter) {
+      planInterpreter = value;
+    },
     setReferenceInterpreter(
       value: import("./references.js").ReferenceInterpreter,
     ) {
