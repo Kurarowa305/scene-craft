@@ -2,7 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { chatFixture } from "./chat-fixture.js";
 import { spawn } from "node:child_process";
-import { readFile, stat } from "node:fs/promises";
+import { readFile, stat, writeFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import { createInterface } from "node:readline";
 
@@ -103,6 +103,57 @@ test(
         (await f.read(`/api/conversations/${f.chat.id}/records`)).length,
         0,
       );
+    } finally {
+      client?.close();
+      await f.close();
+    }
+  },
+);
+
+test(
+  "旧解釈threadの遅い失敗で、停止後に再開した新しい試行を止めない",
+  { timeout: 10000 },
+  async () => {
+    const f = await chatFixture(true);
+    let client: Awaited<ReturnType<typeof mcp>> | undefined;
+    try {
+      const r = await f.post(`/api/conversations/${f.chat.id}/messages`, {
+        body: "手作業で「Photoshopで空の色を調整した」を記録して",
+      });
+      client = await mcp(f);
+      const current = await client.current();
+      await writeFile(
+        join(f.directory, "codex/hold-interpretation-start"),
+        "hold",
+      );
+      const pending = client.call("record_manual_work", {
+        contextRef: current.contextRef,
+        sourceRequestId: r.id,
+      });
+      await waitFor(async () => {
+        try {
+          await stat(
+            join(f.directory, "codex/fixture-interpretation-start-held"),
+          );
+          return true;
+        } catch {
+          return false;
+        }
+      });
+      await f.post(`/api/chat-requests/${r.id}/stop`);
+      await waitFor(async () => Boolean((await f.view()).requests[0].terminal));
+      await f.post(`/api/chat-requests/${r.id}/resume`);
+      await waitFor(
+        async () =>
+          (await f.view()).requests[0].retryCount === 1 &&
+          Boolean((await f.view()).requests[0].turnId),
+      );
+      await pending;
+      const latest = (await f.view()).requests[0];
+      assert.equal(latest.retryCount, 1);
+      assert.equal(latest.phase, "running");
+      assert.equal(latest.error, null);
+      assert.equal(latest.recordInterpretation, undefined);
     } finally {
       client?.close();
       await f.close();

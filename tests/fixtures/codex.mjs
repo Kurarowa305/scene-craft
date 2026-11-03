@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // External protocol fixture only; the application uses its production stdio adapter.
 import { createInterface } from "node:readline";
-import { writeFileSync, readFileSync } from "node:fs";
+import { writeFileSync, readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import { spawn } from "node:child_process";
 async function recordInstruction(context, body, threadId) {
@@ -119,6 +119,20 @@ createInterface({ input: process.stdin }).on("line", (line) => {
         JSON.stringify(threadEnvironments.get(id) ?? {}),
       );
     result = { thread: { id }, model: p.model, modelProvider: "openai" };
+    if (
+      p.baseInstructions?.startsWith("Interpret the CURRENT human message") &&
+      existsSync(join(process.env.CODEX_HOME, "hold-interpretation-start"))
+    ) {
+      writeFileSync(
+        join(process.env.CODEX_HOME, "fixture-interpretation-start-held"),
+        "ready",
+      );
+      setTimeout(
+        () => send({ id: m.id, result: { ...result, model: "fixture-b" } }),
+        650,
+      );
+      return;
+    }
   }
   if (m.method === "thread/unsubscribe") result = { status: "unsubscribed" };
   if (m.method === "turn/start") {

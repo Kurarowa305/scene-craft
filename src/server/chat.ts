@@ -72,7 +72,11 @@ export function registerChat(
         stillCurrent,
       );
     } catch (error) {
-      if (error instanceof OperationError && blockingErrors.has(error.code)) {
+      if (
+        error instanceof OperationError &&
+        blockingErrors.has(error.code) &&
+        stillCurrent()
+      ) {
         const latest = chat.get(request.id);
         latest.error = error.code;
         latest.phase = latest.terminal ? "blocked" : "stopping";
